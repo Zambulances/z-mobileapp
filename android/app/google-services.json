@@ -1,0 +1,199 @@
+{
+  "project_info": {
+    "project_number": "214496791559",
+    "firebase_url": "https://tagxi-340103-default-rtdb.firebaseio.com",
+    "project_id": "tagxi-340103",
+    "storage_bucket": "tagxi-340103.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214496791559:android:d2dd107c133a16f2e2eea2",
+        "android_client_info": {
+          "package_name": "com.driver.tagxi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tagxi.user",
+                "app_store_id": "1608868419"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214496791559:android:bc84c3979128cd1ce2eea2",
+        "android_client_info": {
+          "package_name": "com.firebase.clean"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214496791559-s3qol2gn4sdkp2injgpe39jbd6o9bu1p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.firebase.clean",
+            "certificate_hash": "acfc208ce5b529d4328354f7f3541da552ab592c"
+          }
+        },
+        {
+          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tagxi.user",
+                "app_store_id": "1608868419"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214496791559:android:2a904adbd5b0d34ee2eea2",
+        "android_client_info": {
+          "package_name": "com.tagxi.operator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214496791559-h5ki1f1od2fdo2b24pr3uol3tuqspunp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tagxi.operator",
+            "certificate_hash": "b6f68583c64953291101c4aaf8edc4a841d41571"
+          }
+        },
+        {
+          "client_id": "214496791559-mjm6emnj708lie3o5j76akv1j06pf7re.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tagxi.operator",
+            "certificate_hash": "9c79dfa50c59f9c738a641ac6839861a8dbf45e2"
+          }
+        },
+        {
+          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tagxi.user",
+                "app_store_id": "1608868419"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214496791559:android:9a383c3780116fc3e2eea2",
+        "android_client_info": {
+          "package_name": "com.tagxi.user"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214496791559-5u4kc265gvl939lm1a34u67um42qfj2n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tagxi.user",
+            "certificate_hash": "9c79dfa50c59f9c738a641ac6839861a8dbf45e2"
+          }
+        },
+        {
+          "client_id": "214496791559-is8v3lcclp6o1931jrm8l4rg7d191u0t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tagxi.user",
+            "certificate_hash": "760f4fe53f3be4d2ba6c7a540a48c89f678abad0"
+          }
+        },
+        {
+          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tagxi.user",
+                "app_store_id": "1608868419"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
