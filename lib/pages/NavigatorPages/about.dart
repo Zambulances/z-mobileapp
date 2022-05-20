@@ -76,7 +76,7 @@ class _AboutState extends State<About> {
                         InkWell(
                           onTap: () {
                             openBrowser(
-                                'https://ondemandappz.com/privacy-policy.php');
+                                'https://tagyourtaxi.com/privacy-policy');
                           },
                           child: Text(
                             languages[choosenLanguage]
@@ -94,7 +94,7 @@ class _AboutState extends State<About> {
                         InkWell(
                           onTap: () {
                             openBrowser(
-                                'https://ondemandappz.com/privacy-policy.php');
+                                'https://tagyourtaxi.com/privacy-policy');
                           },
                           child: Text(
                             languages[choosenLanguage]['text_privacy'],
@@ -110,7 +110,7 @@ class _AboutState extends State<About> {
                         //website
                         InkWell(
                           onTap: () {
-                            openBrowser('https://ondemandappz.com');
+                            openBrowser('https://tagyourtaxi.com');
                           },
                           child: Text(
                             languages[choosenLanguage]['text_about'],

@@ -50,7 +50,7 @@ bool internet = true;
 
 //base url
 String url = 'https://tagxi-server.ondemandappz.com/';
-String mqttUrl = '52.91.17.40';
+String mqttUrl = '';
 int mqttPort = 1883;
 String mapkey = 'AIzaSyBeVRs1icwooRpk7ErjCEQCwu0OQowVt9I';
  String mapStyle = '';
@@ -93,9 +93,11 @@ validateEmail() async {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
       } else {
+        debugPrint(response.body);
         result = 'failed';
       }
     } else {
+      debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
   } catch (e) {
@@ -197,6 +199,7 @@ uploadDocs() async {
     if (request.statusCode == 200) {
       result = val['message'];
     } else {
+      debugPrint(val);
       result = val['message'];
     }
   } catch (e) {
@@ -229,6 +232,7 @@ getCountryCode() async {
           : 0;
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'error';
     }
   } catch (e) {
@@ -345,6 +349,8 @@ getServiceLocation() async {
     if (response.statusCode == 200) {
       serviceLocations = jsonDecode(response.body)['data'];
       res = 'success';
+    }else{
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -369,6 +375,8 @@ getvehicleType() async {
     if (response.statusCode == 200) {
       vehicleType = jsonDecode(response.body)['data'];
       res = 'success';
+    }else{
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -394,6 +402,8 @@ getVehicleMake() async {
     if (response.statusCode == 200) {
       vehicleMake = jsonDecode(response.body)['data'];
       res = 'success';
+    }else{
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -418,6 +428,8 @@ getVehicleModel() async {
     if (response.statusCode == 200) {
       vehicleModel = jsonDecode(response.body)['data'];
       res = 'success';
+    }else{
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -466,6 +478,7 @@ registerDriver() async {
       await getUserDetails();
       result = 'true';
     } else {
+      debugPrint(response.body);
       result = 'false';
     }
   } catch (e) {
@@ -493,9 +506,11 @@ updateReferral() async {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'true';
       } else {
+        debugPrint(response.body);
         result = 'false';
       }
     } else {
+      debugPrint(response.body);
       result = 'false';
     }
   } catch (e) {
@@ -526,6 +541,7 @@ getDocumentsNeeded() async {
       enableDocumentSubmit = jsonDecode(response.body)['enable_submit_button'];
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -577,6 +593,7 @@ verifyUser(String number) async {
         val = false;
       }
     } else {
+      debugPrint(response.body);
       val = false;
     }
   } catch (e) {
@@ -610,7 +627,7 @@ driverLogin() async {
       result = true;
       pref.setString('Bearer', bearerToken[0].token);
     } else {
-      
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -637,9 +654,17 @@ getUserDetails() async {
     );
     if (response.statusCode == 200) {
       
+      
       userDetails = jsonDecode(response.body)['data'];
+      
 
       sosData = userDetails['sos']['data'];
+      if(userDetails['mqtt_ip'] != null && userDetails['mqtt_ip'] != ''){
+        mqttUrl = userDetails['mqtt_ip'];
+        if(client == ''){
+         client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
+        }
+      }
 
       if (userDetails['onTripRequest'] != null) {
         driverReq = userDetails['onTripRequest']['data'];
@@ -648,6 +673,7 @@ getUserDetails() async {
           waitingBeforeStart();
         }
         else if(driverReq['is_completed'] == 0 && driverReq['is_trip_start'] == 1 && rideTimer == null){
+          print('waiting after started');
           waitingAfterStart();
         }
         
@@ -675,6 +701,7 @@ getUserDetails() async {
       }
       result = true;
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -699,7 +726,7 @@ class BearerClass {
 }
 
 Map<String, dynamic> driverReq = {};
-var client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
+dynamic client = '';
 bool userReject = false;
 
 //mqtt for documents approvals
@@ -710,6 +737,7 @@ mqttForDocuments() async {
   client.autoReconnect = true;
 
   try {
+    print(mqttUrl + ' is mqtt url');
     await client.connect();
   } on NoConnectionException catch (e) {
     debugPrint(e.toString());
@@ -835,8 +863,11 @@ driverStatus() async {
       result = true;
       if (userDetails['active'] == false) {
         userInactive();
+      }else{
+        userActive();
       }
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -864,6 +895,8 @@ currentPositionUpdate() async {
     permission = await locs.hasPermission();
       if (userDetails['active'] == true &&
           serviceEnabled == true &&
+          mqttUrl != '' &&
+          client != '' &&
           permission == PermissionStatus.granted) {
         if (await locs.isBackgroundModeEnabled() == false) {
           await locs.enableBackgroundMode(enable: true);
@@ -958,7 +991,7 @@ requestDetailsUpdate(
       lastLong = lng;
     } else {
       var distance = await calculateDistance(lastLat, lastLong, lat, lng);
-      if (distance >= 10.0) {
+      if (distance >= 110.0) {
         latlngArray.add({'lat': lat, 'lng': lng});
         lastLat = lat;
         lastLong = lng;
@@ -1016,6 +1049,16 @@ userInactive() {
   });
 }
 
+userActive() {
+  final _position = FirebaseDatabase.instance.ref();
+  _position.child('drivers/' + userDetails['id'].toString()).update({
+    'is_active': 1,
+    'l': {'0': center.latitude, '1': center.longitude},
+    'updated_at': ServerValue.timestamp,
+    'is_available': userDetails['available'],
+  });
+}
+
 calculateIdleDistance(lat1, lon1, lat2, lon2) {
   
 
@@ -1053,7 +1096,9 @@ requestAccept() async {
         duration = 0;
         valueNotifierHome.incrementNotifier();
       }
-    } else {}
+    } else {
+      debugPrint(response.body);
+    }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -1078,10 +1123,13 @@ requestReject() async {
         audioPlayers.stop();
         audioPlayers.dispose(); 
         await getUserDetails();
+        userActive();
         // audioPlayers.stop();
         valueNotifierHome.incrementNotifier();
       }
-    } 
+    } else{
+      debugPrint(response.body);
+    }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -1134,6 +1182,8 @@ driverArrived() async {
         await getUserDetails();
         valueNotifierHome.incrementNotifier();
       }
+    }else{
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -1181,6 +1231,7 @@ tripStart() async {
       await getUserDetails();
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1212,6 +1263,7 @@ tripStartDispatcher() async {
       await getUserDetails();
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1234,6 +1286,7 @@ geoCoding(double lat, double lng) async {
       var val = jsonDecode(response.body);
       result = val['results'][0]['formatted_address'];
     } else {
+      debugPrint(response.body);
       result = '';
     }
   } catch (e) {
@@ -1309,7 +1362,9 @@ endTrip() async {
       await getUserDetails();
 
       valueNotifierHome.incrementNotifier();
-    } 
+    } else{
+      debugPrint(response.body);
+    }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -1332,11 +1387,14 @@ getPolylines() async {
   try {
     var response = await http.get(Uri.parse(
         'https://maps.googleapis.com/maps/api/directions/json?destination=$pickLat%2C$pickLng&origin=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
-
+  if(response.statusCode == 200){
     var steps =
         jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
 
     decodeEncodedPolyline(steps);
+  }else{
+    debugPrint(response.body);
+  }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -1437,6 +1495,7 @@ userRating() async {
       await getUserDetails();
       result = true;
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -1478,11 +1537,13 @@ cancelRequestDriver(reason) async {
         await FirebaseDatabase.instance.ref().child('requests/' +  driverReq['id']).update({'is_cancelled':true});
         result = true;
         await getUserDetails();
+        userActive();
         valueNotifierHome.incrementNotifier();
       } else {
         result = false;
       }
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -1510,7 +1571,9 @@ getSosData(lat, lng) async {
     if (response.statusCode == 200) {
       sosData = jsonDecode(response.body)['data'];
       valueNotifierHome.incrementNotifier();
-    } 
+    } else{
+      debugPrint(response.body);
+    }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -1536,7 +1599,9 @@ getCurrentMessages() async {
         chatList = jsonDecode(response.body)['data'];
         valueNotifierHome.incrementNotifier();
       }
-    } 
+    } else{
+      debugPrint(response.body);
+    }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -1556,7 +1621,9 @@ sendMessage(chat) async {
         body: jsonEncode({'request_id': driverReq['id'], 'message': chat}));
     if (response.statusCode == 200) {
       getCurrentMessages();
-    } 
+    } else{
+      debugPrint(response.body);
+    }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -1575,7 +1642,9 @@ messageSeen() async {
       body: jsonEncode({'request_id': driverReq['id']}));
   if (response.statusCode == 200) {
     getCurrentMessages();
-  } 
+  } else{
+    debugPrint(response.body);
+  }
 }
 
 //cancellation reason
@@ -1595,6 +1664,7 @@ cancelReason(reason) async {
       cancelReasonsList = jsonDecode(response.body)['data'];
       result = true;
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -1648,6 +1718,7 @@ updateVehicle() async {
       await getUserDetails();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1684,6 +1755,7 @@ updateProfile(name, email) async {
         await getUserDetails();
       }
     } else {
+      debugPrint(val);
       result = 'failure';
     }
   } catch (e) {
@@ -1714,6 +1786,7 @@ updateProfileWithoutImage(name, email) async {
         await getUserDetails();
       }
     } else {
+      debugPrint(val);
       result = 'failure';
     }
   } catch (e) {
@@ -1740,6 +1813,7 @@ getFaqData(lat, lng) async {
       valueNotifierHome.incrementNotifier();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1767,6 +1841,7 @@ getHistory(id) async {
       result = 'success';
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierHome.incrementNotifier();
     }
@@ -1797,6 +1872,7 @@ getHistoryPages(id) async {
       result = 'success';
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierHome.incrementNotifier();
     }
@@ -1830,6 +1906,7 @@ getWalletHistory() async {
       result = 'success';
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierHome.incrementNotifier();
     }
@@ -1860,6 +1937,7 @@ getWalletHistoryPage(page) async {
       result = 'success';
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierHome.incrementNotifier();
     }
@@ -1889,6 +1967,7 @@ addSos(name, number) async {
       await getUserDetails();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1914,6 +1993,7 @@ deleteSos(id) async {
       await getUserDetails();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1941,6 +2021,7 @@ getReferral() async {
       myReferralCode = jsonDecode(response.body)['data'];
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1970,6 +2051,7 @@ getStripePayment(money) async {
       results = 'success';
       stripeToken = jsonDecode(response.body)['data'];
     } else {
+      debugPrint(response.body);
       results = 'failure';
     }
   } catch (e) {
@@ -1999,6 +2081,7 @@ addMoneyStripe(amount, nonce) async {
       await getWalletHistory();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2029,6 +2112,7 @@ getPaystackPayment(money)async{
       results = 'success';
       paystackCode = jsonDecode(response.body)['data'];
     } else {
+      debugPrint(response.body);
       results = 'failure';
     }
   } catch (e) {
@@ -2056,6 +2140,7 @@ addMoneyPaystack(amount, nonce) async {
       paystackCode.clear();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2085,6 +2170,7 @@ addMoneyFlutterwave(amount, nonce) async {
       paystackCode.clear();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2114,6 +2200,7 @@ addMoneyRazorpay(amount, nonce) async {
       paystackCode.clear();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2144,11 +2231,13 @@ getBrianTreeToken()async{
       brainTreeToken = jsonDecode(response.body)['data']['client_token'];
       result = 'success';
     }else{
+      debugPrint(response.body);
       result = 'failure';
     }
     
     
   }else{
+    debugPrint(response.body);
     result = 'failure';
   }
   }catch(e){
@@ -2184,10 +2273,12 @@ getCfToken(money, currency)async{
       cftToken = jsonDecode(response.body);
       result = 'success';
     }else{
+      debugPrint(response.body);
       result = 'failure';
     }
     
   }else{
+    debugPrint(response.body);
     result = 'failure';
   }
   }catch(e){
@@ -2226,9 +2317,11 @@ cashFreePaymentSuccess()async{
         await getWalletHistory();
         await getUserDetails();
       }else{
+        debugPrint(response.body);
         result = 'failure';
       }
     }else{
+      debugPrint(response.body);
       result = 'failure';
     }
   }catch(e){
@@ -2253,6 +2346,7 @@ userLogout() async {
       pref.remove('Bearer');
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2276,7 +2370,7 @@ checkInternetConnection()async {
       client.disconnect();
     } else {
       internet = true;
-      if(client.connectionStatus!.state != ConnectionState.active && client.connectionStatus == null && userDetails.isNotEmpty){
+      if(client.connectionStatus!.state != ConnectionState.active && client.connectionStatus == null && userDetails.isNotEmpty && mqttUrl != '' && client != ''){
         mqttForDocuments();
       }
       valueNotifierHome.incrementNotifier();
@@ -2312,6 +2406,7 @@ driverTodayEarning() async {
       result = 'success';
       driverTodayEarnings = jsonDecode(response.body)['data'];
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2338,6 +2433,7 @@ driverWeeklyEarning() async {
       driverWeeklyEarnings = jsonDecode(response.body)['data'];
       weekDays = jsonDecode(response.body)['data']['week_days'];
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2363,6 +2459,7 @@ driverEarningReport(fromdate, todate) async {
       driverReportEarnings = jsonDecode(response.body)['data'];
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2390,6 +2487,7 @@ requestWithdraw(amount) async {
       await getWithdrawList();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
   } catch (e) {
@@ -2424,6 +2522,7 @@ getWithdrawList() async {
           jsonDecode(response.body)['withdrawal_history']['meta']['pagination'];
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2456,6 +2555,7 @@ getWithdrawListPages(page) async {
           jsonDecode(response.body)['withdrawal_history']['meta']['pagination'];
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2485,6 +2585,7 @@ getBankInfo() async {
       result = 'success';
       bankData = jsonDecode(response.body)['data'];
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2516,6 +2617,7 @@ addBankData(accName, accNo, bankCode, bankName) async {
       await getBankInfo();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2567,6 +2669,7 @@ getGeneralComplaint(type) async {
       generalComplaintList = jsonDecode(response.body)['data'];
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -2595,7 +2698,7 @@ makeGeneralComplaint() async {
      
       result = 'success';
     } else {
-      
+      debugPrint(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -2625,7 +2728,7 @@ makeRequestComplaint() async {
       
       result = 'success';
     } else {
-      
+      debugPrint(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -2698,6 +2801,9 @@ waitingAfterStart()async{
   }
   if(_waitingTime.value != null && waitingTime == null){
     waitingTime = _waitingTime.value;
+  // ignore: prefer_conditional_assignment
+  }else if(waitingTime == null){
+    waitingTime = 0;
   }
   if(_aWaitingTime.value != null){
     waitingAfterTime = _aWaitingTime.value;

@@ -220,13 +220,18 @@ class _SosState extends State<Sos> {
                                 child: Button(
                                     onTap: () async {
                                       //pick contact
+                                      // setState(() {
+                                      //   _isLoading = true;
+                                      // });
                                       var nav = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   const PickContact()));
                                       if (nav) {
-                                        setState(() {});
+                                        setState(() {
+                                          // _isLoading = false;
+                                        });
                                       }
                                     },
                                     text: languages[choosenLanguage]

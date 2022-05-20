@@ -24,6 +24,7 @@ class _VehicleColorState extends State<VehicleColor> {
 
   String uploadError = '';
 
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -124,6 +125,10 @@ class _VehicleColorState extends State<VehicleColor> {
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
+                                  }else{
+                                    setState(() {
+                                      uploadError = languages[choosenLanguage]['text_somethingwentwrong'];
+                                    });
                                   }
                                 } else {
                                   var update = await updateVehicle();

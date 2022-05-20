@@ -43,6 +43,7 @@ class _OtpState extends State<Otp> {
   void initState() {
     _loading = false;
     timers();
+    otpFalse();
     super.initState();
   }
 
@@ -52,6 +53,61 @@ class _OtpState extends State<Otp> {
     super.dispose();
   }
 
+
+//otp is false
+otpFalse()async{
+  if(phoneAuthCheck == false){
+    _loading = true;
+    otpController.text = '123456';
+    otpNumber = otpController.text;
+    var verify =
+                                              await verifyUser(phnumber);
+                                          if (verify == true) {
+                                            if (userDetails[
+                                                    'uploaded_document'] ==
+                                                false) {
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Docs()),
+                                                  (route) => false);
+                                            } else if (userDetails[
+                                                        'uploaded_document'] ==
+                                                    true &&
+                                                userDetails['approve'] ==
+                                                    false) {
+                                              Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const DocsProcess(),
+                                                  ),
+                                                  (route) => false);
+                                            } else if (userDetails[
+                                                        'uploaded_document'] ==
+                                                    true &&
+                                                userDetails['approve'] ==
+                                                    true) {
+                                              mqttForDocuments();
+                                              
+                                                Navigator.pushAndRemoveUntil(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const Maps()),
+                                                    (route) => false);
+                                             
+                                            }
+                                          } else {
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const GetStarted()));
+                                          }
+  }
+}
 
 //auto verify otp
 
@@ -229,7 +285,8 @@ verifyOtp()async{
                                   )
                                 ),
                                 child: TextField(
-                                  autofocus: true,
+                                  controller: otpController,
+                                  autofocus: (phoneAuthCheck == false) ? false : true,
                                   onChanged: (val){
                                     setState(() {
                                       otpNumber = val;

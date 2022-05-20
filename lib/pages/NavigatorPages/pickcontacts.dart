@@ -16,13 +16,15 @@ class PickContact extends StatefulWidget {
   _PickContactState createState() => _PickContactState();
 }
 
+  List contacts = [];
+
 class _PickContactState extends State<PickContact> {
   bool _isLoading = false;
   String pickedName = '';
   String pickedNumber = '';
   bool _contactDenied = false;
 
-  List contacts = [];
+
   @override
   void initState() {
     getContact();
@@ -40,6 +42,7 @@ class _PickContactState extends State<PickContact> {
 
 //fetch contact data
   getContact() async {
+    if(contacts.isEmpty){
     var permission = await getContactPermission();
     if (permission == PermissionStatus.granted) {
       setState(() {
@@ -65,7 +68,7 @@ class _PickContactState extends State<PickContact> {
         _contactDenied = true;
       });
       
-   
+    }
     }
   }
 
@@ -104,12 +107,26 @@ class _PickContactState extends State<PickContact> {
                       ),
                     ),
                     Positioned(
-                        child: InkWell(
-                            onTap: () {
-                              
-                              Navigator.pop(context, false);
-                            },
-                            child: const Icon(Icons.arrow_back)))
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                                onTap: () {
+                                  
+                                  Navigator.pop(context, true);
+                                },
+                                child: const Icon(Icons.arrow_back)),
+
+                                InkWell(
+                                onTap: () {
+                                  setState(() {
+                                  contacts.clear();
+                                  });
+                                  getContact();
+                                },
+                                child: const Icon(Icons.replay_outlined)),
+                          ],
+                        ))
                   ],
                 ),
                 SizedBox(
@@ -262,7 +279,7 @@ class _PickContactState extends State<PickContact> {
                                         _contactDenied = false;
                                         
                                       });
-                                      Navigator.pop(context,false);
+                                      Navigator.pop(context,true);
                                     },
                                     child: Container(
                                                       height: media.width * 0.1,

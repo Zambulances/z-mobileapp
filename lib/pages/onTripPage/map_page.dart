@@ -1247,7 +1247,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                                       Container(
                                                                                         height: media.width * 0.25,
                                                                                         width: media.width * 0.25,
-                                                                                        decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle, image: DecorationImage(image: NetworkImage(driverReq['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
+                                                                                        decoration: BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NetworkImage(driverReq['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
                                                                                       ),
                                                                                       SizedBox(width: media.width * 0.05),
                                                                                       SizedBox(
@@ -1516,7 +1516,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                             width:
                                                                                 media.width * 0.25,
                                                                             decoration: BoxDecoration(
-                                                                                color: Colors.red,
+                                                                                
                                                                                 shape: BoxShape.circle,
                                                                                 image: DecorationImage(image: NetworkImage(driverReq['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
                                                                           ),
