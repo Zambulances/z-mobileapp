@@ -43,7 +43,6 @@ class _ReviewState extends State<Review> {
               color: page,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                
                 children: [
                   Container(
                     height: media.width * 0.25,

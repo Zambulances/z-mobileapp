@@ -17,7 +17,7 @@ class WalletPage extends StatefulWidget {
 
   @override
   _WalletPageState createState() => _WalletPageState();
-} 
+}
 
 dynamic addMoney;
 
@@ -548,9 +548,9 @@ class _WalletPageState extends State<WalletPage> {
                                               if (addMoney != 0 &&
                                                   addMoney != null) {
                                                 setState(() {
-                                                      _choosePayment = true;
-                                                      _addPayment = false;
-                                                    });
+                                                  _choosePayment = true;
+                                                  _addPayment = false;
+                                                });
                                               }
                                             },
                                             text: languages[choosenLanguage]
@@ -566,225 +566,296 @@ class _WalletPageState extends State<WalletPage> {
                             ))
                         : Container(),
 
-                        //choose payment method
-                    (_choosePayment == true) ? Positioned(child: Container(
-                          height: media.height*1,
-                          width: media.width*1,
-                          color: Colors.transparent.withOpacity(0.6),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                      width: media.width * 0.8,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          InkWell(
-                                            onTap: () {
-                                              setState(() {
-                                                _choosePayment = false;
-                                                _addPayment = true;
-                                              });
-                                            },
-                                            child: Container(
-                                              height: media.height * 0.05,
-                                              width: media.height * 0.05,
-                                              decoration: BoxDecoration(
-                                                color: page,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(Icons.cancel,
-                                                  color: buttonColor),
-                                            ),
+                    //choose payment method
+                    (_choosePayment == true)
+                        ? Positioned(
+                            child: Container(
+                            height: media.height * 1,
+                            width: media.width * 1,
+                            color: Colors.transparent.withOpacity(0.6),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: media.width * 0.8,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _choosePayment = false;
+                                            _addPayment = true;
+                                          });
+                                        },
+                                        child: Container(
+                                          height: media.height * 0.05,
+                                          width: media.height * 0.05,
+                                          decoration: BoxDecoration(
+                                            color: page,
+                                            shape: BoxShape.circle,
                                           ),
-                                        ],
+                                          child: Icon(Icons.cancel,
+                                              color: buttonColor),
+                                        ),
                                       ),
-                                    ),
-                                    SizedBox(height: media.width * 0.025),
-                                    Container(
-                                      padding: EdgeInsets.all(media.width*0.05),
-                                      width: media.width*0.8,
-                                      height: media.height*0.6,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color:page
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: media.width * 0.025),
+                                Container(
+                                  padding: EdgeInsets.all(media.width * 0.05),
+                                  width: media.width * 0.8,
+                                  height: media.height * 0.6,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: page),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                          width: media.width * 0.7,
+                                          child: Text(
+                                            languages[choosenLanguage]
+                                                ['text_choose_payment'],
+                                            style: GoogleFonts.roboto(
+                                                fontSize:
+                                                    media.width * eighteen,
+                                                fontWeight: FontWeight.w600),
+                                          )),
+                                      SizedBox(
+                                        height: media.width * 0.05,
                                       ),
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            
-                                                    width: media.width*0.7,
-                                                    child: Text(languages[choosenLanguage]['text_choose_payment'],
-                                                    style: GoogleFonts.roboto(
-                                                      fontSize:media.width*eighteen,
-                                                      fontWeight: FontWeight.w600
-                                                    ),
-                                                    )),
-                                                    SizedBox(height: media.width*0.05,),
-                                          Expanded(
-                                            
-                                            child: SingleChildScrollView(
-                                              physics: const BouncingScrollPhysics(),
-                                              child: Column(
-                                                children: [
-                                                  (walletBalance['stripe'] == true) ?
-                                                    Container(
-                                                      margin: EdgeInsets.only(bottom: media.width*0.025),
-                                                      alignment: Alignment.center,
-                                                    width: media.width*0.7,
-                                                    child: InkWell(
-                                                      onTap: ()async{
-                                                        var val = await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const SelectWallet()));
-                                                if (val) {
-                                                  setState(() {
-                                                    _choosePayment = false;
-                                                    _addPayment = false;
-                                                    addMoney = null;
-                                                    addMoneyController.clear();
-                                                  });
-                                                }
-                                                      },
-                                                      child: Container(
-                                                        width: media.width*0.25,
-                                                        height: media.width*0.125,
-                                                        decoration:const BoxDecoration(
-                                                          image: DecorationImage(image: AssetImage('assets/images/stripe-icon.png'),fit: BoxFit.contain)
+                                      Expanded(
+                                        child: SingleChildScrollView(
+                                          physics:
+                                              const BouncingScrollPhysics(),
+                                          child: Column(
+                                            children: [
+                                              (walletBalance['stripe'] == true)
+                                                  ? Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: media.width *
+                                                              0.025),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      width: media.width * 0.7,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          var val = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const SelectWallet()));
+                                                          if (val) {
+                                                            setState(() {
+                                                              _choosePayment =
+                                                                  false;
+                                                              _addPayment =
+                                                                  false;
+                                                              addMoney = null;
+                                                              addMoneyController
+                                                                  .clear();
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          width: media.width *
+                                                              0.25,
+                                                          height: media.width *
+                                                              0.125,
+                                                          decoration: const BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/stripe-icon.png'),
+                                                                  fit: BoxFit
+                                                                      .contain)),
                                                         ),
-                                                      ),
-                                                    )) : Container(),
-                                                   (walletBalance['paystack'] == true) ?
-                                                    Container(
-                                                      alignment: Alignment.center,
-                                                      margin: EdgeInsets.only(bottom: media.width*0.025),
-                                                    width: media.width*0.7,
-                                                    child: InkWell(
-                                                       onTap: ()async{
-                                                        var val = await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const PayStackPage()));
-                                                if (val) {
-                                                  setState(() {
-                                                    _choosePayment = false;
-                                                    _addPayment = false;
-                                                    addMoney = null;
-                                                    addMoneyController.clear();
-                                                  });
-                                                }
-                                                      },
-                                                      child: Container(
-                                                        width: media.width*0.25,
-                                                        height: media.width*0.125,
-                                                        decoration:const BoxDecoration(
-                                                          image: DecorationImage(image: AssetImage('assets/images/paystack-icon.png'),fit: BoxFit.contain)
+                                                      ))
+                                                  : Container(),
+                                              (walletBalance['paystack'] ==
+                                                      true)
+                                                  ? Container(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      margin: EdgeInsets.only(
+                                                          bottom: media.width *
+                                                              0.025),
+                                                      width: media.width * 0.7,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          var val = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const PayStackPage()));
+                                                          if (val) {
+                                                            setState(() {
+                                                              _choosePayment =
+                                                                  false;
+                                                              _addPayment =
+                                                                  false;
+                                                              addMoney = null;
+                                                              addMoneyController
+                                                                  .clear();
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          width: media.width *
+                                                              0.25,
+                                                          height: media.width *
+                                                              0.125,
+                                                          decoration: const BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/paystack-icon.png'),
+                                                                  fit: BoxFit
+                                                                      .contain)),
                                                         ),
-                                                      ),
-                                                    )) : Container(),
-                                                    (walletBalance['flutter_wave'] == true) ?
-                                                    Container(
-                                                      margin: EdgeInsets.only(bottom: media.width*0.025),
-                                                      alignment: Alignment.center,
-                                                    width: media.width*0.7,
-                                                    child: InkWell(
-                                                       onTap: ()async{
-                                                        var val = await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const FlutterWavePage()));
-                                                if (val) {
-                                                  setState(() {
-                                                    _choosePayment = false;
-                                                    _addPayment = false;
-                                                    addMoney = null;
-                                                    addMoneyController.clear();
-                                                  });
-                                                }
-                                                      },
-                                                      child: Container(
-                                                        width: media.width*0.25,
-                                                        height: media.width*0.125,
-                                                        decoration:const BoxDecoration(
-                                                          image: DecorationImage(image: AssetImage('assets/images/flutterwave-icon.png'),fit: BoxFit.contain)
+                                                      ))
+                                                  : Container(),
+                                              (walletBalance['flutter_wave'] ==
+                                                      true)
+                                                  ? Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: media.width *
+                                                              0.025),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      width: media.width * 0.7,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          var val = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const FlutterWavePage()));
+                                                          if (val) {
+                                                            setState(() {
+                                                              _choosePayment =
+                                                                  false;
+                                                              _addPayment =
+                                                                  false;
+                                                              addMoney = null;
+                                                              addMoneyController
+                                                                  .clear();
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          width: media.width *
+                                                              0.25,
+                                                          height: media.width *
+                                                              0.125,
+                                                          decoration: const BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/flutterwave-icon.png'),
+                                                                  fit: BoxFit
+                                                                      .contain)),
                                                         ),
-                                                      ),
-                                                    )) : Container(),
-                                                    (walletBalance['razor_pay'] == true) ?
-                                                    Container(
-                                                      margin: EdgeInsets.only(bottom: media.width*0.025),
-                                                      alignment: Alignment.center,
-                                                    width: media.width*0.7,
-                                                    child: InkWell(
-                                                       onTap: ()async{
-                                                        var val = await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const RazorPayPage()));
-                                                if (val) {
-                                                  setState(() {
-                                                    _choosePayment = false;
-                                                    _addPayment = false;
-                                                    addMoney = null;
-                                                    addMoneyController.clear();
-                                                  });
-                                                }
-                                                      },
-                                                      child: Container(
-                                                        width: media.width*0.25,
-                                                        height: media.width*0.125,
-                                                        decoration:const BoxDecoration(
-                                                          image: DecorationImage(image: AssetImage('assets/images/razorpay-icon.jpeg'),fit: BoxFit.contain)
+                                                      ))
+                                                  : Container(),
+                                              (walletBalance['razor_pay'] ==
+                                                      true)
+                                                  ? Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: media.width *
+                                                              0.025),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      width: media.width * 0.7,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          var val = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const RazorPayPage()));
+                                                          if (val) {
+                                                            setState(() {
+                                                              _choosePayment =
+                                                                  false;
+                                                              _addPayment =
+                                                                  false;
+                                                              addMoney = null;
+                                                              addMoneyController
+                                                                  .clear();
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          width: media.width *
+                                                              0.25,
+                                                          height: media.width *
+                                                              0.125,
+                                                          decoration: const BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/razorpay-icon.jpeg'),
+                                                                  fit: BoxFit
+                                                                      .contain)),
                                                         ),
-                                                      ),
-                                                    )) : Container(),
-                                                    (walletBalance['cash_free'] == true) ?
-                                                    Container(
-                                                      margin: EdgeInsets.only(bottom: media.width*0.025),
-                                                      alignment: Alignment.center,
-                                                    width: media.width*0.7,
-                                                    child: InkWell(
-                                                       onTap: ()async{
-                                                        var val = await Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const CashFreePage()));
-                                                if (val) {
-                                                  setState(() {
-                                                    _choosePayment = false;
-                                                    _addPayment = false;
-                                                    addMoney = null;
-                                                    addMoneyController.clear();
-                                                  });
-                                                }
-                                                      },
-                                                      child: Container(
-                                                        width: media.width*0.25,
-                                                        height: media.width*0.125,
-                                                        decoration:const BoxDecoration(
-                                                          image: DecorationImage(image: AssetImage('assets/images/cashfree-icon.jpeg'),fit: BoxFit.contain)
+                                                      ))
+                                                  : Container(),
+                                              (walletBalance['cash_free'] ==
+                                                      true)
+                                                  ? Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: media.width *
+                                                              0.025),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      width: media.width * 0.7,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          var val = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          const CashFreePage()));
+                                                          if (val) {
+                                                            setState(() {
+                                                              _choosePayment =
+                                                                  false;
+                                                              _addPayment =
+                                                                  false;
+                                                              addMoney = null;
+                                                              addMoneyController
+                                                                  .clear();
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          width: media.width *
+                                                              0.25,
+                                                          height: media.width *
+                                                              0.125,
+                                                          decoration: const BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/cashfree-icon.jpeg'),
+                                                                  fit: BoxFit
+                                                                      .contain)),
                                                         ),
-                                                      ),
-                                                    )) : Container(),
-                                                    
-                                                    
-                                                ],
-                                              ),
-                                            ),
+                                                      ))
+                                                  : Container(),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    )
-                            ],
-                          ),
-                        )) : Container(),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ))
+                        : Container(),
                     //no internet
                     (internet == false)
                         ? Positioned(

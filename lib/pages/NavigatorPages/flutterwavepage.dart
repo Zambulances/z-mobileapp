@@ -16,76 +16,65 @@ class FlutterWavePage extends StatefulWidget {
   _FlutterWavePageState createState() => _FlutterWavePageState();
 }
 
-
-
 class _FlutterWavePageState extends State<FlutterWavePage> {
   bool _isLoading = false;
   bool _success = false;
   bool _failed = false;
- dynamic flutterwave;
+  dynamic flutterwave;
   @override
   void initState() {
     payMoney();
     super.initState();
   }
 
-
-
 //payment gateway code
-payMoney()async{
-   setState(() {
-                                      _isLoading = true;
-                                    });
+  payMoney() async {
+    setState(() {
+      _isLoading = true;
+    });
 
     final style = FlutterwaveStyle(
-
-        appBarText: "Flutterwave Checkout",
-        buttonColor: buttonColor,
-        appBarIcon:const Icon(Icons.message, color: Color(0xffd0ebff)),
-        buttonTextStyle:const TextStyle(
-          color: Colors.black,
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-      appBarColor:const Color(0xffd0ebff),
-      dialogCancelTextStyle:const TextStyle(
+      appBarText: "Flutterwave Checkout",
+      buttonColor: buttonColor,
+      appBarIcon: const Icon(Icons.message, color: Color(0xffd0ebff)),
+      buttonTextStyle: const TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
+      ),
+      appBarColor: const Color(0xffd0ebff),
+      dialogCancelTextStyle: const TextStyle(
         color: Colors.redAccent,
         fontSize: 16,
       ),
-      dialogContinueTextStyle:const TextStyle(
+      dialogContinueTextStyle: const TextStyle(
         color: Colors.blue,
         fontSize: 16,
       ),
-
     );
 
     final Customer customer = Customer(
-            name: userDetails['name'],
-            phoneNumber: userDetails['mobile'],
-            email: userDetails['email']);
+        name: userDetails['name'],
+        phoneNumber: userDetails['mobile'],
+        email: userDetails['email']);
 
-          flutterwave = Flutterwave(
+    flutterwave = Flutterwave(
+      context: context,
+      style: style,
+      publicKey: "FLWPUBK_TEST-9e6ca8625f1660a249809d7d979a0a72-X",
+      currency: "NGN",
+      txRef: userDetails['id'].toString() + '_' + DateTime.now().toString(),
+      amount: addMoney.toString(),
+      customer: customer,
+      paymentOptions: "ussd, card, barter, payattitude, account",
+      customization: Customization(title: "Test Payment"),
+      isTestMode: true,
+    );
 
-        context: context,
-        style: style,
-        publicKey: "FLWPUBK_TEST-9e6ca8625f1660a249809d7d979a0a72-X",
-        currency: "NGN",
-        txRef: userDetails['id'].toString() + '_' + DateTime.now().toString(),
-        amount: addMoney.toString(),
-        customer: customer,
-        paymentOptions: "ussd, card, barter, payattitude, account",
-        customization: Customization(title: "Test Payment"),
-        isTestMode: true,
-
-        );
-
-
-  
- setState(() {
-   _isLoading = false;
- });
-
-}
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,44 +123,48 @@ payMoney()async{
                         SizedBox(
                           height: media.width * 0.05,
                         ),
-                        Text(walletBalance['currency_symbol'] + ' ' + addMoney.toString(),
-                        style: GoogleFonts.roboto(
-                          fontSize: media.width*twenty,
-                          fontWeight: FontWeight.w600
-                        ),
+                        Text(
+                          walletBalance['currency_symbol'] +
+                              ' ' +
+                              addMoney.toString(),
+                          style: GoogleFonts.roboto(
+                              fontSize: media.width * twenty,
+                              fontWeight: FontWeight.w600),
                         ),
                         SizedBox(
                           height: media.width * 0.05,
                         ),
-                       Button(onTap: ()async{
-                        
-                          final ChargeResponse response = await flutterwave.charge();
+                        Button(
+                            onTap: () async {
+                              final ChargeResponse response =
+                                  await flutterwave.charge();
 // ignore: unnecessary_null_comparison
-if (response != null) {
-
-  if(response.status == 'success') {
-     setState(() {
-                           _isLoading = true;
-                         });
-    var val = await addMoneyFlutterwave(addMoney, response.transactionId);
-    if(val == 'success'){
-      setState(() {
-        _success = true;
-        _isLoading = false;
-      });
-    }
-  } else {
-    setState(() {
-      _failed = true;
-      _isLoading = false;
-    });
-   // Transaction not successful
-  }
-} else {
-  _isLoading = false;
-  Navigator.pop(context,true);
-}
-                       }, text: 'Pay')
+                              if (response != null) {
+                                if (response.status == 'success') {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  var val = await addMoneyFlutterwave(
+                                      addMoney, response.transactionId);
+                                  if (val == 'success') {
+                                    setState(() {
+                                      _success = true;
+                                      _isLoading = false;
+                                    });
+                                  }
+                                } else {
+                                  setState(() {
+                                    _failed = true;
+                                    _isLoading = false;
+                                  });
+                                  // Transaction not successful
+                                }
+                              } else {
+                                _isLoading = false;
+                                Navigator.pop(context, true);
+                              }
+                            },
+                            text: 'Pay')
                       ],
                     ),
                   ),

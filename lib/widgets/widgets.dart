@@ -36,7 +36,6 @@ class _ButtonState extends State<Button> {
       child: Container(
         height: media.width * 0.12,
         width: (widget.width != null) ? widget.width : null,
-        
         padding: EdgeInsets.only(
             left: media.width * twenty, right: media.width * twenty),
         decoration: BoxDecoration(

@@ -9,7 +9,6 @@ import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
-
 class RazorPayPage extends StatefulWidget {
   const RazorPayPage({Key? key}) : super(key: key);
 
@@ -17,13 +16,11 @@ class RazorPayPage extends StatefulWidget {
   _RazorPayPageState createState() => _RazorPayPageState();
 }
 
-
-
 class _RazorPayPageState extends State<RazorPayPage> {
   bool _isLoading = false;
   bool _success = false;
   bool _failed = false;
- dynamic _razorpay;
+  dynamic _razorpay;
 
   @override
   void initState() {
@@ -35,21 +32,19 @@ class _RazorPayPageState extends State<RazorPayPage> {
     super.initState();
   }
 
-
-void _handlePaymentSuccess(PaymentSuccessResponse response)async {
-    var val = await addMoneyRazorpay(addMoney , response.paymentId);
-    if(val == 'success'){
-    setState(() {
-      _success = true;
-      _isLoading = false;
-    });
-    }else{
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    var val = await addMoneyRazorpay(addMoney, response.paymentId);
+    if (val == 'success') {
+      setState(() {
+        _success = true;
+        _isLoading = false;
+      });
+    } else {
       setState(() {
         _failed = true;
         _isLoading = false;
       });
     }
-   
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
@@ -57,35 +52,28 @@ void _handlePaymentSuccess(PaymentSuccessResponse response)async {
       _failed = true;
       _isLoading = false;
     });
-  
   }
 
-  void _handleExternalWallet(ExternalWalletResponse response) {
-   
-  }
-
+  void _handleExternalWallet(ExternalWalletResponse response) {}
 
 //payment gateway code
-payMoney()async{
-   setState(() {
-                                      _isLoading = true;
-                                    });
+  payMoney() async {
+    setState(() {
+      _isLoading = true;
+    });
     var options = {
-  'key': 'rzp_test_L58xOhOjEMu6wF',
-  'amount': addMoney * 100,
-  'name': userDetails['name'],
-  'description': '',
-  'prefill': {
-    'contact': userDetails['mobile'],
-    'email': userDetails['email']
+      'key': 'rzp_test_L58xOhOjEMu6wF',
+      'amount': addMoney * 100,
+      'name': userDetails['name'],
+      'description': '',
+      'prefill': {
+        'contact': userDetails['mobile'],
+        'email': userDetails['email']
+      }
+    };
+
+    await _razorpay.open(options);
   }
-};
-
-await _razorpay.open(options);
-
-                                    
-                                    
-}
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +122,6 @@ await _razorpay.open(options);
                         SizedBox(
                           height: media.width * 0.05,
                         ),
-                       
                       ],
                     ),
                   ),
@@ -174,7 +161,7 @@ await _razorpay.open(options);
                                             setState(() {
                                               _failed = false;
                                             });
-                                            Navigator.pop(context,true);
+                                            Navigator.pop(context, true);
                                           },
                                           text: languages[choosenLanguage]
                                               ['text_ok'])
@@ -186,7 +173,7 @@ await _razorpay.open(options);
                           ))
                       : Container(),
 
-                      //payment success
+                  //payment success
                   (_success == true)
                       ? Positioned(
                           top: 0,
@@ -221,7 +208,7 @@ await _razorpay.open(options);
                                           onTap: () async {
                                             setState(() {
                                               _success = false;
-                                            
+
                                               Navigator.pop(context, true);
                                             });
                                           },

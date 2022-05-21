@@ -379,7 +379,7 @@ class _LoginState extends State<Login> {
                                   InkWell(
                                     onTap: () {
                                       openBrowser(
-                                          'https://ondemandappz.com/privacy-policy.php');
+                                          'https://tagyourtaxi.com/privacy-policy');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]['text_terms'],
@@ -399,7 +399,7 @@ class _LoginState extends State<Login> {
                                   InkWell(
                                     onTap: () {
                                       openBrowser(
-                                          'https://ondemandappz.com/privacy-policy.php');
+                                          'https://tagyourtaxi.com/privacy-policy');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]

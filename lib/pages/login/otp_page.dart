@@ -43,6 +43,7 @@ class _OtpState extends State<Otp> {
   void initState() {
     _loading = false;
     timers();
+    otpFalse();
     super.initState();
   }
 
@@ -51,6 +52,55 @@ class _OtpState extends State<Otp> {
     timer.cancel;
     super.dispose();
   }
+
+  //otp is false
+  otpFalse() async {
+    if (phoneAuthCheck == false) {
+      _loading = true;
+      otpController.text = '123456';
+      otpNumber = otpController.text;
+      var verify = await verifyUser(phnumber);
+
+      if (verify == true) {
+        if (userRequestData.isNotEmpty &&
+            userRequestData['is_completed'] == 1) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const Invoice()),
+              (route) => false);
+        } else if (userRequestData.isNotEmpty &&
+            userRequestData['is_completed'] != 1) {
+          mqttForUser();
+          Future.delayed(const Duration(seconds: 2), () {
+            if (userRequestData['is_rental'] == true) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BookingConfirmation(
+                            type: 1,
+                          )),
+                  (route) => false);
+            } else {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BookingConfirmation()),
+                  (route) => false);
+            }
+          });
+        } else {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const Maps()),
+              (route) => false);
+        }
+      } else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const GetStarted()));
+      }
+    }
+  }
+
   //auto verify otp
 
   verifyOtp() async {
@@ -70,11 +120,21 @@ class _OtpState extends State<Otp> {
             userRequestData['is_completed'] != 1) {
           mqttForUser();
           Future.delayed(const Duration(seconds: 2), () {
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const BookingConfirmation()),
-                (route) => false);
+            if (userRequestData['is_rental'] == true) {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BookingConfirmation(
+                            type: 1,
+                          )),
+                  (route) => false);
+            } else {
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BookingConfirmation()),
+                  (route) => false);
+            }
           });
         } else {
           Navigator.pushAndRemoveUntil(
@@ -200,7 +260,9 @@ class _OtpState extends State<Otp> {
                                     border: Border.all(
                                         color: borderLines, width: 1.2)),
                                 child: TextField(
-                                  autofocus: true,
+                                  controller: otpController,
+                                  autofocus:
+                                      (phoneAuthCheck == false) ? false : true,
                                   onChanged: (val) {
                                     setState(() {
                                       otpNumber = val;
@@ -260,7 +322,7 @@ class _OtpState extends State<Otp> {
                                           if (userRequestData.isNotEmpty &&
                                               userRequestData['is_completed'] ==
                                                   1) {
-                                                    //invoice page
+                                            //invoice page
                                             Navigator.pushAndRemoveUntil(
                                                 context,
                                                 MaterialPageRoute(
@@ -274,13 +336,26 @@ class _OtpState extends State<Otp> {
                                             mqttForUser();
                                             Future.delayed(
                                                 const Duration(seconds: 2), () {
-                                                  // ride page
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const BookingConfirmation()),
-                                                  (route) => false);
+                                              // ride page
+                                              if (userRequestData[
+                                                      'is_rental'] ==
+                                                  true) {
+                                                Navigator.pushAndRemoveUntil(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            BookingConfirmation(
+                                                              type: 1,
+                                                            )),
+                                                    (route) => false);
+                                              } else {
+                                                Navigator.pushAndRemoveUntil(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            BookingConfirmation()),
+                                                    (route) => false);
+                                              }
                                             });
                                           } else {
                                             //home page
@@ -290,7 +365,6 @@ class _OtpState extends State<Otp> {
                                                     builder: (context) =>
                                                         const Maps()),
                                                 (route) => false);
-                                            
                                           }
                                         } else {
                                           //get started
@@ -334,12 +408,25 @@ class _OtpState extends State<Otp> {
                                               Future.delayed(
                                                   const Duration(seconds: 2),
                                                   () {
-                                                Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const BookingConfirmation()),
-                                                    (route) => false);
+                                                if (userRequestData[
+                                                        'is_rental'] ==
+                                                    true) {
+                                                  Navigator.pushAndRemoveUntil(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              BookingConfirmation(
+                                                                type: 1,
+                                                              )),
+                                                      (route) => false);
+                                                } else {
+                                                  Navigator.pushAndRemoveUntil(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              BookingConfirmation()),
+                                                      (route) => false);
+                                                }
                                               });
                                             } else {
                                               Navigator.pushAndRemoveUntil(

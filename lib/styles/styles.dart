@@ -39,4 +39,3 @@ Color online = const Color(0xff309700);
 Color onlineOfflineText = const Color(0xffFFFFFF);
 Color borderLines = const Color(0xffE5E5E5);
 Color starColor = const Color(0xffFac500);
-

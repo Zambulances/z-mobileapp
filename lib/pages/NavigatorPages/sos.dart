@@ -239,7 +239,7 @@ class _SosState extends State<Sos> {
                     ),
                   ),
 
-                  //delete sos 
+                  //delete sos
                   (_isDeleting == true)
                       ? Positioned(
                           top: 0,

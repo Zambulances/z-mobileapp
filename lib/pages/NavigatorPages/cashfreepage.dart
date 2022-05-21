@@ -11,15 +11,12 @@ import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:cashfree_pg/cashfree_pg.dart';
 
-
 class CashFreePage extends StatefulWidget {
   const CashFreePage({Key? key}) : super(key: key);
 
   @override
   _CashFreePageState createState() => _CashFreePageState();
 }
-
-
 
 class _CashFreePageState extends State<CashFreePage> {
   bool _isLoading = false;
@@ -33,56 +30,56 @@ class _CashFreePageState extends State<CashFreePage> {
   }
 
 //payment code
-payMoney()async{
-   setState(() {
-                                      _isLoading = true;
-                                    });
-var getToken = await getCfToken(addMoney.toString(),walletBalance['currency_code'] );
-                                                  if(getToken == 'success'){
-                                                    
-                                                    await CashfreePGSDK.doPayment({
-                                                    'appId':'159508ae34a76191df96dff52d805951',
-                                                    'stage' : 'TEST',
-                                                    'orderId' : cftToken['orderId'],
-                                                    'orderAmount' : addMoney.toString(),
-                                                    'orderCurrency' : walletBalance['currency_code'],
-                                                    'customerPhone' : userDetails['mobile'],
-                                                    'customerEmail' : userDetails['email'],
-                                                    'tokenData' : cftToken['cftoken'],
-                                                    'color1' : '#FCB13D',
-                                                    'color2' : '#ffffff',
-                                                    'customerName' : userDetails['name']
-                                                    }).then((value) async{
-                                                      cfSuccessList = jsonDecode(jsonEncode(value));
-                                                      if(cfSuccessList['txStatus'] == 'SUCCESS'){
-                                                       var verify = await cashFreePaymentSuccess();
-                                                       if(verify == 'success'){
-                                                         setState(() {
-                                                            _success = true;
-                                                  _isLoading = false;
-                                                });
-                                                       }else{
-                                                         setState(() {
-                                                           _failed = true;
-                                                           _isLoading = false;
-                                                         });
-                                                       }
-                                                      }else{
-                                                        setState(() {
-                                                          _failed = true;
-                                                        });
-                                                      }
-                                                    });
-                                                  }else{
-                                                    setState(() {
-                                                      _failed = true;
-                                                    });
-                                                  }
-                                    
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-}
+  payMoney() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var getToken =
+        await getCfToken(addMoney.toString(), walletBalance['currency_code']);
+    if (getToken == 'success') {
+      await CashfreePGSDK.doPayment({
+        'appId': '159508ae34a76191df96dff52d805951',
+        'stage': 'TEST',
+        'orderId': cftToken['orderId'],
+        'orderAmount': addMoney.toString(),
+        'orderCurrency': walletBalance['currency_code'],
+        'customerPhone': userDetails['mobile'],
+        'customerEmail': userDetails['email'],
+        'tokenData': cftToken['cftoken'],
+        'color1': '#FCB13D',
+        'color2': '#ffffff',
+        'customerName': userDetails['name']
+      }).then((value) async {
+        cfSuccessList = jsonDecode(jsonEncode(value));
+        if (cfSuccessList['txStatus'] == 'SUCCESS') {
+          var verify = await cashFreePaymentSuccess();
+          if (verify == 'success') {
+            setState(() {
+              _success = true;
+              _isLoading = false;
+            });
+          } else {
+            setState(() {
+              _failed = true;
+              _isLoading = false;
+            });
+          }
+        } else {
+          setState(() {
+            _failed = true;
+          });
+        }
+      });
+    } else {
+      setState(() {
+        _failed = true;
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +128,6 @@ var getToken = await getCfToken(addMoney.toString(),walletBalance['currency_code
                         SizedBox(
                           height: media.width * 0.05,
                         ),
-                       
                       ],
                     ),
                   ),
@@ -171,7 +167,7 @@ var getToken = await getCfToken(addMoney.toString(),walletBalance['currency_code
                                             setState(() {
                                               _failed = false;
                                             });
-                                            Navigator.pop(context,true);
+                                            Navigator.pop(context, true);
                                           },
                                           text: languages[choosenLanguage]
                                               ['text_ok'])
@@ -183,7 +179,7 @@ var getToken = await getCfToken(addMoney.toString(),walletBalance['currency_code
                           ))
                       : Container(),
 
-                      //payment success
+                  //payment success
                   (_success == true)
                       ? Positioned(
                           top: 0,

@@ -30,28 +30,35 @@ class _LoadingPageState extends State<LoadingPage> {
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-    
     await getDetailsOfDevice();
     if (internet == true) {
       var val = await getLocalData();
 
       if (val == '3') {
-
         if (userRequestData.isNotEmpty &&
             userRequestData['is_completed'] == 1) {
-              //invoice page of ride
+          //invoice page of ride
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const Invoice()),
               (route) => false);
         } else if (userRequestData.isNotEmpty &&
             userRequestData['is_completed'] != 1) {
-              //searching ride page
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const BookingConfirmation()),
-              (route) => false);
+          //searching ride page
+          if (userRequestData['is_rental'] == true) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BookingConfirmation(
+                          type: 1,
+                        )),
+                (route) => false);
+          } else {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => BookingConfirmation()),
+                (route) => false);
+          }
           mqttForUser();
         } else {
           //home page
@@ -76,7 +83,6 @@ class _LoadingPageState extends State<LoadingPage> {
     } else {
       setState(() {});
     }
-   
   }
 
   @override
@@ -122,7 +128,6 @@ class _LoadingPageState extends State<LoadingPage> {
                       },
                     ))
                 : Container(),
-            
           ],
         ),
       ),

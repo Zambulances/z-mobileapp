@@ -77,12 +77,10 @@ class _SelectWalletState extends State<SelectWallet> {
                         SizedBox(
                           height: media.width * 0.05,
                         ),
-                        
                         Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-
                               //card design
                               CardField(
                                 controller: cardController,
@@ -227,7 +225,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                           onTap: () async {
                                             setState(() {
                                               _success = false;
-                                              
+
                                               Navigator.pop(context, true);
                                             });
                                           },

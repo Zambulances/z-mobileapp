@@ -39,7 +39,7 @@ bool internet = true;
 
 //base url
 String url = 'https://tagxi-server.ondemandappz.com/';
-String mqttUrl = '52.91.17.40';
+String mqttUrl = '';
 int mqttPort = 1883;
 String mapkey = 'AIzaSyBeVRs1icwooRpk7ErjCEQCwu0OQowVt9I';
 
@@ -58,6 +58,11 @@ checkInternetConnection() {
     }
   });
 }
+
+// void printWrapped(String text) {
+//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+// }
 
 getDetailsOfDevice() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
@@ -103,9 +108,11 @@ validateEmail() async {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
       } else {
+        debugPrint(response.body);
         result = 'failed';
       }
     } else {
+      debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
     return result;
@@ -206,6 +213,7 @@ getCountryCode() async {
           : 0;
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'error';
     }
   } catch (e) {
@@ -326,11 +334,11 @@ registerUser() async {
       bearerToken.add(BearerClass(
           type: jsonVal['token_type'].toString(),
           token: jsonVal['access_token'].toString()));
-      // SharedPreferences pref = await SharedPreferences.getInstance();
       pref.setString('Bearer', bearerToken[0].token);
       await getUserDetails();
       result = 'true';
     } else {
+      debugPrint(response.body);
       result = 'false';
     }
     return result;
@@ -357,9 +365,11 @@ updateReferral() async {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'true';
       } else {
+        debugPrint(response.body);
         result = 'false';
       }
     } else {
+      debugPrint(response.body);
       result = 'false';
     }
     return result;
@@ -411,6 +421,7 @@ verifyUser(String number) async {
         val = false;
       }
     } else {
+      debugPrint(response.body);
       val = false;
     }
     return val;
@@ -443,6 +454,7 @@ userLogin() async {
       result = true;
       pref.setString('Bearer', bearerToken[0].token);
     } else {
+      debugPrint(response.body);
       result = false;
     }
     return result;
@@ -472,12 +484,18 @@ getUserDetails() async {
           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
       favAddress = userDetails['favouriteLocations']['data'];
       sosData = userDetails['sos']['data'];
+      if (userDetails['mqtt_ip'] != null && userDetails['mqtt_ip'] != '') {
+        mqttUrl = userDetails['mqtt_ip'];
+        if (client == '') {
+          client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
+        }
+      }
       if (userDetails['onTripRequest'] != null) {
         userRequestData = userDetails['onTripRequest']['data'];
         if (userRequestData['accepted_at'] != null) {
           getCurrentMessages();
         }
-        if (client.connectionStatus == null) {
+        if (client.connectionStatus == null && client != '' && mqttUrl != '') {
           mqttForUser();
         }
         valueNotifierHome.incrementNotifier();
@@ -513,6 +531,7 @@ getUserDetails() async {
       }
       result = true;
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -536,13 +555,13 @@ class BearerClass {
 }
 
 Map<String, dynamic> driverReq = {};
-var client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
+dynamic client = '';
 
 //mqtt for documents approvals
 mqttForUser() async {
   client.setProtocolV311();
   client.logging(on: true);
-  client.keepAlivePeriod = 60000;
+  client.keepAlivePeriod = 120;
   client.autoReconnect = true;
 
   try {
@@ -658,6 +677,7 @@ geoCoding(double lat, double lng) async {
       var val = jsonDecode(response.body);
       result = val['results'][0]['formatted_address'];
     } else {
+      debugPrint(response.body);
       result = '';
     }
   } catch (e) {
@@ -688,6 +708,7 @@ getAutoAddress(input, sessionToken, lat, lng) async {
       addAutoFill = jsonDecode(response.body)['predictions'];
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       valueNotifierHome.incrementNotifier();
     }
   } catch (e) {
@@ -707,7 +728,8 @@ geoCodingForLatLng(placeid) async {
     if (response.statusCode == 200) {
       var val = jsonDecode(response.body)['result']['geometry']['location'];
       center = LatLng(val['lat'], val['lng']);
-      // valueNotifierHome.incrementNotifier();
+    } else {
+      debugPrint(response.body);
     }
     return center;
   } catch (e) {
@@ -768,14 +790,13 @@ getPolylines() async {
   try {
     var response = await http.get(Uri.parse(
         'https://maps.googleapis.com/maps/api/directions/json?destination=$pickLat%2C$pickLng&origin=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
-  if(response.statusCode ==200){
-    var steps =
-        jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
-    decodeEncodedPolyline(steps);
-  }else{
-
-  }
-    
+    if (response.statusCode == 200) {
+      var steps =
+          jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
+      decodeEncodedPolyline(steps);
+    } else {
+      debugPrint(response.body);
+    }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
@@ -887,11 +908,13 @@ etaRequest() async {
         }));
 
     if (response.statusCode == 200) {
-      
       etaDetails = jsonDecode(response.body)['data'];
+      choosenVehicle =
+          etaDetails.indexWhere((element) => element['is_default'] == true);
       result = true;
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       if (jsonDecode(response.body)['message'] ==
           "service not available with this location") {
         serviceNotAvailable = true;
@@ -934,6 +957,89 @@ etaRequestWithPromo() async {
       promoStatus = 1;
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
+      promoStatus = 2;
+      promoCode = '';
+      valueNotifierBook.incrementNotifier();
+
+      result = false;
+    }
+    return result;
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+}
+
+//rental eta request
+
+rentalEta() async {
+  dynamic result;
+  try {
+    var response = await http.post(
+        Uri.parse(url + 'api/v1/request/list-packages'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'pick_lat': (userRequestData.isNotEmpty)
+              ? userRequestData['pick_lat']
+              : addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+          'pick_lng': (userRequestData.isNotEmpty)
+              ? userRequestData['pick_lng']
+              : addressList
+                  .firstWhere((e) => e.id == 'pickup')
+                  .latlng
+                  .longitude,
+        }));
+
+    if (response.statusCode == 200) {
+      etaDetails = jsonDecode(response.body)['data'];
+      rentalOption = etaDetails[0]['typesWithPrice']['data'];
+      rentalChoosenOption = 0;
+      result = true;
+      valueNotifierBook.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      result = false;
+    }
+    return result;
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+}
+
+rentalRequestWithPromo() async {
+  dynamic result;
+  try {
+    var response = await http.post(
+        Uri.parse(url + 'api/v1/request/list-packages'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'pick_lat':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+          'pick_lng':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.longitude,
+          'ride_type': 1,
+          'promo_code': promoCode
+        }));
+
+    if (response.statusCode == 200) {
+      etaDetails = jsonDecode(response.body)['data'];
+      rentalOption = etaDetails[0]['typesWithPrice']['data'];
+      rentalChoosenOption = 0;
+      promoCode = '';
+      promoStatus = 1;
+      valueNotifierBook.incrementNotifier();
+    } else {
+      debugPrint(response.body);
       promoStatus = 2;
       promoCode = '';
       valueNotifierBook.incrementNotifier();
@@ -1007,6 +1113,7 @@ createRequest() async {
 
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -1072,6 +1179,7 @@ createRequestWithPromo() async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -1128,12 +1236,14 @@ createRequestLater() async {
               addressList.firstWhere((e) => e.id == 'pickup').address,
           'drop_address': addressList.firstWhere((e) => e.id == 'drop').address,
           'trip_start_time': choosenDateTime.toString().substring(0, 19),
-          'is_later': true
+          'is_later': true,
+          'request_eta_amount': etaDetails[choosenVehicle]['total']
         }));
     if (response.statusCode == 200) {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
@@ -1191,16 +1301,261 @@ createRequestLaterPromo() async {
           'drop_address': addressList.firstWhere((e) => e.id == 'drop').address,
           'promocode_id': etaDetails[choosenVehicle]['promocode_id'],
           'trip_start_time': choosenDateTime.toString().substring(0, 19),
-          'is_later': true
+          'is_later': true,
+          'request_eta_amount': etaDetails[choosenVehicle]['total']
         }));
     if (response.statusCode == 200) {
       myMarkers.clear();
       valueNotifierBook.incrementNotifier();
       result = 'success';
     } else {
+      debugPrint(response.body);
       if (jsonDecode(response.body)['message'] == 'no drivers available') {
         noDriverFound = true;
       } else {
+        tripReqError = true;
+      }
+
+      result = 'failure';
+      valueNotifierBook.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+
+  return result;
+}
+
+//create rental request
+
+createRentalRequest() async {
+  dynamic result;
+  try {
+    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'pick_lat':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+          'pick_lng':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.longitude,
+          'vehicle_type': rentalOption[choosenVehicle]['zone_type_id'],
+          'ride_type': 1,
+          'payment_opt': (rentalOption[choosenVehicle]['payment_type']
+                      .toString()
+                      .split(',')
+                      .toList()[payingVia] ==
+                  'card')
+              ? 0
+              : (rentalOption[choosenVehicle]['payment_type']
+                          .toString()
+                          .split(',')
+                          .toList()[payingVia] ==
+                      'cash')
+                  ? 1
+                  : 2,
+          'pick_address':
+              addressList.firstWhere((e) => e.id == 'pickup').address,
+          'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
+          'rental_pack_id': etaDetails[rentalChoosenOption]['id']
+        }));
+    if (response.statusCode == 200) {
+      mqttForUser();
+      userRequestData = jsonDecode(response.body)['data'];
+
+      result = 'success';
+
+      valueNotifierBook.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      if (jsonDecode(response.body)['message'] == 'no drivers available') {
+        noDriverFound = true;
+      } else {
+        tripReqError = true;
+      }
+
+      result = 'failure';
+      valueNotifierBook.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+      valueNotifierBook.incrementNotifier();
+    }
+  }
+  return result;
+}
+
+createRentalRequestWithPromo() async {
+  dynamic result;
+  try {
+    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'pick_lat':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+          'pick_lng':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.longitude,
+          'vehicle_type': rentalOption[choosenVehicle]['zone_type_id'],
+          'ride_type': 1,
+          'payment_opt': (rentalOption[choosenVehicle]['payment_type']
+                      .toString()
+                      .split(',')
+                      .toList()[payingVia] ==
+                  'card')
+              ? 0
+              : (rentalOption[choosenVehicle]['payment_type']
+                          .toString()
+                          .split(',')
+                          .toList()[payingVia] ==
+                      'cash')
+                  ? 1
+                  : 2,
+          'pick_address':
+              addressList.firstWhere((e) => e.id == 'pickup').address,
+          'promocode_id': rentalOption[choosenVehicle]['promocode_id'],
+          'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
+          'rental_pack_id': etaDetails[rentalChoosenOption]['id']
+        }));
+    if (response.statusCode == 200) {
+      userRequestData = jsonDecode(response.body)['data'];
+      mqttForUser();
+      result = 'success';
+      valueNotifierBook.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      if (jsonDecode(response.body)['message'] == 'no drivers available') {
+        noDriverFound = true;
+      } else {
+        debugPrint(response.body);
+        tripReqError = true;
+      }
+
+      result = 'failure';
+      valueNotifierBook.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
+createRentalRequestLater() async {
+  dynamic result;
+  try {
+    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'pick_lat':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+          'pick_lng':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.longitude,
+          'vehicle_type': rentalOption[choosenVehicle]['zone_type_id'],
+          'ride_type': 1,
+          'payment_opt': (rentalOption[choosenVehicle]['payment_type']
+                      .toString()
+                      .split(',')
+                      .toList()[payingVia] ==
+                  'card')
+              ? 0
+              : (rentalOption[choosenVehicle]['payment_type']
+                          .toString()
+                          .split(',')
+                          .toList()[payingVia] ==
+                      'cash')
+                  ? 1
+                  : 2,
+          'pick_address':
+              addressList.firstWhere((e) => e.id == 'pickup').address,
+          'trip_start_time': choosenDateTime.toString().substring(0, 19),
+          'is_later': true,
+          'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
+          'rental_pack_id': etaDetails[rentalChoosenOption]['id']
+        }));
+    if (response.statusCode == 200) {
+      result = 'success';
+      valueNotifierBook.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      if (jsonDecode(response.body)['message'] == 'no drivers available') {
+        noDriverFound = true;
+      } else {
+        tripReqError = true;
+      }
+
+      result = 'failure';
+      valueNotifierBook.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+    }
+  }
+  return result;
+}
+
+createRentalRequestLaterPromo() async {
+  dynamic result;
+  try {
+    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'pick_lat':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
+          'pick_lng':
+              addressList.firstWhere((e) => e.id == 'pickup').latlng.longitude,
+          'vehicle_type': rentalOption[choosenVehicle]['zone_type_id'],
+          'ride_type': 1,
+          'payment_opt': (rentalOption[choosenVehicle]['payment_type']
+                      .toString()
+                      .split(',')
+                      .toList()[payingVia] ==
+                  'card')
+              ? 0
+              : (rentalOption[choosenVehicle]['payment_type']
+                          .toString()
+                          .split(',')
+                          .toList()[payingVia] ==
+                      'cash')
+                  ? 1
+                  : 2,
+          'pick_address':
+              addressList.firstWhere((e) => e.id == 'pickup').address,
+          'promocode_id': rentalOption[choosenVehicle]['promocode_id'],
+          'trip_start_time': choosenDateTime.toString().substring(0, 19),
+          'is_later': true,
+          'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
+          'rental_pack_id': etaDetails[rentalChoosenOption]['id'],
+        }));
+    if (response.statusCode == 200) {
+      myMarkers.clear();
+      valueNotifierBook.incrementNotifier();
+      result = 'success';
+    } else {
+      debugPrint(response.body);
+      if (jsonDecode(response.body)['message'] == 'no drivers available') {
+        noDriverFound = true;
+      } else {
+        debugPrint(response.body);
         tripReqError = true;
       }
 
@@ -1271,6 +1626,8 @@ cancelRequest() async {
       userRequestData = {};
       client.disconnect();
       valueNotifierBook.incrementNotifier();
+    } else {
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -1280,7 +1637,6 @@ cancelRequest() async {
 }
 
 cancelLaterRequest(val) async {
-  print('cancel started');
   try {
     var response = await http.post(Uri.parse(url + 'api/v1/request/cancel'),
         headers: {
@@ -1289,12 +1645,11 @@ cancelLaterRequest(val) async {
         },
         body: jsonEncode({'request_id': val}));
     if (response.statusCode == 200) {
-      print(response.body);
       userRequestData = {};
       client.disconnect();
       valueNotifierBook.incrementNotifier();
-    }else{
-      print(response.body);
+    } else {
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -1319,6 +1674,8 @@ cancelRequestWithReason(reason) async {
       userRequestData = {};
       client.disconnect();
       valueNotifierBook.incrementNotifier();
+    } else {
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -1355,6 +1712,7 @@ cancelReason(reason) async {
       cancelReasonsList = jsonDecode(response.body)['data'];
       result = true;
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -1399,6 +1757,7 @@ userRating() async {
       await getUserDetails();
       result = true;
     } else {
+      debugPrint(response.body);
       result = false;
     }
   } catch (e) {
@@ -1458,6 +1817,7 @@ addFavLocation(lat, lng, add, name) async {
       await getUserDetails();
       valueNotifierHome.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = false;
     }
     return result;
@@ -1487,6 +1847,7 @@ getSosData(lat, lng) async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1538,6 +1899,8 @@ getCurrentMessages() async {
         chatList = jsonDecode(response.body)['data'];
         valueNotifierBook.incrementNotifier();
       }
+    } else {
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -1559,6 +1922,8 @@ sendMessage(chat) async {
             jsonEncode({'request_id': userRequestData['id'], 'message': chat}));
     if (response.statusCode == 200) {
       getCurrentMessages();
+    } else {
+      debugPrint(response.body);
     }
   } catch (e) {
     if (e is SocketException) {
@@ -1578,6 +1943,8 @@ messageSeen() async {
       body: jsonEncode({'request_id': userRequestData['id']}));
   if (response.statusCode == 200) {
     getCurrentMessages();
+  } else {
+    debugPrint(response.body);
   }
 }
 
@@ -1597,6 +1964,7 @@ addSos(name, number) async {
       await getUserDetails();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1622,6 +1990,7 @@ deleteSos(id) async {
       await getUserDetails();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1659,6 +2028,7 @@ getFaqData(lat, lng) async {
       valueNotifierBook.incrementNotifier();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1685,6 +2055,7 @@ removeFavAddress(id) async {
       await getUserDetails();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1712,6 +2083,7 @@ getReferral() async {
       myReferralCode = jsonDecode(response.body)['data'];
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1737,6 +2109,7 @@ userLogout() async {
 
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1764,6 +2137,7 @@ getHistory(id) async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -1794,6 +2168,7 @@ getHistoryPages(id) async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -1827,6 +2202,7 @@ getWalletHistory() async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -1857,6 +2233,7 @@ getWalletHistoryPage(page) async {
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
+      debugPrint(response.body);
       result = 'failure';
       valueNotifierBook.incrementNotifier();
     }
@@ -1881,6 +2258,7 @@ getClientToken() async {
     if (response.statusCode == 200) {
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1910,6 +2288,7 @@ getStripePayment(money) async {
       results = 'success';
       stripeToken = jsonDecode(response.body)['data'];
     } else {
+      debugPrint(response.body);
       results = 'failure';
     }
   } catch (e) {
@@ -1938,6 +2317,7 @@ addMoneyStripe(amount, nonce) async {
       await getWalletHistory();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -1950,10 +2330,9 @@ addMoneyStripe(amount, nonce) async {
 }
 
 //paystack payment
-Map<String,dynamic> paystackCode = {};
+Map<String, dynamic> paystackCode = {};
 
-
-getPaystackPayment(money)async{
+getPaystackPayment(money) async {
   dynamic results;
   paystackCode.clear();
   try {
@@ -1968,6 +2347,7 @@ getPaystackPayment(money)async{
       results = 'success';
       paystackCode = jsonDecode(response.body)['data'];
     } else {
+      debugPrint(response.body);
       results = 'failure';
     }
   } catch (e) {
@@ -1995,6 +2375,7 @@ addMoneyPaystack(amount, nonce) async {
       paystackCode.clear();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2024,6 +2405,7 @@ addMoneyFlutterwave(amount, nonce) async {
       paystackCode.clear();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2053,6 +2435,7 @@ addMoneyRazorpay(amount, nonce) async {
       paystackCode.clear();
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failure';
     }
   } catch (e) {
@@ -2066,36 +2449,34 @@ addMoneyRazorpay(amount, nonce) async {
 
 //cashfree
 
-Map<String,dynamic> cftToken = {};
+Map<String, dynamic> cftToken = {};
 
-getCfToken(money, currency)async{
+getCfToken(money, currency) async {
   cftToken.clear();
   cfSuccessList.clear();
   dynamic result;
-  try{
-    var response =await http.post(Uri.parse(url + 'api/v1/payment/cashfree/generate-cftoken'),
-   headers: {
-              'Authorization': 'Bearer ' + bearerToken[0].token,
-              'Content-Type': 'application/json'
-            },
-  body: jsonEncode({
-    'order_amount' : money,
-    'order_currency': currency
-  })
-            );
-  if(response.statusCode == 200){
-    if(jsonDecode(response.body)['status'] == 'OK'){
-      cftToken = jsonDecode(response.body);
-      result = 'success';
-    }else{
+  try {
+    var response = await http.post(
+        Uri.parse(url + 'api/v1/payment/cashfree/generate-cftoken'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode({'order_amount': money, 'order_currency': currency}));
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['status'] == 'OK') {
+        cftToken = jsonDecode(response.body);
+        result = 'success';
+      } else {
+        debugPrint(response.body);
+        result = 'failure';
+      }
+    } else {
+      debugPrint(response.body);
       result = 'failure';
     }
-    
-  }else{
-    result = 'failure';
-  }
-  }catch(e){
-    if(e is SocketException){
+  } catch (e) {
+    if (e is SocketException) {
       internet = false;
       result = 'no internet';
     }
@@ -2103,40 +2484,42 @@ getCfToken(money, currency)async{
   return result;
 }
 
-Map<String,dynamic> cfSuccessList = {};
+Map<String, dynamic> cfSuccessList = {};
 
-cashFreePaymentSuccess()async{
+cashFreePaymentSuccess() async {
   dynamic result;
-  try{
-    var response = await http.post(Uri.parse(url + 'api/v1/payment/cashfree/add-money-to-wallet-webhooks'),
-    headers: {
-              'Authorization': 'Bearer ' + bearerToken[0].token,
-              'Content-Type': 'application/json'
-            },
-    body: jsonEncode({
-      'orderId' : cfSuccessList['orderId'],
-      'orderAmount':cfSuccessList['orderAmount'],
-      'referenceId':cfSuccessList['referenceId'],
-      'txStatus':cfSuccessList['txStatus'],
-      'paymentMode':cfSuccessList['paymentMode'],
-      'txMsg':cfSuccessList['txMsg'],
-      'txTime':cfSuccessList['txTime'],
-      'signature':cfSuccessList['signature']
-    })
-    );
-    if(response.statusCode == 200){
-      if(jsonDecode(response.body)['success'] == true){
+  try {
+    var response = await http.post(
+        Uri.parse(url + 'api/v1/payment/cashfree/add-money-to-wallet-webhooks'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode({
+          'orderId': cfSuccessList['orderId'],
+          'orderAmount': cfSuccessList['orderAmount'],
+          'referenceId': cfSuccessList['referenceId'],
+          'txStatus': cfSuccessList['txStatus'],
+          'paymentMode': cfSuccessList['paymentMode'],
+          'txMsg': cfSuccessList['txMsg'],
+          'txTime': cfSuccessList['txTime'],
+          'signature': cfSuccessList['signature']
+        }));
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
         await getWalletHistory();
         await getUserDetails();
-      }else{
+      } else {
+        debugPrint(response.body);
         result = 'failure';
       }
-    }else{
+    } else {
+      debugPrint(response.body);
       result = 'failure';
     }
-  }catch(e){
-    if(e is SocketException){
+  } catch (e) {
+    if (e is SocketException) {
       internet = false;
       result = 'no internet';
     }
@@ -2168,6 +2551,7 @@ updateProfile(name, email) async {
         await getUserDetails();
       }
     } else {
+      debugPrint(val);
       result = 'failure';
     }
   } catch (e) {
@@ -2198,6 +2582,7 @@ updateProfileWithoutImage(name, email) async {
         await getUserDetails();
       }
     } else {
+      debugPrint(val);
       result = 'failure';
     }
   } catch (e) {
@@ -2228,6 +2613,7 @@ getGeneralComplaint(type) async {
       generalComplaintList = jsonDecode(response.body)['data'];
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -2255,6 +2641,7 @@ makeGeneralComplaint() async {
     if (response.statusCode == 200) {
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failed';
     }
   } catch (e) {
@@ -2283,6 +2670,7 @@ makeRequestComplaint() async {
     if (response.statusCode == 200) {
       result = 'success';
     } else {
+      debugPrint(response.body);
       result = 'failed';
     }
   } catch (e) {

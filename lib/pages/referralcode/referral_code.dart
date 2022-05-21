@@ -90,36 +90,55 @@ class _ReferralState extends State<Referral> {
                   children: [
                     //skip
                     Button(
-                        onTap: () {
-                          registerUser();
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          _error = '';
-
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const Maps()));
-                        },
-                        text: languages[choosenLanguage]['text_skip']),
-                        //apply code
-                    Button(
-                      onTap: () async {
-                        if (controller.text.isNotEmpty) {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          await registerUser();
+                        onTap: () async {
                           setState(() {
-                            _error = '';
                             _loading = true;
                           });
-                          var result = await updateReferral();
-                          if (result == 'true') {
+                          var val = await registerUser();
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          _error = '';
+                          if (val == 'true') {
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => const Maps()));
                           } else {
                             setState(() {
-                              _error = 'please enter valid referral code';
+                              _error = languages[choosenLanguage]
+                                  ['text_somethingwentwrong'];
+                            });
+                          }
+                          setState(() {
+                            _loading = false;
+                          });
+                        },
+                        text: languages[choosenLanguage]['text_skip']),
+                    //apply code
+                    Button(
+                      onTap: () async {
+                        if (controller.text.isNotEmpty) {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          setState(() {
+                            _error = '';
+                            _loading = true;
+                          });
+                          var val = await registerUser();
+                          if (val == 'true') {
+                            var result = await updateReferral();
+                            if (result == 'true') {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Maps()));
+                            } else {
+                              setState(() {
+                                _error = 'please enter valid referral code';
+                              });
+                            }
+                          } else {
+                            setState(() {
+                              _error = languages[choosenLanguage]
+                                  ['text_somethingwentwrong'];
                             });
                           }
                           setState(() {

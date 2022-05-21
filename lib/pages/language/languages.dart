@@ -57,7 +57,6 @@ class _LanguagesState extends State<Languages> {
                     ),
                     alignment: Alignment.center,
                   ),
-                 
                 ],
               ),
             ),
@@ -144,7 +143,6 @@ class _LanguagesState extends State<Languages> {
             (choosenLanguage != '')
                 ? Button(
                     onTap: () {
-                      
                       pref.setString('languageDirection', languageDirection);
                       pref.setString('choosenLanguage', choosenLanguage);
                       Navigator.pushReplacement(
@@ -154,7 +152,6 @@ class _LanguagesState extends State<Languages> {
                     },
                     text: languages[choosenLanguage]['text_confirm'])
                 : Container(),
-            
           ],
         ),
       ),

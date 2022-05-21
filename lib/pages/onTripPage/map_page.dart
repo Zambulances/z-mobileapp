@@ -47,7 +47,6 @@ bool logout = false;
 
 class _MapsState extends State<Maps> with WidgetsBindingObserver {
   LatLng _centerLocation = const LatLng(41.4219057, -102.0840772);
- 
 
   dynamic _sessionToken;
   bool _loading = false;
@@ -105,6 +104,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
 
 //get location permission and location details
   getLocs() async {
+    addressList.removeWhere((element) => element.id == 'drop');
     serviceEnabled = await location.serviceEnabled();
     polyline.clear();
 
@@ -155,7 +155,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
           userLocationIcon = value;
         });
       });
-      
+
       final Uint8List markerIcon =
           await getBytesFromAsset('assets/images/top-taxi.png', 40);
       pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
@@ -213,11 +213,21 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                   userRequestData['accepted_at'] != null) {
                 mqttForUser();
                 Future.delayed(const Duration(seconds: 2), () {
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const BookingConfirmation()),
-                      (route) => false);
+                  if (userRequestData['is_rental'] == true) {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BookingConfirmation(
+                                  type: 1,
+                                )),
+                        (route) => false);
+                  } else {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BookingConfirmation()),
+                        (route) => false);
+                  }
                 });
               }
               return Directionality(
@@ -578,11 +588,24 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                             Alignment.center,
                                                         child: (_dropLocationMap ==
                                                                 false)
-                                                            ? Image.asset(
-                                                                'assets/images/pickupmarker.png',
-                                                                width: media
-                                                                        .width *
-                                                                    0.07,
+                                                            ? Column(
+                                                                children: [
+                                                                  SizedBox(
+                                                                    height: (media.height /
+                                                                            2) -
+                                                                        media.width *
+                                                                            0.08,
+                                                                  ),
+                                                                  Image.asset(
+                                                                    'assets/images/pickupmarker.png',
+                                                                    width: media
+                                                                            .width *
+                                                                        0.07,
+                                                                    height: media
+                                                                            .width *
+                                                                        0.08,
+                                                                  ),
+                                                                ],
                                                               )
                                                             : Image.asset(
                                                                 'assets/images/dropmarker.png'))),
@@ -873,16 +896,31 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                         20 + media.width * 0.5,
                                                     child: SizedBox(
                                                       width: media.width * 0.9,
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
                                                         children: [
+                                                          Button(
+                                                            onTap: () {
+                                                              if (addressList
+                                                                  .isNotEmpty) {
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                        builder: (context) =>
+                                                                            BookingConfirmation(
+                                                                              type: 1,
+                                                                            )));
+                                                              }
+                                                            },
+                                                            text: languages[
+                                                                    choosenLanguage]
+                                                                ['text_rental'],
+                                                          ),
                                                           InkWell(
                                                             onTap: () async {
-                                                           
                                                               setState(() {
-                                                                
                                                                 _controller?.animateCamera(
                                                                     CameraUpdate
                                                                         .newLatLngZoom(
@@ -1104,7 +1142,6 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                         child:
                                                                             Column(
                                                                           children: [
-                                                                            
                                                                             (addAutoFill.isNotEmpty)
                                                                                 ? Column(
                                                                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1151,7 +1188,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                                                                   }
                                                                                                                 });
                                                                                                                 if (addressList.length == 2) {
-                                                                                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const BookingConfirmation()));
+                                                                                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => BookingConfirmation()));
                                                                                                                 }
                                                                                                               }
                                                                                                               setState(() {
@@ -1161,8 +1198,6 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                                                                 if (_pickaddress == true) {
                                                                                                                   center = val;
                                                                                                                   _controller?.moveCamera(CameraUpdate.newLatLngZoom(val, 14.0));
-                                                                                                                  
-
                                                                                                                 }
                                                                                                                 _bottom = 0;
                                                                                                               });
@@ -1243,7 +1278,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                                                             addressList.firstWhere((element) => element.id == 'pickup').latlng = LatLng(favAddress[i]['pick_lat'], favAddress[i]['pick_lng']);
                                                                                                           }
                                                                                                           _controller?.moveCamera(CameraUpdate.newLatLngZoom(LatLng(favAddress[i]['pick_lat'], favAddress[i]['pick_lng']), 14.0));
-                                                                                                        
+
                                                                                                           _bottom = 0;
                                                                                                         });
                                                                                                       } else {
@@ -1258,7 +1293,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                                                           _bottom = 0;
                                                                                                         });
                                                                                                         if (addressList.length == 2) {
-                                                                                                          Navigator.push(context, MaterialPageRoute(builder: (context) => const BookingConfirmation()));
+                                                                                                          Navigator.push(context, MaterialPageRoute(builder: (context) => BookingConfirmation()));
 
                                                                                                           dropAddress = favAddress[i]['pick_address'];
                                                                                                         }

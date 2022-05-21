@@ -185,7 +185,6 @@ class _ChatPageState extends State<ChatPage> {
                                   media.width * 0.01,
                                   media.width * 0.025,
                                   media.width * 0.01),
-                              
                               width: media.width * 0.9,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),

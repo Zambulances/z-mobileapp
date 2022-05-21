@@ -50,7 +50,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                   Positioned(
                       child: InkWell(
                           onTap: () {
-                            
                             Navigator.pop(context);
                           },
                           child: const Icon(Icons.arrow_back)))
@@ -548,6 +547,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                       SizedBox(
                         height: media.height * 0.05,
                       ),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -566,6 +566,32 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                       SizedBox(
                         height: media.height * 0.05,
                       ),
+                      (myHistory[selectedHistory]['is_rental'] == true)
+                          ? Container(
+                              padding:
+                                  EdgeInsets.only(bottom: media.width * 0.05),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_ride_type'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                  Text(
+                                    myHistory[selectedHistory]
+                                        ['rental_package_name'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -712,7 +738,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            languages[choosenLanguage]['text_waiting_time_1'] +
+                            languages[choosenLanguage]['text_waiting_price'] +
                                 ' (' +
                                 myHistory[selectedHistory]['requestBill']
                                     ['data']['requested_currency_symbol'] +

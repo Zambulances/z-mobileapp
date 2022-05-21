@@ -70,7 +70,6 @@ class _SelectLanguageState extends State<SelectLanguage> {
               ),
               Expanded(
                 child: SizedBox(
-                  
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(

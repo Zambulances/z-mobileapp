@@ -127,7 +127,7 @@ class _DropLocationState extends State<DropLocation>
                                 zoom: 14.0,
                               ),
                               onCameraMove: (CameraPosition position) {
-                               //pick current location
+                                //pick current location
                                 setState(() {
                                   _centerLocation = position.target;
                                 });
@@ -213,9 +213,17 @@ class _DropLocationState extends State<DropLocation>
                       height: media.height * 1,
                       width: media.width * 1,
                       alignment: Alignment.center,
-                      child: Image.asset(
-                        'assets/images/dropmarker.png',
-                        width: media.width * 0.07,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: (media.height / 2) - media.width * 0.08,
+                          ),
+                          Image.asset(
+                            'assets/images/dropmarker.png',
+                            width: media.width * 0.07,
+                            height: media.width * 0.08,
+                          ),
+                        ],
                       ),
                     )),
                     Positioned(
@@ -228,7 +236,6 @@ class _DropLocationState extends State<DropLocation>
                                   const EdgeInsets.only(right: 20, left: 20),
                               child: InkWell(
                                 onTap: () async {
-                                  
                                   _controller?.animateCamera(
                                       CameraUpdate.newLatLngZoom(
                                           currentLocation, 14.0));
@@ -377,7 +384,6 @@ class _DropLocationState extends State<DropLocation>
                                   ),
                                   Button(
                                       onTap: () async {
-                                       
                                         if (addressList
                                             .where((element) =>
                                                 element.id == 'drop')
@@ -398,11 +404,12 @@ class _DropLocationState extends State<DropLocation>
                                               .latlng = _center;
                                         }
                                         if (addressList.length == 2) {
-                                          var val = await Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const BookingConfirmation()));
+                                          var val =
+                                              await Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          BookingConfirmation()));
                                           if (val) {
                                             setState(() {});
                                           }
@@ -416,7 +423,7 @@ class _DropLocationState extends State<DropLocation>
                           ],
                         )),
 
-                        //autofill address
+                    //autofill address
                     Positioned(
                         top: 0,
                         child: Container(
@@ -633,7 +640,7 @@ class _DropLocationState extends State<DropLocation>
                           ),
                         )),
 
-                        //fav address
+                    //fav address
                     (favAddressAdd == true)
                         ? Positioned(
                             top: 0,

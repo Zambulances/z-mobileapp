@@ -130,8 +130,10 @@ class _InvoiceState extends State<Invoice> {
                                     ),
                                     Text(
                                       (userRequestData['is_rental'] == false)
-                                          ? 'Regular'
-                                          : 'Rental',
+                                          ? languages[choosenLanguage]
+                                              ['text_regular']
+                                          : languages[choosenLanguage]
+                                              ['text_rental'],
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * fourteen,
                                           color: textColor),
@@ -219,9 +221,35 @@ class _InvoiceState extends State<Invoice> {
                           )
                         ],
                       ),
+
                       SizedBox(
                         height: media.height * 0.05,
                       ),
+                      (userRequestData['is_rental'] == true)
+                          ? Container(
+                              padding:
+                                  EdgeInsets.only(bottom: media.width * 0.05),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_ride_type'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                  Text(
+                                    userRequestData['rental_package_name'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -368,7 +396,7 @@ class _InvoiceState extends State<Invoice> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            languages[choosenLanguage]['text_waiting_time_1'] +
+                            languages[choosenLanguage]['text_waiting_price'] +
                                 ' (' +
                                 userRequestData['requestBill']['data']
                                     ['requested_currency_symbol'] +

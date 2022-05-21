@@ -26,22 +26,21 @@ class _FaqState extends State<Faq> {
     super.initState();
   }
 
-
 //get faq data
   faqDatas() async {
-    if(currentLocation != null){
-       await getFaqData(currentLocation.latitude, currentLocation.longitude);
-    setState(() {
-      _faqCompleted = true;
-      _isLoading = false;
-    });
-    }else{
-    var loc = await Location.instance.getLocation();
-    await getFaqData(loc.latitude, loc.longitude);
-    setState(() {
-      _faqCompleted = true;
-      _isLoading = false;
-    });
+    if (currentLocation != null) {
+      await getFaqData(currentLocation.latitude, currentLocation.longitude);
+      setState(() {
+        _faqCompleted = true;
+        _isLoading = false;
+      });
+    } else {
+      var loc = await Location.instance.getLocation();
+      await getFaqData(loc.latitude, loc.longitude);
+      setState(() {
+        _faqCompleted = true;
+        _isLoading = false;
+      });
     }
   }
 

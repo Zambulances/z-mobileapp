@@ -16,13 +16,14 @@ class PickContact extends StatefulWidget {
   _PickContactState createState() => _PickContactState();
 }
 
+List contacts = [];
+
 class _PickContactState extends State<PickContact> {
   bool _isLoading = false;
   String pickedName = '';
   String pickedNumber = '';
   bool _contactDenied = false;
 
-  List contacts = [];
   @override
   void initState() {
     getContact();
@@ -40,30 +41,31 @@ class _PickContactState extends State<PickContact> {
 
 //fetch contacts
   getContact() async {
-    var permission = await getContactPermission();
-    if (permission == PermissionStatus.granted) {
-      setState(() {
-        _isLoading = true;
-      });
-      Iterable<Contact> contactsList = await ContactsService.getContacts();
+    if (contacts.isEmpty) {
+      var permission = await getContactPermission();
+      if (permission == PermissionStatus.granted) {
+        setState(() {
+          _isLoading = true;
+        });
+        Iterable<Contact> contactsList = await ContactsService.getContacts();
 
-      setState(() {
-        // ignore: avoid_function_literals_in_foreach_calls
-        contactsList.forEach((contact) {
-          contact.phones!.toSet().forEach((phone) {
-            contacts.add({
-              'name': contact.displayName ?? contact.givenName,
-              'phone': phone.value
+        setState(() {
+          // ignore: avoid_function_literals_in_foreach_calls
+          contactsList.forEach((contact) {
+            contact.phones!.toSet().forEach((phone) {
+              contacts.add({
+                'name': contact.displayName ?? contact.givenName,
+                'phone': phone.value
+              });
             });
           });
-          
+          _isLoading = false;
         });
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _contactDenied = true;
-      });
+      } else {
+        setState(() {
+          _contactDenied = true;
+        });
+      }
     }
   }
 
@@ -102,11 +104,24 @@ class _PickContactState extends State<PickContact> {
                       ),
                     ),
                     Positioned(
-                        child: InkWell(
+                        child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
                             onTap: () {
                               Navigator.pop(context);
                             },
-                            child: const Icon(Icons.arrow_back)))
+                            child: const Icon(Icons.arrow_back)),
+                        InkWell(
+                            onTap: () {
+                              setState(() {
+                                contacts.clear();
+                              });
+                              getContact();
+                            },
+                            child: const Icon(Icons.replay_outlined)),
+                      ],
+                    ))
                   ],
                 ),
                 SizedBox(

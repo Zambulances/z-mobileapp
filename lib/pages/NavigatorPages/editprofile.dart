@@ -364,7 +364,7 @@ class _EditProfileState extends State<EditProfile> {
                     ))
                 : Container(),
 
-                //popup for denied permission
+            //popup for denied permission
             (_permission != '')
                 ? Positioned(
                     child: Container(
@@ -481,12 +481,12 @@ class _EditProfileState extends State<EditProfile> {
                     ))
                 : Container(),
 
-                //loader
+            //loader
             (_isLoading == true)
                 ? const Positioned(top: 0, child: Loading())
                 : Container(),
 
-                //error
+            //error
             (_error == true)
                 ? Positioned(
                     child: Container(
