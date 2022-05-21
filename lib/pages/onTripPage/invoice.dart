@@ -117,8 +117,10 @@ class _InvoiceState extends State<Invoice> {
                                     ),
                                     Text(
                                       (driverReq['is_rental'] == false)
-                                          ? 'Regular'
-                                          : 'Rental',
+                                          ? languages[choosenLanguage]
+                                              ['text_regular']
+                                          : languages[choosenLanguage]
+                                              ['text_rental'],
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * fourteen,
                                           color: textColor),
@@ -209,6 +211,31 @@ class _InvoiceState extends State<Invoice> {
                       SizedBox(
                         height: media.height * 0.05,
                       ),
+                      (driverReq['is_rental'] == true)
+                          ? Container(
+                              padding:
+                                  EdgeInsets.only(bottom: media.width * 0.05),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_ride_type'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                  Text(
+                                    driverReq['rental_package_name'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -230,7 +257,7 @@ class _InvoiceState extends State<Invoice> {
                           ),
                         ],
                       ),
-                       SizedBox(
+                      SizedBox(
                         height: media.height * 0.02,
                       ),
                       Row(
@@ -286,8 +313,20 @@ class _InvoiceState extends State<Invoice> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                           languages[choosenLanguage]['text_waiting_price'] + ' (' + driverReq['requestBill']['data']
-                                    ['requested_currency_symbol'] + ' ' + driverReq['requestBill']['data']['waiting_charge_per_min'].toString() + ' x '  + driverReq['requestBill']['data']['calculated_waiting_time'].toString() + ' mins' + ')',
+                            languages[choosenLanguage]['text_waiting_price'] +
+                                ' (' +
+                                driverReq['requestBill']['data']
+                                    ['requested_currency_symbol'] +
+                                ' ' +
+                                driverReq['requestBill']['data']
+                                        ['waiting_charge_per_min']
+                                    .toString() +
+                                ' x ' +
+                                driverReq['requestBill']['data']
+                                        ['calculated_waiting_time']
+                                    .toString() +
+                                ' mins' +
+                                ')',
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twelve,
                                 color: textColor),
@@ -296,7 +335,8 @@ class _InvoiceState extends State<Invoice> {
                             driverReq['requestBill']['data']
                                     ['requested_currency_symbol'] +
                                 ' ' +
-                                driverReq['requestBill']['data']['waiting_charge']
+                                driverReq['requestBill']['data']
+                                        ['waiting_charge']
                                     .toString(),
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twelve,
@@ -391,35 +431,37 @@ class _InvoiceState extends State<Invoice> {
                           ),
                         ],
                       ),
-                      (driverReq['requestBill']['data']
-                                        ['promo_discount'] != null) ?
-                      SizedBox(
-                        height: media.height * 0.02,
-                      ) : Container(),
-                      (driverReq['requestBill']['data']
-                                        ['promo_discount'] != null) ?
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            languages[choosenLanguage]['text_discount'],
-                            style: GoogleFonts.roboto(
-                                fontSize: media.width * twelve,
-                                color: Colors.red),
-                          ),
-                          Text(
-                            driverReq['requestBill']['data']
-                                    ['requested_currency_symbol'] +
-                                ' ' +
-                                driverReq['requestBill']['data']
-                                        ['promo_discount']
-                                    .toString(),
-                            style: GoogleFonts.roboto(
-                                fontSize: media.width * twelve,
-                                color: Colors.red),
-                          ),
-                        ],
-                      ) : Container(),
+                      (driverReq['requestBill']['data']['promo_discount'] !=
+                              null)
+                          ? SizedBox(
+                              height: media.height * 0.02,
+                            )
+                          : Container(),
+                      (driverReq['requestBill']['data']['promo_discount'] !=
+                              null)
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  languages[choosenLanguage]['text_discount'],
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * twelve,
+                                      color: Colors.red),
+                                ),
+                                Text(
+                                  driverReq['requestBill']['data']
+                                          ['requested_currency_symbol'] +
+                                      ' ' +
+                                      driverReq['requestBill']['data']
+                                              ['promo_discount']
+                                          .toString(),
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * twelve,
+                                      color: Colors.red),
+                                ),
+                              ],
+                            )
+                          : Container(),
                       SizedBox(
                         height: media.height * 0.02,
                       ),
@@ -444,7 +486,6 @@ class _InvoiceState extends State<Invoice> {
                           ),
                         ],
                       ),
-                     
                       SizedBox(
                         height: media.height * 0.02,
                       ),

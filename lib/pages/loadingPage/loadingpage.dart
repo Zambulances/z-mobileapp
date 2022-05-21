@@ -18,9 +18,7 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-
   String dot = '.';
- 
 
   var demopage = TextEditingController();
 
@@ -33,10 +31,10 @@ class _LoadingPageState extends State<LoadingPage> {
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-      await getDetailsOfDevice();
-      if(internet == true){
+    await getDetailsOfDevice();
+    if (internet == true) {
       var val = await getLocalData();
-      
+
       //if user is login and check waiting for approval status and send accordingly
       if (val == '3') {
         if (userDetails['uploaded_document'] == false) {
@@ -52,39 +50,31 @@ class _LoadingPageState extends State<LoadingPage> {
           mqttForDocuments();
         } else if (userDetails['uploaded_document'] == true &&
             userDetails['approve'] == true) {
-          
-          
-            //status approved
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const Maps()),
-                (route) => false);
+          //status approved
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const Maps()),
+              (route) => false);
           mqttForDocuments();
         }
       }
       //if user is not login in this device
       else if (val == '2') {
-        Future.delayed(const Duration(seconds: 2), (){
+        Future.delayed(const Duration(seconds: 2), () {
           Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const Login()));
+              context, MaterialPageRoute(builder: (context) => const Login()));
         });
-        
-      }
-      
-       else {
+      } else {
         //user installing first time and didnt yet choosen language
-       
-          Future.delayed(const Duration(seconds: 2), (){
+
+        Future.delayed(const Duration(seconds: 2), () {
           Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => const Languages()));
-              });
-        
-      }}else{
-        setState(() {
-          
         });
       }
-    
+    } else {
+      setState(() {});
+    }
   }
 
   @override
@@ -116,7 +106,7 @@ class _LoadingPageState extends State<LoadingPage> {
                 ],
               ),
             ),
-            
+
             //internet is not connected
             (internet == false)
                 ? Positioned(
@@ -131,7 +121,6 @@ class _LoadingPageState extends State<LoadingPage> {
                       },
                     ))
                 : Container(),
-           
           ],
         ),
       ),

@@ -106,7 +106,8 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                           decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               border: Border.all(
-                                                  color:const Color(0xff222222),
+                                                  color:
+                                                      const Color(0xff222222),
                                                   width: 1.2)),
                                           alignment: Alignment.center,
                                           child: (_choosenLanguage == i)

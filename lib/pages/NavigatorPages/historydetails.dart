@@ -216,9 +216,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 alignment: Alignment.center,
                                 height: media.width * 0.05,
                                 width: media.width * 0.05,
-                                decoration:  BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: buttonColor),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle, color: buttonColor),
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
@@ -265,7 +264,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             margin: EdgeInsets.only(top: media.width * 0.025),
                             height: 1,
                             width: media.width * 0.15,
-                            color:  buttonColor,
+                            color: buttonColor,
                           ),
                           Column(
                             children: [
@@ -273,9 +272,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 alignment: Alignment.center,
                                 height: media.width * 0.05,
                                 width: media.width * 0.05,
-                                decoration:  BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: buttonColor),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle, color: buttonColor),
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
@@ -323,7 +321,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             margin: EdgeInsets.only(top: media.width * 0.025),
                             height: 1,
                             width: media.width * 0.15,
-                            color:  buttonColor,
+                            color: buttonColor,
                           ),
                           Column(
                             children: [
@@ -331,9 +329,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 alignment: Alignment.center,
                                 height: media.width * 0.05,
                                 width: media.width * 0.05,
-                                decoration:  BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: buttonColor),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle, color: buttonColor),
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
@@ -472,8 +469,10 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                       (myHistory[selectedHistory]
                                                   ['is_rental'] ==
                                               false)
-                                          ? 'Regular'
-                                          : 'Rental',
+                                          ? languages[choosenLanguage]
+                                              ['text_regular']
+                                          : languages[choosenLanguage]
+                                              ['text_rental'],
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * fourteen,
                                           color: textColor),
@@ -566,6 +565,32 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                       SizedBox(
                         height: media.height * 0.05,
                       ),
+                      (myHistory[selectedHistory]['is_rental'] == true)
+                          ? Container(
+                              padding:
+                                  EdgeInsets.only(bottom: media.width * 0.05),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_ride_type'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                  Text(
+                                    myHistory[selectedHistory]
+                                        ['rental_package_name'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Container(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -588,7 +613,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                         ],
                       ),
-                      
                       SizedBox(
                         height: media.height * 0.02,
                       ),
@@ -660,7 +684,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 ),
                                 Text(
                                   myHistory[selectedHistory]['requestBill']
-                                          ['data']['requested_currency_symbol'] +
+                                              ['data']
+                                          ['requested_currency_symbol'] +
                                       ' ' +
                                       myHistory[selectedHistory]['requestBill']
                                               ['data']['cancellation_fee']
@@ -693,7 +718,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 ),
                                 Text(
                                   myHistory[selectedHistory]['requestBill']
-                                          ['data']['requested_currency_symbol'] +
+                                              ['data']
+                                          ['requested_currency_symbol'] +
                                       ' ' +
                                       myHistory[selectedHistory]['requestBill']
                                               ['data']['airport_surge_fee']
@@ -705,15 +731,27 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                               ],
                             )
                           : Container(),
-                          SizedBox(
+                      SizedBox(
                         height: media.height * 0.02,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            languages[choosenLanguage]['text_waiting_price'] + ' (' + myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_symbol'] + ' ' + myHistory[selectedHistory]['requestBill']['data']['waiting_charge_per_min'].toString() + ' x '  + myHistory[selectedHistory]['requestBill']['data']['calculated_waiting_time'].toString() + ' mins' + ')',
+                            languages[choosenLanguage]['text_waiting_price'] +
+                                ' (' +
+                                myHistory[selectedHistory]['requestBill']
+                                    ['data']['requested_currency_symbol'] +
+                                ' ' +
+                                myHistory[selectedHistory]['requestBill']
+                                        ['data']['waiting_charge_per_min']
+                                    .toString() +
+                                ' x ' +
+                                myHistory[selectedHistory]['requestBill']
+                                        ['data']['calculated_waiting_time']
+                                    .toString() +
+                                ' mins' +
+                                ')',
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twelve,
                                 color: textColor),
@@ -722,7 +760,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             myHistory[selectedHistory]['requestBill']['data']
                                     ['requested_currency_symbol'] +
                                 ' ' +
-                                myHistory[selectedHistory]['requestBill']['data']['waiting_charge']
+                                myHistory[selectedHistory]['requestBill']
+                                        ['data']['waiting_charge']
                                     .toString(),
                             style: GoogleFonts.roboto(
                                 fontSize: media.width * twelve,
@@ -756,34 +795,39 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                         ],
                       ),
                       (myHistory[selectedHistory]['requestBill']['data']
-                                        ['promo_discount'] != null) ?
-                      SizedBox(
-                        height: media.height * 0.02,
-                      ) : Container(),
+                                  ['promo_discount'] !=
+                              null)
+                          ? SizedBox(
+                              height: media.height * 0.02,
+                            )
+                          : Container(),
                       (myHistory[selectedHistory]['requestBill']['data']
-                                        ['promo_discount'] != null) ?
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            languages[choosenLanguage]['text_discount'],
-                            style: GoogleFonts.roboto(
-                                fontSize: media.width * twelve,
-                                color: Colors.red),
-                          ),
-                          Text(
-                            myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_symbol'] +
-                                ' ' +
-                                myHistory[selectedHistory]['requestBill']['data']
-                                        ['promo_discount']
-                                    .toString(),
-                            style: GoogleFonts.roboto(
-                                fontSize: media.width * twelve,
-                                color: Colors.red),
-                          ),
-                        ],
-                      ) : Container(),
+                                  ['promo_discount'] !=
+                              null)
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  languages[choosenLanguage]['text_discount'],
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * twelve,
+                                      color: Colors.red),
+                                ),
+                                Text(
+                                  myHistory[selectedHistory]['requestBill']
+                                              ['data']
+                                          ['requested_currency_symbol'] +
+                                      ' ' +
+                                      myHistory[selectedHistory]['requestBill']
+                                              ['data']['promo_discount']
+                                          .toString(),
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * twelve,
+                                      color: Colors.red),
+                                ),
+                              ],
+                            )
+                          : Container(),
                       SizedBox(
                         height: media.height * 0.02,
                       ),

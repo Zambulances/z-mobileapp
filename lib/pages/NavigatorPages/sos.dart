@@ -62,7 +62,6 @@ class _SosState extends State<Sos> {
                             Positioned(
                                 child: InkWell(
                                     onTap: () {
-                                      
                                       Navigator.pop(context);
                                     },
                                     child: const Icon(Icons.arrow_back)))

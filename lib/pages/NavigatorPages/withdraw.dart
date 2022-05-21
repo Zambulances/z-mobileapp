@@ -244,9 +244,8 @@ class _WithdrawState extends State<Withdraw> {
                                         )
                                       : (_isLoading == false &&
                                               withDrawHistory.isEmpty)
-                                          ? Text(
-                                              languages[choosenLanguage]
-                                                  ['text_noDataFound'])
+                                          ? Text(languages[choosenLanguage]
+                                              ['text_noDataFound'])
                                           : Container(),
                                   (withDrawHistoryPages.isNotEmpty)
                                       ? (withDrawHistoryPages['current_page'] <
@@ -258,12 +257,11 @@ class _WithdrawState extends State<Withdraw> {
                                                   _isLoading = true;
                                                 });
 
-                                             
-                                                    await getWithdrawListPages(
-                                                        (withDrawHistoryPages[
-                                                                    'current_page'] +
-                                                                1)
-                                                            .toString());
+                                                await getWithdrawListPages(
+                                                    (withDrawHistoryPages[
+                                                                'current_page'] +
+                                                            1)
+                                                        .toString());
 
                                                 setState(() {
                                                   _isLoading = false;
@@ -335,7 +333,6 @@ class _WithdrawState extends State<Withdraw> {
                               child: Column(children: [
                                 Container(
                                   height: media.width * 0.128,
-                                 
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
@@ -389,17 +386,16 @@ class _WithdrawState extends State<Withdraw> {
                                                           'wallet_balance']
                                                       .toString()) >=
                                                   double.parse(val)) {
-                                               
                                                 withDrawMoney =
                                                     double.parse(val);
                                               } else {
-                                                addMoneyController.text = withDrawList[
-                                                        'wallet_balance']
-                                                    .toString();
+                                                addMoneyController.text =
+                                                    withDrawList[
+                                                            'wallet_balance']
+                                                        .toString();
                                                 withDrawMoney = withDrawList[
                                                     'wallet_balance'];
                                               }
-                                              
                                             });
                                           },
                                           keyboardType: TextInputType.number,
@@ -562,7 +558,6 @@ class _WithdrawState extends State<Withdraw> {
                                     ),
                                     Button(
                                       onTap: () async {
-                                        
                                         FocusManager.instance.primaryFocus
                                             ?.unfocus();
                                         setState(() {
@@ -597,7 +592,8 @@ class _WithdrawState extends State<Withdraw> {
                                                       const BankDetails()));
                                           if (nav) {
                                             setState(() {
-                                              addMoneyController.text = withDrawMoney;
+                                              addMoneyController.text =
+                                                  withDrawMoney;
                                               addBank = false;
                                             });
                                           }
@@ -621,7 +617,7 @@ class _WithdrawState extends State<Withdraw> {
                       ))
                   : Container(),
 
-                  //no internet
+              //no internet
               (internet == false)
                   ? Positioned(
                       top: 0,
@@ -672,7 +668,7 @@ class _WithdrawState extends State<Withdraw> {
                       ))
                   : Container(),
 
-                  //loader
+              //loader
               (_isLoading == true)
                   ? const Positioned(top: 0, child: Loading())
                   : Container()

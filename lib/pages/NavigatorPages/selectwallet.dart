@@ -23,8 +23,6 @@ class _SelectWalletState extends State<SelectWallet> {
   bool _success = false;
   bool _failed = false;
 
-
-
   @override
   void initState() {
     Stripe.publishableKey =
@@ -83,7 +81,6 @@ class _SelectWalletState extends State<SelectWallet> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-
                               //card design
                               CardField(
                                 onCardChanged: (card) {
@@ -103,11 +100,10 @@ class _SelectWalletState extends State<SelectWallet> {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    var val =
-                                        await getStripePayment(addMoney);
+                                    var val = await getStripePayment(addMoney);
                                     if (val == 'success') {
-                                      var val2 = await Stripe.instance
-                                          .confirmPayment(
+                                      var val2 =
+                                          await Stripe.instance.confirmPayment(
                                         stripeToken['client_token'],
                                         PaymentMethodParams.card(
                                           billingDetails: BillingDetails(
@@ -138,8 +134,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                       _isLoading = false;
                                     });
                                   },
-                                  text: languages[choosenLanguage]
-                                      ['text_pay'])
+                                  text: languages[choosenLanguage]['text_pay'])
                             ],
                           ),
                         )
@@ -193,7 +188,7 @@ class _SelectWalletState extends State<SelectWallet> {
                           ))
                       : Container(),
 
-                      //payment success
+                  //payment success
                   (_success == true)
                       ? Positioned(
                           top: 0,

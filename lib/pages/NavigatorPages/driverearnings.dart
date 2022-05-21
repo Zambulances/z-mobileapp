@@ -213,7 +213,7 @@ class _DriverEarningsState extends State<DriverEarnings> {
                   ),
                   Expanded(
                       child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     child: (driverTodayEarnings.isNotEmpty && _showEarning == 0)
                         ?
                         //current day earnings
@@ -262,8 +262,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                   Column(
                                     children: [
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
                                           languages[choosenLanguage]
                                               ['text_trips'],
@@ -276,10 +276,11 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                         height: media.width * 0.015,
                                       ),
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
-                                          driverTodayEarnings['total_trips_count']
+                                          driverTodayEarnings[
+                                                  'total_trips_count']
                                               .toString(),
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
@@ -296,8 +297,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                   Column(
                                     children: [
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
                                           languages[choosenLanguage]
                                               ['text_hours'],
@@ -310,8 +311,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                         height: media.width * 0.015,
                                       ),
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
                                           driverTodayEarnings[
                                                   'total_hours_worked']
@@ -331,8 +332,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                   Column(
                                     children: [
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
                                           languages[choosenLanguage]
                                               ['text_enable_wallet'],
@@ -345,8 +346,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                         height: media.width * 0.015,
                                       ),
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
                                           driverTodayEarnings[
                                                   'total_wallet_trip_count']
@@ -366,10 +367,11 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                   Column(
                                     children: [
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
-                                          languages[choosenLanguage]['text_cash'],
+                                          languages[choosenLanguage]
+                                              ['text_cash'],
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
                                               color: hintColor),
@@ -379,8 +381,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                         height: media.width * 0.015,
                                       ),
                                       Container(
-                                        width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                        width: media.width * 0.17,
+                                        alignment: Alignment.center,
                                         child: Text(
                                           driverTodayEarnings[
                                                   'total_cash_trip_count']
@@ -606,13 +608,14 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                       Column(
                                         children: [
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               languages[choosenLanguage]
                                                   ['text_trips'],
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: hintColor),
                                             ),
                                           ),
@@ -620,14 +623,15 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                             height: media.width * 0.015,
                                           ),
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               driverWeeklyEarnings[
                                                       'total_trips_count']
                                                   .toString(),
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: textColor),
                                             ),
                                           ),
@@ -641,13 +645,14 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                       Column(
                                         children: [
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               languages[choosenLanguage]
                                                   ['text_hours'],
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: hintColor),
                                             ),
                                           ),
@@ -655,14 +660,15 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                             height: media.width * 0.015,
                                           ),
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               driverWeeklyEarnings[
                                                       'total_hours_worked']
                                                   .toString(),
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: textColor),
                                             ),
                                           ),
@@ -676,13 +682,14 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                       Column(
                                         children: [
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               languages[choosenLanguage]
                                                   ['text_enable_wallet'],
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: hintColor),
                                             ),
                                           ),
@@ -690,14 +697,15 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                             height: media.width * 0.015,
                                           ),
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               driverWeeklyEarnings[
                                                       'total_wallet_trip_count']
                                                   .toString(),
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: textColor),
                                             ),
                                           ),
@@ -711,13 +719,14 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                       Column(
                                         children: [
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               languages[choosenLanguage]
                                                   ['text_cash'],
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: hintColor),
                                             ),
                                           ),
@@ -725,14 +734,15 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                             height: media.width * 0.015,
                                           ),
                                           Container(
-                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                            width: media.width * 0.17,
+                                            alignment: Alignment.center,
                                             child: Text(
                                               driverWeeklyEarnings[
                                                       'total_cash_trip_count']
                                                   .toString(),
                                               style: GoogleFonts.roboto(
-                                                  fontSize: media.width * sixteen,
+                                                  fontSize:
+                                                      media.width * sixteen,
                                                   color: textColor),
                                             ),
                                           ),
@@ -865,7 +875,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                           _datePicker();
                                         },
                                         child: Container(
-                                          padding: const EdgeInsets.only(bottom: 10),
+                                          padding:
+                                              const EdgeInsets.only(bottom: 10),
                                           decoration: BoxDecoration(
                                               border: Border(
                                                   bottom: BorderSide(
@@ -894,7 +905,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                               media.width *
                                                                   sixteen),
                                                     ),
-                                              const Icon(Icons.date_range_outlined)
+                                              const Icon(
+                                                  Icons.date_range_outlined)
                                             ],
                                           ),
                                         ),
@@ -1033,12 +1045,15 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                       Column(
                                                         children: [
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               languages[
                                                                       choosenLanguage]
-                                                                  ['text_trips'],
+                                                                  [
+                                                                  'text_trips'],
                                                               style: GoogleFonts.roboto(
                                                                   fontSize: media
                                                                           .width *
@@ -1053,8 +1068,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                                     0.015,
                                                           ),
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               driverReportEarnings[
                                                                       'total_trips_count']
@@ -1078,12 +1095,15 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                       Column(
                                                         children: [
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               languages[
                                                                       choosenLanguage]
-                                                                  ['text_hours'],
+                                                                  [
+                                                                  'text_hours'],
                                                               style: GoogleFonts.roboto(
                                                                   fontSize: media
                                                                           .width *
@@ -1098,8 +1118,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                                     0.015,
                                                           ),
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               driverReportEarnings[
                                                                       'total_hours_worked']
@@ -1123,8 +1145,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                       Column(
                                                         children: [
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               languages[
                                                                       choosenLanguage]
@@ -1144,8 +1168,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                                     0.015,
                                                           ),
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               driverReportEarnings[
                                                                       'total_wallet_trip_count']
@@ -1169,8 +1195,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                       Column(
                                                         children: [
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               languages[
                                                                       choosenLanguage]
@@ -1189,8 +1217,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                                     0.015,
                                                           ),
                                                           Container(
-                                                            width: media.width*0.17,
-                                        alignment:Alignment.center,
+                                                            width: media.width *
+                                                                0.17,
+                                                            alignment: Alignment
+                                                                .center,
                                                             child: Text(
                                                               driverReportEarnings[
                                                                       'total_cash_trip_count']
@@ -1346,7 +1376,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               ],
                                             )
                                           : Container(),
-                                          SizedBox(height: media.width*0.05,)
+                                      SizedBox(
+                                        height: media.width * 0.05,
+                                      )
                                     ],
                                   )
                                 : Container(),

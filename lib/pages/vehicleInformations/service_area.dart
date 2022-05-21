@@ -164,7 +164,7 @@ class _ServiceAreaState extends State<ServiceArea> {
                     ))
                 : Container(),
 
-                //loader
+            //loader
             (_loaded == false)
                 ? const Positioned(top: 0, child: Loading())
                 : Container()

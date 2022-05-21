@@ -154,7 +154,7 @@ class _ReferralState extends State<Referral> {
                     ))
                 : Container(),
 
-                //loader
+            //loader
             (_loading == true)
                 ? const Positioned(top: 0, child: Loading())
                 : Container()

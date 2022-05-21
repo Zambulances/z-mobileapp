@@ -48,16 +48,19 @@ class _ReviewState extends State<Review> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                      (driverReq.isNotEmpty) ?  Container(
-                          height: media.width * 0.25,
-                          width: media.width * 0.25,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image: NetworkImage(driverReq['userDetail']
-                                      ['data']['profile_picture']),
-                                  fit: BoxFit.cover)),
-                        ) : Container(),
+                        (driverReq.isNotEmpty)
+                            ? Container(
+                                height: media.width * 0.25,
+                                width: media.width * 0.25,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                        image: NetworkImage(
+                                            driverReq['userDetail']['data']
+                                                ['profile_picture']),
+                                        fit: BoxFit.cover)),
+                              )
+                            : Container(),
                         SizedBox(
                           height: media.height * 0.02,
                         ),
@@ -190,7 +193,7 @@ class _ReviewState extends State<Review> {
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>const Maps()),
+                                          builder: (context) => const Maps()),
                                       (route) => false);
                                 } else {
                                   setState(() {
@@ -217,7 +220,7 @@ class _ReviewState extends State<Review> {
                           ))
                       : Container(),
 
-                      //loader
+                  //loader
                   (_loading == true)
                       ? const Positioned(child: Loading())
                       : Container()

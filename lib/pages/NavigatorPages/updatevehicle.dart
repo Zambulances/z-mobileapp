@@ -38,14 +38,14 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                     width: media.width * 1,
                     alignment: Alignment.center,
                     child: SizedBox(
-                      width: media.width*0.7,
+                      width: media.width * 0.7,
                       child: Text(
                         languages[choosenLanguage]['text_updateVehicle'],
                         style: GoogleFonts.roboto(
                             fontSize: media.width * twenty,
                             fontWeight: FontWeight.w600,
                             color: textColor),
-                            textAlign: TextAlign.center,
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
@@ -176,11 +176,13 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                         ),
                       ))),
 
-                      //navigate to pick service page
+              //navigate to pick service page
               Button(
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) =>const ServiceArea()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ServiceArea()));
                   },
                   text: languages[choosenLanguage]['text_edit'])
             ],

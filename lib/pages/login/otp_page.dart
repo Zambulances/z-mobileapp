@@ -53,131 +53,89 @@ class _OtpState extends State<Otp> {
     super.dispose();
   }
 
-
 //otp is false
-otpFalse()async{
-  if(phoneAuthCheck == false){
-    _loading = true;
-    otpController.text = '123456';
-    otpNumber = otpController.text;
-    var verify =
-                                              await verifyUser(phnumber);
-                                          if (verify == true) {
-                                            if (userDetails[
-                                                    'uploaded_document'] ==
-                                                false) {
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Docs()),
-                                                  (route) => false);
-                                            } else if (userDetails[
-                                                        'uploaded_document'] ==
-                                                    true &&
-                                                userDetails['approve'] ==
-                                                    false) {
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DocsProcess(),
-                                                  ),
-                                                  (route) => false);
-                                            } else if (userDetails[
-                                                        'uploaded_document'] ==
-                                                    true &&
-                                                userDetails['approve'] ==
-                                                    true) {
-                                              mqttForDocuments();
-                                              
-                                                Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const Maps()),
-                                                    (route) => false);
-                                             
-                                            }
-                                          } else {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const GetStarted()));
-                                          }
+  otpFalse() async {
+    if (phoneAuthCheck == false) {
+      _loading = true;
+      otpController.text = '123456';
+      otpNumber = otpController.text;
+      var verify = await verifyUser(phnumber);
+      if (verify == true) {
+        if (userDetails['uploaded_document'] == false) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => Docs()),
+              (route) => false);
+        } else if (userDetails['uploaded_document'] == true &&
+            userDetails['approve'] == false) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DocsProcess(),
+              ),
+              (route) => false);
+        } else if (userDetails['uploaded_document'] == true &&
+            userDetails['approve'] == true) {
+          mqttForDocuments();
+
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const Maps()),
+              (route) => false);
+        }
+      } else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const GetStarted()));
+      }
+    }
   }
-}
 
 //auto verify otp
 
-verifyOtp()async{
-  try {
+  verifyOtp() async {
+    try {
+      // Sign the user in (or link) with the credential
+      await FirebaseAuth.instance.signInWithCredential(credentials);
 
-                                          // Sign the user in (or link) with the credential
-                                          await FirebaseAuth.instance
-                                              .signInWithCredential(credentials);
+      var verify = await verifyUser(phnumber);
+      credentials = null;
+      if (verify == true) {
+        if (userDetails['uploaded_document'] == false) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => Docs()),
+              (route) => false);
+        } else if (userDetails['uploaded_document'] == true &&
+            userDetails['approve'] == false) {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const DocsProcess(),
+              ),
+              (route) => false);
+        } else if (userDetails['uploaded_document'] == true &&
+            userDetails['approve'] == true) {
+          mqttForDocuments();
 
-                                          var verify =
-                                              await verifyUser(phnumber);
-                                              credentials = null;
-                                          if (verify == true) {
-                                            if (userDetails[
-                                                    'uploaded_document'] ==
-                                                false) {
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Docs()),
-                                                  (route) => false);
-                                            } else if (userDetails[
-                                                        'uploaded_document'] ==
-                                                    true &&
-                                                userDetails['approve'] ==
-                                                    false) {
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const DocsProcess(),
-                                                  ),
-                                                  (route) => false);
-                                            } else if (userDetails[
-                                                        'uploaded_document'] ==
-                                                    true &&
-                                                userDetails['approve'] ==
-                                                    true) {
-                                              mqttForDocuments();
-                                              
-                                                Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const Maps()),
-                                                    (route) => false);
-                                             
-                                            }
-                                          } else {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const GetStarted()));
-                                          }
-                                        } on FirebaseAuthException catch (error) {
-                                          if (error.code ==
-                                              'invalid-verification-code') {
-                                            setState(() {
-                                              otpController.clear();
-                                              otpNumber = '';
-                                              _error =
-                                                  languages[choosenLanguage]['text_otp_error'];
-                                            });
-                                          }
-                                        }
-}
-
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const Maps()),
+              (route) => false);
+        }
+      } else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const GetStarted()));
+      }
+    } on FirebaseAuthException catch (error) {
+      if (error.code == 'invalid-verification-code') {
+        setState(() {
+          otpController.clear();
+          otpNumber = '';
+          _error = languages[choosenLanguage]['text_otp_error'];
+        });
+      }
+    }
+  }
 
 // running resend otp timer
   timers() {
@@ -206,7 +164,7 @@ verifyOtp()async{
         child: ValueListenableBuilder(
             valueListenable: valueNotifierHome.value,
             builder: (context, value, child) {
-              if(credentials != null){
+              if (credentials != null) {
                 _loading = true;
                 verifyOtp();
               }
@@ -275,43 +233,40 @@ verifyOtp()async{
                               SizedBox(height: media.height * 0.1),
                               Container(
                                 height: media.width * 0.15,
-                                width: media.width*0.9,
+                                width: media.width * 0.9,
                                 decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: page,
-                                  border:Border.all(
-                                    color: borderLines,
-                                    width: 1.2
-                                  )
-                                ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: page,
+                                    border: Border.all(
+                                        color: borderLines, width: 1.2)),
                                 child: TextField(
                                   controller: otpController,
-                                  autofocus: (phoneAuthCheck == false) ? false : true,
-                                  onChanged: (val){
+                                  autofocus:
+                                      (phoneAuthCheck == false) ? false : true,
+                                  onChanged: (val) {
                                     setState(() {
                                       otpNumber = val;
                                     });
-                                    if(val.length == 6){
-                                      FocusManager.instance.primaryFocus?.unfocus();
+                                    if (val.length == 6) {
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
                                     }
                                   },
-                                  decoration:  InputDecoration(
-                                    border: InputBorder.none,
-                                    counterText: '',
-                                    hintText: languages[choosenLanguage]['text_enter_otp_login']
-                                  ),
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      counterText: '',
+                                      hintText: languages[choosenLanguage]
+                                          ['text_enter_otp_login']),
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.roboto(
-                                    fontSize:media.width*twenty,
+                                    fontSize: media.width * twenty,
                                     color: textColor,
                                     fontWeight: FontWeight.w600,
                                   ),
                                   maxLength: 6,
-                                  keyboardType:TextInputType.number ,
-                                  
+                                  keyboardType: TextInputType.number,
                                 ),
                               ),
-                              
 
                               // show error on otp
                               (_error != '')
@@ -454,14 +409,13 @@ verifyOtp()async{
                                               otpController.clear();
                                               otpNumber = '';
                                               _error =
-                                                  languages[choosenLanguage]['text_otp_error'];
-                                                  _loading = false;
+                                                  languages[choosenLanguage]
+                                                      ['text_otp_error'];
+                                              _loading = false;
                                             });
                                           }
-                                         
                                         }
                                       }
-                                      
                                     } else if (phoneAuthCheck == true &&
                                         resendTime == 0 &&
                                         otpNumber.length != 6) {
@@ -474,7 +428,6 @@ verifyOtp()async{
                                       phoneAuth(countries[phcode]['dial_code'] +
                                           phnumber);
                                     }
-                                    
                                   },
                                   borcolor:
                                       (resendTime != 0 && otpNumber.length != 6)

@@ -16,14 +16,13 @@ class PickContact extends StatefulWidget {
   _PickContactState createState() => _PickContactState();
 }
 
-  List contacts = [];
+List contacts = [];
 
 class _PickContactState extends State<PickContact> {
   bool _isLoading = false;
   String pickedName = '';
   String pickedNumber = '';
   bool _contactDenied = false;
-
 
   @override
   void initState() {
@@ -42,33 +41,31 @@ class _PickContactState extends State<PickContact> {
 
 //fetch contact data
   getContact() async {
-    if(contacts.isEmpty){
-    var permission = await getContactPermission();
-    if (permission == PermissionStatus.granted) {
-      setState(() {
-        _isLoading = true;
-      });
-      
-      Iterable<Contact> contactsList = await ContactsService.getContacts();
-      setState(() {
-        // ignore: avoid_function_literals_in_foreach_calls
-        contactsList.forEach((contact) {
-          contact.phones!.toSet().forEach((phone) {
-            contacts.add({
-              'name': contact.displayName ?? contact.givenName,
-              'phone': phone.value
+    if (contacts.isEmpty) {
+      var permission = await getContactPermission();
+      if (permission == PermissionStatus.granted) {
+        setState(() {
+          _isLoading = true;
+        });
+
+        Iterable<Contact> contactsList = await ContactsService.getContacts();
+        setState(() {
+          // ignore: avoid_function_literals_in_foreach_calls
+          contactsList.forEach((contact) {
+            contact.phones!.toSet().forEach((phone) {
+              contacts.add({
+                'name': contact.displayName ?? contact.givenName,
+                'phone': phone.value
+              });
             });
           });
-          
+          _isLoading = false;
         });
-        _isLoading = false;
-      });
-    }  else {
-      setState(() {
-        _contactDenied = true;
-      });
-      
-    }
+      } else {
+        setState(() {
+          _contactDenied = true;
+        });
+      }
     }
   }
 
@@ -108,25 +105,23 @@ class _PickContactState extends State<PickContact> {
                     ),
                     Positioned(
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            InkWell(
-                                onTap: () {
-                                  
-                                  Navigator.pop(context, true);
-                                },
-                                child: const Icon(Icons.arrow_back)),
-
-                                InkWell(
-                                onTap: () {
-                                  setState(() {
-                                  contacts.clear();
-                                  });
-                                  getContact();
-                                },
-                                child: const Icon(Icons.replay_outlined)),
-                          ],
-                        ))
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                            onTap: () {
+                              Navigator.pop(context, true);
+                            },
+                            child: const Icon(Icons.arrow_back)),
+                        InkWell(
+                            onTap: () {
+                              setState(() {
+                                contacts.clear();
+                              });
+                              getContact();
+                            },
+                            child: const Icon(Icons.replay_outlined)),
+                      ],
+                    ))
                   ],
                 ),
                 SizedBox(
@@ -260,103 +255,105 @@ class _PickContactState extends State<PickContact> {
             ),
 
             //permission denied error
-            (_contactDenied == true) ?
-            Positioned(child: Container(
-                        height: media.height*1,
-                        width: media.width*1,
-                        color: Colors.transparent.withOpacity(0.6),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: media.width*0.9,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+            (_contactDenied == true)
+                ? Positioned(
+                    child: Container(
+                    height: media.height * 1,
+                    width: media.width * 1,
+                    color: Colors.transparent.withOpacity(0.6),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: media.width * 0.9,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _contactDenied = false;
+                                  });
+                                  Navigator.pop(context, true);
+                                },
+                                child: Container(
+                                  height: media.width * 0.1,
+                                  width: media.width * 0.1,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle, color: page),
+                                  child: const Icon(Icons.cancel_outlined),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: media.width * 0.05,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(media.width * 0.05),
+                          width: media.width * 0.9,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: page,
+                              boxShadow: [
+                                BoxShadow(
+                                    blurRadius: 2.0,
+                                    spreadRadius: 2.0,
+                                    color: Colors.black.withOpacity(0.2))
+                              ]),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                  width: media.width * 0.8,
+                                  child: Text(
+                                    languages[choosenLanguage]
+                                        ['text_open_contact_setting'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w600),
+                                  )),
+                              SizedBox(height: media.width * 0.05),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   InkWell(
-                                    onTap: (){
-                                      setState(() {
-                                        _contactDenied = false;
-                                        
-                                      });
-                                      Navigator.pop(context,true);
-                                    },
-                                    child: Container(
-                                                      height: media.width * 0.1,
-                                                      width: media.width * 0.1,
-                                                      decoration: BoxDecoration(
-                                                          shape: BoxShape.circle,
-                                                          color: page),
-                                                      child: const Icon(
-                                                          Icons.cancel_outlined),
-                                                    ),
-                                  ),
+                                      onTap: () async {
+                                        await openAppSettings();
+                                      },
+                                      child: Text(
+                                        languages[choosenLanguage]
+                                            ['text_open_settings'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * sixteen,
+                                            color: buttonColor,
+                                            fontWeight: FontWeight.w600),
+                                      )),
+                                  InkWell(
+                                      onTap: () async {
+                                        setState(() {
+                                          _contactDenied = false;
+                                        });
+                                        getContact();
+                                      },
+                                      child: Text(
+                                        languages[choosenLanguage]['text_done'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * sixteen,
+                                            color: buttonColor,
+                                            fontWeight: FontWeight.w600),
+                                      ))
                                 ],
-                              ),
-                            ),
-                            SizedBox(
-                                        height: media.width * 0.05,
-                                      ),
-                            Container(
-                              padding: EdgeInsets.all(media.width*0.05),
-                              width: media.width*0.9,
-                              decoration:BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: page,
-                                boxShadow: [BoxShadow(blurRadius: 2.0,spreadRadius: 2.0,color: Colors.black.withOpacity(0.2))]
-                              ),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    width: media.width*0.8,
-                                    child: Text(languages[choosenLanguage]['text_open_contact_setting'],
-                                    style: GoogleFonts.roboto(
-                                      fontSize:media.width*sixteen,
-                                      color: textColor,
-                                      fontWeight:FontWeight.w600
-                                    ),
-                                    )),
-                                    SizedBox(height:media.width*0.05),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        InkWell(
-                                          onTap: ()async{
-                                            await openAppSettings();
-                                            
-                                            
-                                          },
-                                          child: Text(languages[choosenLanguage]['text_open_settings'],
-                                          style: GoogleFonts.roboto(
-                                      fontSize:media.width*sixteen,
-                                      color: buttonColor,
-                                      fontWeight:FontWeight.w600
-                                    ),
-                                          )),
-                                        InkWell(
-                                          onTap: ()async{
-                                            setState(() {
-                                              _contactDenied = false;
-                                              
-                                            });
-                                            getContact();
-                                           
-                                          },
-                                          child: Text(languages[choosenLanguage]['text_done'],
-                                          style: GoogleFonts.roboto(
-                                      fontSize:media.width*sixteen,
-                                      color: buttonColor,
-                                      fontWeight:FontWeight.w600
-                                    ),
-                                          ))
-                                      ],
-                                    )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      )) : Container(),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ))
+                : Container(),
             //loader
             (_isLoading == true)
                 ? const Positioned(top: 0, child: Loading())

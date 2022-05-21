@@ -84,7 +84,6 @@ class _BankDetailsState extends State<BankDetails> {
                         Positioned(
                             child: InkWell(
                                 onTap: () {
-                                  
                                   Navigator.pop(context);
                                 },
                                 child: const Icon(Icons.arrow_back)))

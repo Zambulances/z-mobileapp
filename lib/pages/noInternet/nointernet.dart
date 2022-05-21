@@ -10,7 +10,7 @@ class NoInternet extends StatefulWidget {
   // const NoInternet({ Key? key }) : super(key: key);
   dynamic onTap;
   // ignore: use_key_in_widget_constructors
-   NoInternet({required this.onTap});
+  NoInternet({required this.onTap});
 
   @override
   _NoInternetState createState() => _NoInternetState();

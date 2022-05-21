@@ -102,7 +102,7 @@ class _VehicleNumberState extends State<VehicleNumber> {
                   ),
                 ),
               ])),
-              //no internet
+          //no internet
           (internet == false)
               ? Positioned(
                   top: 0,

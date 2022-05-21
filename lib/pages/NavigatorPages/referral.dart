@@ -30,7 +30,6 @@ class _ReferralPageState extends State<ReferralPage> {
   _getReferral() async {
     await getReferral();
     setState(() {
-    
       _isLoading = false;
     });
   }

@@ -7,7 +7,6 @@ import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 
-
 class MakeComplaint extends StatefulWidget {
   final int fromPage;
   // ignore: prefer_const_constructors_in_immutables, use_key_in_widget_constructors
@@ -100,109 +99,107 @@ class _MakeComplaintState extends State<MakeComplaint> {
                   ),
                   (generalComplaintList.isNotEmpty)
                       ? Expanded(
-                        child: Column(
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    if (_showOptions == false) {
-                                      _showOptions = true;
-                                    } else {
-                                      _showOptions = false;
-                                    }
-                                  });
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.only(
-                                      left: media.width * 0.05,
-                                      right: media.width * 0.05),
-                                  height: media.width * 0.12,
-                                  width: media.width * 0.8,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: borderLines, width: 1.2)),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(generalComplaintList[complaintType]
-                                          ['title']),
-                                      RotatedBox(
-                                        quarterTurns:
-                                            (_showOptions == true) ? 2 : 0,
-                                        child: Container(
-                                          height: media.width * 0.08,
-                                          width: media.width * 0.08,
-                                          decoration:const BoxDecoration(
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      'assets/images/chevron-down.png'),
-                                                  fit: BoxFit.contain)),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
+                          child: Column(children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (_showOptions == false) {
+                                  _showOptions = true;
+                                } else {
+                                  _showOptions = false;
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                  left: media.width * 0.05,
+                                  right: media.width * 0.05),
+                              height: media.width * 0.12,
+                              width: media.width * 0.8,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color: borderLines, width: 1.2)),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(generalComplaintList[complaintType]
+                                      ['title']),
+                                  RotatedBox(
+                                    quarterTurns:
+                                        (_showOptions == true) ? 2 : 0,
+                                    child: Container(
+                                      height: media.width * 0.08,
+                                      width: media.width * 0.08,
+                                      decoration: const BoxDecoration(
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  'assets/images/chevron-down.png'),
+                                              fit: BoxFit.contain)),
+                                    ),
+                                  )
+                                ],
                               ),
-                              SizedBox(
-                                height: media.width * 0.08,
+                            ),
+                          ),
+                          SizedBox(
+                            height: media.width * 0.08,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(media.width * 0.025),
+                            width: media.width * 0.8,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border:
+                                    Border.all(color: borderLines, width: 1.2)),
+                            child: TextField(
+                              controller: complaintText,
+                              minLines: 5,
+                              maxLines: 5,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintStyle: GoogleFonts.roboto(
+                                    fontSize: media.width * fourteen),
+                                hintText: languages[choosenLanguage]
+                                        ['text_complaint_2'] +
+                                    ' (' +
+                                    languages[choosenLanguage]
+                                        ['text_complaint_3'] +
+                                    ')',
                               ),
-                              Container(
-                                padding: EdgeInsets.all(media.width * 0.025),
-                                width: media.width * 0.8,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: borderLines, width: 1.2)),
-                                child: TextField(
-                                  controller: complaintText,
-                                  minLines: 5,
-                                  maxLines: 5,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintStyle: GoogleFonts.roboto(
-                                        fontSize: media.width * fourteen),
-                                    hintText: languages[choosenLanguage]
-                                            ['text_complaint_2'] +
-                                        ' (' +
-                                        languages[choosenLanguage]
-                                            ['text_complaint_3'] +
-                                        ')',
-                                  ),
-                                ),
-                              ),
-                              
-                            ])
-                      )
+                            ),
+                          ),
+                        ]))
                       : Container(),
-                      (generalComplaintList.isNotEmpty) ? Container(
-                         padding: EdgeInsets.all(media.width*0.05),
-                         child: Button(
-                                    onTap: () async {
-                                      if (complaintText.text.length >= 10) {
-                                        setState(() {
-                                          _isLoading = true;
-                                        });
-                                        complaintDesc = complaintText.text;
-                                        dynamic result;
-                                        if (widget.fromPage == 1) {
-                                          result = await makeRequestComplaint();
-                                        } else {
-                                          result = await makeGeneralComplaint();
-                                        }
-                                        setState(() {
-                                          if (result == 'success') {
-                                            _success = true;
-                                          }
-                      
-                                          _isLoading = false;
-                                        });
-                                      }
-                                    },
-                                    text: languages[choosenLanguage]['text_submit']),
-                       )
-                          : Container()  
+                  (generalComplaintList.isNotEmpty)
+                      ? Container(
+                          padding: EdgeInsets.all(media.width * 0.05),
+                          child: Button(
+                              onTap: () async {
+                                if (complaintText.text.length >= 10) {
+                                  setState(() {
+                                    _isLoading = true;
+                                  });
+                                  complaintDesc = complaintText.text;
+                                  dynamic result;
+                                  if (widget.fromPage == 1) {
+                                    result = await makeRequestComplaint();
+                                  } else {
+                                    result = await makeGeneralComplaint();
+                                  }
+                                  setState(() {
+                                    if (result == 'success') {
+                                      _success = true;
+                                    }
+
+                                    _isLoading = false;
+                                  });
+                                }
+                              },
+                              text: languages[choosenLanguage]['text_submit']),
+                        )
+                      : Container()
                 ],
               ),
             ),
@@ -225,7 +222,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                         color: page,
                       ),
                       child: SingleChildScrollView(
-                        physics:const BouncingScrollPhysics(),
+                        physics: const BouncingScrollPhysics(),
                         child: Column(
                           children: generalComplaintList
                               .asMap()
@@ -266,7 +263,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                     ))
                 : Container(),
 
-                //success
+            //success
             (_success == true)
                 ? Positioned(
                     child: Container(

@@ -24,7 +24,6 @@ class _VehicleColorState extends State<VehicleColor> {
 
   String uploadError = '';
 
-
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -84,7 +83,6 @@ class _VehicleColorState extends State<VehicleColor> {
                         textController: controller,
                         onTap: (val) {
                           setState(() {
-                            
                             vehicleColor = controller.text;
                           });
                         },
@@ -119,15 +117,17 @@ class _VehicleColorState extends State<VehicleColor> {
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>const Referral()),
+                                            builder: (context) =>
+                                                const Referral()),
                                         (route) => false);
                                     serviceLocations.clear();
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
-                                  }else{
+                                  } else {
                                     setState(() {
-                                      uploadError = languages[choosenLanguage]['text_somethingwentwrong'];
+                                      uploadError = languages[choosenLanguage]
+                                          ['text_somethingwentwrong'];
                                     });
                                   }
                                 } else {
@@ -136,7 +136,7 @@ class _VehicleColorState extends State<VehicleColor> {
                                     Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) =>const Maps()),
+                                            builder: (context) => const Maps()),
                                         (route) => false);
                                     serviceLocations.clear();
                                     vehicleMake.clear();
@@ -155,7 +155,7 @@ class _VehicleColorState extends State<VehicleColor> {
                 ),
               ])),
 
-              //no internet
+          //no internet
           (internet == false)
               ? Positioned(
                   top: 0,
@@ -168,7 +168,7 @@ class _VehicleColorState extends State<VehicleColor> {
                   ))
               : Container(),
 
-              //loader
+          //loader
           (_isLoading == true)
               ? const Positioned(top: 0, child: Loading())
               : Container()

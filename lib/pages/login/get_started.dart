@@ -205,7 +205,7 @@ class _GetStartedState extends State<GetStarted> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                 const ServiceArea()));
+                                                  const ServiceArea()));
                                     } else {
                                       setState(() {
                                         verifyEmailError = result.toString();

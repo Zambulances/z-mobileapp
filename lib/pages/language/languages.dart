@@ -148,8 +148,7 @@ class _LanguagesState extends State<Languages> {
                   ? Button(
                       onTap: () {
                         //saving language settings in local
-                        pref.setString(
-                            'languageDirection', languageDirection);
+                        pref.setString('languageDirection', languageDirection);
                         pref.setString('choosenLanguage', choosenLanguage);
                         Navigator.pushReplacement(
                             context,

@@ -48,7 +48,6 @@ class _LoadingState extends State<Loading> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          
           SizedBox(
             height: 20,
             width: media.width * 1,

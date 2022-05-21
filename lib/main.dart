@@ -12,7 +12,7 @@ void main() async {
   await Firebase.initializeApp();
   checkInternetConnection();
   initMessaging();
-  
+
   currentPositionUpdate();
   runApp(const MyApp());
 }

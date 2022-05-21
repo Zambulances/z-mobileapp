@@ -148,11 +148,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_enable_history'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -184,11 +184,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_enable_wallet'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -221,11 +221,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_enable_referal'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -258,11 +258,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_updateVehicle'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -295,7 +295,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]['text_earnings'],
                                     overflow: TextOverflow.ellipsis,
@@ -335,11 +335,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_manage_docs'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -371,7 +371,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]['text_faq'],
                                     overflow: TextOverflow.ellipsis,
@@ -409,7 +409,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]['text_sos'],
                                     overflow: TextOverflow.ellipsis,
@@ -448,11 +448,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_change_language'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -481,11 +481,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_updateBank'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -521,11 +521,11 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]
                                         ['text_make_complaints'],
-                                        overflow: TextOverflow.ellipsis,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor),
@@ -553,7 +553,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]['text_about'],
                                     overflow: TextOverflow.ellipsis,
@@ -589,7 +589,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                   width: media.width * 0.025,
                                 ),
                                 SizedBox(
-                                  width: media.width*0.55,
+                                  width: media.width * 0.55,
                                   child: Text(
                                     languages[choosenLanguage]['text_logout'],
                                     overflow: TextOverflow.ellipsis,

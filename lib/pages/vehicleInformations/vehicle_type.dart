@@ -183,7 +183,7 @@ class _VehicleTypeState extends State<VehicleType> {
                     ))
                 : Container(),
 
-                //loader
+            //loader
             (_loaded == false)
                 ? const Positioned(top: 0, child: Loading())
                 : Container()

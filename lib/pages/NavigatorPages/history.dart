@@ -36,7 +36,6 @@ class _HistoryState extends State<History> {
     });
     await getHistory('is_later=1');
 
-    
     setState(() {
       _isLoading = false;
     });
@@ -77,7 +76,6 @@ class _HistoryState extends State<History> {
                     Positioned(
                         child: InkWell(
                             onTap: () {
-                             
                               Navigator.pop(context);
                             },
                             child: const Icon(Icons.arrow_back)))
@@ -240,7 +238,7 @@ class _HistoryState extends State<History> {
                                                           context,
                                                           MaterialPageRoute(
                                                               builder: (context) =>
-                                                                const  HistoryDetails()));
+                                                                  const HistoryDetails()));
                                                     },
                                                     child: Container(
                                                       margin: EdgeInsets.only(
@@ -819,68 +817,54 @@ class _HistoryState extends State<History> {
                                                                     )),
                                                               ],
                                                             ),
-                                                            SizedBox(
-                                                              height:
-                                                                  media.width *
-                                                                      0.05,
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Container(
-                                                                  height: media
-                                                                          .width *
-                                                                      0.05,
-                                                                  width: media
-                                                                          .width *
-                                                                      0.05,
-                                                                  alignment:
-                                                                      Alignment
-                                                                          .center,
-                                                                  decoration: BoxDecoration(
-                                                                      shape: BoxShape
-                                                                          .circle,
-                                                                      color: const Color(
-                                                                              0xff319900)
-                                                                          .withOpacity(
-                                                                              0.3)),
-                                                                  child:
-                                                                      Container(
-                                                                    height: media
-                                                                            .width *
-                                                                        0.025,
-                                                                    width: media
-                                                                            .width *
-                                                                        0.025,
-                                                                    decoration: const BoxDecoration(
-                                                                        shape: BoxShape
-                                                                            .circle,
-                                                                        color: Color(
-                                                                            0xff319900)),
-                                                                  ),
-                                                                ),
-                                                                SizedBox(
-                                                                  width: media
-                                                                          .width *
-                                                                      0.05,
-                                                                ),
-                                                                SizedBox(
-                                                                    width: media
-                                                                            .width *
-                                                                        0.7,
-                                                                    child: Text(
-                                                                      myHistory[
-                                                                              i]
-                                                                          [
-                                                                          'drop_address'],
-                                                                      style: GoogleFonts.roboto(
-                                                                          fontSize:
-                                                                              media.width * twelve),
-                                                                    )),
-                                                              ],
-                                                            ),
+                                                            (myHistory[i][
+                                                                        'drop_address'] !=
+                                                                    null)
+                                                                ? Container(
+                                                                    padding: EdgeInsets.only(
+                                                                        top: media.width *
+                                                                            0.05),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .start,
+                                                                      children: [
+                                                                        Container(
+                                                                          height:
+                                                                              media.width * 0.05,
+                                                                          width:
+                                                                              media.width * 0.05,
+                                                                          alignment:
+                                                                              Alignment.center,
+                                                                          decoration: BoxDecoration(
+                                                                              shape: BoxShape.circle,
+                                                                              color: const Color(0xff319900).withOpacity(0.3)),
+                                                                          child:
+                                                                              Container(
+                                                                            height:
+                                                                                media.width * 0.025,
+                                                                            width:
+                                                                                media.width * 0.025,
+                                                                            decoration:
+                                                                                const BoxDecoration(shape: BoxShape.circle, color: Color(0xff319900)),
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              media.width * 0.05,
+                                                                        ),
+                                                                        SizedBox(
+                                                                            width: media.width *
+                                                                                0.7,
+                                                                            child:
+                                                                                Text(
+                                                                              myHistory[i]['drop_address'],
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                            )),
+                                                                      ],
+                                                                    ),
+                                                                  )
+                                                                : Container(),
                                                           ],
                                                         ),
                                                       ),
@@ -1074,61 +1058,41 @@ class _HistoryState extends State<History> {
                                                                         )),
                                                                   ],
                                                                 ),
-                                                                SizedBox(
-                                                                  height: media
-                                                                          .width *
-                                                                      0.05,
-                                                                ),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Container(
-                                                                      height: media
-                                                                              .width *
-                                                                          0.05,
-                                                                      width: media
-                                                                              .width *
-                                                                          0.05,
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .center,
-                                                                      decoration: BoxDecoration(
-                                                                          shape: BoxShape
-                                                                              .circle,
-                                                                          color:
-                                                                              const Color(0xff319900).withOpacity(0.3)),
-                                                                      child:
-                                                                          Container(
-                                                                        height: media.width *
-                                                                            0.025,
-                                                                        width: media.width *
-                                                                            0.025,
-                                                                        decoration: const BoxDecoration(
-                                                                            shape:
-                                                                                BoxShape.circle,
-                                                                            color: Color(0xff319900)),
-                                                                      ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      width: media
-                                                                              .width *
-                                                                          0.05,
-                                                                    ),
-                                                                    SizedBox(
-                                                                        width: media.width *
-                                                                            0.7,
+                                                                (myHistory[i][
+                                                                            'drop_address'] !=
+                                                                        null)
+                                                                    ? Container(
+                                                                        padding:
+                                                                            EdgeInsets.only(top: media.width * 0.05),
                                                                         child:
-                                                                            Text(
-                                                                          myHistory[i]
-                                                                              [
-                                                                              'drop_address'],
-                                                                          style:
-                                                                              GoogleFonts.roboto(fontSize: media.width * twelve),
-                                                                        )),
-                                                                  ],
-                                                                ),
+                                                                            Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.start,
+                                                                          children: [
+                                                                            Container(
+                                                                              height: media.width * 0.05,
+                                                                              width: media.width * 0.05,
+                                                                              alignment: Alignment.center,
+                                                                              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xff319900).withOpacity(0.3)),
+                                                                              child: Container(
+                                                                                height: media.width * 0.025,
+                                                                                width: media.width * 0.025,
+                                                                                decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xff319900)),
+                                                                              ),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width: media.width * 0.05,
+                                                                            ),
+                                                                            SizedBox(
+                                                                                width: media.width * 0.7,
+                                                                                child: Text(
+                                                                                  myHistory[i]['drop_address'],
+                                                                                  style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                                )),
+                                                                          ],
+                                                                        ),
+                                                                      )
+                                                                    : Container(),
                                                               ],
                                                             ),
                                                           ),
@@ -1159,12 +1123,11 @@ class _HistoryState extends State<History> {
                                       _isLoading = true;
                                     });
                                     if (_showHistory == 0) {
-                                      await getHistoryPages(
-                                          'is_later=1&page=' +
-                                              (myHistoryPage['pagination']
-                                                          ['current_page'] +
-                                                      1)
-                                                  .toString());
+                                      await getHistoryPages('is_later=1&page=' +
+                                          (myHistoryPage['pagination']
+                                                      ['current_page'] +
+                                                  1)
+                                              .toString());
                                     } else if (_showHistory == 1) {
                                       await getHistoryPages(
                                           'is_completed=1&page=' +

@@ -29,7 +29,7 @@ class _EditProfileState extends State<EditProfile> {
   TextEditingController email = TextEditingController();
 
 //get gallery permission
- getGalleryPermission() async {
+  getGalleryPermission() async {
     var status = await Permission.photos.status;
     if (status != PermissionStatus.granted) {
       status = await Permission.photos.request();
@@ -49,38 +49,34 @@ class _EditProfileState extends State<EditProfile> {
 //pick image from gallery
   pickImageFromGallery() async {
     var permission = await getGalleryPermission();
-    if(permission == PermissionStatus.granted){
+    if (permission == PermissionStatus.granted) {
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      proImageFile = pickedFile?.path;
-      _pickImage = false;
-    });
-    }
-    else{
+      setState(() {
+        proImageFile = pickedFile?.path;
+        _pickImage = false;
+      });
+    } else {
       setState(() {
         _permission = 'noPhotos';
       });
-      
     }
   }
 
 //pick image from camera
   pickImageFromCamera() async {
-    var permission =await getCameraPermission();
-    if(permission == PermissionStatus.granted){
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-    setState(() {
-      proImageFile = pickedFile?.path;
-      _pickImage = false;
-    });}
-     else{
-       setState(() {
-         _permission = 'noCamera';
-       });
-      
+    var permission = await getCameraPermission();
+    if (permission == PermissionStatus.granted) {
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      setState(() {
+        proImageFile = pickedFile?.path;
+        _pickImage = false;
+      });
+    } else {
+      setState(() {
+        _permission = 'noCamera';
+      });
     }
   }
-
 
   @override
   void initState() {
@@ -226,8 +222,7 @@ class _EditProfileState extends State<EditProfile> {
                               val = await updateProfileWithoutImage(
                                   name.text, email.text);
                             } else {
-                              val =
-                                  await updateProfile(name.text, email.text);
+                              val = await updateProfile(name.text, email.text);
                             }
                             if (val == 'success') {
                               Navigator.pop(context, true);
@@ -369,105 +364,111 @@ class _EditProfileState extends State<EditProfile> {
                     ))
                 : Container(),
 
-                //permission denied popup
-              (_permission != '') ? Positioned(child: Container(
-                        height: media.height*1,
-                        width: media.width*1,
-                        color: Colors.transparent.withOpacity(0.6),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: media.width*0.9,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+            //permission denied popup
+            (_permission != '')
+                ? Positioned(
+                    child: Container(
+                    height: media.height * 1,
+                    width: media.width * 1,
+                    color: Colors.transparent.withOpacity(0.6),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: media.width * 0.9,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _permission = '';
+                                    _pickImage = false;
+                                  });
+                                },
+                                child: Container(
+                                  height: media.width * 0.1,
+                                  width: media.width * 0.1,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle, color: page),
+                                  child: const Icon(Icons.cancel_outlined),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: media.width * 0.05,
+                        ),
+                        Container(
+                          padding: EdgeInsets.all(media.width * 0.05),
+                          width: media.width * 0.9,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: page,
+                              boxShadow: [
+                                BoxShadow(
+                                    blurRadius: 2.0,
+                                    spreadRadius: 2.0,
+                                    color: Colors.black.withOpacity(0.2))
+                              ]),
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                  width: media.width * 0.8,
+                                  child: Text(
+                                    (_permission == 'noPhotos')
+                                        ? languages[choosenLanguage]
+                                            ['text_open_photos_setting']
+                                        : languages[choosenLanguage]
+                                            ['text_open_camera_setting'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w600),
+                                  )),
+                              SizedBox(height: media.width * 0.05),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   InkWell(
-                                    onTap: (){
-                                      setState(() {
-                                        _permission = '';
-                                        _pickImage = false;
-                                      });
-                                    },
-                                    child: Container(
-                                                      height: media.width * 0.1,
-                                                      width: media.width * 0.1,
-                                                      decoration: BoxDecoration(
-                                                          shape: BoxShape.circle,
-                                                          color: page),
-                                                      child: const Icon(
-                                                          Icons.cancel_outlined),
-                                                    ),
-                                  ),
+                                      onTap: () async {
+                                        await openAppSettings();
+                                      },
+                                      child: Text(
+                                        languages[choosenLanguage]
+                                            ['text_open_settings'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * sixteen,
+                                            color: buttonColor,
+                                            fontWeight: FontWeight.w600),
+                                      )),
+                                  InkWell(
+                                      onTap: () async {
+                                        (_permission == 'noCamera')
+                                            ? pickImageFromCamera()
+                                            : pickImageFromGallery();
+                                        setState(() {
+                                          _permission = '';
+                                        });
+                                      },
+                                      child: Text(
+                                        languages[choosenLanguage]['text_done'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * sixteen,
+                                            color: buttonColor,
+                                            fontWeight: FontWeight.w600),
+                                      ))
                                 ],
-                              ),
-                            ),
-                            SizedBox(
-                                        height: media.width * 0.05,
-                                      ),
-                            Container(
-                              padding: EdgeInsets.all(media.width*0.05),
-                              width: media.width*0.9,
-                              decoration:BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: page,
-                                boxShadow: [BoxShadow(blurRadius: 2.0,spreadRadius: 2.0,color: Colors.black.withOpacity(0.2))]
-                              ),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    width: media.width*0.8,
-                                    child: Text(
-                                      (_permission == 'noPhotos') ?
-                                      languages[choosenLanguage]['text_open_photos_setting'] : languages[choosenLanguage]['text_open_camera_setting'],
-                                    style: GoogleFonts.roboto(
-                                      fontSize:media.width*sixteen,
-                                      color: textColor,
-                                      fontWeight:FontWeight.w600
-                                    ),
-                                    )),
-                                    SizedBox(height:media.width*0.05),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        InkWell(
-                                          onTap: ()async{
-                                            await openAppSettings();
-                                            
-                                            
-                                          },
-                                          child: Text(languages[choosenLanguage]['text_open_settings'],
-                                          style: GoogleFonts.roboto(
-                                      fontSize:media.width*sixteen,
-                                      color: buttonColor,
-                                      fontWeight:FontWeight.w600
-                                    ),
-                                          )),
-                                        InkWell(
-                                          onTap: ()async{
-                                            (_permission == 'noCamera') ? pickImageFromCamera() : pickImageFromGallery();
-                                            setState(() {
-                                              _permission = '';
-                                             
-                                            });
-                                            
-                                           
-                                          },
-                                          child: Text(languages[choosenLanguage]['text_done'],
-                                          style: GoogleFonts.roboto(
-                                      fontSize:media.width*sixteen,
-                                      color: buttonColor,
-                                      fontWeight:FontWeight.w600
-                                    ),
-                                          ))
-                                      ],
-                                    )
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      )) : Container(),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ))
+                : Container(),
             //loader
             (_isLoading == true)
                 ? const Positioned(top: 0, child: Loading())

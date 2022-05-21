@@ -166,7 +166,7 @@ class _VehicleMakeState extends State<VehicleMake> {
                     ))
                 : Container(),
 
-                //loader
+            //loader
             (_loaded == false)
                 ? const Positioned(top: 0, child: Loading())
                 : Container()

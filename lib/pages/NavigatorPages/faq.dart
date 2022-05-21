@@ -28,7 +28,6 @@ class _FaqState extends State<Faq> {
 //get faq datas
 
   faqDatas() async {
-    
     await getFaqData(center.latitude, center.longitude);
     setState(() {
       _isLoading = false;

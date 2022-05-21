@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
@@ -18,67 +16,66 @@ class PayStackPage extends StatefulWidget {
   _PayStackPageState createState() => _PayStackPageState();
 }
 
-
-
 class _PayStackPageState extends State<PayStackPage> {
   bool _isLoading = false;
   bool _success = false;
   bool _failed = false;
- final plugin = PaystackPlugin();
+  final plugin = PaystackPlugin();
   @override
   void initState() {
-    plugin.initialize(publicKey: 'pk_test_b4cb479fa0d654cb6db52663b27a019973ecfaf5');
+    plugin.initialize(
+        publicKey: 'pk_test_b4cb479fa0d654cb6db52663b27a019973ecfaf5');
     payMoney();
     super.initState();
   }
 
-
 //payment gateway code
-payMoney()async{
-   setState(() {
-                                      _isLoading = true;
-                                    });
-                                    var val = await getPaystackPayment(addMoney * 100);
-                                    if(val == 'success'){
-                                    Charge charge = Charge()
-                                    ..amount = addMoney * 100
-                                    ..reference = paystackCode['reference']
-                                    ..accessCode = paystackCode['access_code']
-                                    ..email = userDetails['email'];
-                                    var response = await plugin.checkout(
-       context,
-       method: CheckoutMethod.selectable, // Defaults to CheckoutMethod.selectable
-       charge: charge,
-     );
-     if(response.message == 'Transaction terminated'){
-       Navigator.pop(context,true);
-     }
-     if(response.message == 'Success'){
-      var val = await addMoneyPaystack(addMoney, response.reference);
-      if(val == 'success'){
+  payMoney() async {
+    setState(() {
+      _isLoading = true;
+    });
+    var val = await getPaystackPayment(addMoney * 100);
+    if (val == 'success') {
+      Charge charge = Charge()
+        ..amount = addMoney * 100
+        ..reference = paystackCode['reference']
+        ..accessCode = paystackCode['access_code']
+        ..email = userDetails['email'];
+      var response = await plugin.checkout(
+        context,
+        method:
+            CheckoutMethod.selectable, // Defaults to CheckoutMethod.selectable
+        charge: charge,
+      );
+      if (response.message == 'Transaction terminated') {
+        Navigator.pop(context, true);
+      }
+      if (response.message == 'Success') {
+        var val = await addMoneyPaystack(addMoney, response.reference);
+        if (val == 'success') {
+          setState(() {
+            _success = true;
+          });
+        } else {
+          setState(() {
+            _failed = true;
+          });
+        }
+      } else {
         setState(() {
-          _success = true;
+          _failed = true;
         });
-      }else{
-                                      setState(() {
-                                        _failed = true;
-                                      });
-                                    }
-     }else{
-                                      setState(() {
-                                        _failed = true;
-                                      });
-                                    }
-                                    }else{
-                                      setState(() {
-                                        _failed = true;
-                                      });
-                                    }
-                                    
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-}
+      }
+    } else {
+      setState(() {
+        _failed = true;
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +124,6 @@ payMoney()async{
                         SizedBox(
                           height: media.width * 0.05,
                         ),
-                       
                       ],
                     ),
                   ),
@@ -178,7 +174,7 @@ payMoney()async{
                           ))
                       : Container(),
 
-                      //success payment
+                  //success payment
                   (_success == true)
                       ? Positioned(
                           top: 0,
@@ -213,7 +209,7 @@ payMoney()async{
                                           onTap: () async {
                                             setState(() {
                                               _success = false;
-                                              
+
                                               Navigator.pop(context, true);
                                             });
                                           },
