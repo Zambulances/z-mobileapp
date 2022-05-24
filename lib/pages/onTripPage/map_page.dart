@@ -901,6 +901,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                             MainAxisAlignment
                                                                 .spaceBetween,
                                                         children: [
+                                                          (userDetails['show_rental_ride'] == true) ?
                                                           Button(
                                                             onTap: () {
                                                               if (addressList
@@ -917,7 +918,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                             text: languages[
                                                                     choosenLanguage]
                                                                 ['text_rental'],
-                                                          ),
+                                                          ) : Container(),
                                                           InkWell(
                                                             onTap: () async {
                                                               setState(() {

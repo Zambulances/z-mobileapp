@@ -480,6 +480,7 @@ getUserDetails() async {
       },
     );
     if (response.statusCode == 200) {
+      print(response.body);
       userDetails =
           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
       favAddress = userDetails['favouriteLocations']['data'];
