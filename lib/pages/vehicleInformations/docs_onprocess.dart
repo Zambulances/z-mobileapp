@@ -139,7 +139,7 @@ class _DocsProcessState extends State<DocsProcess> {
                                       ),
                                       SizedBox(height: media.height * 0.02),
                                       Text(
-                                        (userDetails['declined_error'] != null)
+                                        (userDetails['declined_reason'] != null)
                                             ? userDetails['declined_reason']
                                                 .toString()
                                             : '',

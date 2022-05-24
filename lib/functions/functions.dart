@@ -528,6 +528,7 @@ getDocumentsNeeded() async {
     });
 
     if (response.statusCode == 200) {
+      print(jsonDecode(response.body)['data'][1]);
       documentsNeeded = jsonDecode(response.body)['data'];
       enableDocumentSubmit = jsonDecode(response.body)['enable_submit_button'];
       result = 'success';
@@ -1371,7 +1372,7 @@ endTrip() async {
   }
 }
 
-dynamic heading;
+dynamic heading = 0.0;
 
 //get polylines
 
