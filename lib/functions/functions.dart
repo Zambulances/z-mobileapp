@@ -188,8 +188,12 @@ uploadDocs() async {
         .addAll({'Authorization': 'Bearer ' + bearerToken[0].token});
     response.files
         .add(await http.MultipartFile.fromPath('document', imageFile));
+        if(documentsNeeded[choosenDocs]['has_expiry_date'] == true){
     response.fields['expiry_date'] = expDate.toString().substring(0, 19);
+        }
+        if(documentsNeeded[choosenDocs]['has_identify_number'] == true){
     response.fields['identify_number'] = docIdNumber;
+        }
     response.fields['document_id'] = docsId.toString();
     var request = await response.send();
     var respon = await http.Response.fromStream(request);
@@ -526,9 +530,8 @@ getDocumentsNeeded() async {
       'Authorization': 'Bearer ' + bearerToken[0].token,
       'Content-Type': 'application/json'
     });
-
     if (response.statusCode == 200) {
-      print(jsonDecode(response.body)['data'][1]);
+      print(response.body);
       documentsNeeded = jsonDecode(response.body)['data'];
       enableDocumentSubmit = jsonDecode(response.body)['enable_submit_button'];
       result = 'success';
@@ -645,6 +648,7 @@ getUserDetails() async {
       },
     );
     if (response.statusCode == 200) {
+      print(bearerToken[0].token);
       userDetails = jsonDecode(response.body)['data'];
 
       sosData = userDetails['sos']['data'];
@@ -2365,13 +2369,14 @@ checkInternetConnection() async {
       client.disconnect();
     } else {
       internet = true;
+      if(userDetails.isNotEmpty){
       if (client.connectionStatus!.state != ConnectionState.active &&
           client.connectionStatus == null &&
           userDetails.isNotEmpty &&
           mqttUrl != '' &&
           client != '') {
         mqttForDocuments();
-      }
+      }}
       valueNotifierHome.incrementNotifier();
       valueNotifierHome.incrementNotifier();
     }

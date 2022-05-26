@@ -24,6 +24,7 @@ class Docs extends StatefulWidget {
 }
 
 int docsId = 0;
+int choosenDocs = 0;
 
 class _DocsState extends State<Docs> {
   bool _loaded = false;
@@ -111,6 +112,7 @@ class _DocsState extends State<Docs> {
                                             child: InkWell(
                                               onTap: () async {
                                                 docsId = documentsNeeded[i]['id'];
+                                                choosenDocs = i;
                                                 await Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
@@ -561,61 +563,63 @@ class _UploadDocsState extends State<UploadDocs> {
                             ),
                     ),
                   ),
-                  SizedBox(
-                    height: media.height * 0.04,
-                  ),
-                  InkWell(
-                    onTap: () {
-                      _datePicker();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(
-                          border: Border(
-                              bottom:
-                                  BorderSide(color: underline, width: 1.5))),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          (date != '')
-                              ? Text(
-                                  date,
-                                  style: GoogleFonts.roboto(
-                                      color: textColor,
-                                      fontSize: media.width * sixteen),
-                                )
-                              : Text(
-                                  'Select Date',
-                                  style: GoogleFonts.roboto(
-                                      color: textColor.withOpacity(0.5),
-                                      fontSize: media.width * sixteen),
-                                ),
-                          const Icon(Icons.date_range_outlined)
-                        ],
+                  (documentsNeeded[choosenDocs]['has_expiry_date'] == true) ?
+                  Container(
+                    padding:EdgeInsets.only(top:media.height * 0.04),
+                    child: InkWell(
+                      onTap: () {
+                        _datePicker();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                            border: Border(
+                                bottom:
+                                    BorderSide(color: underline, width: 1.5))),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            (date != '')
+                                ? Text(
+                                    date,
+                                    style: GoogleFonts.roboto(
+                                        color: textColor,
+                                        fontSize: media.width * sixteen),
+                                  )
+                                : Text(
+                                    'Select Date',
+                                    style: GoogleFonts.roboto(
+                                        color: textColor.withOpacity(0.5),
+                                        fontSize: media.width * sixteen),
+                                  ),
+                            const Icon(Icons.date_range_outlined)
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    height: media.height * 0.02,
-                  ),
-                  InputField(
-                    text: (languages[choosenLanguage][documentsNeeded
-                                .firstWhere((element) =>
-                                    element['id'] ==
-                                    docsId)['identify_number_locale_key']
-                                .toString()] !=
-                            null)
-                        ? languages[choosenLanguage][documentsNeeded[docsId]
-                                ['identify_number_locale_key']
-                            .toString()]
-                        : 'Identification Number',
-                    textController: idNumber,
-                    onTap: (val) {
-                      setState(() {
-                        docIdNumber = idNumber.text;
-                      });
-                    },
-                  ),
+                  ) : Container(),
+                  (documentsNeeded[choosenDocs]['has_identify_number'] == true) ?
+                  Container(
+                    padding: EdgeInsets.only(top:media.height * 0.02),
+                    child: InputField(
+                      text: (languages[choosenLanguage][documentsNeeded
+                                  .firstWhere((element) =>
+                                      element['id'] ==
+                                      docsId)['identify_number_locale_key']
+                                  .toString()] !=
+                              null)
+                          ? languages[choosenLanguage][documentsNeeded[docsId]
+                                  ['identify_number_locale_key']
+                              .toString()]
+                          : 'Identification Number',
+                      textController: idNumber,
+                      onTap: (val) {
+                        setState(() {
+                          docIdNumber = idNumber.text;
+                        });
+                      },
+                    ),
+                  ) : Container(),
 
                   //error
                   (_error == '')
@@ -630,7 +634,7 @@ class _UploadDocsState extends State<UploadDocs> {
                                 color: Colors.red),
                           )),
                   SizedBox(height: media.height * 0.04),
-                  (imageFile != null && idNumber.text.isNotEmpty && date != '')
+                  (imageFile != null && (documentsNeeded[choosenDocs]['has_identify_number'] == true) ? idNumber.text.isNotEmpty : 1+1 == 2 &&  (documentsNeeded[choosenDocs]['has_expiry_date'] == true) ? date != '' : 1+1 ==2)
                       ? Button(
                           onTap: () async {
                             FocusManager.instance.primaryFocus?.unfocus();
