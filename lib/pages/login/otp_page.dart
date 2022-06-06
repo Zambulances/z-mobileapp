@@ -271,6 +271,7 @@ class _OtpState extends State<Otp> {
                               // show error on otp
                               (_error != '')
                                   ? Container(
+                                      width: media.width * 0.8,
                                       alignment: Alignment.center,
                                       margin: EdgeInsets.only(
                                           top: media.height * 0.02),

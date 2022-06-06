@@ -169,6 +169,7 @@ class _GetStartedState extends State<GetStarted> {
                           ? Container(
                               margin: EdgeInsets.only(top: media.height * 0.03),
                               alignment: Alignment.center,
+                              width: media.width * 0.8,
                               child: Text(
                                 verifyEmailError,
                                 style: GoogleFonts.roboto(

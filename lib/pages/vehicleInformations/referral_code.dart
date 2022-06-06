@@ -122,7 +122,8 @@ class _ReferralState extends State<Referral> {
                                       builder: (context) => Docs()));
                             } else {
                               setState(() {
-                                _error = 'please enter valid referral code';
+                                _error = languages[choosenLanguage]
+                                    ['text_referral_code'];
                               });
                             }
                             setState(() {

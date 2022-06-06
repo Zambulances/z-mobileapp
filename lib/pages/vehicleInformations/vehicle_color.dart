@@ -89,6 +89,7 @@ class _VehicleColorState extends State<VehicleColor> {
                       ),
                       (uploadError != '')
                           ? Container(
+                              width: media.width * 0.8,
                               margin: const EdgeInsets.only(top: 20),
                               child: Text(
                                 uploadError,
@@ -126,8 +127,8 @@ class _VehicleColorState extends State<VehicleColor> {
                                     vehicleType.clear();
                                   } else {
                                     setState(() {
-                                      uploadError = languages[choosenLanguage]
-                                          ['text_somethingwentwrong'];
+                                      uploadError =
+                                          uploadError = reg.toString();
                                     });
                                   }
                                 } else {

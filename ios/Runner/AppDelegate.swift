@@ -18,8 +18,19 @@ import Firebase
      UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
     }
     application.registerForRemoteNotifications()
+    
+        
    UIApplication.shared.beginReceivingRemoteControlEvents()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
+    
+    override func applicationDidEnterBackground(_ application: UIApplication) {
+    
+        application.beginBackgroundTask();
+    }
+    override func applicationDidBecomeActive(_ application: UIApplication) {
+        application.endBackgroundTask();
+    }
+    
 }

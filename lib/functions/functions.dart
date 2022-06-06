@@ -47,6 +47,7 @@ AudioCache audioPlayer = AudioCache();
 AudioPlayer audioPlayers = AudioPlayer();
 String audio = 'audio/notification_sound.mp3';
 bool internet = true;
+dynamic centerCheck;
 
 //base url
 String url = 'https://tagxi-server.ondemandappz.com/';
@@ -188,12 +189,12 @@ uploadDocs() async {
         .addAll({'Authorization': 'Bearer ' + bearerToken[0].token});
     response.files
         .add(await http.MultipartFile.fromPath('document', imageFile));
-        if(documentsNeeded[choosenDocs]['has_expiry_date'] == true){
-    response.fields['expiry_date'] = expDate.toString().substring(0, 19);
-        }
-        if(documentsNeeded[choosenDocs]['has_identify_number'] == true){
-    response.fields['identify_number'] = docIdNumber;
-        }
+    if (documentsNeeded[choosenDocs]['has_expiry_date'] == true) {
+      response.fields['expiry_date'] = expDate.toString().substring(0, 19);
+    }
+    if (documentsNeeded[choosenDocs]['has_identify_number'] == true) {
+      response.fields['identify_number'] = docIdNumber;
+    }
     response.fields['document_id'] = docsId.toString();
     var request = await response.send();
     var respon = await http.Response.fromStream(request);
@@ -474,7 +475,7 @@ registerDriver() async {
       result = 'true';
     } else {
       debugPrint(response.body);
-      result = 'false';
+      result = jsonDecode(response.body)['message'];
     }
   } catch (e) {
     if (e is SocketException) {
@@ -531,7 +532,6 @@ getDocumentsNeeded() async {
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
-      print(response.body);
       documentsNeeded = jsonDecode(response.body)['data'];
       enableDocumentSubmit = jsonDecode(response.body)['enable_submit_button'];
       result = 'success';
@@ -648,7 +648,6 @@ getUserDetails() async {
       },
     );
     if (response.statusCode == 200) {
-      print(bearerToken[0].token);
       userDetails = jsonDecode(response.body)['data'];
 
       sosData = userDetails['sos']['data'];
@@ -906,10 +905,35 @@ currentPositionUpdate() async {
 
         // Test if location services are enabled.
 
-        center = LatLng(double.parse(pos.latitude.toString()),
-            double.parse(pos.longitude.toString()));
-        heading = pos.heading;
-        valueNotifierHome.incrementNotifier();
+        if (center == null && centerCheck == null) {
+          center = LatLng(double.parse(pos.latitude.toString()),
+              double.parse(pos.longitude.toString()));
+          heading = pos.heading;
+        } else if (center != null && centerCheck == null) {
+          var val = await calculateDistance(
+              center.latitude, center.longitude, pos.latitude, pos.longitude);
+          if (val > 150) {
+            centerCheck = val;
+          } else {
+            center = LatLng(double.parse(pos.latitude.toString()),
+                double.parse(pos.longitude.toString()));
+            heading = pos.heading;
+          }
+        } else if (center != null && centerCheck != null) {
+          var val = await calculateDistance(
+              center.latitude, center.longitude, pos.latitude, pos.longitude);
+          if (val > centerCheck) {
+            center = LatLng(double.parse(pos.latitude.toString()),
+                double.parse(pos.longitude.toString()));
+            heading = pos.heading;
+            centerCheck = null;
+          } else {
+            center = LatLng(double.parse(pos.latitude.toString()),
+                double.parse(pos.longitude.toString()));
+            heading = pos.heading;
+            centerCheck = null;
+          }
+        }
         final _position = FirebaseDatabase.instance.ref();
 
         try {
@@ -932,9 +956,9 @@ currentPositionUpdate() async {
             if (driverReq['accepted_at'] != null &&
                 driverReq['is_completed'] == 0) {
               requestDetailsUpdate(
-                  double.parse(pos.heading.toString()),
-                  double.parse(pos.latitude.toString()),
-                  double.parse(pos.longitude.toString()));
+                  double.parse(heading.toString()),
+                  double.parse(center.latitude.toString()),
+                  double.parse(center.longitude.toString()));
             }
           }
           valueNotifierHome.incrementNotifier();
@@ -997,7 +1021,7 @@ requestDetailsUpdate(
       lastLong = lng;
     } else {
       var distance = await calculateDistance(lastLat, lastLong, lat, lng);
-      if (distance >= 110.0) {
+      if (distance >= 150.0) {
         latlngArray.add({'lat': lat, 'lng': lng});
         lastLat = lat;
         lastLong = lng;
@@ -1123,7 +1147,6 @@ requestReject() async {
         duration = 0;
         await getUserDetails();
         userActive();
-        // audioPlayers.stop();
         valueNotifierHome.incrementNotifier();
       }
     } else {
@@ -1390,7 +1413,7 @@ getPolylines() async {
   String dropLng = driverReq['drop_lng'].toString();
   try {
     var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/directions/json?destination=$pickLat%2C$pickLng&origin=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
     if (response.statusCode == 200) {
       var steps =
           jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
@@ -1900,6 +1923,11 @@ Map<String, dynamic> walletBalance = {};
 List walletHistory = [];
 Map<String, dynamic> walletPages = {};
 
+void printWrapped(String text) {
+  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+  pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+}
+
 getWalletHistory() async {
   dynamic result;
   try {
@@ -1907,6 +1935,7 @@ getWalletHistory() async {
         Uri.parse(url + 'api/v1/payment/wallet/history'),
         headers: {'Authorization': 'Bearer ' + bearerToken[0].token});
     if (response.statusCode == 200) {
+      printWrapped(response.body);
       walletBalance = jsonDecode(response.body);
       walletHistory = walletBalance['wallet_history']['data'];
       walletPages = walletBalance['wallet_history']['meta']['pagination'];
@@ -2369,14 +2398,15 @@ checkInternetConnection() async {
       client.disconnect();
     } else {
       internet = true;
-      if(userDetails.isNotEmpty){
-      if (client.connectionStatus!.state != ConnectionState.active &&
-          client.connectionStatus == null &&
-          userDetails.isNotEmpty &&
-          mqttUrl != '' &&
-          client != '') {
-        mqttForDocuments();
-      }}
+      if (userDetails.isNotEmpty) {
+        if (client.connectionStatus!.state != ConnectionState.active &&
+            client.connectionStatus == null &&
+            userDetails.isNotEmpty &&
+            mqttUrl != '' &&
+            client != '') {
+          mqttForDocuments();
+        }
+      }
       valueNotifierHome.incrementNotifier();
       valueNotifierHome.incrementNotifier();
     }
