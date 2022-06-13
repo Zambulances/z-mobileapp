@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+// import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/editprofile.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
@@ -89,10 +90,13 @@ dynamic timerLocation;
 //get current location
 getCurrentLocation() {
   timerLocation = Timer.periodic(const Duration(seconds: 5), (timer) async {
-    var loc = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium);
+    var serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (serviceEnabled == true) {
+      var loc = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium);
 
-    currentLocation = LatLng(loc.latitude, loc.longitude);
+      currentLocation = LatLng(loc.latitude, loc.longitude);
+    }
   });
 }
 
@@ -339,7 +343,7 @@ registerUser() async {
       result = 'true';
     } else {
       debugPrint(response.body);
-      result = 'false';
+      result = jsonDecode(response.body)['message'];
     }
     return result;
   } catch (e) {
@@ -480,7 +484,6 @@ getUserDetails() async {
       },
     );
     if (response.statusCode == 200) {
-      print(response.body);
       userDetails =
           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
       favAddress = userDetails['favouriteLocations']['data'];
@@ -790,7 +793,7 @@ getPolylines() async {
 
   try {
     var response = await http.get(Uri.parse(
-        'https://maps.googleapis.com/maps/api/directions/json?destination=$pickLat%2C$pickLng&origin=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
     if (response.statusCode == 200) {
       var steps =
           jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
@@ -2568,7 +2571,7 @@ updateProfileWithoutImage(name, email) async {
   try {
     var response = http.MultipartRequest(
       'POST',
-      Uri.parse(url + 'api/v1/user/driver-profile'),
+      Uri.parse(url + 'api/v1/user/profile'),
     );
     response.headers
         .addAll({'Authorization': 'Bearer ' + bearerToken[0].token});

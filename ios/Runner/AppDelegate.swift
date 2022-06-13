@@ -20,4 +20,11 @@ import Firebase
  UIApplication.shared.beginReceivingRemoteControlEvents()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
+var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0);
+    override func applicationDidEnterBackground(_ application: UIApplication) {
+                bgTask = application.beginBackgroundTask()
+    }
+    override func applicationDidBecomeActive(_ application: UIApplication) {
+        application.endBackgroundTask(bgTask);
+    }
 }

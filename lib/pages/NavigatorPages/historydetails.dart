@@ -471,8 +471,10 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                       (myHistory[selectedHistory]
                                                   ['is_rental'] ==
                                               false)
-                                          ? 'Regular'
-                                          : 'Rental',
+                                          ? languages[choosenLanguage]
+                                              ['text_regular']
+                                          : languages[choosenLanguage]
+                                              ['text_rental'],
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * fourteen,
                                           color: textColor),

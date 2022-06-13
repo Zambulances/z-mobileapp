@@ -79,6 +79,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   bool notifyCompleted = false;
   bool _showInfo = false;
   dynamic _showInfoInt;
+  dynamic _dist;
   @override
   void initState() {
     WidgetsBinding.instance!.addObserver(this);
@@ -202,7 +203,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 //add drop marker
   addPickDropMarker() async {
     addMarker();
-    if (widget.type != 1 || userRequestData['is_rental'] != true) {
+    if (widget.type != 1) {
       addDropMarker();
       getPolylines();
     }
@@ -226,6 +227,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
           : LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']);
     });
     choosenVehicle = null;
+    _dist = null;
     etaDetails.clear();
     if (widget.type != 1) {
       etaRequest();
@@ -490,6 +492,21 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       driverData['l'][1]),
                                                   icon: pinLocationIcon,
                                                 ));
+                                                if (userRequestData[
+                                                        'arrived_at'] ==
+                                                    null) {
+                                                  var distCalc =
+                                                      calculateDistance(
+                                                          userRequestData[
+                                                              'pick_lat'],
+                                                          userRequestData[
+                                                              'pick_lng'],
+                                                          driverData['l'][0],
+                                                          driverData['l'][1]);
+                                                  _dist = double.parse(
+                                                      (distCalc / 1000)
+                                                          .toString());
+                                                }
                                               }
                                             }
                                           }
@@ -813,7 +830,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                 fit: BoxFit.contain,
                                                                                               ))
                                                                                           : Container(),
-                                                                                      (minutes[etaDetails[i]['type_id']] != null)
+                                                                                      (minutes[etaDetails[i]['type_id']] != '')
                                                                                           ? Text(
                                                                                               minutes[etaDetails[i]['type_id']].toString(),
                                                                                               style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.3)),
@@ -911,39 +928,47 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                 media.width *
                                                                     0.025,
                                                           ),
-                                                          SingleChildScrollView(
-                                                            scrollDirection:
-                                                                Axis.horizontal,
-                                                            child: Row(
-                                                              children:
-                                                                  etaDetails
-                                                                      .asMap()
-                                                                      .map((i,
-                                                                          value) {
-                                                                        return MapEntry(
-                                                                            i,
-                                                                            Container(
-                                                                              margin: EdgeInsets.only(right: media.width * 0.05),
-                                                                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: (rentalChoosenOption == i) ? buttonColor : borderLines),
-                                                                              padding: EdgeInsets.all(media.width * 0.02),
-                                                                              child: InkWell(
-                                                                                onTap: () {
-                                                                                  setState(() {
-                                                                                    rentalOption = etaDetails[i]['typesWithPrice']['data'];
-                                                                                    rentalChoosenOption = i;
-                                                                                    choosenVehicle = null;
-                                                                                    payingVia = 0;
-                                                                                  });
-                                                                                },
-                                                                                child: Text(
-                                                                                  etaDetails[i]['package_name'],
-                                                                                  style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.w600, color: (rentalChoosenOption == i) ? Colors.white : Colors.black),
+                                                          SizedBox(
+                                                            width: media.width *
+                                                                0.9,
+                                                            child:
+                                                                SingleChildScrollView(
+                                                              scrollDirection:
+                                                                  Axis.horizontal,
+                                                              child: Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children:
+                                                                    etaDetails
+                                                                        .asMap()
+                                                                        .map((i,
+                                                                            value) {
+                                                                          return MapEntry(
+                                                                              i,
+                                                                              Container(
+                                                                                margin: EdgeInsets.only(right: media.width * 0.05),
+                                                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: (rentalChoosenOption == i) ? buttonColor : borderLines),
+                                                                                padding: EdgeInsets.all(media.width * 0.02),
+                                                                                child: InkWell(
+                                                                                  onTap: () {
+                                                                                    setState(() {
+                                                                                      rentalOption = etaDetails[i]['typesWithPrice']['data'];
+                                                                                      rentalChoosenOption = i;
+                                                                                      choosenVehicle = null;
+                                                                                      payingVia = 0;
+                                                                                    });
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    etaDetails[i]['package_name'],
+                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.w600, color: (rentalChoosenOption == i) ? Colors.white : Colors.black),
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                            ));
-                                                                      })
-                                                                      .values
-                                                                      .toList(),
+                                                                              ));
+                                                                        })
+                                                                        .values
+                                                                        .toList(),
+                                                              ),
                                                             ),
                                                           ),
                                                           SizedBox(
@@ -2964,22 +2989,28 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         (userRequestData['accepted_at'] !=
                                                     null &&
                                                 userRequestData['arrived_at'] ==
-                                                    null)
+                                                    null &&
+                                                _dist != null)
                                             ? languages[choosenLanguage]
-                                                ['text_arriving']
-                                            : (userRequestData[
-                                                            'accepted_at'] !=
+                                                    ['text_arrive_eta'] +
+                                                ' ' +
+                                                double.parse(
+                                                        ((_dist * 2))
+                                                            .toString())
+                                                    .round()
+                                                    .toString() +
+                                                ' ' +
+                                                languages[choosenLanguage]
+                                                    ['text_mins']
+                                            : (userRequestData['accepted_at'] !=
                                                         null &&
-                                                    userRequestData[
-                                                            'arrived_at'] !=
+                                                    userRequestData['arrived_at'] !=
                                                         null &&
-                                                    userRequestData[
-                                                            'is_trip_start'] ==
+                                                    userRequestData['is_trip_start'] ==
                                                         0)
                                                 ? languages[choosenLanguage]
                                                     ['text_arrived']
-                                                : (userRequestData[
-                                                                'accepted_at'] !=
+                                                : (userRequestData['accepted_at'] !=
                                                             null &&
                                                         userRequestData[
                                                                 'arrived_at'] !=

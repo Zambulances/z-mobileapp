@@ -23,8 +23,13 @@ class _PayStackPageState extends State<PayStackPage> {
   final plugin = PaystackPlugin();
   @override
   void initState() {
-    plugin.initialize(
-        publicKey: 'pk_test_b4cb479fa0d654cb6db52663b27a019973ecfaf5');
+    if (walletBalance['paystack_environment'] == 'test') {
+      plugin.initialize(
+          publicKey: walletBalance['paystack_test_publishable_key']);
+    } else {
+      plugin.initialize(
+          publicKey: walletBalance['paystack_live_publishable_key']);
+    }
     payMoney();
     super.initState();
   }
@@ -80,171 +85,176 @@ class _PayStackPageState extends State<PayStackPage> {
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
-    return Material(
-      child: ValueListenableBuilder(
-          valueListenable: valueNotifierHome.value,
-          builder: (context, value, child) {
-            return Directionality(
-              textDirection: (languageDirection == 'rtl')
-                  ? TextDirection.rtl
-                  : TextDirection.ltr,
-              child: Stack(
-                children: [
-                  Container(
-                    padding: EdgeInsets.fromLTRB(media.width * 0.05,
-                        media.width * 0.05, media.width * 0.05, 0),
-                    height: media.height * 1,
-                    width: media.width * 1,
-                    color: page,
-                    child: Column(
-                      children: [
-                        SizedBox(height: MediaQuery.of(context).padding.top),
-                        Stack(
-                          children: [
-                            Container(
-                              padding:
-                                  EdgeInsets.only(bottom: media.width * 0.05),
-                              width: media.width * 0.9,
-                              alignment: Alignment.center,
-                              child: Text(
-                                languages[choosenLanguage]['text_addmoney'],
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * sixteen,
-                                    fontWeight: FontWeight.bold),
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Material(
+        child: ValueListenableBuilder(
+            valueListenable: valueNotifierHome.value,
+            builder: (context, value, child) {
+              return Directionality(
+                textDirection: (languageDirection == 'rtl')
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                child: Stack(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.fromLTRB(media.width * 0.05,
+                          media.width * 0.05, media.width * 0.05, 0),
+                      height: media.height * 1,
+                      width: media.width * 1,
+                      color: page,
+                      child: Column(
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).padding.top),
+                          Stack(
+                            children: [
+                              Container(
+                                padding:
+                                    EdgeInsets.only(bottom: media.width * 0.05),
+                                width: media.width * 0.9,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  languages[choosenLanguage]['text_addmoney'],
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * sixteen,
+                                      fontWeight: FontWeight.bold),
+                                ),
                               ),
-                            ),
-                            Positioned(
-                                child: InkWell(
-                                    onTap: () {
-                                      Navigator.pop(context, true);
-                                    },
-                                    child: const Icon(Icons.arrow_back)))
-                          ],
-                        ),
-                        SizedBox(
-                          height: media.width * 0.05,
-                        ),
-                      ],
+                              Positioned(
+                                  child: InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context, true);
+                                      },
+                                      child: const Icon(Icons.arrow_back)))
+                            ],
+                          ),
+                          SizedBox(
+                            height: media.width * 0.05,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  //payment failed
-                  (_failed == true)
-                      ? Positioned(
-                          top: 0,
-                          child: Container(
-                            height: media.height * 1,
-                            width: media.width * 1,
-                            color: Colors.transparent.withOpacity(0.6),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(media.width * 0.05),
-                                  width: media.width * 0.9,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: page),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        languages[choosenLanguage]
-                                            ['text_somethingwentwrong'],
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * sixteen,
-                                            color: textColor,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(
-                                        height: media.width * 0.05,
-                                      ),
-                                      Button(
-                                          onTap: () async {
-                                            setState(() {
-                                              _failed = false;
-                                            });
-                                          },
-                                          text: languages[choosenLanguage]
-                                              ['text_ok'])
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ))
-                      : Container(),
+                    //payment failed
+                    (_failed == true)
+                        ? Positioned(
+                            top: 0,
+                            child: Container(
+                              height: media.height * 1,
+                              width: media.width * 1,
+                              color: Colors.transparent.withOpacity(0.6),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(media.width * 0.05),
+                                    width: media.width * 0.9,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: page),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          languages[choosenLanguage]
+                                              ['text_somethingwentwrong'],
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(
+                                          height: media.width * 0.05,
+                                        ),
+                                        Button(
+                                            onTap: () async {
+                                              setState(() {
+                                                _failed = false;
+                                              });
+                                            },
+                                            text: languages[choosenLanguage]
+                                                ['text_ok'])
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ))
+                        : Container(),
 
-                  //success
-                  (_success == true)
-                      ? Positioned(
-                          top: 0,
-                          child: Container(
-                            height: media.height * 1,
-                            width: media.width * 1,
-                            color: Colors.transparent.withOpacity(0.6),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.all(media.width * 0.05),
-                                  width: media.width * 0.9,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: page),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        languages[choosenLanguage]
-                                            ['text_paymentsuccess'],
-                                        textAlign: TextAlign.center,
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * sixteen,
-                                            color: textColor,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                      SizedBox(
-                                        height: media.width * 0.05,
-                                      ),
-                                      Button(
-                                          onTap: () async {
-                                            setState(() {
-                                              _success = false;
+                    //success
+                    (_success == true)
+                        ? Positioned(
+                            top: 0,
+                            child: Container(
+                              height: media.height * 1,
+                              width: media.width * 1,
+                              color: Colors.transparent.withOpacity(0.6),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(media.width * 0.05),
+                                    width: media.width * 0.9,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: page),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          languages[choosenLanguage]
+                                              ['text_paymentsuccess'],
+                                          textAlign: TextAlign.center,
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                        SizedBox(
+                                          height: media.width * 0.05,
+                                        ),
+                                        Button(
+                                            onTap: () async {
+                                              setState(() {
+                                                _success = false;
 
-                                              Navigator.pop(context, true);
-                                            });
-                                          },
-                                          text: languages[choosenLanguage]
-                                              ['text_ok'])
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ))
-                      : Container(),
+                                                Navigator.pop(context, true);
+                                              });
+                                            },
+                                            text: languages[choosenLanguage]
+                                                ['text_ok'])
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ))
+                        : Container(),
 
-                  //no internet
-                  (internet == false)
-                      ? Positioned(
-                          top: 0,
-                          child: NoInternet(
-                            onTap: () {
-                              setState(() {
-                                internetTrue();
-                                _isLoading = true;
-                              });
-                            },
-                          ))
-                      : Container(),
+                    //no internet
+                    (internet == false)
+                        ? Positioned(
+                            top: 0,
+                            child: NoInternet(
+                              onTap: () {
+                                setState(() {
+                                  internetTrue();
+                                  _isLoading = true;
+                                });
+                              },
+                            ))
+                        : Container(),
 
-                  //loader
-                  (_isLoading == true)
-                      ? const Positioned(top: 0, child: Loading())
-                      : Container()
-                ],
-              ),
-            );
-          }),
+                    //loader
+                    (_isLoading == true)
+                        ? const Positioned(top: 0, child: Loading())
+                        : Container()
+                  ],
+                ),
+              );
+            }),
+      ),
     );
   }
 }

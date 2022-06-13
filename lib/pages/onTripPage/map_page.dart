@@ -475,7 +475,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                         .difference(
                                                                             dt)
                                                                         .inMinutes <=
-                                                                    2) {
+                                                                    200) {
                                                                   myMarkers.add(
                                                                       Marker(
                                                                     markerId: MarkerId('car' +
@@ -901,24 +901,27 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                             MainAxisAlignment
                                                                 .spaceBetween,
                                                         children: [
-                                                          (userDetails['show_rental_ride'] == true) ?
-                                                          Button(
-                                                            onTap: () {
-                                                              if (addressList
-                                                                  .isNotEmpty) {
-                                                                Navigator.push(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                        builder: (context) =>
-                                                                            BookingConfirmation(
-                                                                              type: 1,
-                                                                            )));
-                                                              }
-                                                            },
-                                                            text: languages[
-                                                                    choosenLanguage]
-                                                                ['text_rental'],
-                                                          ) : Container(),
+                                                          (userDetails[
+                                                                      'show_rental_ride'] ==
+                                                                  true)
+                                                              ? Button(
+                                                                  onTap: () {
+                                                                    if (addressList
+                                                                        .isNotEmpty) {
+                                                                      Navigator.push(
+                                                                          context,
+                                                                          MaterialPageRoute(
+                                                                              builder: (context) => BookingConfirmation(
+                                                                                    type: 1,
+                                                                                  )));
+                                                                    }
+                                                                  },
+                                                                  text: languages[
+                                                                          choosenLanguage]
+                                                                      [
+                                                                      'text_rental'],
+                                                                )
+                                                              : Container(),
                                                           InkWell(
                                                             onTap: () async {
                                                               setState(() {

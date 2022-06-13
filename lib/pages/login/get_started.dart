@@ -155,6 +155,7 @@ class _GetStartedState extends State<GetStarted> {
                       //email already exist error
                       (verifyEmailError != '')
                           ? Container(
+                              width: media.width * 0.8,
                               margin: EdgeInsets.only(top: media.height * 0.03),
                               alignment: Alignment.center,
                               child: Text(
@@ -175,6 +176,10 @@ class _GetStartedState extends State<GetStarted> {
                               alignment: Alignment.center,
                               child: Button(
                                   onTap: () async {
+                                    String pattern =
+        r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])*$";
+    RegExp regex = RegExp(pattern);
+                                if(regex.hasMatch(emailText.text)){
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
 
@@ -184,25 +189,39 @@ class _GetStartedState extends State<GetStarted> {
                                     });
                                     //validate email already exist
                                     var result = await validateEmail();
-                                    setState(() {
-                                      _loading = false;
-                                    });
+
                                     if (result == 'success') {
                                       setState(() {
                                         verifyEmailError = '';
                                       });
-                                      //referral page
-                                      Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Referral()),
-                                          (route) => false);
+                                      var _register = await registerUser();
+                                      if (_register == 'true') {
+                                        //referral page
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Referral()),
+                                            (route) => false);
+                                      } else {
+                                        setState(() {
+                                          verifyEmailError =
+                                              _register.toString();
+                                        });
+                                      }
                                     } else {
                                       setState(() {
                                         verifyEmailError = result.toString();
                                       });
                                     }
+                                    setState(() {
+                                      _loading = false;
+                                    });
+                                }else{
+                                  setState(() {
+                                        verifyEmailError = languages[choosenLanguage]['text_email_validation'];
+                                      });
+                                }
                                   },
                                   text: languages[choosenLanguage]
                                       ['text_next']))
