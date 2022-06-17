@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/drop_loc_select.dart';
@@ -21,6 +22,7 @@ import 'dart:ui' as ui;
 import '../navDrawer/nav_drawer.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:permission_handler/permission_handler.dart' as perm;
+import 'package:vector_math/vector_math.dart' as vector;
 
 class Maps extends StatefulWidget {
   const Maps({Key? key}) : super(key: key);
@@ -45,9 +47,11 @@ bool requestCancelledByDriver = false;
 bool cancelRequestByUser = false;
 bool logout = false;
 
-class _MapsState extends State<Maps> with WidgetsBindingObserver {
+
+class _MapsState extends State<Maps> with WidgetsBindingObserver ,TickerProviderStateMixin {
   LatLng _centerLocation = const LatLng(41.4219057, -102.0840772);
 
+  dynamic animationController;
   dynamic _sessionToken;
   bool _loading = false;
   bool _pickaddress = false;
@@ -55,15 +59,21 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
   bool _dropLocationMap = false;
   bool _locationDenied = false;
   int gettingPerm = 0;
+  Animation<double>? _animation;
   late bool serviceEnabled;
   late PermissionStatus permission;
   Location location = Location();
   String state = '';
-  GoogleMapController? _controller;
+  dynamic _controller;
+  Map myBearings = {};
 
   late BitmapDescriptor pinLocationIcon;
   dynamic userLocationIcon;
   bool favAddressAdd = false;
+
+  final _mapMarkerSC = StreamController<List<Marker>>();
+  StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
+  Stream<List<Marker>> get carMarkerStream => _mapMarkerSC.stream;
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
@@ -92,6 +102,14 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
     }
   }
 
+  @override
+  void dispose(){
+    if(animationController != null){
+    animationController.dispose();
+    }
+    super.dispose();
+  }
+
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
@@ -104,6 +122,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
 
 //get location permission and location details
   getLocs() async {
+    myBearings.clear;
     addressList.removeWhere((element) => element.id == 'drop');
     serviceEnabled = await location.serviceEnabled();
     polyline.clear();
@@ -442,12 +461,8 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                     DatabaseEvent>
                                                                 event) {
                                                           if (event.hasData) {
-                                                            myMarkers.removeWhere(
-                                                                (element) => element
-                                                                    .markerId
-                                                                    .toString()
-                                                                    .contains(
-                                                                        'car'));
+                                                            // myMarkers.removeWhere(
+                                                            //     (element) => element.markerId.toString().contains('car'));
                                                             List driverData =
                                                                 [];
                                                             event.data!.snapshot
@@ -475,15 +490,14 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                         .difference(
                                                                             dt)
                                                                         .inMinutes <=
-                                                                    200) {
+                                                                    2) {
+                                                                      if(myMarkers.where((e) => e.markerId.toString().contains('car' + element['id'].toString())).isEmpty){
                                                                   myMarkers.add(
                                                                       Marker(
                                                                     markerId: MarkerId('car' +
                                                                         element['id']
                                                                             .toString()),
-                                                                    rotation: double.parse(
-                                                                        element['bearing']
-                                                                            .toString()),
+                                                                    rotation: (myBearings[element['id'].toString()] != null) ? myBearings[element['id'].toString()] : 0.0,
                                                                     position: LatLng(
                                                                         element['l']
                                                                             [0],
@@ -493,89 +507,118 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
                                                                     icon:
                                                                         pinLocationIcon,
                                                                   ));
+                                                                    }else if(_controller != null){
+
+                                                                      if(myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude != element['l'][0] || 
+                                                      myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude != element['l'][1]){
+                                                        var dist = calculateDistance(myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude, myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude, element['l'][0], element['l'][1]);
+                                                        if(dist > 100){
+                                                         animationController = AnimationController(
+
+                                                           duration: const Duration(milliseconds: 1500),//Animation duration of marker
+
+                                                           vsync: this,//From the widget
+    
+
+                                                             );
+                                                   
+                                                      animateCar(myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude,myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude, element['l'][0], element['l'][1], _mapMarkerSink, this, _controller, 'car' + element['id'].toString(),element['id']);
+                                                        }
+                                                      }
+                                                                    }
+                                                                }
+                                                              }else{
+                                                                if(myMarkers.where((e) => e.markerId.toString().contains('car' + element['id'].toString())).isNotEmpty){
+                                                                  myMarkers.removeWhere(
+                                                                (e) => e.markerId.toString().contains('car' + element['id'].toString()));
                                                                 }
                                                               }
                                                             });
                                                           }
-                                                          return GoogleMap(
-                                                            onMapCreated:
-                                                                _onMapCreated,
-                                                            compassEnabled:
-                                                                false,
-                                                            initialCameraPosition:
-                                                                CameraPosition(
-                                                              target: center,
-                                                              zoom: 14.0,
-                                                            ),
-                                                            onCameraMove:
-                                                                (CameraPosition
-                                                                    position) {
-                                                              _centerLocation =
-                                                                  position
-                                                                      .target;
-                                                            },
-                                                            onCameraIdle:
-                                                                () async {
-                                                              if (_bottom ==
-                                                                      0 &&
-                                                                  _pickaddress ==
-                                                                      false) {
-                                                                var val = await geoCoding(
-                                                                    _centerLocation
-                                                                        .latitude,
-                                                                    _centerLocation
-                                                                        .longitude);
-                                                                setState(() {
-                                                                  if (addressList
-                                                                      .where((element) =>
-                                                                          element
-                                                                              .id ==
-                                                                          'pickup')
-                                                                      .isNotEmpty) {
-                                                                    var add = addressList.firstWhere((element) =>
-                                                                        element
-                                                                            .id ==
-                                                                        'pickup');
-                                                                    add.address =
-                                                                        val;
-                                                                    add.latlng = LatLng(
+                                                          return StreamBuilder<List<Marker>>(
+                                                            stream: carMarkerStream,
+                                                            builder: (context, snapshot) {
+                                                              return GoogleMap(
+                                                                onMapCreated:
+                                                                    _onMapCreated,
+                                                                compassEnabled:
+                                                                    false,
+                                                                initialCameraPosition:
+                                                                    CameraPosition(
+                                                                  target: center,
+                                                                  zoom: 14.0,
+                                                                ),
+                                                                onCameraMove:
+                                                                    (CameraPosition
+                                                                        position) {
+                                                                  _centerLocation =
+                                                                      position
+                                                                          .target;
+                                                                },
+                                                                onCameraIdle:
+                                                                    () async {
+                                                                  if (_bottom ==
+                                                                          0 &&
+                                                                      _pickaddress ==
+                                                                          false) {
+                                                                    var val = await geoCoding(
                                                                         _centerLocation
                                                                             .latitude,
                                                                         _centerLocation
                                                                             .longitude);
-                                                                  } else {
-                                                                    addressList.add(AddressList(
-                                                                        id:
-                                                                            'pickup',
-                                                                        address:
-                                                                            val,
-                                                                        latlng: LatLng(
-                                                                            _centerLocation.latitude,
-                                                                            _centerLocation.longitude)));
+                                                                    setState(() {
+                                                                      if (addressList
+                                                                          .where((element) =>
+                                                                              element
+                                                                                  .id ==
+                                                                              'pickup')
+                                                                          .isNotEmpty) {
+                                                                        var add = addressList.firstWhere((element) =>
+                                                                            element
+                                                                                .id ==
+                                                                            'pickup');
+                                                                        add.address =
+                                                                            val;
+                                                                        add.latlng = LatLng(
+                                                                            _centerLocation
+                                                                                .latitude,
+                                                                            _centerLocation
+                                                                                .longitude);
+                                                                      } else {
+                                                                        addressList.add(AddressList(
+                                                                            id:
+                                                                                'pickup',
+                                                                            address:
+                                                                                val,
+                                                                            latlng: LatLng(
+                                                                                _centerLocation.latitude,
+                                                                                _centerLocation.longitude)));
+                                                                      }
+                                                                    });
+                                                                  } else if (_pickaddress ==
+                                                                      true) {
+                                                                    setState(() {
+                                                                      _pickaddress =
+                                                                          false;
+                                                                    });
                                                                   }
-                                                                });
-                                                              } else if (_pickaddress ==
-                                                                  true) {
-                                                                setState(() {
-                                                                  _pickaddress =
-                                                                      false;
-                                                                });
-                                                              }
-                                                            },
-                                                            minMaxZoomPreference:
-                                                                const MinMaxZoomPreference(
-                                                                    8.0, 20.0),
-                                                            myLocationButtonEnabled:
-                                                                false,
-                                                            markers:
-                                                                Set<Marker>.from(
-                                                                    myMarkers),
-                                                            buildingsEnabled:
-                                                                false,
-                                                            zoomControlsEnabled:
-                                                                false,
-                                                            myLocationEnabled:
-                                                                true,
+                                                                },
+                                                                minMaxZoomPreference:
+                                                                    const MinMaxZoomPreference(
+                                                                        8.0, 20.0),
+                                                                myLocationButtonEnabled:
+                                                                    false,
+                                                                markers:
+                                                                    Set<Marker>.from(
+                                                                        myMarkers),
+                                                                buildingsEnabled:
+                                                                    false,
+                                                                zoomControlsEnabled:
+                                                                    false,
+                                                                myLocationEnabled:
+                                                                    true,
+                                                              );
+                                                            }
                                                           );
                                                         })),
                                                 Positioned(
@@ -2057,4 +2100,153 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver {
       ),
     );
   }
+
+
+
+  double getBearing(LatLng begin, LatLng end) {
+
+  double lat = (begin.latitude - end.latitude).abs();
+
+  double lng = (begin.longitude - end.longitude).abs();
+
+ 
+
+  if (begin.latitude < end.latitude && begin.longitude < end.longitude) {
+
+    return vector.degrees(atan(lng / lat));
+
+  } else if (begin.latitude >= end.latitude && begin.longitude < end.longitude) {
+
+    return (90 - vector.degrees(atan(lng / lat))) + 90;
+
+  } else if (begin.latitude >= end.latitude && begin.longitude >= end.longitude) {
+
+    return vector.degrees(atan(lng / lat)) + 180;
+
+  } else if (begin.latitude < end.latitude && begin.longitude >= end.longitude) {
+
+    return (90 - vector.degrees(atan(lng / lat))) + 270;
+
+  }
+
+  return -1;
+
+}
+
+  animateCar(
+
+  double fromLat, //Starting latitude
+
+  double fromLong, //Starting longitude
+
+  double toLat, //Ending latitude
+
+  double toLong, //Ending longitude
+
+  StreamSink<List<Marker>> mapMarkerSink, //Stream build of map to update the UI
+
+  TickerProvider provider,//Ticker provider of the widget. This is used for animation
+
+  GoogleMapController controller, //Google map controller of our widget
+
+  markerid,
+
+  markerBearing
+) async {
+
+ final double bearing = getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
+
+ myBearings[markerBearing.toString()] = bearing;
+
+  var carMarker = Marker(
+
+      markerId: MarkerId(markerid),
+
+      position: LatLng(fromLat, fromLong),
+
+      icon: pinLocationIcon,
+
+      anchor: const Offset(0.5, 0.5),
+
+      flat: true,
+
+      draggable: false);
+
+      myMarkers.add(carMarker);
+
+  mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
+
+
+  Tween<double> tween = Tween(begin: 0, end: 1);
+
+
+
+  _animation = tween.animate(animationController)
+  ..addListener(() async {
+
+    
+    myMarkers.removeWhere((element) => element.markerId == MarkerId(markerid));
+
+    final v = _animation!.value;
+
+    double lng = v * toLong + (1 - v) * fromLong;
+
+    double lat = v * toLat + (1 - v) * fromLat;
+
+    LatLng newPos = LatLng(lat, lng);
+
+   
+
+    //Removing old marker if present in the marker array
+
+    // if (myMarkers.contains(markerid)) {
+    //   setState(() {
+    //     myMarkers.remove(markerid);
+    //   });
+    //    }
+
+ 
+
+    //New marker location
+
+    carMarker = Marker(
+
+          markerId: MarkerId(markerid),
+
+          position: newPos,
+
+          icon: pinLocationIcon,
+
+          anchor: const Offset(0.5, 0.5),
+
+          flat: true,
+
+          rotation: bearing,
+
+          draggable: false);
+
+     //Adding new marker to our list and updating the google map UI.
+
+     myMarkers.add(carMarker);
+
+     mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
+
+     //Moving the google camera to the new animated location.
+
+    //  controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: newPos, zoom: 15.5)));
+
+    });
+
+   
+
+    //Starting the animation
+
+    animationController.forward();
+    // setState(() {
+    //   carMarkers[validator] = '0';
+    // });
+
+}
+
+
 }

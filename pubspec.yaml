@@ -64,6 +64,7 @@ dependencies:
   cashfree_pg: ^2.0.9+29
   uuid: ^3.0.6
   package_info_plus: ^1.4.2
+  vector_math: ^2.1.1
 
 dev_dependencies:
   flutter_test:
