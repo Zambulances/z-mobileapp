@@ -24,13 +24,12 @@ import Firebase
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
-    
+var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0);
     override func applicationDidEnterBackground(_ application: UIApplication) {
-    
-        application.beginBackgroundTask();
+                bgTask = application.beginBackgroundTask()
     }
     override func applicationDidBecomeActive(_ application: UIApplication) {
-        application.endBackgroundTask();
+        application.endBackgroundTask(bgTask);
     }
     
 }

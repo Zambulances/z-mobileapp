@@ -847,6 +847,7 @@ class ValueNotifyingHome {
 }
 
 ValueNotifying valueNotifierHome = ValueNotifying();
+ValueNotifying valueNotifiercheck = ValueNotifying();
 
 //driver online offline status
 driverStatus() async {
@@ -908,7 +909,7 @@ currentPositionUpdate() async {
         if (center == null && centerCheck == null) {
           center = LatLng(double.parse(pos.latitude.toString()),
               double.parse(pos.longitude.toString()));
-          heading = pos.heading;
+          // heading = pos.heading;
         } else if (center != null && centerCheck == null) {
           var val = await calculateDistance(
               center.latitude, center.longitude, pos.latitude, pos.longitude);
@@ -917,7 +918,7 @@ currentPositionUpdate() async {
           } else {
             center = LatLng(double.parse(pos.latitude.toString()),
                 double.parse(pos.longitude.toString()));
-            heading = pos.heading;
+            // heading = pos.heading;
           }
         } else if (center != null && centerCheck != null) {
           var val = await calculateDistance(
@@ -925,12 +926,12 @@ currentPositionUpdate() async {
           if (val > centerCheck) {
             center = LatLng(double.parse(pos.latitude.toString()),
                 double.parse(pos.longitude.toString()));
-            heading = pos.heading;
+            // heading = pos.heading;
             centerCheck = null;
           } else {
             center = LatLng(double.parse(pos.latitude.toString()),
                 double.parse(pos.longitude.toString()));
-            heading = pos.heading;
+            // heading = pos.heading;
             centerCheck = null;
           }
         }
@@ -1163,7 +1164,7 @@ requestReject() async {
 //sound
 
 sound() async {
-  audioPlayers = await audioPlayer.loop('audio/request_sound.mp3');
+  audioPlayers = await audioPlayer.play('audio/request_sound.mp3');
 
   Timer.periodic(const Duration(seconds: 1), (timer) {
     if (duration > 0.0 &&

@@ -188,6 +188,10 @@ class _GetStartedState extends State<GetStarted> {
                               alignment: Alignment.center,
                               child: Button(
                                   onTap: () async {
+                                    String pattern =
+        r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])*$";
+    RegExp regex = RegExp(pattern);
+                                if(regex.hasMatch(emailText.text)){
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
                                     setState(() {
@@ -213,6 +217,11 @@ class _GetStartedState extends State<GetStarted> {
                                       });
                                       debugPrint('failed');
                                     }
+                                }else{
+                                  setState(() {
+                                        verifyEmailError = languages[choosenLanguage]['text_email_validation'];
+                                      });
+                                }
                                   },
                                   text: languages[choosenLanguage]
                                       ['text_next']))
