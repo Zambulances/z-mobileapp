@@ -189,39 +189,41 @@ class _GetStartedState extends State<GetStarted> {
                               child: Button(
                                   onTap: () async {
                                     String pattern =
-        r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])*$";
-    RegExp regex = RegExp(pattern);
-                                if(regex.hasMatch(emailText.text)){
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
-                                    setState(() {
-                                      verifyEmailError = '';
-                                      _loading = true;
-                                    });
-                                    var result = await validateEmail();
-                                    setState(() {
-                                      _loading = false;
-                                    });
-                                    if (result == 'success') {
+                                        r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])*$";
+                                    RegExp regex = RegExp(pattern);
+                                    if (regex.hasMatch(emailText.text)) {
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
                                       setState(() {
                                         verifyEmailError = '';
+                                        _loading = true;
                                       });
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ServiceArea()));
+                                      var result = await validateEmail();
+                                      setState(() {
+                                        _loading = false;
+                                      });
+                                      if (result == 'success') {
+                                        setState(() {
+                                          verifyEmailError = '';
+                                        });
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ServiceArea()));
+                                      } else {
+                                        setState(() {
+                                          verifyEmailError = result.toString();
+                                        });
+                                        debugPrint('failed');
+                                      }
                                     } else {
                                       setState(() {
-                                        verifyEmailError = result.toString();
+                                        verifyEmailError =
+                                            languages[choosenLanguage]
+                                                ['text_email_validation'];
                                       });
-                                      debugPrint('failed');
                                     }
-                                }else{
-                                  setState(() {
-                                        verifyEmailError = languages[choosenLanguage]['text_email_validation'];
-                                      });
-                                }
                                   },
                                   text: languages[choosenLanguage]
                                       ['text_next']))

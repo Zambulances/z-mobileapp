@@ -894,58 +894,26 @@ currentPositionUpdate() async {
           mqttUrl != '' &&
           client != '' &&
           permission == PermissionStatus.granted) {
-        if (await locs.isBackgroundModeEnabled() == false) {
-          await locs.enableBackgroundMode(enable: true);
-          locs.changeNotificationOptions(iconName: '@mipmap/ic_launcher');
-        }
         if (client.connectionStatus!.state != MqttConnectionState.connected ||
             client.connectionStatus == null) {
           mqttForDocuments();
         }
-        var pos = await Location.instance.getLocation();
-
-        // Test if location services are enabled.
-
-        if (center == null && centerCheck == null) {
-          center = LatLng(double.parse(pos.latitude.toString()),
-              double.parse(pos.longitude.toString()));
-          // heading = pos.heading;
-        } else if (center != null && centerCheck == null) {
-          var val = await calculateDistance(
-              center.latitude, center.longitude, pos.latitude, pos.longitude);
-          if (val > 150) {
-            centerCheck = val;
-          } else {
-            center = LatLng(double.parse(pos.latitude.toString()),
-                double.parse(pos.longitude.toString()));
-            // heading = pos.heading;
-          }
-        } else if (center != null && centerCheck != null) {
-          var val = await calculateDistance(
-              center.latitude, center.longitude, pos.latitude, pos.longitude);
-          if (val > centerCheck) {
-            center = LatLng(double.parse(pos.latitude.toString()),
-                double.parse(pos.longitude.toString()));
-            // heading = pos.heading;
-            centerCheck = null;
-          } else {
-            center = LatLng(double.parse(pos.latitude.toString()),
-                double.parse(pos.longitude.toString()));
-            // heading = pos.heading;
-            centerCheck = null;
-          }
+        if (positionStream == null || positionStream!.isPaused) {
+          positionStreamData();
         }
+
         final _position = FirebaseDatabase.instance.ref();
 
         try {
           _position.child('drivers/' + userDetails['id'].toString()).update({
-            'bearing': pos.heading,
+            'bearing': heading,
+            'date': DateTime.now().toString(),
             'id': userDetails['id'],
-            'g': geo.encode(double.parse(pos.longitude.toString()),
-                double.parse(pos.latitude.toString())),
+            'g': geo.encode(double.parse(center.longitude.toString()),
+                double.parse(center.latitude.toString())),
             'is_active': userDetails['active'] == true ? 1 : 0,
             'is_available': userDetails['available'],
-            'l': {'0': pos.latitude, '1': pos.longitude},
+            'l': {'0': center.latitude, '1': center.longitude},
             'mobile': userDetails['mobile'],
             'name': userDetails['name'],
             'updated_at': ServerValue.timestamp,
@@ -1022,7 +990,7 @@ requestDetailsUpdate(
       lastLong = lng;
     } else {
       var distance = await calculateDistance(lastLat, lastLong, lat, lng);
-      if (distance >= 150.0) {
+      if (distance >= 100.0) {
         latlngArray.add({'lat': lat, 'lng': lng});
         lastLat = lat;
         lastLong = lng;
@@ -2823,7 +2791,6 @@ waitingBeforeStart() async {
   });
 }
 
-dynamic positionStream;
 dynamic currentRidePosition;
 
 dynamic startTimer;
@@ -2888,6 +2855,50 @@ waitingAfterStart() async {
     } else {
       timer.cancel();
       rideTimer = null;
+    }
+  });
+}
+
+//location stream
+bool positionStreamStarted = false;
+StreamSubscription<geolocs.Position>? positionStream;
+
+geolocs.LocationSettings locationSettings = (platform == TargetPlatform.android)
+    ? geolocs.AndroidSettings(
+        accuracy: geolocs.LocationAccuracy.high,
+        distanceFilter: 50,
+        foregroundNotificationConfig:
+            const geolocs.ForegroundNotificationConfig(
+          notificationText:
+              "Tagxi Driver will continue to receive your location in background",
+          notificationTitle: "Location background service running",
+          enableWakeLock: true,
+        ))
+    : geolocs.AppleSettings(
+        accuracy: geolocs.LocationAccuracy.high,
+        activityType: geolocs.ActivityType.fitness,
+        distanceFilter: 50,
+        showBackgroundLocationIndicator: true,
+      );
+
+dynamic testDistance = 0;
+
+positionStreamData() {
+  positionStream =
+      geolocs.Geolocator.getPositionStream(locationSettings: locationSettings)
+          .handleError((error) {
+    positionStream = null;
+    positionStream!.cancel();
+  }).listen((geolocs.Position? position) {
+    if (position != null) {
+      center = LatLng(position.latitude, position.longitude);
+      if (driverReq['is_trip_start'] == 1 && driverReq['is_completed'] == 0) {
+        testDistance = testDistance + 50;
+      } else if (driverReq.isEmpty) {
+        testDistance = 0;
+      }
+    } else {
+      positionStream!.cancel();
     }
   });
 }

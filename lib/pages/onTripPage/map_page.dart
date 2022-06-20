@@ -32,10 +32,8 @@ class Maps extends StatefulWidget {
 }
 
 dynamic center;
-dynamic _heading;
 
 List<Marker> myMarkers = [];
-// Set<Marker> _markers = {};
 Set<Circle> circles = {};
 
 dynamic _timer;
@@ -45,11 +43,11 @@ bool logout = false;
 bool getStartOtp = false;
 String driverOtp = '';
 
-class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProviderStateMixin {
+class _MapsState extends State<Maps>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   bool sosLoaded = false;
   bool cancelRequest = false;
   bool _pickAnimateDone = false;
-  bool _dropAnimateDone = false;
   late bool serviceEnabled;
   late PermissionStatus permission;
   Location location = Location();
@@ -108,7 +106,9 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
     if (_timer != null) {
       _timer.cancel();
     }
-    animationController.dispose();
+    if (animationController != null) {
+      animationController.dispose();
+    }
     super.dispose();
   }
 
@@ -188,25 +188,28 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
     }
   }
 
+  getLatLngBounds() {
+    LatLngBounds bound;
+    if (driverReq['pick_lat'] > driverReq['drop_lat'] &&
+        driverReq['pick_lng'] > driverReq['drop_lng']) {
+      bound = LatLngBounds(
+          southwest: LatLng(driverReq['drop_lat'], driverReq['drop_lng']),
+          northeast: LatLng(driverReq['pick_lat'], driverReq['pick_lng']));
+    } else if (driverReq['pick_lng'] > driverReq['drop_lng']) {
+      bound = LatLngBounds(
+          southwest: LatLng(driverReq['pick_lat'], driverReq['drop_lng']),
+          northeast: LatLng(driverReq['drop_lat'], driverReq['pick_lng']));
+    } else if (driverReq['pick_lat'] > driverReq['drop_lat']) {
+      bound = LatLngBounds(
+          southwest: LatLng(driverReq['drop_lat'], driverReq['pick_lng']),
+          northeast: LatLng(driverReq['pick_lat'], driverReq['drop_lng']));
+    } else {
+      bound = LatLngBounds(
+          southwest: LatLng(driverReq['pick_lat'], driverReq['pick_lng']),
+          northeast: LatLng(driverReq['drop_lat'], driverReq['drop_lng']));
+    }
 
-  getLatLngBounds(){
-  LatLngBounds bound;
-     if (driverReq['pick_lat'] > driverReq['drop_lat'] &&
-      driverReq['pick_lng'] > driverReq['drop_lng']) {
-    bound = LatLngBounds(southwest: LatLng(driverReq['drop_lat'], driverReq['drop_lng']), northeast: LatLng(driverReq['pick_lat'], driverReq['pick_lng']));
-  } else if (driverReq['pick_lng'] > driverReq['drop_lng']) {
-    bound = LatLngBounds(
-        southwest: LatLng(driverReq['pick_lat'], driverReq['drop_lng']),
-        northeast: LatLng(driverReq['drop_lat'], driverReq['pick_lng']));
-  } else if (driverReq['pick_lat'] > driverReq['drop_lat']) {
-    bound = LatLngBounds(
-        southwest: LatLng(driverReq['drop_lat'], driverReq['pick_lng']),
-        northeast: LatLng(driverReq['pick_lat'], driverReq['drop_lng']));
-  } else {
-    bound = LatLngBounds(southwest: LatLng(driverReq['pick_lat'],driverReq['pick_lng']), northeast: LatLng(driverReq['drop_lat'], driverReq['drop_lng']));
-  }
-
-    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound,50);
+    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
     _controller!.animateCamera(cameraUpdate);
   }
 
@@ -354,31 +357,49 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
             if (myMarkers
                     .where((element) => element.markerId == const MarkerId('1'))
                     .isNotEmpty &&
-                pinLocationIcon != null && _controller != null) {
-                  print('working 1');
-                  print('working ' + myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position.longitude.toString());
-                  var dist = calculateDistance(myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position.latitude, myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position.longitude, center.latitude, center.longitude);
-                  if(dist > 100 && animationController == null){
-                  animationController = AnimationController(
+                pinLocationIcon != null &&
+                _controller != null) {
+              var dist = calculateDistance(
+                  myMarkers
+                      .firstWhere(
+                          (element) => element.markerId == const MarkerId('1'))
+                      .position
+                      .latitude,
+                  myMarkers
+                      .firstWhere(
+                          (element) => element.markerId == const MarkerId('1'))
+                      .position
+                      .longitude,
+                  center.latitude,
+                  center.longitude);
+              if (dist > 100 && animationController == null) {
+                animationController = AnimationController(
+                  duration: const Duration(
+                      milliseconds: 1500), //Animation duration of marker
 
-    duration: const Duration(milliseconds: 1500),//Animation duration of marker
-
-    vsync: this,//From the widget
-    
-
-  );
-  // animateCar(11.0589583, 76.9967118, 11.1589583, 76.9967118, _mapMarkerSink, this, _controller);
-                animateCar(myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position.latitude, myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position.longitude, center.latitude, center.longitude, _mapMarkerSink, this, _controller);
-                  }
-                // animateCar(myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position.latitude, myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position.longitude, 11.0589583, 76.9967118, _mapMarkerSink, this, _controller);
-              // if (driverReq.isEmpty || driverReq['is_trip_start'] == 1) {
-              //   // _controller?.animateCamera(CameraUpdate.newLatLng(center));
-              // }
+                  vsync: this, //From the widget
+                );
+                animateCar(
+                    myMarkers
+                        .firstWhere((element) =>
+                            element.markerId == const MarkerId('1'))
+                        .position
+                        .latitude,
+                    myMarkers
+                        .firstWhere((element) =>
+                            element.markerId == const MarkerId('1'))
+                        .position
+                        .longitude,
+                    center.latitude,
+                    center.longitude,
+                    _mapMarkerSink,
+                    this,
+                    _controller);
+              }
             } else if (myMarkers
                     .where((element) => element.markerId == const MarkerId('1'))
                     .isEmpty &&
                 pinLocationIcon != null) {
-                  print('working 2');
               myMarkers.add(Marker(
                   markerId: const MarkerId('1'),
                   rotation: heading,
@@ -416,11 +437,6 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
                     .isEmpty) {
                   addMarker();
                 }
-
-                // if (_dropAnimateDone == false &&
-                //     driverReq['is_rental'] != true) {
-                //   getLatLngBounds();
-                // }
               } else if (driverReq['is_completed'] == 1 &&
                   driverReq['requestBill'] != null) {
                 WidgetsBinding.instance?.addPostFrameCallback((_) {
@@ -430,7 +446,6 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
                       (route) => false);
                 });
                 _pickAnimateDone = false;
-                _dropAnimateDone = false;
                 myMarkers.removeWhere(
                     (element) => element.markerId == const MarkerId('2'));
                 myMarkers.removeWhere(
@@ -451,8 +466,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
                 _pickAnimateDone = false;
               }
             }
-            
-            
+
             if (userDetails['approve'] == false) {
               WidgetsBinding.instance?.addPostFrameCallback((_) {
                 Navigator.pushAndRemoveUntil(
@@ -705,33 +719,48 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
                                                     height: media.height * 1,
                                                     width: media.width * 1,
                                                     //google maps
-                                                    child: StreamBuilder<List<Marker>>(
-                                                      stream: mapMarkerStream,
-                                                      builder: (context, snapshot) {
-                                                        return GoogleMap(
-                                                          padding:EdgeInsets.only(bottom:(driverReq.isNotEmpty) ?  media.width*1 : 0,top:media.height*0.1 + MediaQuery.of(context).padding.top),
-                                                          onMapCreated:
-                                                              _onMapCreated,
-                                                          initialCameraPosition:
-                                                              CameraPosition(
-                                                            target: center,
-                                                            zoom: 11.0,
-                                                          ),
-                                                          markers: Set<Marker>.from(
-                                                              myMarkers),
-                                                          polylines: polyline,
-                                                          minMaxZoomPreference:
-                                                              const MinMaxZoomPreference(
-                                                                  0.0, 20.0),
-                                                          myLocationButtonEnabled:
-                                                              false,
-                                                          compassEnabled: false,
-                                                          buildingsEnabled: false,
-                                                          zoomControlsEnabled:
-                                                              false,
-                                                        );
-                                                      }
-                                                    )),
+                                                    child: StreamBuilder<
+                                                            List<Marker>>(
+                                                        stream: mapMarkerStream,
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          return GoogleMap(
+                                                            padding: EdgeInsets.only(
+                                                                bottom: (driverReq
+                                                                        .isNotEmpty)
+                                                                    ? media.width *
+                                                                        1
+                                                                    : 0,
+                                                                top: media.height *
+                                                                        0.1 +
+                                                                    MediaQuery.of(
+                                                                            context)
+                                                                        .padding
+                                                                        .top),
+                                                            onMapCreated:
+                                                                _onMapCreated,
+                                                            initialCameraPosition:
+                                                                CameraPosition(
+                                                              target: center,
+                                                              zoom: 11.0,
+                                                            ),
+                                                            markers:
+                                                                Set<Marker>.from(
+                                                                    myMarkers),
+                                                            polylines: polyline,
+                                                            minMaxZoomPreference:
+                                                                const MinMaxZoomPreference(
+                                                                    0.0, 20.0),
+                                                            myLocationButtonEnabled:
+                                                                false,
+                                                            compassEnabled:
+                                                                false,
+                                                            buildingsEnabled:
+                                                                false,
+                                                            zoomControlsEnabled:
+                                                                false,
+                                                          );
+                                                        })),
 
                                                 //driver status
                                                 Positioned(
@@ -1182,7 +1211,6 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
                                                                     .newLatLngZoom(
                                                                         center,
                                                                         18.0));
-                                                            // print('my marker' + myMarkers.length.toString());
                                                           },
                                                           child: Container(
                                                             height:
@@ -2321,9 +2349,7 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
                                                         FocusScope.of(context)
                                                             .nextFocus();
                                                       });
-                                                    }
-                                                    
-                                                     else {
+                                                    } else {
                                                       setState(() {
                                                         FocusScope.of(context)
                                                             .previousFocus();
@@ -2352,7 +2378,8 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
                                           ),
                                           (_errorOtp == true)
                                               ? Text(
-                                                  languages[choosenLanguage]['text_error_trip_otp'],
+                                                  languages[choosenLanguage]
+                                                      ['text_error_trip_otp'],
                                                   style: GoogleFonts.roboto(
                                                       color: Colors.red,
                                                       fontSize:
@@ -3200,157 +3227,106 @@ class _MapsState extends State<Maps> with WidgetsBindingObserver , TickerProvide
     );
   }
 
-   double getBearing(LatLng begin, LatLng end) {
+  double getBearing(LatLng begin, LatLng end) {
+    double lat = (begin.latitude - end.latitude).abs();
 
-  double lat = (begin.latitude - end.latitude).abs();
+    double lng = (begin.longitude - end.longitude).abs();
 
-  double lng = (begin.longitude - end.longitude).abs();
+    if (begin.latitude < end.latitude && begin.longitude < end.longitude) {
+      return vector.degrees(atan(lng / lat));
+    } else if (begin.latitude >= end.latitude &&
+        begin.longitude < end.longitude) {
+      return (90 - vector.degrees(atan(lng / lat))) + 90;
+    } else if (begin.latitude >= end.latitude &&
+        begin.longitude >= end.longitude) {
+      return vector.degrees(atan(lng / lat)) + 180;
+    } else if (begin.latitude < end.latitude &&
+        begin.longitude >= end.longitude) {
+      return (90 - vector.degrees(atan(lng / lat))) + 270;
+    }
 
- 
-
-  if (begin.latitude < end.latitude && begin.longitude < end.longitude) {
-
-    return vector.degrees(atan(lng / lat));
-
-  } else if (begin.latitude >= end.latitude && begin.longitude < end.longitude) {
-
-    return (90 - vector.degrees(atan(lng / lat))) + 90;
-
-  } else if (begin.latitude >= end.latitude && begin.longitude >= end.longitude) {
-
-    return vector.degrees(atan(lng / lat)) + 180;
-
-  } else if (begin.latitude < end.latitude && begin.longitude >= end.longitude) {
-
-    return (90 - vector.degrees(atan(lng / lat))) + 270;
-
+    return -1;
   }
 
-  return -1;
-
-}
-
   animateCar(
+    double fromLat, //Starting latitude
 
-  double fromLat, //Starting latitude
+    double fromLong, //Starting longitude
 
-  double fromLong, //Starting longitude
+    double toLat, //Ending latitude
 
-  double toLat, //Ending latitude
+    double toLong, //Ending longitude
 
-  double toLong, //Ending longitude
+    StreamSink<List<Marker>>
+        mapMarkerSink, //Stream build of map to update the UI
 
-  StreamSink<List<Marker>> mapMarkerSink, //Stream build of map to update the UI
+    TickerProvider
+        provider, //Ticker provider of the widget. This is used for animation
 
-  TickerProvider provider,//Ticker provider of the widget. This is used for animation
+    GoogleMapController controller, //Google map controller of our widget
+  ) async {
+    final double bearing =
+        getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
 
-  GoogleMapController controller, //Google map controller of our widget
-) async {
+    var carMarker = Marker(
+        markerId: const MarkerId('1'),
+        position: LatLng(fromLat, fromLong),
+        icon: pinLocationIcon,
+        anchor: const Offset(0.5, 0.5),
+        flat: true,
+        draggable: false);
 
- final double bearing = getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
+    myMarkers.add(carMarker);
 
- _heading = bearing;
+    mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
 
-  var carMarker = Marker(
+    Tween<double> tween = Tween(begin: 0, end: 1);
 
-      markerId:const MarkerId('1'),
+    _animation = tween.animate(animationController)
+      ..addListener(() async {
+        myMarkers
+            .removeWhere((element) => element.markerId == const MarkerId('1'));
 
-      position: LatLng(fromLat, fromLong),
+        final v = _animation!.value;
 
-      icon: pinLocationIcon,
+        double lng = v * toLong + (1 - v) * fromLong;
 
-      anchor: const Offset(0.5, 0.5),
+        double lat = v * toLat + (1 - v) * fromLat;
 
-      flat: true,
+        LatLng newPos = LatLng(lat, lng);
 
-      draggable: false);
+        //New marker location
 
-      myMarkers.add(carMarker);
+        carMarker = Marker(
+            markerId: const MarkerId('1'),
+            position: newPos,
+            icon: pinLocationIcon,
+            anchor: const Offset(0.5, 0.5),
+            flat: true,
+            rotation: bearing,
+            draggable: false);
 
-  mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
+        //Adding new marker to our list and updating the google map UI.
 
- 
-  Tween<double> tween = Tween(begin: 0, end: 1);
+        myMarkers.add(carMarker);
 
-
-
-  _animation = tween.animate(animationController)
-  ..addListener(() async {
-
-    
-    myMarkers.removeWhere((element) => element.markerId == const MarkerId('1'));
-
-    final v = _animation!.value;
-
-    double lng = v * toLong + (1 - v) * fromLong;
-
-    double lat = v * toLat + (1 - v) * fromLat;
-
-    LatLng newPos = LatLng(lat, lng);
-
-   
-
-    //Removing old marker if present in the marker array
-
-    // if (myMarker.contains(markerid)) {
-    //   setState(() {
-    //     myMarker.remove(markerid);
-    //   });
-    //    }
-
- 
-
-    //New marker location
-
-    carMarker = Marker(
-
-          markerId:const MarkerId('1'),
-
-          position: newPos,
-
-          icon: pinLocationIcon,
-
-          anchor: const Offset(0.5, 0.5),
-
-          flat: true,
-
-          rotation: bearing,
-
-          draggable: false);
-
-     //Adding new marker to our list and updating the google map UI.
-
-     myMarkers.add(carMarker);
-
-     mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
-
-     //Moving the google camera to the new animated location.
-
-    //  controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: newPos, zoom: 15.5)));
-
-    });
-
-   
+        mapMarkerSink.add(Set<Marker>.from(myMarkers).toList());
+      });
 
     //Starting the animation
 
     animationController.forward();
-    // setState(() {
-    //   carMarkers[validator] = '0';
-    // });
-    // setState(() {
-    // });
 
-   controller.getVisibleRegion().then((value) { if(value.contains(myMarkers.firstWhere((element) => element.markerId == const MarkerId('1')).position)){
-   }else{
-     controller.animateCamera(CameraUpdate.newLatLng(center));
-   }});
+    if (driverReq.isEmpty || driverReq['is_trip_start'] == 1) {
+      controller.getVisibleRegion().then((value) {
+        if (value.contains(myMarkers
+            .firstWhere((element) => element.markerId == const MarkerId('1'))
+            .position)) {
+        } else {
+          controller.animateCamera(CameraUpdate.newLatLng(center));
+        }
+      });
+    }
     animationController = null;
-    
-    
+  }
 }
-
-
-}
-
-
