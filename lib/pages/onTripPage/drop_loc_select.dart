@@ -133,13 +133,18 @@ class _DropLocationState extends State<DropLocation>
                                 });
                               },
                               onCameraIdle: () async {
-                                var val = await geoCoding(
-                                    _centerLocation.latitude,
-                                    _centerLocation.longitude);
-                                setState(() {
-                                  _center = _centerLocation;
-                                  dropAddressConfirmation = val;
-                                });
+                                if (addAutoFill.isEmpty) {
+                                  var val = await geoCoding(
+                                      _centerLocation.latitude,
+                                      _centerLocation.longitude);
+                                  setState(() {
+                                    _center = _centerLocation;
+                                    dropAddressConfirmation = val;
+                                  });
+                                } else {
+                                  addAutoFill.clear();
+                                  search.clear();
+                                }
                               },
                               minMaxZoomPreference:
                                   const MinMaxZoomPreference(8.0, 20.0),
@@ -589,13 +594,9 @@ class _DropLocationState extends State<DropLocation>
                                                                               [
                                                                               'description'];
 
-                                                                      _controller?.animateCamera(CameraUpdate.newLatLngZoom(
+                                                                      _controller?.moveCamera(CameraUpdate.newLatLngZoom(
                                                                           _center,
                                                                           14.0));
-                                                                      addAutoFill
-                                                                          .clear();
-                                                                      search
-                                                                          .clear();
                                                                     });
                                                                     FocusManager
                                                                         .instance

@@ -177,51 +177,53 @@ class _GetStartedState extends State<GetStarted> {
                               child: Button(
                                   onTap: () async {
                                     String pattern =
-        r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])*$";
-    RegExp regex = RegExp(pattern);
-                                if(regex.hasMatch(emailText.text)){
-                                    FocusManager.instance.primaryFocus
-                                        ?.unfocus();
+                                        r"^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])*$";
+                                    RegExp regex = RegExp(pattern);
+                                    if (regex.hasMatch(emailText.text)) {
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
 
-                                    setState(() {
-                                      verifyEmailError = '';
-                                      _loading = true;
-                                    });
-                                    //validate email already exist
-                                    var result = await validateEmail();
-
-                                    if (result == 'success') {
                                       setState(() {
                                         verifyEmailError = '';
+                                        _loading = true;
                                       });
-                                      var _register = await registerUser();
-                                      if (_register == 'true') {
-                                        //referral page
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const Referral()),
-                                            (route) => false);
+                                      //validate email already exist
+                                      var result = await validateEmail();
+
+                                      if (result == 'success') {
+                                        setState(() {
+                                          verifyEmailError = '';
+                                        });
+                                        var _register = await registerUser();
+                                        if (_register == 'true') {
+                                          //referral page
+                                          Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const Referral()),
+                                              (route) => false);
+                                        } else {
+                                          setState(() {
+                                            verifyEmailError =
+                                                _register.toString();
+                                          });
+                                        }
                                       } else {
                                         setState(() {
-                                          verifyEmailError =
-                                              _register.toString();
+                                          verifyEmailError = result.toString();
                                         });
                                       }
+                                      setState(() {
+                                        _loading = false;
+                                      });
                                     } else {
                                       setState(() {
-                                        verifyEmailError = result.toString();
+                                        verifyEmailError =
+                                            languages[choosenLanguage]
+                                                ['text_email_validation'];
                                       });
                                     }
-                                    setState(() {
-                                      _loading = false;
-                                    });
-                                }else{
-                                  setState(() {
-                                        verifyEmailError = languages[choosenLanguage]['text_email_validation'];
-                                      });
-                                }
                                   },
                                   text: languages[choosenLanguage]
                                       ['text_next']))
