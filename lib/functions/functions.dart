@@ -990,7 +990,7 @@ requestDetailsUpdate(
       lastLong = lng;
     } else {
       var distance = await calculateDistance(lastLat, lastLong, lat, lng);
-      if (distance >= 100.0) {
+      if (distance >= 150.0) {
         latlngArray.add({'lat': lat, 'lng': lng});
         lastLat = lat;
         lastLong = lng;
@@ -2892,11 +2892,7 @@ positionStreamData() {
   }).listen((geolocs.Position? position) {
     if (position != null) {
       center = LatLng(position.latitude, position.longitude);
-      if (driverReq['is_trip_start'] == 1 && driverReq['is_completed'] == 0) {
-        testDistance = testDistance + 50;
-      } else if (driverReq.isEmpty) {
-        testDistance = 0;
-      }
+      
     } else {
       positionStream!.cancel();
     }

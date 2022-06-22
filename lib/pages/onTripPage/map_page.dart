@@ -55,6 +55,7 @@ class _MapsState extends State<Maps>
   dynamic _controller;
   Animation<double>? _animation;
   dynamic animationController;
+  String _cancellingError = '';
 
   String _cancelReason = '';
   bool _locationDenied = false;
@@ -418,10 +419,12 @@ class _MapsState extends State<Maps>
                 }
 
                 if (_pickAnimateDone != true) {
-                  _controller?.animateCamera(CameraUpdate.newLatLngZoom(
-                      LatLng(driverReq['pick_lat'], driverReq['pick_lng']),
-                      11.0));
                   _pickAnimateDone = true;
+                  Future.delayed(const Duration(seconds: 2), () {
+                    _controller?.animateCamera(CameraUpdate.newLatLngZoom(
+                        LatLng(driverReq['pick_lat'], driverReq['pick_lng']),
+                        11.0));
+                  });
                 }
               } else if (driverReq['is_trip_start'] == 1 &&
                   driverReq['is_completed'] == 0) {
@@ -1912,6 +1915,7 @@ class _MapsState extends State<Maps>
                                                                                       if (val == true) {
                                                                                         setState(() {
                                                                                           cancelRequest = true;
+                                                                                          _cancellingError = '';
                                                                                         });
                                                                                       }
                                                                                       setState(() {
@@ -2627,6 +2631,18 @@ class _MapsState extends State<Maps>
                                               ),
                                             )
                                           : Container(),
+                                          (_cancellingError != '')
+                                          ? Container(
+                                              padding: EdgeInsets.only(
+                                                  top: media.width * 0.02,
+                                                  bottom: media.width * 0.02),
+                                              width: media.width * 0.9,
+                                              child: Text(_cancellingError,
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * twelve,
+                                                      color: Colors.red)))
+                                          : Container(),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -2643,11 +2659,24 @@ class _MapsState extends State<Maps>
                                                 if (_cancelReason != '') {
                                                   if (_cancelReason ==
                                                       'others') {
+                                                        if (cancelReasonText !=
+                                                            '' &&
+                                                        cancelReasonText
+                                                            .isNotEmpty) {
+                                                      _cancellingError = '';
                                                     await cancelRequestDriver(
                                                         cancelReasonText);
                                                     setState(() {
                                                       cancelRequest = false;
                                                     });
+                                                    } else {
+                                                      setState(() {
+                                                        _cancellingError = languages[
+                                                                choosenLanguage]
+                                                            [
+                                                            'text_add_cancel_reason'];
+                                                      });
+                                                    }
                                                   } else {
                                                     await cancelRequestDriver(
                                                         _cancelReason);
