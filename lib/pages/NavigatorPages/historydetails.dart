@@ -605,7 +605,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                           Text(
                             myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_code'] +
+                                    ['requested_currency_symbol'] +
                                 ' ' +
                                 myHistory[selectedHistory]['requestBill']
                                         ['data']['base_price']
@@ -631,7 +631,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                           Text(
                             myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_code'] +
+                                    ['requested_currency_symbol'] +
                                 ' ' +
                                 myHistory[selectedHistory]['requestBill']
                                         ['data']['distance_price']
@@ -656,7 +656,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                           Text(
                             myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_code'] +
+                                    ['requested_currency_symbol'] +
                                 ' ' +
                                 myHistory[selectedHistory]['requestBill']
                                         ['data']['time_price']
@@ -688,7 +688,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 ),
                                 Text(
                                   myHistory[selectedHistory]['requestBill']
-                                          ['data']['requested_currency_code'] +
+                                          ['data']['requested_currency_symbol'] +
                                       ' ' +
                                       myHistory[selectedHistory]['requestBill']
                                               ['data']['cancellation_fee']
@@ -721,7 +721,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 ),
                                 Text(
                                   myHistory[selectedHistory]['requestBill']
-                                          ['data']['requested_currency_code'] +
+                                          ['data']['requested_currency_symbol'] +
                                       ' ' +
                                       myHistory[selectedHistory]['requestBill']
                                               ['data']['airport_surge_fee']
@@ -785,7 +785,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                           Text(
                             myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_code'] +
+                                    ['requested_currency_symbol'] +
                                 ' ' +
                                 myHistory[selectedHistory]['requestBill']
                                         ['data']['admin_commision']
@@ -844,7 +844,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                           Text(
                             myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_code'] +
+                                    ['requested_currency_symbol'] +
                                 ' ' +
                                 myHistory[selectedHistory]['requestBill']
                                         ['data']['service_tax']
@@ -876,7 +876,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                           Text(
                             myHistory[selectedHistory]['requestBill']['data']
-                                    ['requested_currency_code'] +
+                                    ['requested_currency_symbol'] +
                                 ' ' +
                                 myHistory[selectedHistory]['requestBill']
                                         ['data']['total_amount']

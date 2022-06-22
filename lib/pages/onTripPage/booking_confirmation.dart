@@ -83,6 +83,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   bool _showInfo = false;
   dynamic _showInfoInt;
   dynamic _dist;
+  String _cancellingError = '';
 
   final _mapMarkerSC = StreamController<List<Marker>>();
   StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
@@ -344,6 +345,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     if (widget.type != 1) {
       addDropMarker();
       getPolylines();
+    }else{
+      if(userRequestData.isNotEmpty){
+      CameraUpdate cameraUpdate = CameraUpdate.newLatLng(LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']));
+    _controller!.animateCamera(cameraUpdate);
+      }else{
+        CameraUpdate cameraUpdate = CameraUpdate.newLatLng(addressList.firstWhere((element) => element.id == 'pickup').latlng);
+    _controller!.animateCamera(cameraUpdate);
+      }
     }
   }
 
@@ -441,18 +450,18 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                 .firstWhere((element) => element.id == 'pickup')
                 .latlng
                 .latitude -
-            (lat * 6.2)
+            (lat * 1.24)
         : (userRequestData.isNotEmpty && addressList.isEmpty)
-            ? userRequestData['pick_lat'] - (lat * 6.2)
+            ? userRequestData['pick_lat'] - (lat * 1.24)
             : 0.0;
     double lowerLon = (userRequestData.isEmpty && addressList.isNotEmpty)
         ? addressList
                 .firstWhere((element) => element.id == 'pickup')
                 .latlng
                 .longitude -
-            (lon * 6.2)
+            (lon * 1.24)
         : (userRequestData.isNotEmpty && addressList.isEmpty)
-            ? userRequestData['pick_lng'] - (lon * 6.2)
+            ? userRequestData['pick_lng'] - (lon * 1.24)
             : 0.0;
 
     double greaterLat = (userRequestData.isEmpty && addressList.isNotEmpty)
@@ -460,18 +469,18 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                 .firstWhere((element) => element.id == 'pickup')
                 .latlng
                 .latitude +
-            (lat * 6.2)
+            (lat * 1.24)
         : (userRequestData.isNotEmpty && addressList.isEmpty)
-            ? userRequestData['pick_lat'] - (lat * 6.2)
+            ? userRequestData['pick_lat'] - (lat * 1.24)
             : 0.0;
     double greaterLon = (userRequestData.isEmpty && addressList.isNotEmpty)
         ? addressList
                 .firstWhere((element) => element.id == 'pickup')
                 .latlng
                 .longitude +
-            (lon * 6.2)
+            (lon * 1.24)
         : (userRequestData.isNotEmpty && addressList.isEmpty)
-            ? userRequestData['pick_lng'] - (lat * 6.2)
+            ? userRequestData['pick_lng'] - (lat * 1.24)
             : 0.0;
     var lower = geo.encode(lowerLon, lowerLat);
     var higher = geo.encode(greaterLon, greaterLat);
@@ -1148,7 +1157,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                               StreamBuilder<DatabaseEvent>(
                                                                                   stream: fdb.onValue,
                                                                                   builder: (context, AsyncSnapshot event) {
-                                                                                    if (event.data != null) {
+                                                                                    if (event.data != null && etaDetails.isNotEmpty) {
                                                                                       minutes[etaDetails[i]['type_id']] = '';
                                                                                       List vehicleList = [];
                                                                                       List vehicles = [];
@@ -1384,7 +1393,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         StreamBuilder<DatabaseEvent>(
                                                                                             stream: fdb.onValue,
                                                                                             builder: (context, AsyncSnapshot event) {
-                                                                                              if (event.data != null) {
+                                                                                              if (event.data != null && etaDetails.isNotEmpty) {
                                                                                                 minutes[rentalOption[i]['type_id']] = '';
                                                                                                 List vehicleList = [];
                                                                                                 List vehicles = [];
@@ -4169,6 +4178,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                 var reason = await cancelReason((userRequestData['is_driver_arrived'] == 0) ? 'before' : 'after');
                                                                                 if (reason == true) {
                                                                                   setState(() {
+                                                                                    _cancellingError = '';
                                                                                     _cancelling = true;
                                                                                   });
                                                                                 }
@@ -4539,6 +4549,25 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           ),
                                                         )
                                                       : Container(),
+                                                      (_cancellingError != '')
+                                                      ? Container(
+                                                          padding: EdgeInsets.only(
+                                                              top: media.width *
+                                                                  0.02,
+                                                              bottom:
+                                                                  media.width *
+                                                                      0.02),
+                                                          width:
+                                                              media.width * 0.9,
+                                                          child: Text(
+                                                              _cancellingError,
+                                                              style: GoogleFonts.roboto(
+                                                                  fontSize: media
+                                                                          .width *
+                                                                      twelve,
+                                                                  color: Colors
+                                                                      .red)))
+                                                      : Container(),
                                                   Row(
                                                     mainAxisAlignment:
                                                         MainAxisAlignment
@@ -4558,12 +4587,26 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                 '') {
                                                               if (_cancelReason ==
                                                                   'others') {
+                                                                    if (_cancelCustomReason !=
+                                                                        '' &&
+                                                                    _cancelCustomReason
+                                                                        .isNotEmpty) {
+                                                                  _cancellingError =
+                                                                      '';
                                                                 await cancelRequestWithReason(
                                                                     _cancelCustomReason);
                                                                 setState(() {
                                                                   _cancelling =
                                                                       false;
                                                                 });
+                                                                } else {
+                                                                  setState(() {
+                                                                    _cancellingError =
+                                                                        languages[choosenLanguage]
+                                                                            [
+                                                                            'text_add_cancel_reason'];
+                                                                  });
+                                                                }
                                                               } else {
                                                                 await cancelRequestWithReason(
                                                                     _cancelReason);

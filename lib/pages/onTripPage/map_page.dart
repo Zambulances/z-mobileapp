@@ -197,11 +197,11 @@ class _MapsState extends State<Maps>
   Widget build(BuildContext context) {
     double lat = 0.0144927536231884;
     double lon = 0.0181818181818182;
-    double lowerLat = center.latitude - (lat * 6.2);
-    double lowerLon = center.longitude - (lon * 6.2);
+    double lowerLat = center.latitude - (lat * 1.24);
+    double lowerLon = center.longitude - (lon * 1.24);
 
-    double greaterLat = center.latitude + (lat * 6.2);
-    double greaterLon = center.longitude + (lon * 6.2);
+    double greaterLat = center.latitude + (lat * 1.24);
+    double greaterLon = center.longitude + (lon * 1.24);
     var lower = geo.encode(lowerLon, lowerLat);
     var higher = geo.encode(greaterLon, greaterLat);
 
