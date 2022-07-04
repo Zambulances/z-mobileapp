@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +27,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_year.dart';
+import 'package:tagyourtaxi_driver/styles/styles.dart';
 import '../pages/vehicleInformations/upload_docs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mqtt_client/mqtt_client.dart';
@@ -35,6 +37,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'geohash.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:awesome_notifications/android_foreground_service.dart';
 
 //languages code
 dynamic phcode;
@@ -634,6 +637,11 @@ driverLogin() async {
   return result;
 }
 
+// background(){
+//   isBackground = true;
+//   valueNotifierHome.incrementNotifier();
+// }
+
 Map<String, dynamic> userDetails = {};
 
 //user current state
@@ -681,8 +689,10 @@ getUserDetails() async {
         driverReq = userDetails['metaRequest']['data'];
 
         if (duration == 0 || duration == 0.0) {
+         
           duration = 30;
           sound();
+        
         }
 
         valueNotifierHome.incrementNotifier();
@@ -798,6 +808,9 @@ mqttForDocuments() async {
         userReject = true;
         duration = 0;
         audioPlayer.play(audio);
+        
+        AwesomeNotifications().cancel(7425);
+        
       }
       getStartOtp = false;
 
@@ -810,14 +823,51 @@ mqttForDocuments() async {
 
       driverReq = val;
       valueNotifierHome.incrementNotifier();
+      
       if (duration == 0 || duration == 0.0) {
+      //  AndroidForegroundService.startForeground(
+      //    content: NotificationContent(id: 1, channelKey: 'call_channel',body: 'you got a new request',category: NotificationCategory.Service,autoDismissible: false,
+      //   displayOnBackground: true,
+      //   displayOnForeground: true,
+      //   fullScreenIntent: true,
+      //   wakeUpScreen: true,
+        
+      //   notificationLayout: NotificationLayout.Default
+      //   ),actionButtons: [
+      //     NotificationActionButton(key: '1', label: 'Reject'),
+      //     NotificationActionButton(key: '2', label: 'Accept'),
+
+      //   ]);
+       
+        AwesomeNotifications().createNotification(content: NotificationContent(id: 7425, channelKey: 'trip_request',
+        title: 'Pick Address',
+        body: driverReq['pick_address'],autoDismissible: false,
+        displayOnBackground: true,
+        displayOnForeground: false,
+        fullScreenIntent: true,
+        backgroundColor: page,
+        color: buttonColor,
+          
+        wakeUpScreen: true,
+        locked: true,
+        
+        notificationLayout: NotificationLayout.BigText
+        ),actionButtons: [
+          NotificationActionButton(key: 'reject', label: 'Reject Request',autoDismissible: true,buttonType: ActionButtonType.KeepOnTop,color: Colors.red),
+          NotificationActionButton(key: 'accept', label: 'Accept Request',buttonType: ActionButtonType.Default,color: Colors.green,showInCompactView: true),
+
+        ]);
+       
+
         duration = 30;
         sound();
+       
       }
     } else if (c[0].topic == 'new_message_' + userDetails['id'].toString()) {
       if (jsonDecode(pt)["success_message"] == "new_message") {
         chatList = jsonDecode(pt)['data'];
         audioPlayer.play(audio);
+       
         valueNotifierHome.incrementNotifier();
       } else {
         audioPlayer.play(audio);
@@ -1075,6 +1125,8 @@ requestAccept() async {
         body: jsonEncode({'request_id': driverReq['id'], 'is_accept': 1}));
 
     if (response.statusCode == 200) {
+        AwesomeNotifications().cancel(7425);
+        
       if (jsonDecode(response.body)['message'] == 'success') {
         audioPlayers.stop();
         audioPlayers.dispose();
@@ -1110,11 +1162,13 @@ requestReject() async {
         body: jsonEncode({'request_id': driverReq['id'], 'is_accept': 0}));
 
     if (response.statusCode == 200) {
+        AwesomeNotifications().cancel(7425);
       if (jsonDecode(response.body)['message'] == 'success') {
         audioPlayers.stop();
         audioPlayers.dispose();
-        duration = 0;
+        
         await getUserDetails();
+        duration = 0;
         userActive();
         valueNotifierHome.incrementNotifier();
       }
@@ -1129,6 +1183,8 @@ requestReject() async {
   }
 }
 
+
+
 //sound
 
 sound() async {
@@ -1140,7 +1196,7 @@ sound() async {
         driverReq.isNotEmpty) {
       duration--;
       valueNotifierHome.incrementNotifier();
-    } else if (driverReq['accepted_at'] == null && duration <= 0.0) {
+    } else if (driverReq.isNotEmpty && driverReq['accepted_at'] == null && duration <= 0.0) {
       timer.cancel();
       audioPlayers.stop();
       audioPlayers.dispose();
@@ -2876,7 +2932,7 @@ geolocs.LocationSettings locationSettings = (platform == TargetPlatform.android)
         ))
     : geolocs.AppleSettings(
         accuracy: geolocs.LocationAccuracy.high,
-        activityType: geolocs.ActivityType.fitness,
+        activityType: geolocs.ActivityType.otherNavigation,
         distanceFilter: 50,
         showBackgroundLocationIndicator: true,
       );
@@ -2887,8 +2943,9 @@ positionStreamData() {
   positionStream =
       geolocs.Geolocator.getPositionStream(locationSettings: locationSettings)
           .handleError((error) {
+            print(error);
     positionStream = null;
-    positionStream!.cancel();
+    positionStream?.cancel();
   }).listen((geolocs.Position? position) {
     if (position != null) {
       center = LatLng(position.latitude, position.longitude);

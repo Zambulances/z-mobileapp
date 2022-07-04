@@ -1,7 +1,11 @@
+import 'dart:convert';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/functions/notifications.dart';
+import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'pages/loadingPage/loadingpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -22,6 +26,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
+
+
     platform = Theme.of(context).platform;
     return GestureDetector(
         onTap: () {
@@ -37,6 +44,6 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Tagxi Driver',
             theme: ThemeData(),
-            home: const LoadingPage()));
+            home:const LoadingPage()));
   }
 }

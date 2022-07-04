@@ -48,7 +48,7 @@ dependencies:
   location: ^4.3.0
   audioplayers: ^0.20.1
   url_launcher: ^6.0.18
-  flutter_local_notifications: ^9.3.2
+  flutter_local_notifications: ^9.5.3
   permission_handler: ^9.2.0
   contacts_service: ^0.6.3
   share_plus: ^3.1.0
@@ -60,6 +60,7 @@ dependencies:
   cashfree_pg: ^2.0.9+29
   package_info_plus: ^1.4.2
   vector_math: ^2.1.1
+  awesome_notifications: ^0.6.21
 
 
 dev_dependencies:

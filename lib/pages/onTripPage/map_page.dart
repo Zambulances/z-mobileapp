@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +23,7 @@ import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 
 class Maps extends StatefulWidget {
@@ -355,6 +357,7 @@ class _MapsState extends State<Maps>
       child: ValueListenableBuilder(
           valueListenable: valueNotifierHome.value,
           builder: (context, value, child) {
+            
             if (myMarkers
                     .where((element) => element.markerId == const MarkerId('1'))
                     .isNotEmpty &&
@@ -409,6 +412,10 @@ class _MapsState extends State<Maps>
                   anchor: const Offset(0.5, 0.5)));
             }
             if (driverReq.isNotEmpty) {
+              // if(isBackground == true){
+              //   print('this is va');
+              //   // launch('app://open.my.app');
+              // }
               if (driverReq['is_trip_start'] != 1) {
                 if (myMarkers
                     .where((element) => element.markerId == const MarkerId('2'))
@@ -938,6 +945,7 @@ class _MapsState extends State<Maps>
                                                                     Scaffold.of(
                                                                             context)
                                                                         .openDrawer();
+                                                                  //  AwesomeNotifications();
                                                                   },
                                                                   child: const Icon(
                                                                       Icons
@@ -1915,6 +1923,7 @@ class _MapsState extends State<Maps>
                                                                                       if (val == true) {
                                                                                         setState(() {
                                                                                           cancelRequest = true;
+                                                                                          _cancelReason = '';
                                                                                           _cancellingError = '';
                                                                                         });
                                                                                       }
