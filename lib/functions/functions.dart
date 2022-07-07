@@ -1391,6 +1391,9 @@ tripStartDispatcher() async {
     if (response.statusCode == 200) {
       result = 'success';
       await getUserDetails();
+      FirebaseDatabase.instance.ref('requests').child(driverReq['id']).update({
+        'trip_start':'1'
+      });
       valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);
