@@ -453,6 +453,40 @@ class _NavDrawerState extends State<NavDrawer> {
                           ),
                         ),
 
+                        //delete account
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              deleteAccount = true;
+                            });
+                            valueNotifierHome.incrementNotifier();
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(media.width * 0.025),
+                            child: Row(
+                              children: [
+                                Icon(Icons.delete_forever,
+                                size: media.width*0.075,
+                                ),
+                                SizedBox(
+                                  width: media.width * 0.025,
+                                ),
+                                SizedBox(
+                                  width: media.width * 0.55,
+                                  child: Text(
+                                    languages[choosenLanguage]['text_delete_account'],
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        color: textColor),
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+
                         //logout
                         InkWell(
                           onTap: () {

@@ -70,7 +70,7 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userRequestData.isNotEmpty &&
             userRequestData['is_completed'] != 1) {
-          mqttForUser();
+          // mqttForUser();
           Future.delayed(const Duration(seconds: 2), () {
             if (userRequestData['is_rental'] == true) {
               Navigator.pushAndRemoveUntil(
@@ -104,6 +104,7 @@ class _OtpState extends State<Otp> {
   //auto verify otp
 
   verifyOtp() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     try {
       // Sign the user in (or link) with the credential
       await FirebaseAuth.instance.signInWithCredential(credentials);
@@ -118,7 +119,7 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userRequestData.isNotEmpty &&
             userRequestData['is_completed'] != 1) {
-          mqttForUser();
+          // mqttForUser();
           Future.delayed(const Duration(seconds: 2), () {
             if (userRequestData['is_rental'] == true) {
               Navigator.pushAndRemoveUntil(
@@ -333,7 +334,7 @@ class _OtpState extends State<Otp> {
                                                   .isNotEmpty &&
                                               userRequestData['is_completed'] !=
                                                   1) {
-                                            mqttForUser();
+                                            // mqttForUser();
                                             Future.delayed(
                                                 const Duration(seconds: 2), () {
                                               // ride page
@@ -404,7 +405,7 @@ class _OtpState extends State<Otp> {
                                                 userRequestData[
                                                         'is_completed'] !=
                                                     1) {
-                                              mqttForUser();
+                                              // mqttForUser();
                                               Future.delayed(
                                                   const Duration(seconds: 2),
                                                   () {

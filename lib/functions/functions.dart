@@ -42,7 +42,7 @@ bool internet = true;
 String url = 'https://tagxi-server.ondemandappz.com/';
 String mqttUrl = '';
 int mqttPort = 1883;
-String mapkey = 'AIzaSyBeVRs1icwooRpk7ErjCEQCwu0OQowVt9I';
+String mapkey = 'AIzaSyB4KttZBNVcz6Q52gaIgKK8-3h2Qk8RA3Y';
 
 //check internet connection
 
@@ -60,10 +60,10 @@ checkInternetConnection() {
   });
 }
 
-// void printWrapped(String text) {
-//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
-// }
+void printWrapped(String text) {
+  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+  pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+}
 
 getDetailsOfDevice() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
@@ -206,14 +206,15 @@ getCountryCode() async {
 
     if (response.statusCode == 200) {
       countries = jsonDecode(response.body)['data'];
+      printWrapped(countries.toString());
       phcode = (countries
               .where((element) =>
-                  element['code'] ==
-                  WidgetsBinding.instance!.window.locale.countryCode)
+                  element['default'] ==
+                  true)
               .isNotEmpty)
           ? countries.indexWhere((element) =>
-              element['code'] ==
-              WidgetsBinding.instance!.window.locale.countryCode)
+              element['default'] ==
+              true)
           : 0;
       result = 'success';
     } else {
@@ -239,6 +240,7 @@ dynamic credentials;
 
 phoneAuth(String phone) async {
   try {
+    credentials = null;
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phone,
       verificationCompleted: (PhoneAuthCredential credential) async {
@@ -495,12 +497,28 @@ getUserDetails() async {
         }
       }
       if (userDetails['onTripRequest'] != null) {
+        if(userRequestData != userDetails['onTripRequest']['data']){
+          audioPlayer.play(audio);
+        }
         userRequestData = userDetails['onTripRequest']['data'];
         if (userRequestData['accepted_at'] != null) {
           getCurrentMessages();
         }
+        
         if (client.connectionStatus == null && client != '' && mqttUrl != '') {
-          mqttForUser();
+          // mqttForUser();
+        }
+        if(userRequestData['is_completed'] == 0){
+        if(rideStreamUpdate == null || rideStreamUpdate?.isPaused == true || rideStreamStart == null || rideStreamStart?.isPaused == true){
+        streamRide();
+        }
+        }else{
+          if(rideStreamUpdate != null || rideStreamUpdate?.isPaused == false || rideStreamStart != null || rideStreamStart?.isPaused == false){
+            rideStreamUpdate?.cancel();
+            rideStreamUpdate = null;
+            rideStreamStart?.cancel();
+            rideStreamStart = null;
+          }
         }
         valueNotifierHome.incrementNotifier();
         valueNotifierBook.incrementNotifier();
@@ -521,12 +539,27 @@ getUserDetails() async {
                   userRequestData['drop_lat'], userRequestData['drop_lng'])),
         );
 
-        if (client.connectionStatus == null) {
-          mqttForUser();
+        if (requestStreamStart == null || requestStreamStart?.isPaused == true || requestStreamEnd == null || requestStreamEnd?.isPaused == true) {
+          streamRequest();
         }
+        valueNotifierHome.incrementNotifier();
         valueNotifierBook.incrementNotifier();
       } else {
+        if(userRequestData.isNotEmpty){
+          audioPlayer.play(audio);
+        }
+        chatList.clear();
         userRequestData = {};
+        requestStreamStart?.cancel();
+        requestStreamEnd?.cancel();
+        rideStreamUpdate?.cancel();
+        rideStreamStart?.cancel();
+        requestStreamEnd = null;
+        requestStreamStart = null;
+        rideStreamUpdate = null;
+        rideStreamStart = null;
+        valueNotifierHome.incrementNotifier();
+        valueNotifierBook.incrementNotifier();
       }
       if (userDetails['active'] == false) {
         isActive = 'false';
@@ -562,7 +595,7 @@ Map<String, dynamic> driverReq = {};
 dynamic client = '';
 
 //mqtt for documents approvals
-mqttForUser() async {
+mqttForUse() async {
   client.setProtocolV311();
   client.logging(on: true);
   client.keepAlivePeriod = 120;
@@ -1111,8 +1144,11 @@ createRequest() async {
           'request_eta_amount': etaDetails[choosenVehicle]['total']
         }));
     if (response.statusCode == 200) {
-      mqttForUser();
+      // mqttForUser();
+      // streamRequest();
+      printWrapped(response.body);
       userRequestData = jsonDecode(response.body)['data'];
+      streamRequest();
       result = 'success';
 
       valueNotifierBook.incrementNotifier();
@@ -1179,8 +1215,9 @@ createRequestWithPromo() async {
         }));
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
-      mqttForUser();
+      // mqttForUser();
       result = 'success';
+      streamRequest();
       valueNotifierBook.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1245,6 +1282,7 @@ createRequestLater() async {
         }));
     if (response.statusCode == 200) {
       result = 'success';
+      streamRequest();
       valueNotifierBook.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1310,6 +1348,7 @@ createRequestLaterPromo() async {
         }));
     if (response.statusCode == 200) {
       myMarkers.clear();
+      streamRequest();
       valueNotifierBook.incrementNotifier();
       result = 'success';
     } else {
@@ -1369,9 +1408,9 @@ createRentalRequest() async {
           'rental_pack_id': etaDetails[rentalChoosenOption]['id']
         }));
     if (response.statusCode == 200) {
-      mqttForUser();
+      // mqttForUser();
       userRequestData = jsonDecode(response.body)['data'];
-
+streamRequest();
       result = 'success';
 
       valueNotifierBook.incrementNotifier();
@@ -1432,7 +1471,8 @@ createRentalRequestWithPromo() async {
         }));
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
-      mqttForUser();
+      // mqttForUser();
+      streamRequest();
       result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
@@ -1493,6 +1533,7 @@ createRentalRequestLater() async {
         }));
     if (response.statusCode == 200) {
       result = 'success';
+      streamRequest();
       valueNotifierBook.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1552,6 +1593,7 @@ createRentalRequestLaterPromo() async {
         }));
     if (response.statusCode == 200) {
       myMarkers.clear();
+      streamRequest();
       valueNotifierBook.incrementNotifier();
       result = 'success';
     } else {
@@ -1619,6 +1661,7 @@ class RequestCreate {
 //user cancel request
 
 cancelRequest() async {
+  dynamic result;
   try {
     var response = await http.post(Uri.parse(url + 'api/v1/request/cancel'),
         headers: {
@@ -1627,17 +1670,29 @@ cancelRequest() async {
         },
         body: jsonEncode({'request_id': userRequestData['id']}));
     if (response.statusCode == 200) {
+      userCancelled = true;
+      FirebaseDatabase.instance.ref('requests').child(userRequestData['id']).update({
+        'cancelled_by_user':true
+      });
       userRequestData = {};
-      client.disconnect();
+      if(requestStreamStart?.isPaused == false || requestStreamEnd?.isPaused == false){
+        requestStreamStart?.cancel();
+        requestStreamEnd?.cancel();
+        requestStreamStart = null;
+        requestStreamEnd = null;
+      }
+      result = 'success';
       valueNotifierBook.incrementNotifier();
     } else {
       debugPrint(response.body);
+      result = 'failed';
     }
   } catch (e) {
     if (e is SocketException) {
       internet = false;
     }
   }
+  return result;
 }
 
 cancelLaterRequest(val) async {
@@ -1650,7 +1705,12 @@ cancelLaterRequest(val) async {
         body: jsonEncode({'request_id': val}));
     if (response.statusCode == 200) {
       userRequestData = {};
-      client.disconnect();
+      if(requestStreamStart?.isPaused == false || requestStreamEnd?.isPaused == false){
+        requestStreamStart?.cancel();
+        requestStreamEnd?.cancel();
+        requestStreamStart = null;
+        requestStreamEnd = null;
+      }
       valueNotifierBook.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1675,8 +1735,16 @@ cancelRequestWithReason(reason) async {
             {'request_id': userRequestData['id'], 'reason': reason}));
     if (response.statusCode == 200) {
       cancelRequestByUser = true;
+      FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).update({
+        'cancelled_by_user':true
+      });
       userRequestData = {};
-      client.disconnect();
+      if(rideStreamUpdate?.isPaused == false || rideStreamStart?.isPaused == false){
+        rideStreamUpdate?.cancel();
+        rideStreamUpdate = null;
+        rideStreamStart?.cancel();
+        rideStreamStart = null;
+      }
       valueNotifierBook.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1900,6 +1968,9 @@ getCurrentMessages() async {
     );
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
+        if(chatList.where((element) => element['from_type'] == 2).length != jsonDecode(response.body)['data'].where((element)=>element['from_type'] == 2).length){
+          audioPlayer.play(audio);
+        }
         chatList = jsonDecode(response.body)['data'];
         valueNotifierBook.incrementNotifier();
       }
@@ -1925,7 +1996,11 @@ sendMessage(chat) async {
         body:
             jsonEncode({'request_id': userRequestData['id'], 'message': chat}));
     if (response.statusCode == 200) {
-      getCurrentMessages();
+      await getCurrentMessages();
+      FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).update({
+        'message_by_user' : chatList.length
+      });
+      
     } else {
       debugPrint(response.body);
     }
@@ -2319,6 +2394,7 @@ addMoneyStripe(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
+      await getUserDetails();
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -2376,6 +2452,7 @@ addMoneyPaystack(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
+      await getUserDetails();
       paystackCode.clear();
       result = 'success';
     } else {
@@ -2406,7 +2483,7 @@ addMoneyFlutterwave(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
-      paystackCode.clear();
+      await getUserDetails();
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -2436,7 +2513,7 @@ addMoneyRazorpay(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
-      paystackCode.clear();
+      await getUserDetails();
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -2681,6 +2758,102 @@ makeRequestComplaint() async {
     if (e is SocketException) {
       internet = false;
       result = 'no internet';
+    }
+  }
+  return result;
+}
+
+//requestStream
+StreamSubscription<DatabaseEvent>? requestStreamStart;
+StreamSubscription<DatabaseEvent>? requestStreamEnd;
+bool userCancelled = false;
+
+streamRequest(){
+  print('func1 started');
+  requestStreamEnd?.cancel();
+  requestStreamStart?.cancel();
+  rideStreamUpdate?.cancel();
+  rideStreamStart?.cancel();
+  requestStreamStart = null;
+  requestStreamEnd = null;
+  rideStreamUpdate = null;
+  rideStreamStart = null;
+  requestStreamStart = FirebaseDatabase.instance.ref('requests').child(userRequestData['id']).onChildAdded.handleError((onError){
+    requestStreamStart?.cancel();
+  }).listen((event) async { 
+    print('func2 started');
+      
+       getUserDetails();
+      print('func zero');
+      requestStreamEnd?.cancel();
+      requestStreamStart?.cancel();
+    
+  });
+  
+}
+
+StreamSubscription<DatabaseEvent>? rideStreamStart;
+StreamSubscription<DatabaseEvent>? rideStreamUpdate;
+
+streamRide(){
+  print('func3 started');
+  requestStreamEnd?.cancel();
+  requestStreamStart?.cancel();
+  rideStreamUpdate?.cancel();
+  rideStreamStart?.cancel();
+  requestStreamStart = null;
+  requestStreamEnd = null;
+  rideStreamUpdate = null;
+  rideStreamStart = null;
+  rideStreamUpdate = FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).onChildChanged.handleError((onError){
+    rideStreamUpdate?.cancel();
+  }).listen((DatabaseEvent event) async { 
+    if(event.snapshot.key.toString() == 'trip_start' || event.snapshot.key.toString() == 'trip_arrived' || event.snapshot.key.toString() == 'is_completed'){
+       getUserDetails();
+      print('func one');
+    }else if(event.snapshot.key.toString() == 'message_by_driver'){
+       getCurrentMessages();
+      print('func two');
+    }else if(event.snapshot.key.toString() == 'cancelled_by_driver'){
+      requestCancelledByDriver = true;
+       getUserDetails();
+      print('func three');
+    }
+  });
+
+  rideStreamStart = FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).onChildAdded.handleError((onError){
+    rideStreamStart?.cancel();
+  }).listen((DatabaseEvent event) async { 
+    if(event.snapshot.key.toString() == 'message_by_driver'){
+       getCurrentMessages();
+      print('func four');
+    }else if(event.snapshot.key.toString() == 'cancelled_by_driver'){
+      requestCancelledByDriver = true;
+       getUserDetails();
+      print('func five');
+    }
+  });
+}
+
+userDelete()async{
+  dynamic result;
+  try {
+    var response = await http.post(Uri.parse(url + 'api/v1/user/delete-user-account'), headers: {
+      'Authorization': 'Bearer ' + bearerToken[0].token,
+      'Content-Type': 'application/json'
+    });
+    if (response.statusCode == 200) {
+      pref.remove('Bearer');
+
+      result = 'success';
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
     }
   }
   return result;

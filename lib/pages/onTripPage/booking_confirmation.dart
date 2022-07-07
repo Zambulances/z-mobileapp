@@ -138,10 +138,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
 //running timer
   timer() {
-    timing = 300;
+    timing = userRequestData['maximum_time_for_find_drivers_for_regular_ride'];
 
     if (mounted) {
-      timers = Timer.periodic(const Duration(seconds: 1), (timer) {
+      timers = Timer.periodic(const Duration(seconds: 1), (timer) async {
         if (userRequestData.isNotEmpty &&
             userDetails['accepted_at'] == null &&
             timing > 0) {
@@ -150,10 +150,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
         } else if (userRequestData.isNotEmpty &&
             userRequestData['accepted_at'] == null &&
             timing == 0) {
-          setState(() {
+            await cancelRequest();
+             
             noDriverFound = true;
-          });
-          cancelRequest();
+         
+             
           timers.cancel();
         } else {
           timers.cancel();
@@ -876,9 +877,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           builder: (context, snapshot) {
                                             return GoogleMap(
                                               padding: EdgeInsets.only(
-                                                  bottom: (widget.type != 1)
-                                                      ? media.width * 1
-                                                      : 0,
+                                                  bottom:media.width * 1,
                                                   top: media.height * 0.1 +
                                                       MediaQuery.of(context)
                                                           .padding
@@ -2073,6 +2072,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     children: [
+                                                      (userDetails['show_ride_later_feature'] == true) ?
                                                       Button(
                                                           color: page,
                                                           textcolor:
@@ -2096,10 +2096,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           text: languages[
                                                                   choosenLanguage]
                                                               [
-                                                              'text_ridelater']),
+                                                              'text_ridelater']) : Container(),
                                                       Button(
-                                                          width: media.width *
-                                                              0.42,
+                                                          width: (userDetails['show_ride_later_feature'] == true) ? media.width *
+                                                              0.42 : media.width*0.9,
                                                           color: buttonColor,
                                                           onTap: () async {
                                                             setState(() {
@@ -3512,7 +3512,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                     height: media.width * 0.02,
                                                     width: (media.width *
                                                         0.9 *
-                                                        (timing / 300)),
+                                                        (timing / userDetails['maximum_time_for_find_drivers_for_regular_ride'])),
                                                     decoration: BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius
@@ -3635,7 +3635,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       ),
                                                       (userRequestData[
                                                                   'is_trip_start'] !=
-                                                              1)
+                                                              1 && userRequestData['show_otp_feature'] == true)
                                                           ? Container(
                                                               padding: EdgeInsets
                                                                   .fromLTRB(
@@ -4699,12 +4699,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   child: CupertinoDatePicker(
                                                       minimumDate:
                                                           DateTime.now().add(
-                                                              const Duration(
-                                                                  minutes: 30)),
+                                                               Duration(
+                                                                  minutes: int.parse(userDetails['user_can_make_a_ride_after_x_miniutes']))),
                                                       initialDateTime:
                                                           DateTime.now().add(
-                                                              const Duration(
-                                                                  minutes: 31)),
+                                                               Duration(
+                                                                  minutes: int.parse(userDetails['user_can_make_a_ride_after_x_miniutes']))),
                                                       maximumDate:
                                                           DateTime.now().add(
                                                               const Duration(

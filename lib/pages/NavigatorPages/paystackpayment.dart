@@ -46,6 +46,7 @@ class _PayStackPageState extends State<PayStackPage> {
         ..amount = addMoney * 100
         ..reference = paystackCode['reference']
         ..accessCode = paystackCode['access_code']
+        ..currency = walletBalance['currency_code']
         ..email = userDetails['email'];
 
       var response = await plugin.checkout(

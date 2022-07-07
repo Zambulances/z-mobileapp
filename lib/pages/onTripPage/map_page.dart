@@ -46,6 +46,7 @@ String favNameText = '';
 bool requestCancelledByDriver = false;
 bool cancelRequestByUser = false;
 bool logout = false;
+bool deleteAccount = false;
 
 class _MapsState extends State<Maps>
     with WidgetsBindingObserver, TickerProviderStateMixin {
@@ -70,6 +71,7 @@ class _MapsState extends State<Maps>
   late BitmapDescriptor pinLocationIcon;
   dynamic userLocationIcon;
   bool favAddressAdd = false;
+  bool _showToast = false;
 
   final _mapMarkerSC = StreamController<List<Marker>>();
   StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
@@ -118,6 +120,19 @@ class _MapsState extends State<Maps>
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
         .buffer
         .asUint8List();
+  }
+
+//show toast for demo
+  addToast() {
+    setState(() {
+      _showToast = true;
+    });
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        _showToast = false;
+        
+      });
+    });
   }
 
 //get location permission and location details
@@ -174,7 +189,35 @@ class _MapsState extends State<Maps>
           userLocationIcon = value;
         });
       });
-
+      //remove in original
+       var val = await geoCoding(
+             _centerLocation
+                 .latitude,
+             _centerLocation
+                 .longitude);
+         setState(
+             () {
+           if (addressList
+               .where((element) =>
+                   element.id ==
+                   'pickup')
+               .isNotEmpty) {
+             var add = addressList.firstWhere((element) =>
+                 element.id ==
+                 'pickup');
+             add.address =
+                 val;
+             add.latlng = LatLng(
+                 _centerLocation.latitude,
+                 _centerLocation.longitude);
+           } else {
+             addressList.add(AddressList(
+                 id: 'pickup',
+                 address: val,
+                 latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
+           }
+         });
+         //remove in original
       final Uint8List markerIcon =
           await getBytesFromAsset('assets/images/top-taxi.png', 40);
       pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
@@ -230,7 +273,7 @@ class _MapsState extends State<Maps>
                   userRequestData['is_later'] == 1 &&
                   userRequestData['is_completed'] != 1 &&
                   userRequestData['accepted_at'] != null) {
-                mqttForUser();
+                // mqttForUser();
                 Future.delayed(const Duration(seconds: 2), () {
                   if (userRequestData['is_rental'] == true) {
                     Navigator.pushAndRemoveUntil(
@@ -602,38 +645,34 @@ class _MapsState extends State<Maps>
                                                                   },
                                                                   onCameraIdle:
                                                                       () async {
-                                                                    if (_bottom ==
+                                                                         if (_bottom ==
                                                                             0 &&
                                                                         _pickaddress ==
                                                                             false) {
-                                                                      var val = await geoCoding(
-                                                                          _centerLocation
-                                                                              .latitude,
-                                                                          _centerLocation
-                                                                              .longitude);
-                                                                      setState(
-                                                                          () {
-                                                                        if (addressList
-                                                                            .where((element) =>
-                                                                                element.id ==
-                                                                                'pickup')
-                                                                            .isNotEmpty) {
-                                                                          var add = addressList.firstWhere((element) =>
-                                                                              element.id ==
-                                                                              'pickup');
-                                                                          add.address =
-                                                                              val;
-                                                                          add.latlng = LatLng(
-                                                                              _centerLocation.latitude,
-                                                                              _centerLocation.longitude);
-                                                                        } else {
-                                                                          addressList.add(AddressList(
-                                                                              id: 'pickup',
-                                                                              address: val,
-                                                                              latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
-                                                                        }
-                                                                      });
-                                                                    } else if (_pickaddress ==
+                                                                              // setState(
+                                                                    //       () {
+                                                                    //     if (addressList
+                                                                    //         .where((element) =>
+                                                                    //             element.id ==
+                                                                    //             'pickup')
+                                                                    //         .isNotEmpty) {
+                                                                    //       var add = addressList.firstWhere((element) =>
+                                                                    //           element.id ==
+                                                                    //           'pickup');
+                                                                    //       add.address =
+                                                                    //           val;
+                                                                    //       add.latlng = LatLng(
+                                                                    //           _centerLocation.latitude,
+                                                                    //           _centerLocation.longitude);
+                                                                    //     } else {
+                                                                    //       addressList.add(AddressList(
+                                                                    //           id: 'pickup',
+                                                                    //           address: val,
+                                                                    //           latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
+                                                                    //     }
+                                                                    //   });
+                                                                        addToast();
+                                                                            }else if (_pickaddress ==
                                                                         true) {
                                                                       setState(
                                                                           () {
@@ -641,6 +680,46 @@ class _MapsState extends State<Maps>
                                                                             false;
                                                                       });
                                                                     }
+                                                                    // if (_bottom ==
+                                                                    //         0 &&
+                                                                    //     _pickaddress ==
+                                                                    //         false) {
+                                                                    //           
+                                                                    //   var val = await geoCoding(
+                                                                    //       _centerLocation
+                                                                    //           .latitude,
+                                                                    //       _centerLocation
+                                                                    //           .longitude);
+                                                                    //   setState(
+                                                                    //       () {
+                                                                    //     if (addressList
+                                                                    //         .where((element) =>
+                                                                    //             element.id ==
+                                                                    //             'pickup')
+                                                                    //         .isNotEmpty) {
+                                                                    //       var add = addressList.firstWhere((element) =>
+                                                                    //           element.id ==
+                                                                    //           'pickup');
+                                                                    //       add.address =
+                                                                    //           val;
+                                                                    //       add.latlng = LatLng(
+                                                                    //           _centerLocation.latitude,
+                                                                    //           _centerLocation.longitude);
+                                                                    //     } else {
+                                                                    //       addressList.add(AddressList(
+                                                                    //           id: 'pickup',
+                                                                    //           address: val,
+                                                                    //           latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
+                                                                    //     }
+                                                                    //   });
+                                                                    // } else if (_pickaddress ==
+                                                                    //     true) {
+                                                                    //   setState(
+                                                                    //       () {
+                                                                    //     _pickaddress =
+                                                                    //         false;
+                                                                    //   });
+                                                                    // }
                                                                   },
                                                                   minMaxZoomPreference:
                                                                       const MinMaxZoomPreference(
@@ -963,6 +1042,7 @@ class _MapsState extends State<Maps>
                                                                           () {
                                                                         Scaffold.of(context)
                                                                             .openDrawer();
+                                                                            printWrapped(userDetails.toString());
                                                                       },
                                                                       child: const Icon(
                                                                           Icons
@@ -1941,6 +2021,100 @@ class _MapsState extends State<Maps>
                               ))
                           : Container(),
 
+                      //delete account
+                      (deleteAccount == true)
+                          ? Positioned(
+                              top: 0,
+                              child: Container(
+                                height: media.height * 1,
+                                width: media.width * 1,
+                                color: Colors.transparent.withOpacity(0.6),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: media.width * 0.9,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Container(
+                                              height: media.height * 0.1,
+                                              width: media.width * 0.1,
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: page),
+                                              child: InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      deleteAccount = false;
+                                                    });
+                                                  },
+                                                  child: const Icon(
+                                                      Icons.cancel_outlined))),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.all(media.width * 0.05),
+                                      width: media.width * 0.9,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: page),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            languages[choosenLanguage]
+                                                ['text_delete_confirm'],
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                color: textColor,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                          SizedBox(
+                                            height: media.width * 0.05,
+                                          ),
+                                          Button(
+                                              onTap: () async {
+                                                setState(() {
+                                                  deleteAccount = false;
+                                                  _loading = true;
+                                                });
+                                                var result = await userDelete();
+                                                if (result == 'success') {
+                                                  setState(() {
+                                                    Navigator.pushAndRemoveUntil(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const Login()),
+                                                        (route) => false);
+                                                    userDetails.clear();
+                                                  });
+                                                } else {
+                                                  setState(() {
+                                                    _loading = false;
+                                                    deleteAccount = true;
+                                                  });
+                                                }
+                                                setState(() {
+                                                  _loading = false;
+                                                });
+                                              },
+                                              text: languages[choosenLanguage]
+                                                  ['text_confirm'])
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ))
+                          : Container(),
+
+
                       //logout
                       (logout == true)
                           ? Positioned(
@@ -2115,6 +2289,28 @@ class _MapsState extends State<Maps>
                               ),
                             ))
                           : Container(),
+
+                      //display toast
+                  (_showToast == true)
+                      ? Positioned(
+                          top: media.height * 0.5,
+                          child: Container(
+                            width: media.width*0.9,
+                            margin: EdgeInsets.all(media.width*0.05),
+                            padding: EdgeInsets.all(media.width * 0.025),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: page),
+                            child: Text(
+                              'Auto address by scrolling map feature is not available in demo',
+                              style: GoogleFonts.roboto(
+                                  fontSize: media.width * twelve,
+                                  color: textColor),
+                                  textAlign: TextAlign.center,
+                            ),
+                          ))
+                      : Container(),
+
                       //loader
                       (_loading == true || state == '')
                           ? const Positioned(top: 0, child: Loading())
