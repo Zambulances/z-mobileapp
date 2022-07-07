@@ -76,7 +76,7 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userDetails['uploaded_document'] == true &&
             userDetails['approve'] == true) {
-          mqttForDocuments();
+          // mqttForDocuments();
 
           Navigator.pushAndRemoveUntil(
               context,
@@ -93,6 +93,7 @@ class _OtpState extends State<Otp> {
 //auto verify otp
 
   verifyOtp() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     try {
       // Sign the user in (or link) with the credential
       await FirebaseAuth.instance.signInWithCredential(credentials);
@@ -115,7 +116,7 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userDetails['uploaded_document'] == true &&
             userDetails['approve'] == true) {
-          mqttForDocuments();
+          // mqttForDocuments();
 
           Navigator.pushAndRemoveUntil(
               context,
@@ -325,7 +326,7 @@ class _OtpState extends State<Otp> {
                                                       'uploaded_document'] ==
                                                   true &&
                                               userDetails['approve'] == true) {
-                                            mqttForDocuments();
+                                            // mqttForDocuments();
                                             Future.delayed(
                                                 const Duration(seconds: 2), () {
                                               Navigator.pushAndRemoveUntil(
@@ -384,7 +385,7 @@ class _OtpState extends State<Otp> {
                                                     true &&
                                                 userDetails['approve'] ==
                                                     true) {
-                                              mqttForDocuments();
+                                              // mqttForDocuments();
                                               Future.delayed(
                                                   const Duration(seconds: 2),
                                                   () {

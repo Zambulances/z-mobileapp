@@ -56,7 +56,7 @@ dynamic centerCheck;
 String url = 'https://tagxi-server.ondemandappz.com/';
 String mqttUrl = '';
 int mqttPort = 1883;
-String mapkey = 'AIzaSyBeVRs1icwooRpk7ErjCEQCwu0OQowVt9I';
+String mapkey = 'AIzaSyB4KttZBNVcz6Q52gaIgKK8-3h2Qk8RA3Y';
 String mapStyle = '';
 
 getDetailsOfDevice() async {
@@ -229,12 +229,12 @@ getCountryCode() async {
       countries = jsonDecode(response.body)['data'];
       phcode = (countries
               .where((element) =>
-                  element['code'] ==
-                  WidgetsBinding.instance!.window.locale.countryCode)
+                  element['default'] ==
+                  true)
               .isNotEmpty)
           ? countries.indexWhere((element) =>
-              element['code'] ==
-              WidgetsBinding.instance!.window.locale.countryCode)
+              element['default'] ==
+              true)
           : 0;
       result = 'success';
     } else {
@@ -260,6 +260,7 @@ dynamic credentials;
 
 phoneAuth(String phone) async {
   try {
+    credentials = null;
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phone,
       verificationCompleted: (PhoneAuthCredential credential) async {
@@ -688,9 +689,28 @@ getUserDetails() async {
       } else if (userDetails['metaRequest'] != null) {
         driverReq = userDetails['metaRequest']['data'];
 
+
         if (duration == 0 || duration == 0.0) {
+          AwesomeNotifications().createNotification(content: NotificationContent(id: 7425, channelKey: 'trip_request',
+        title: 'Pick Address',
+        body: driverReq['pick_address'],autoDismissible: false,
+        displayOnBackground: true,
+        displayOnForeground: false,
+        fullScreenIntent: true,
+        backgroundColor: page,
+        color: buttonColor,
+          
+        wakeUpScreen: true,
+        locked: true,
+        
+        notificationLayout: NotificationLayout.BigText
+        ),actionButtons: [
+          NotificationActionButton(key: 'reject', label: 'Reject Request',autoDismissible: true,buttonType: ActionButtonType.KeepOnTop,color: Colors.red),
+          NotificationActionButton(key: 'accept', label: 'Accept Request',buttonType: ActionButtonType.Default,color: Colors.green,showInCompactView: true),
+
+        ]);
          
-          duration = 30;
+          duration = double.parse(userDetails['trip_accept_reject_duration_for_driver'].toString());
           sound();
         
         }
@@ -698,7 +718,12 @@ getUserDetails() async {
         valueNotifierHome.incrementNotifier();
       } else {
         duration = 0;
+        if(driverReq.isNotEmpty){
+          audioPlayer.play(audio);
+        }
+        chatList.clear();
         driverReq = {};
+        valueNotifierHome.incrementNotifier();
       }
       if (userDetails['active'] == false) {
         isActive = 'false';
@@ -735,8 +760,10 @@ Map<String, dynamic> driverReq = {};
 dynamic client = '';
 bool userReject = false;
 
+
+
 //mqtt for documents approvals
-mqttForDocuments() async {
+mqttForDocument() async {
   client.setProtocolV311();
   client.logging(on: true);
   client.keepAlivePeriod = 120;
@@ -845,7 +872,6 @@ mqttForDocuments() async {
         displayOnBackground: true,
         displayOnForeground: false,
         fullScreenIntent: true,
-        backgroundColor: page,
         color: buttonColor,
           
         wakeUpScreen: true,
@@ -859,7 +885,7 @@ mqttForDocuments() async {
         ]);
        
 
-        duration = 30;
+        duration = double.parse(userDetails['trip_accept_reject_duration_for_driver'].toString());
         sound();
        
       }
@@ -939,14 +965,24 @@ currentPositionUpdate() async {
     if (userDetails.isNotEmpty) {
       serviceEnabled = await locs.serviceEnabled();
       permission = await locs.hasPermission();
+      
       if (userDetails['active'] == true &&
           serviceEnabled == true &&
           mqttUrl != '' &&
           client != '' &&
           permission == PermissionStatus.granted) {
+            if(driverReq.isEmpty){
+            if(requestStreamStart == null || requestStreamStart?.isPaused == true){
+              streamRequest();
+            }
+            }else if(driverReq.isNotEmpty && driverReq['accepted_at'] != null){
+              if(rideStreamStart == null || rideStreamStart?.isPaused == true || rideStreamChanges == null || rideStreamChanges?.isPaused == true){
+                streamRide();
+              }
+            }
         if (client.connectionStatus!.state != MqttConnectionState.connected ||
             client.connectionStatus == null) {
-          mqttForDocuments();
+          // mqttForDocuments();
         }
         if (positionStream == null || positionStream!.isPaused) {
           positionStreamData();
@@ -995,7 +1031,22 @@ currentPositionUpdate() async {
         center = LatLng(double.parse(pos.latitude.toString()),
             double.parse(pos.longitude.toString()));
       }
+      var _driverStatus = await FirebaseDatabase.instance.ref('drivers/' + userDetails['id'].toString()).child('approve').get();
+      if(_driverStatus.value == 0 && userDetails['approve'] == true){
+       await getUserDetails();
+       if (userDetails['active'] == true) {
+        await driverStatus();
+      }
+      valueNotifierHome.incrementNotifier();
+       audioPlayer.play(audio);
+      }else if(_driverStatus.value == 1 && userDetails['approve'] == false){
+        print('check ver');
+       await getUserDetails();
+       valueNotifierHome.incrementNotifier();
+       audioPlayer.play(audio);
+      }
     }
+    
   });
 }
 
@@ -1058,7 +1109,8 @@ requestDetailsUpdate(
     _data.child('requests/' + driverReq['id']).update({
       'bearing': bearing,
       'distance': (totalDistance == null) ? 0.0 : totalDistance,
-      'id': userDetails['id'],
+      'driver_id': userDetails['id'],
+      'user_id':driverReq['userDetail']['data']['id'],
       'is_cancelled': (driverReq['is_cancelled'] == 0) ? false : true,
       'is_completed': (driverReq['is_completed'] == 0) ? false : true,
       'lat': lat,
@@ -1132,12 +1184,26 @@ requestAccept() async {
         audioPlayers.dispose();
 
         await getUserDetails();
+        
+        if(driverReq.isNotEmpty){
+
         FirebaseDatabase.instance
             .ref()
-            .child('drivers/' + userDetails['id'])
+            .child('drivers/' + userDetails['id'].toString())
             .update({'is_available': false});
         duration = 0;
+        requestStreamStart?.cancel();
+        requestStreamStart = null;
+        requestStreamEnd?.cancel();
+        requestStreamEnd = null;
+        if(rideStreamStart == null || rideStreamStart?.isPaused == true || rideStreamChanges == null || rideStreamChanges?.isPaused == true){
+                streamRide();
+        }
+        requestDetailsUpdate(double.parse(heading.toString()), center.latitude, center.longitude);
+        }
         valueNotifierHome.incrementNotifier();
+        FirebaseDatabase.instance
+            .ref('request-meta/' + driverReq['id'].toString()).remove();
       }
     } else {
       debugPrint(response.body);
@@ -1151,6 +1217,8 @@ requestAccept() async {
 }
 
 //driver request reject
+
+bool driverReject = false;
 
 requestReject() async {
   try {
@@ -1166,7 +1234,7 @@ requestReject() async {
       if (jsonDecode(response.body)['message'] == 'success') {
         audioPlayers.stop();
         audioPlayers.dispose();
-        
+        driverReject = true;
         await getUserDetails();
         duration = 0;
         userActive();
@@ -1183,18 +1251,25 @@ requestReject() async {
   }
 }
 
+audioPlay()async{
+  audioPlayers = await audioPlayer.play('audio/request_sound.mp3');
+}
 
 
 //sound
 
 sound() async {
-  audioPlayers = await audioPlayer.play('audio/request_sound.mp3');
+  audioPlay();
+  
 
-  Timer.periodic(const Duration(seconds: 1), (timer) {
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
     if (duration > 0.0 &&
         driverReq['accepted_at'] == null &&
         driverReq.isNotEmpty) {
       duration--;
+      if(audioPlayers.state == PlayerState.COMPLETED){
+        audioPlay();
+      }
       valueNotifierHome.incrementNotifier();
     } else if (driverReq.isNotEmpty && driverReq['accepted_at'] == null && duration <= 0.0) {
       timer.cancel();
@@ -1224,10 +1299,16 @@ driverArrived() async {
         },
         body: jsonEncode({'request_id': driverReq['id']}));
     if (response.statusCode == 200) {
+      
       if (jsonDecode(response.body)['message'] == 'driver_arrived') {
         waitingBeforeTime = 0;
         waitingTime = 0;
         await getUserDetails();
+        FirebaseDatabase.instance.ref('requests').child(driverReq['id']).update(
+          {
+            'trip_arrived':'1'
+          }
+        );
         valueNotifierHome.incrementNotifier();
       }
     } else {
@@ -1277,6 +1358,9 @@ tripStart() async {
     if (response.statusCode == 200) {
       result = 'success';
       await getUserDetails();
+      FirebaseDatabase.instance.ref('requests').child(driverReq['id']).update({
+        'trip_start':'1'
+      });
       valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1349,7 +1433,7 @@ geoCoding(double lat, double lng) async {
 
 endTrip() async {
   try {
-    await requestDetailsUpdate(heading, center.latitude, center.longitude);
+    await requestDetailsUpdate(double.parse(heading.toString()), center.latitude, center.longitude);
     var dropAddress = await geoCoding(center.latitude, center.longitude);
     var db = await FirebaseDatabase.instance
         .ref()
@@ -1359,12 +1443,14 @@ endTrip() async {
     double dist =
         double.parse(double.parse(db.value.toString()).toStringAsFixed(2));
 
+        var reqId = driverReq['id'];
+
     final _data = FirebaseDatabase.instance.ref();
     _data.child('requests/' + driverReq['id']).update({
       'bearing': heading,
       'id': userDetails['id'],
       'is_cancelled': (driverReq['is_cancelled'] == 0) ? false : true,
-      'is_completed': true,
+      'is_completed': false,
       'lat': center.latitude,
       'lng': center.longitude,
       'lat_lng_array': latlngArray,
@@ -1398,6 +1484,10 @@ endTrip() async {
               : 0
         }));
     if (response.statusCode == 200) {
+      await getUserDetails();
+      FirebaseDatabase.instance.ref('requests').child(reqId).update({
+      'is_completed': true
+    });
       totalDistance = null;
       lastLat = null;
       lastLong = null;
@@ -1411,7 +1501,7 @@ endTrip() async {
       waitingAfterTime = null;
       waitingBeforeTime = null;
       waitingTime = null;
-      await getUserDetails();
+      
 
       valueNotifierHome.incrementNotifier();
     } else {
@@ -1589,7 +1679,7 @@ cancelRequestDriver(reason) async {
         await FirebaseDatabase.instance
             .ref()
             .child('requests/' + driverReq['id'])
-            .update({'is_cancelled': true});
+            .update({'cancelled_by_driver': true});
         result = true;
         await getUserDetails();
         userActive();
@@ -1651,6 +1741,9 @@ getCurrentMessages() async {
     );
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
+        if(chatList.where((element) => element['from_type'] == 1).length != jsonDecode(response.body)['data'].where((element)=>element['from_type'] == 1).length){
+          audioPlayer.play(audio);
+        }
         chatList = jsonDecode(response.body)['data'];
         valueNotifierHome.incrementNotifier();
       }
@@ -1676,6 +1769,9 @@ sendMessage(chat) async {
         body: jsonEncode({'request_id': driverReq['id'], 'message': chat}));
     if (response.statusCode == 200) {
       getCurrentMessages();
+       FirebaseDatabase.instance.ref('requests/' + driverReq['id']).update({
+        'message_by_driver' : chatList.length
+      });
     } else {
       debugPrint(response.body);
     }
@@ -2139,6 +2235,7 @@ addMoneyStripe(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
+      await getUserDetails();
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -2196,6 +2293,7 @@ addMoneyPaystack(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
+      await getUserDetails();
       paystackCode.clear();
       result = 'success';
     } else {
@@ -2226,7 +2324,7 @@ addMoneyFlutterwave(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
-      paystackCode.clear();
+      await getUserDetails();
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -2256,7 +2354,7 @@ addMoneyRazorpay(amount, nonce) async {
             {'amount': amount, 'payment_nonce': nonce, 'payment_id': nonce}));
     if (response.statusCode == 200) {
       await getWalletHistory();
-      paystackCode.clear();
+      await getUserDetails();
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -2429,7 +2527,7 @@ checkInternetConnection() async {
             userDetails.isNotEmpty &&
             mqttUrl != '' &&
             client != '') {
-          mqttForDocuments();
+          // mqttForDocuments();
         }
       }
       valueNotifierHome.incrementNotifier();
@@ -2915,6 +3013,90 @@ waitingAfterStart() async {
   });
 }
 
+//requestStream
+StreamSubscription<DatabaseEvent>? requestStreamStart;
+StreamSubscription<DatabaseEvent>? requestStreamEnd;
+StreamSubscription<DatabaseEvent>? rideStreamStart;
+StreamSubscription<DatabaseEvent>? rideStreamChanges;
+
+streamRequest(){
+  rideStreamStart?.cancel();
+  rideStreamChanges?.cancel();
+  requestStreamEnd?.cancel();
+  requestStreamStart?.cancel();
+  rideStreamStart = null;
+  rideStreamChanges = null;
+  requestStreamStart = null;
+  requestStreamEnd = null;
+  requestStreamStart = FirebaseDatabase.instance.ref('request-meta').orderByChild('driver_id').equalTo(userDetails['id']).onChildAdded.handleError((onError){
+    requestStreamStart?.cancel();
+  }).listen((event) { 
+    
+    if(driverReq.isEmpty){
+      streamEnd(event.snapshot.key.toString());
+       getUserDetails();
+        print('funcs ' + event.snapshot.key.toString());
+        
+    }
+  });
+  
+}
+
+streamEnd(id){
+  print('func4 starts');
+    requestStreamEnd = FirebaseDatabase.instance.ref('request-meta').child(id).onChildRemoved.handleError((onError){
+    requestStreamEnd?.cancel();
+  }).listen((event) { 
+    if(driverReject != true){
+    userReject = true;
+    AwesomeNotifications().cancel(7425);
+    driverReq.clear();
+    getUserDetails();
+    }
+    print('func end');
+  });
+}
+
+streamRide(){
+  print('func3 started');
+  requestStreamEnd?.cancel();
+  requestStreamStart?.cancel();
+  rideStreamStart?.cancel();
+  rideStreamChanges?.cancel();
+  requestStreamStart = null;
+  requestStreamEnd = null;
+  rideStreamStart = null;
+  rideStreamChanges = null;
+  rideStreamChanges = FirebaseDatabase.instance.ref('requests/' + driverReq['id'].toString()).onChildChanged.handleError((onError){
+    rideStreamChanges?.cancel();
+  }).listen((DatabaseEvent event) { 
+    print('func4 started');
+    if(event.snapshot.key.toString() == 'cancelled_by_user'){
+      getUserDetails();
+      if(driverReq.isEmpty){
+      userReject = true;
+      }
+    }else if(event.snapshot.key.toString() == 'message_by_user'){
+      getCurrentMessages();
+    }
+    
+  });
+  rideStreamStart = FirebaseDatabase.instance.ref('requests/' + driverReq['id'].toString()).onChildAdded.handleError((onError){
+    rideStreamChanges?.cancel();
+  }).listen((DatabaseEvent event) async { 
+    print('func4 started');
+    if(event.snapshot.key.toString() == 'cancelled_by_user'){
+      getUserDetails();
+     
+      userReject = true;
+      
+    }else if(event.snapshot.key.toString() == 'message_by_user'){
+      getCurrentMessages();
+    }
+    
+  });
+}
+
 //location stream
 bool positionStreamStarted = false;
 StreamSubscription<geolocs.Position>? positionStream;
@@ -2954,4 +3136,28 @@ positionStreamData() {
       positionStream!.cancel();
     }
   });
+}
+
+userDelete()async{
+  dynamic result;
+  try {
+    var response = await http.post(Uri.parse(url + 'api/v1/user/delete-user-account'), headers: {
+      'Authorization': 'Bearer ' + bearerToken[0].token,
+      'Content-Type': 'application/json'
+    });
+    if (response.statusCode == 200) {
+      pref.remove('Bearer');
+
+      result = 'success';
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+    }
+  }
+  return result;
 }

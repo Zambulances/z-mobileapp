@@ -407,7 +407,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Text(
-                                myHistory[selectedHistory]['ride_user_rating']
+                                myHistory[selectedHistory]['ride_driver_rating']
                                     .toString(),
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * eighteen,

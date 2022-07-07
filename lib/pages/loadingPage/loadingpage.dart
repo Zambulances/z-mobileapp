@@ -113,7 +113,7 @@ class _LoadingPageState extends State<LoadingPage> {
                 MaterialPageRoute(
                   builder: (context) => const DocsProcess(),
                 ));
-            mqttForDocuments();
+            // mqttForDocuments();
           } else if (userDetails['uploaded_document'] == true &&
               userDetails['approve'] == true) {
             //status approved
@@ -121,7 +121,7 @@ class _LoadingPageState extends State<LoadingPage> {
                 context,
                 MaterialPageRoute(builder: (context) => const Maps()),
                 (route) => false);
-            mqttForDocuments();
+            // mqttForDocuments();
           }
         }
         //if user is not login in this device

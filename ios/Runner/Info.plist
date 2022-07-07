@@ -34,6 +34,14 @@
 				<string>com.googleusercontent.apps.214496791559-69n81e5605p5hcf42if08unq4krqi5md</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tagxiurl</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>

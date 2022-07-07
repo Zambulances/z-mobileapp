@@ -1,6 +1,8 @@
 PODS:
   - audioplayers (0.0.1):
     - Flutter
+  - awesome_notifications (0.0.3):
+    - Flutter
   - cashfree_pg (0.0.1):
     - Flutter
   - connectivity_plus (0.0.1):
@@ -158,6 +160,7 @@ PODS:
 
 DEPENDENCIES:
   - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
+  - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
   - cashfree_pg (from `.symlinks/plugins/cashfree_pg/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - contacts_service (from `.symlinks/plugins/contacts_service/ios`)
@@ -210,6 +213,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   audioplayers:
     :path: ".symlinks/plugins/audioplayers/ios"
+  awesome_notifications:
+    :path: ".symlinks/plugins/awesome_notifications/ios"
   cashfree_pg:
     :path: ".symlinks/plugins/cashfree_pg/ios"
   connectivity_plus:
@@ -261,6 +266,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audioplayers: 455322b54050b30ea4b1af7cd9e9d105f74efa8c
+  awesome_notifications: 04530aafec8dac4635244ed4b4072f4aea6cc938
   cashfree_pg: 4d216897f5b81020f5be03de34363d4539600b07
   connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   contacts_service: 849e1f84281804c8bfbec1b4c3eedcb23c5d3eca

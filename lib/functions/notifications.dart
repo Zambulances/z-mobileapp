@@ -93,7 +93,6 @@ enableLights: true,
     if (notification != null) {
       AwesomeNotifications().createNotification(content: NotificationContent(id: 12346, channelKey: 'normal_push',
       autoDismissible: true,
-      backgroundColor: buttonColor,
       title: notification.title,
       body: notification.body,
       displayOnBackground: true,
@@ -106,11 +105,11 @@ category: NotificationCategory.Message
       ));
           
 
-      if (client.connectionStatus!.state != MqttConnectionState.connected ||
-          client.connectionStatus == null) {
-        getUserDetails();
-        audioPlayer.play(audio);
-      }
+      // if (client.connectionStatus!.state != MqttConnectionState.connected ||
+      //     client.connectionStatus == null) {
+      //   getUserDetails();
+      //   audioPlayer.play(audio);
+      // }
     }
   });
 

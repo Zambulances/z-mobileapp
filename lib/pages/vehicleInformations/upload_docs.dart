@@ -345,7 +345,7 @@ class _DocsState extends State<Docs> {
                                               const DocsProcess()),
                                       (route) => false);
 
-                                  mqttForDocuments();
+                                  // mqttForDocuments();
                                 }
                               },
                               text: languages[choosenLanguage]['text_submit'])
