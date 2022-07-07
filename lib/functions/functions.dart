@@ -37,7 +37,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'geohash.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:awesome_notifications/android_foreground_service.dart';
 
 //languages code
 dynamic phcode;
@@ -1040,7 +1039,6 @@ currentPositionUpdate() async {
       valueNotifierHome.incrementNotifier();
        audioPlayer.play(audio);
       }else if(_driverStatus.value == 1 && userDetails['approve'] == false){
-        print('check ver');
        await getUserDetails();
        valueNotifierHome.incrementNotifier();
        audioPlayer.play(audio);
@@ -2056,7 +2054,6 @@ getWalletHistory() async {
         Uri.parse(url + 'api/v1/payment/wallet/history'),
         headers: {'Authorization': 'Bearer ' + bearerToken[0].token});
     if (response.statusCode == 200) {
-      printWrapped(response.body);
       walletBalance = jsonDecode(response.body);
       walletHistory = walletBalance['wallet_history']['data'];
       walletPages = walletBalance['wallet_history']['meta']['pagination'];
@@ -3035,7 +3032,6 @@ streamRequest(){
     if(driverReq.isEmpty){
       streamEnd(event.snapshot.key.toString());
        getUserDetails();
-        print('funcs ' + event.snapshot.key.toString());
         
     }
   });
@@ -3043,7 +3039,6 @@ streamRequest(){
 }
 
 streamEnd(id){
-  print('func4 starts');
     requestStreamEnd = FirebaseDatabase.instance.ref('request-meta').child(id).onChildRemoved.handleError((onError){
     requestStreamEnd?.cancel();
   }).listen((event) { 
@@ -3053,12 +3048,10 @@ streamEnd(id){
     driverReq.clear();
     getUserDetails();
     }
-    print('func end');
   });
 }
 
 streamRide(){
-  print('func3 started');
   requestStreamEnd?.cancel();
   requestStreamStart?.cancel();
   rideStreamStart?.cancel();
@@ -3070,7 +3063,6 @@ streamRide(){
   rideStreamChanges = FirebaseDatabase.instance.ref('requests/' + driverReq['id'].toString()).onChildChanged.handleError((onError){
     rideStreamChanges?.cancel();
   }).listen((DatabaseEvent event) { 
-    print('func4 started');
     if(event.snapshot.key.toString() == 'cancelled_by_user'){
       getUserDetails();
       if(driverReq.isEmpty){
@@ -3084,7 +3076,6 @@ streamRide(){
   rideStreamStart = FirebaseDatabase.instance.ref('requests/' + driverReq['id'].toString()).onChildAdded.handleError((onError){
     rideStreamChanges?.cancel();
   }).listen((DatabaseEvent event) async { 
-    print('func4 started');
     if(event.snapshot.key.toString() == 'cancelled_by_user'){
       getUserDetails();
      
@@ -3125,7 +3116,6 @@ positionStreamData() {
   positionStream =
       geolocs.Geolocator.getPositionStream(locationSettings: locationSettings)
           .handleError((error) {
-            print(error);
     positionStream = null;
     positionStream?.cancel();
   }).listen((geolocs.Position? position) {

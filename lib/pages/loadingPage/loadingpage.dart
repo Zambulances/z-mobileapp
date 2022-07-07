@@ -45,7 +45,6 @@ class _LoadingPageState extends State<LoadingPage> {
   getLanguageDone() async {
 
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
-      print('is allowed $isAllowed');
   if (!isAllowed) {
     // This is just a basic example. For real apps, you must show some
     // friendly dialog box before call the request method.

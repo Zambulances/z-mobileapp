@@ -1,8 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -24,7 +22,6 @@ import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
-import 'package:url_launcher/url_launcher.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 
 class Maps extends StatefulWidget {
@@ -497,19 +494,7 @@ class _MapsState extends State<Maps>
                 body: SingleChildScrollView(
                   child: Stack(
                     children: [
-                      StreamBuilder<DatabaseEvent>(
-                        stream: FirebaseDatabase.instance.ref('request-meta').orderByChild('driver_id').equalTo(335).onValue,
-                        builder: (context, snapshot) {
-                          if(snapshot.hasData){
-                            if(snapshot.data!.snapshot.value != null){
-                            // print(snapshot.data!.snapshot.value.toString());
-                            print('trip child started');
-                            }
-                          else{
-                            print('trip child ended');
-                          }
-                        }
-                          return Container(
+                      Container(
                             color: page,
                             height: media.height * 1,
                             width: media.width * 1,
@@ -959,8 +944,6 @@ class _MapsState extends State<Maps>
                                                                         Scaffold.of(
                                                                                 context)
                                                                             .openDrawer();
-                                                                            print(userDetails['trip_accept_reject_duration_for_driver'].toString());
-                                                                      //  AwesomeNotifications();
                                                                       },
                                                                       child: const Icon(
                                                                           Icons
@@ -2087,9 +2070,7 @@ class _MapsState extends State<Maps>
                                                 )
                                               : Container(),
                                 ]),
-                          );
-                        }
-                      ),
+                          ),
                       (_locationDenied == true)
                           ? Positioned(
                               child: Container(
