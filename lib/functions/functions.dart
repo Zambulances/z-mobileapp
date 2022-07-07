@@ -206,7 +206,6 @@ getCountryCode() async {
 
     if (response.statusCode == 200) {
       countries = jsonDecode(response.body)['data'];
-      printWrapped(countries.toString());
       phcode = (countries
               .where((element) =>
                   element['default'] ==
@@ -1144,9 +1143,6 @@ createRequest() async {
           'request_eta_amount': etaDetails[choosenVehicle]['total']
         }));
     if (response.statusCode == 200) {
-      // mqttForUser();
-      // streamRequest();
-      printWrapped(response.body);
       userRequestData = jsonDecode(response.body)['data'];
       streamRequest();
       result = 'success';
@@ -2769,7 +2765,6 @@ StreamSubscription<DatabaseEvent>? requestStreamEnd;
 bool userCancelled = false;
 
 streamRequest(){
-  print('func1 started');
   requestStreamEnd?.cancel();
   requestStreamStart?.cancel();
   rideStreamUpdate?.cancel();
@@ -2781,10 +2776,8 @@ streamRequest(){
   requestStreamStart = FirebaseDatabase.instance.ref('requests').child(userRequestData['id']).onChildAdded.handleError((onError){
     requestStreamStart?.cancel();
   }).listen((event) async { 
-    print('func2 started');
       
        getUserDetails();
-      print('func zero');
       requestStreamEnd?.cancel();
       requestStreamStart?.cancel();
     
@@ -2796,7 +2789,6 @@ StreamSubscription<DatabaseEvent>? rideStreamStart;
 StreamSubscription<DatabaseEvent>? rideStreamUpdate;
 
 streamRide(){
-  print('func3 started');
   requestStreamEnd?.cancel();
   requestStreamStart?.cancel();
   rideStreamUpdate?.cancel();
@@ -2810,14 +2802,11 @@ streamRide(){
   }).listen((DatabaseEvent event) async { 
     if(event.snapshot.key.toString() == 'trip_start' || event.snapshot.key.toString() == 'trip_arrived' || event.snapshot.key.toString() == 'is_completed'){
        getUserDetails();
-      print('func one');
     }else if(event.snapshot.key.toString() == 'message_by_driver'){
        getCurrentMessages();
-      print('func two');
     }else if(event.snapshot.key.toString() == 'cancelled_by_driver'){
       requestCancelledByDriver = true;
        getUserDetails();
-      print('func three');
     }
   });
 
@@ -2826,11 +2815,9 @@ streamRide(){
   }).listen((DatabaseEvent event) async { 
     if(event.snapshot.key.toString() == 'message_by_driver'){
        getCurrentMessages();
-      print('func four');
     }else if(event.snapshot.key.toString() == 'cancelled_by_driver'){
       requestCancelledByDriver = true;
        getUserDetails();
-      print('func five');
     }
   });
 }

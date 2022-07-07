@@ -1042,7 +1042,6 @@ class _MapsState extends State<Maps>
                                                                           () {
                                                                         Scaffold.of(context)
                                                                             .openDrawer();
-                                                                            printWrapped(userDetails.toString());
                                                                       },
                                                                       child: const Icon(
                                                                           Icons
