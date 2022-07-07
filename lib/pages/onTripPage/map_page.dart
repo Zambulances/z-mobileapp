@@ -476,7 +476,7 @@ class _MapsState extends State<Maps>
               }
             }
 
-            if (userDetails['approve'] == false) {
+            if (userDetails['approve'] == false && driverReq.isEmpty) {
               WidgetsBinding.instance?.addPostFrameCallback((_) {
                 Navigator.pushAndRemoveUntil(
                     context,
