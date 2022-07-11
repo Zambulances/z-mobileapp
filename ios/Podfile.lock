@@ -340,6 +340,8 @@ PODS:
     - abseil/meta/type_traits
   - audioplayers (0.0.1):
     - Flutter
+  - awesome_notifications (0.0.3):
+    - Flutter
   - BoringSSL-GRPC (0.0.7):
     - BoringSSL-GRPC/Implementation (= 0.0.7)
     - BoringSSL-GRPC/Interface (= 0.0.7)
@@ -558,6 +560,7 @@ PODS:
 
 DEPENDENCIES:
   - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
+  - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
   - cashfree_pg (from `.symlinks/plugins/cashfree_pg/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
@@ -619,6 +622,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   audioplayers:
     :path: ".symlinks/plugins/audioplayers/ios"
+  awesome_notifications:
+    :path: ".symlinks/plugins/awesome_notifications/ios"
   cashfree_pg:
     :path: ".symlinks/plugins/cashfree_pg/ios"
   cloud_firestore:
@@ -677,6 +682,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
   audioplayers: 455322b54050b30ea4b1af7cd9e9d105f74efa8c
+  awesome_notifications: 04530aafec8dac4635244ed4b4072f4aea6cc938
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   cashfree_pg: 4d216897f5b81020f5be03de34363d4539600b07
   cloud_firestore: 03020d987c2828e9b2d87f6940d365ddb089394f

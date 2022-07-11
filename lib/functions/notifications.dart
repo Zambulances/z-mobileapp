@@ -9,48 +9,44 @@ FirebaseMessaging messaging = FirebaseMessaging.instance;
 FlutterLocalNotificationsPlugin fltNotification =
     FlutterLocalNotificationsPlugin();
 
-
-void initMessaging(){
+void initMessaging() {
   AwesomeNotifications().initialize('resource://drawable/logo', [
     NotificationChannel(
-          channelGroupKey: 'push_notification',
-          channelKey: 'normal_push',
-          channelName: 'normal_notification',
-          channelDescription: 'normal notification',
-          defaultColor: Colors.grey,
-          ledColor: Colors.blueGrey,
-          enableLights: true,
-          importance: NotificationImportance.Max,
-          channelShowBadge: true,
-          locked: false,
-          playSound: true,
-          defaultPrivacy: NotificationPrivacy.Public
-          ),
+        channelGroupKey: 'push_notification',
+        channelKey: 'normal_push',
+        channelName: 'normal_notification',
+        channelDescription: 'normal notification',
+        defaultColor: Colors.grey,
+        ledColor: Colors.blueGrey,
+        enableLights: true,
+        importance: NotificationImportance.Max,
+        channelShowBadge: true,
+        locked: false,
+        playSound: true,
+        defaultPrivacy: NotificationPrivacy.Public),
   ]);
 
-
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     if (notification != null) {
-      if (requestStreamEnd == null && requestStreamStart == null && rideStreamStart == null && rideStreamUpdate == null) {
+      if (requestStreamEnd == null &&
+          requestStreamStart == null &&
+          rideStreamStart == null &&
+          rideStreamUpdate == null) {
         getUserDetails();
-        // valueNotifierBook.incrementNotifier();
-        // audioPlayer.play(audio);
       }
-      AwesomeNotifications().createNotification(content: NotificationContent(id: 12346, channelKey: 'normal_push',
-      autoDismissible: true,
-      title: notification.title,
-      body: notification.body,
-      displayOnBackground: true,
-      displayOnForeground: true,
-      wakeUpScreen: true,
-
-notificationLayout: NotificationLayout.BigText,
-category: NotificationCategory.Message
-
-      ));
-        
+      AwesomeNotifications().createNotification(
+          content: NotificationContent(
+              id: 12346,
+              channelKey: 'normal_push',
+              autoDismissible: true,
+              title: notification.title,
+              body: notification.body,
+              displayOnBackground: true,
+              displayOnForeground: true,
+              wakeUpScreen: true,
+              notificationLayout: NotificationLayout.BigText,
+              category: NotificationCategory.Message));
     }
   });
-
 }

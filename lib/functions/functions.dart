@@ -21,8 +21,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mqtt_client/mqtt_client.dart';
-import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -40,8 +38,6 @@ bool internet = true;
 
 //base url
 String url = 'https://tagxi-server.ondemandappz.com/';
-String mqttUrl = '';
-int mqttPort = 1883;
 String mapkey = 'AIzaSyB4KttZBNVcz6Q52gaIgKK8-3h2Qk8RA3Y';
 
 //check internet connection
@@ -206,15 +202,10 @@ getCountryCode() async {
 
     if (response.statusCode == 200) {
       countries = jsonDecode(response.body)['data'];
-      phcode = (countries
-              .where((element) =>
-                  element['default'] ==
-                  true)
-              .isNotEmpty)
-          ? countries.indexWhere((element) =>
-              element['default'] ==
-              true)
-          : 0;
+      phcode =
+          (countries.where((element) => element['default'] == true).isNotEmpty)
+              ? countries.indexWhere((element) => element['default'] == true)
+              : 0;
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -489,30 +480,27 @@ getUserDetails() async {
           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
       favAddress = userDetails['favouriteLocations']['data'];
       sosData = userDetails['sos']['data'];
-      if (userDetails['mqtt_ip'] != null && userDetails['mqtt_ip'] != '') {
-        mqttUrl = userDetails['mqtt_ip'];
-        if (client == '') {
-          client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
-        }
-      }
       if (userDetails['onTripRequest'] != null) {
-        if(userRequestData != userDetails['onTripRequest']['data']){
+        if (userRequestData != userDetails['onTripRequest']['data']) {
           audioPlayer.play(audio);
         }
         userRequestData = userDetails['onTripRequest']['data'];
         if (userRequestData['accepted_at'] != null) {
           getCurrentMessages();
         }
-        
-        if (client.connectionStatus == null && client != '' && mqttUrl != '') {
-          // mqttForUser();
-        }
-        if(userRequestData['is_completed'] == 0){
-        if(rideStreamUpdate == null || rideStreamUpdate?.isPaused == true || rideStreamStart == null || rideStreamStart?.isPaused == true){
-        streamRide();
-        }
-        }else{
-          if(rideStreamUpdate != null || rideStreamUpdate?.isPaused == false || rideStreamStart != null || rideStreamStart?.isPaused == false){
+
+        if (userRequestData['is_completed'] == 0) {
+          if (rideStreamUpdate == null ||
+              rideStreamUpdate?.isPaused == true ||
+              rideStreamStart == null ||
+              rideStreamStart?.isPaused == true) {
+            streamRide();
+          }
+        } else {
+          if (rideStreamUpdate != null ||
+              rideStreamUpdate?.isPaused == false ||
+              rideStreamStart != null ||
+              rideStreamStart?.isPaused == false) {
             rideStreamUpdate?.cancel();
             rideStreamUpdate = null;
             rideStreamStart?.cancel();
@@ -538,13 +526,16 @@ getUserDetails() async {
                   userRequestData['drop_lat'], userRequestData['drop_lng'])),
         );
 
-        if (requestStreamStart == null || requestStreamStart?.isPaused == true || requestStreamEnd == null || requestStreamEnd?.isPaused == true) {
+        if (requestStreamStart == null ||
+            requestStreamStart?.isPaused == true ||
+            requestStreamEnd == null ||
+            requestStreamEnd?.isPaused == true) {
           streamRequest();
         }
         valueNotifierHome.incrementNotifier();
         valueNotifierBook.incrementNotifier();
       } else {
-        if(userRequestData.isNotEmpty){
+        if (userRequestData.isNotEmpty) {
           audioPlayer.play(audio);
         }
         chatList.clear();
@@ -591,74 +582,6 @@ class BearerClass {
 }
 
 Map<String, dynamic> driverReq = {};
-dynamic client = '';
-
-//mqtt for documents approvals
-mqttForUse() async {
-  client.setProtocolV311();
-  client.logging(on: true);
-  client.keepAlivePeriod = 120;
-  client.autoReconnect = true;
-
-  try {
-    await client.connect();
-  } on NoConnectionException catch (e) {
-    debugPrint(e.toString());
-    client.connect();
-  }
-
-  if (client.connectionStatus!.state == MqttConnectionState.connected) {
-    debugPrint('connected');
-  } else {
-    client.connect();
-  }
-
-  void onconnected() {
-    debugPrint('connected');
-  }
-
-  client.subscribe(
-      'trip_status_' + userDetails['id'].toString(), MqttQos.atLeastOnce);
-  client.subscribe(
-      'new_message_' + userDetails['id'].toString(), MqttQos.atLeastOnce);
-
-  client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) {
-    final MqttPublishMessage recMess = c![0].payload as MqttPublishMessage;
-
-    final pt =
-        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-
-    if (c[0].topic == 'trip_status_' + userDetails['id'].toString()) {
-      if (jsonDecode(pt)["success_message"] == "no_driver_found") {
-        noDriverFound = true;
-        userRequestData = {};
-        audioPlayer.play(audio);
-        valueNotifierBook.incrementNotifier();
-        client.disconnect();
-      } else if (jsonDecode(pt)['success_message'] ==
-          'request_cancelled_by_driver') {
-        requestCancelledByDriver = true;
-        audioPlayer.play(audio);
-        userRequestData = {};
-        valueNotifierBook.incrementNotifier();
-        client.disconnect();
-      } else {
-        audioPlayer.play(audio);
-        getUserDetails();
-      }
-    } else if (c[0].topic == 'new_message_' + userDetails['id'].toString()) {
-      if (jsonDecode(pt)["success_message"] == "new_message") {
-        chatList = jsonDecode(pt)['data'];
-        audioPlayer.play(audio);
-        valueNotifierBook.incrementNotifier();
-      } else {
-        audioPlayer.play(audio);
-      }
-    }
-  });
-
-  client.onConnected = onconnected;
-}
 
 class ValueNotifying {
   ValueNotifier value = ValueNotifier(0);
@@ -689,10 +612,6 @@ class ValueNotifyingBook {
 }
 
 ValueNotifyingBook valueNotifierBook = ValueNotifyingBook();
-
-//user request handler mqtt
-
-userRequest() async {}
 
 //sound
 AudioCache audioPlayer = AudioCache();
@@ -1211,7 +1130,6 @@ createRequestWithPromo() async {
         }));
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
-      // mqttForUser();
       result = 'success';
       streamRequest();
       valueNotifierBook.incrementNotifier();
@@ -1404,9 +1322,8 @@ createRentalRequest() async {
           'rental_pack_id': etaDetails[rentalChoosenOption]['id']
         }));
     if (response.statusCode == 200) {
-      // mqttForUser();
       userRequestData = jsonDecode(response.body)['data'];
-streamRequest();
+      streamRequest();
       result = 'success';
 
       valueNotifierBook.incrementNotifier();
@@ -1467,7 +1384,6 @@ createRentalRequestWithPromo() async {
         }));
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
-      // mqttForUser();
       streamRequest();
       result = 'success';
       valueNotifierBook.incrementNotifier();
@@ -1667,11 +1583,13 @@ cancelRequest() async {
         body: jsonEncode({'request_id': userRequestData['id']}));
     if (response.statusCode == 200) {
       userCancelled = true;
-      FirebaseDatabase.instance.ref('requests').child(userRequestData['id']).update({
-        'cancelled_by_user':true
-      });
+      FirebaseDatabase.instance
+          .ref('requests')
+          .child(userRequestData['id'])
+          .update({'cancelled_by_user': true});
       userRequestData = {};
-      if(requestStreamStart?.isPaused == false || requestStreamEnd?.isPaused == false){
+      if (requestStreamStart?.isPaused == false ||
+          requestStreamEnd?.isPaused == false) {
         requestStreamStart?.cancel();
         requestStreamEnd?.cancel();
         requestStreamStart = null;
@@ -1701,7 +1619,8 @@ cancelLaterRequest(val) async {
         body: jsonEncode({'request_id': val}));
     if (response.statusCode == 200) {
       userRequestData = {};
-      if(requestStreamStart?.isPaused == false || requestStreamEnd?.isPaused == false){
+      if (requestStreamStart?.isPaused == false ||
+          requestStreamEnd?.isPaused == false) {
         requestStreamStart?.cancel();
         requestStreamEnd?.cancel();
         requestStreamStart = null;
@@ -1731,11 +1650,12 @@ cancelRequestWithReason(reason) async {
             {'request_id': userRequestData['id'], 'reason': reason}));
     if (response.statusCode == 200) {
       cancelRequestByUser = true;
-      FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).update({
-        'cancelled_by_user':true
-      });
+      FirebaseDatabase.instance
+          .ref('requests/' + userRequestData['id'])
+          .update({'cancelled_by_user': true});
       userRequestData = {};
-      if(rideStreamUpdate?.isPaused == false || rideStreamStart?.isPaused == false){
+      if (rideStreamUpdate?.isPaused == false ||
+          rideStreamStart?.isPaused == false) {
         rideStreamUpdate?.cancel();
         rideStreamUpdate = null;
         rideStreamStart?.cancel();
@@ -1821,7 +1741,6 @@ userRating() async {
           'comment': feedback
         }));
     if (response.statusCode == 200) {
-      client.disconnect();
       await getUserDetails();
       result = true;
     } else {
@@ -1964,7 +1883,10 @@ getCurrentMessages() async {
     );
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
-        if(chatList.where((element) => element['from_type'] == 2).length != jsonDecode(response.body)['data'].where((element)=>element['from_type'] == 2).length){
+        if (chatList.where((element) => element['from_type'] == 2).length !=
+            jsonDecode(response.body)['data']
+                .where((element) => element['from_type'] == 2)
+                .length) {
           audioPlayer.play(audio);
         }
         chatList = jsonDecode(response.body)['data'];
@@ -1993,10 +1915,9 @@ sendMessage(chat) async {
             jsonEncode({'request_id': userRequestData['id'], 'message': chat}));
     if (response.statusCode == 200) {
       await getCurrentMessages();
-      FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).update({
-        'message_by_user' : chatList.length
-      });
-      
+      FirebaseDatabase.instance
+          .ref('requests/' + userRequestData['id'])
+          .update({'message_by_user': chatList.length});
     } else {
       debugPrint(response.body);
     }
@@ -2764,7 +2685,7 @@ StreamSubscription<DatabaseEvent>? requestStreamStart;
 StreamSubscription<DatabaseEvent>? requestStreamEnd;
 bool userCancelled = false;
 
-streamRequest(){
+streamRequest() {
   requestStreamEnd?.cancel();
   requestStreamStart?.cancel();
   rideStreamUpdate?.cancel();
@@ -2773,22 +2694,23 @@ streamRequest(){
   requestStreamEnd = null;
   rideStreamUpdate = null;
   rideStreamStart = null;
-  requestStreamStart = FirebaseDatabase.instance.ref('requests').child(userRequestData['id']).onChildAdded.handleError((onError){
+  requestStreamStart = FirebaseDatabase.instance
+      .ref('requests')
+      .child(userRequestData['id'])
+      .onChildAdded
+      .handleError((onError) {
     requestStreamStart?.cancel();
-  }).listen((event) async { 
-      
-       getUserDetails();
-      requestStreamEnd?.cancel();
-      requestStreamStart?.cancel();
-    
+  }).listen((event) async {
+    getUserDetails();
+    requestStreamEnd?.cancel();
+    requestStreamStart?.cancel();
   });
-  
 }
 
 StreamSubscription<DatabaseEvent>? rideStreamStart;
 StreamSubscription<DatabaseEvent>? rideStreamUpdate;
 
-streamRide(){
+streamRide() {
   requestStreamEnd?.cancel();
   requestStreamStart?.cancel();
   rideStreamUpdate?.cancel();
@@ -2797,35 +2719,44 @@ streamRide(){
   requestStreamEnd = null;
   rideStreamUpdate = null;
   rideStreamStart = null;
-  rideStreamUpdate = FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).onChildChanged.handleError((onError){
+  rideStreamUpdate = FirebaseDatabase.instance
+      .ref('requests/' + userRequestData['id'])
+      .onChildChanged
+      .handleError((onError) {
     rideStreamUpdate?.cancel();
-  }).listen((DatabaseEvent event) async { 
-    if(event.snapshot.key.toString() == 'trip_start' || event.snapshot.key.toString() == 'trip_arrived' || event.snapshot.key.toString() == 'is_completed'){
-       getUserDetails();
-    }else if(event.snapshot.key.toString() == 'message_by_driver'){
-       getCurrentMessages();
-    }else if(event.snapshot.key.toString() == 'cancelled_by_driver'){
+  }).listen((DatabaseEvent event) async {
+    if (event.snapshot.key.toString() == 'trip_start' ||
+        event.snapshot.key.toString() == 'trip_arrived' ||
+        event.snapshot.key.toString() == 'is_completed') {
+      getUserDetails();
+    } else if (event.snapshot.key.toString() == 'message_by_driver') {
+      getCurrentMessages();
+    } else if (event.snapshot.key.toString() == 'cancelled_by_driver') {
       requestCancelledByDriver = true;
-       getUserDetails();
+      getUserDetails();
     }
   });
 
-  rideStreamStart = FirebaseDatabase.instance.ref('requests/' + userRequestData['id']).onChildAdded.handleError((onError){
+  rideStreamStart = FirebaseDatabase.instance
+      .ref('requests/' + userRequestData['id'])
+      .onChildAdded
+      .handleError((onError) {
     rideStreamStart?.cancel();
-  }).listen((DatabaseEvent event) async { 
-    if(event.snapshot.key.toString() == 'message_by_driver'){
-       getCurrentMessages();
-    }else if(event.snapshot.key.toString() == 'cancelled_by_driver'){
+  }).listen((DatabaseEvent event) async {
+    if (event.snapshot.key.toString() == 'message_by_driver') {
+      getCurrentMessages();
+    } else if (event.snapshot.key.toString() == 'cancelled_by_driver') {
       requestCancelledByDriver = true;
-       getUserDetails();
+      getUserDetails();
     }
   });
 }
 
-userDelete()async{
+userDelete() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/user/delete-user-account'), headers: {
+    var response = await http
+        .post(Uri.parse(url + 'api/v1/user/delete-user-account'), headers: {
       'Authorization': 'Bearer ' + bearerToken[0].token,
       'Content-Type': 'application/json'
     });

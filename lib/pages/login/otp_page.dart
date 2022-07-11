@@ -70,7 +70,6 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userRequestData.isNotEmpty &&
             userRequestData['is_completed'] != 1) {
-          // mqttForUser();
           Future.delayed(const Duration(seconds: 2), () {
             if (userRequestData['is_rental'] == true) {
               Navigator.pushAndRemoveUntil(
@@ -119,7 +118,6 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userRequestData.isNotEmpty &&
             userRequestData['is_completed'] != 1) {
-          // mqttForUser();
           Future.delayed(const Duration(seconds: 2), () {
             if (userRequestData['is_rental'] == true) {
               Navigator.pushAndRemoveUntil(
@@ -334,7 +332,6 @@ class _OtpState extends State<Otp> {
                                                   .isNotEmpty &&
                                               userRequestData['is_completed'] !=
                                                   1) {
-                                            // mqttForUser();
                                             Future.delayed(
                                                 const Duration(seconds: 2), () {
                                               // ride page
@@ -405,7 +402,6 @@ class _OtpState extends State<Otp> {
                                                 userRequestData[
                                                         'is_completed'] !=
                                                     1) {
-                                              // mqttForUser();
                                               Future.delayed(
                                                   const Duration(seconds: 2),
                                                   () {

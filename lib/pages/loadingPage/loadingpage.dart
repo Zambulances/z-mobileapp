@@ -41,15 +41,14 @@ class _LoadingPageState extends State<LoadingPage> {
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-
-        AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
-  if (!isAllowed) {
-    // This is just a basic example. For real apps, you must show some
-    // friendly dialog box before call the request method.
-    // This is very important to not harm the user experience
-   await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
-});
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
+      if (!isAllowed) {
+        // This is just a basic example. For real apps, you must show some
+        // friendly dialog box before call the request method.
+        // This is very important to not harm the user experience
+        await AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
     _package = await PackageInfo.fromPlatform();
 
     if (platform == TargetPlatform.android) {
@@ -123,7 +122,6 @@ class _LoadingPageState extends State<LoadingPage> {
                       builder: (context) => BookingConfirmation()),
                   (route) => false);
             }
-            // mqttForUser();
           } else {
             //home page
             Navigator.pushAndRemoveUntil(

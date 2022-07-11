@@ -130,7 +130,6 @@ class _MapsState extends State<Maps>
     Future.delayed(const Duration(seconds: 2), () {
       setState(() {
         _showToast = false;
-        
       });
     });
   }
@@ -190,34 +189,23 @@ class _MapsState extends State<Maps>
         });
       });
       //remove in original
-       var val = await geoCoding(
-             _centerLocation
-                 .latitude,
-             _centerLocation
-                 .longitude);
-         setState(
-             () {
-           if (addressList
-               .where((element) =>
-                   element.id ==
-                   'pickup')
-               .isNotEmpty) {
-             var add = addressList.firstWhere((element) =>
-                 element.id ==
-                 'pickup');
-             add.address =
-                 val;
-             add.latlng = LatLng(
-                 _centerLocation.latitude,
-                 _centerLocation.longitude);
-           } else {
-             addressList.add(AddressList(
-                 id: 'pickup',
-                 address: val,
-                 latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
-           }
-         });
-         //remove in original
+      var val =
+          await geoCoding(_centerLocation.latitude, _centerLocation.longitude);
+      setState(() {
+        if (addressList.where((element) => element.id == 'pickup').isNotEmpty) {
+          var add = addressList.firstWhere((element) => element.id == 'pickup');
+          add.address = val;
+          add.latlng =
+              LatLng(_centerLocation.latitude, _centerLocation.longitude);
+        } else {
+          addressList.add(AddressList(
+              id: 'pickup',
+              address: val,
+              latlng:
+                  LatLng(_centerLocation.latitude, _centerLocation.longitude)));
+        }
+      });
+      //remove in original
       final Uint8List markerIcon =
           await getBytesFromAsset('assets/images/top-taxi.png', 40);
       pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
@@ -273,7 +261,6 @@ class _MapsState extends State<Maps>
                   userRequestData['is_later'] == 1 &&
                   userRequestData['is_completed'] != 1 &&
                   userRequestData['accepted_at'] != null) {
-                // mqttForUser();
                 Future.delayed(const Duration(seconds: 2), () {
                   if (userRequestData['is_rental'] == true) {
                     Navigator.pushAndRemoveUntil(
@@ -645,34 +632,34 @@ class _MapsState extends State<Maps>
                                                                   },
                                                                   onCameraIdle:
                                                                       () async {
-                                                                         if (_bottom ==
+                                                                    if (_bottom ==
                                                                             0 &&
                                                                         _pickaddress ==
                                                                             false) {
-                                                                              // setState(
-                                                                    //       () {
-                                                                    //     if (addressList
-                                                                    //         .where((element) =>
-                                                                    //             element.id ==
-                                                                    //             'pickup')
-                                                                    //         .isNotEmpty) {
-                                                                    //       var add = addressList.firstWhere((element) =>
-                                                                    //           element.id ==
-                                                                    //           'pickup');
-                                                                    //       add.address =
-                                                                    //           val;
-                                                                    //       add.latlng = LatLng(
-                                                                    //           _centerLocation.latitude,
-                                                                    //           _centerLocation.longitude);
-                                                                    //     } else {
-                                                                    //       addressList.add(AddressList(
-                                                                    //           id: 'pickup',
-                                                                    //           address: val,
-                                                                    //           latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
-                                                                    //     }
-                                                                    //   });
-                                                                        addToast();
-                                                                            }else if (_pickaddress ==
+                                                                      // setState(
+                                                                      //       () {
+                                                                      //     if (addressList
+                                                                      //         .where((element) =>
+                                                                      //             element.id ==
+                                                                      //             'pickup')
+                                                                      //         .isNotEmpty) {
+                                                                      //       var add = addressList.firstWhere((element) =>
+                                                                      //           element.id ==
+                                                                      //           'pickup');
+                                                                      //       add.address =
+                                                                      //           val;
+                                                                      //       add.latlng = LatLng(
+                                                                      //           _centerLocation.latitude,
+                                                                      //           _centerLocation.longitude);
+                                                                      //     } else {
+                                                                      //       addressList.add(AddressList(
+                                                                      //           id: 'pickup',
+                                                                      //           address: val,
+                                                                      //           latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
+                                                                      //     }
+                                                                      //   });
+                                                                      addToast();
+                                                                    } else if (_pickaddress ==
                                                                         true) {
                                                                       setState(
                                                                           () {
@@ -684,7 +671,7 @@ class _MapsState extends State<Maps>
                                                                     //         0 &&
                                                                     //     _pickaddress ==
                                                                     //         false) {
-                                                                    //           
+                                                                    //
                                                                     //   var val = await geoCoding(
                                                                     //       _centerLocation
                                                                     //           .latitude,
@@ -2113,7 +2100,6 @@ class _MapsState extends State<Maps>
                               ))
                           : Container(),
 
-
                       //logout
                       (logout == true)
                           ? Positioned(
@@ -2290,25 +2276,25 @@ class _MapsState extends State<Maps>
                           : Container(),
 
                       //display toast
-                  (_showToast == true)
-                      ? Positioned(
-                          top: media.height * 0.5,
-                          child: Container(
-                            width: media.width*0.9,
-                            margin: EdgeInsets.all(media.width*0.05),
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: page),
-                            child: Text(
-                              'Auto address by scrolling map feature is not available in demo',
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * twelve,
-                                  color: textColor),
+                      (_showToast == true)
+                          ? Positioned(
+                              top: media.height * 0.5,
+                              child: Container(
+                                width: media.width * 0.9,
+                                margin: EdgeInsets.all(media.width * 0.05),
+                                padding: EdgeInsets.all(media.width * 0.025),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: page),
+                                child: Text(
+                                  'Auto address by scrolling map feature is not available in demo',
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * twelve,
+                                      color: textColor),
                                   textAlign: TextAlign.center,
-                            ),
-                          ))
-                      : Container(),
+                                ),
+                              ))
+                          : Container(),
 
                       //loader
                       (_loading == true || state == '')

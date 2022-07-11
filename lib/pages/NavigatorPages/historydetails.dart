@@ -688,7 +688,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 ),
                                 Text(
                                   myHistory[selectedHistory]['requestBill']
-                                          ['data']['requested_currency_symbol'] +
+                                              ['data']
+                                          ['requested_currency_symbol'] +
                                       ' ' +
                                       myHistory[selectedHistory]['requestBill']
                                               ['data']['cancellation_fee']
@@ -721,7 +722,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 ),
                                 Text(
                                   myHistory[selectedHistory]['requestBill']
-                                          ['data']['requested_currency_symbol'] +
+                                              ['data']
+                                          ['requested_currency_symbol'] +
                                       ' ' +
                                       myHistory[selectedHistory]['requestBill']
                                               ['data']['airport_surge_fee']

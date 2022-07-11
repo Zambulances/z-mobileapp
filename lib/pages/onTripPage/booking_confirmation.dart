@@ -150,11 +150,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
         } else if (userRequestData.isNotEmpty &&
             userRequestData['accepted_at'] == null &&
             timing == 0) {
-            await cancelRequest();
-             
+          await cancelRequest();
+          setState(() {
             noDriverFound = true;
-         
-             
+          });
+
           timers.cancel();
         } else {
           timers.cancel();
@@ -346,13 +346,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     if (widget.type != 1) {
       addDropMarker();
       getPolylines();
-    }else{
-      if(userRequestData.isNotEmpty){
-      CameraUpdate cameraUpdate = CameraUpdate.newLatLng(LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']));
-    _controller!.animateCamera(cameraUpdate);
-      }else{
-        CameraUpdate cameraUpdate = CameraUpdate.newLatLng(addressList.firstWhere((element) => element.id == 'pickup').latlng);
-    _controller!.animateCamera(cameraUpdate);
+    } else {
+      if (userRequestData.isNotEmpty) {
+        CameraUpdate cameraUpdate = CameraUpdate.newLatLng(
+            LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']));
+        _controller!.animateCamera(cameraUpdate);
+      } else {
+        CameraUpdate cameraUpdate = CameraUpdate.newLatLng(
+            addressList.firstWhere((element) => element.id == 'pickup').latlng);
+        _controller!.animateCamera(cameraUpdate);
       }
     }
   }
@@ -877,7 +879,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           builder: (context, snapshot) {
                                             return GoogleMap(
                                               padding: EdgeInsets.only(
-                                                  bottom:media.width * 1,
+                                                  bottom: media.width * 1,
                                                   top: media.height * 0.1 +
                                                       MediaQuery.of(context)
                                                           .padding
@@ -2072,34 +2074,43 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     children: [
-                                                      (userDetails['show_ride_later_feature'] == true) ?
+                                                      (userDetails[
+                                                                  'show_ride_later_feature'] ==
+                                                              true)
+                                                          ? Button(
+                                                              color: page,
+                                                              textcolor:
+                                                                  buttonColor,
+                                                              width:
+                                                                  media.width *
+                                                                      0.42,
+                                                              onTap: () async {
+                                                                if (choosenVehicle !=
+                                                                    null) {
+                                                                  setState(() {
+                                                                    choosenDateTime = DateTime
+                                                                            .now()
+                                                                        .add(const Duration(
+                                                                            minutes:
+                                                                                30));
+                                                                    _dateTimePicker =
+                                                                        true;
+                                                                  });
+                                                                }
+                                                              },
+                                                              text: languages[
+                                                                      choosenLanguage]
+                                                                  [
+                                                                  'text_ridelater'])
+                                                          : Container(),
                                                       Button(
-                                                          color: page,
-                                                          textcolor:
-                                                              buttonColor,
-                                                          width: media.width *
-                                                              0.42,
-                                                          onTap: () async {
-                                                            if (choosenVehicle !=
-                                                                null) {
-                                                              setState(() {
-                                                                choosenDateTime = DateTime
-                                                                        .now()
-                                                                    .add(const Duration(
-                                                                        minutes:
-                                                                            30));
-                                                                _dateTimePicker =
-                                                                    true;
-                                                              });
-                                                            }
-                                                          },
-                                                          text: languages[
-                                                                  choosenLanguage]
-                                                              [
-                                                              'text_ridelater']) : Container(),
-                                                      Button(
-                                                          width: (userDetails['show_ride_later_feature'] == true) ? media.width *
-                                                              0.42 : media.width*0.9,
+                                                          width: (userDetails[
+                                                                      'show_ride_later_feature'] ==
+                                                                  true)
+                                                              ? media.width *
+                                                                  0.42
+                                                              : media.width *
+                                                                  0.9,
                                                           color: buttonColor,
                                                           onTap: () async {
                                                             setState(() {
@@ -3512,7 +3523,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                     height: media.width * 0.02,
                                                     width: (media.width *
                                                         0.9 *
-                                                        (timing / userDetails['maximum_time_for_find_drivers_for_regular_ride'])),
+                                                        (timing /
+                                                            userDetails[
+                                                                'maximum_time_for_find_drivers_for_regular_ride'])),
                                                     decoration: BoxDecoration(
                                                         borderRadius:
                                                             BorderRadius
@@ -3634,8 +3647,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         ),
                                                       ),
                                                       (userRequestData[
-                                                                  'is_trip_start'] !=
-                                                              1 && userRequestData['show_otp_feature'] == true)
+                                                                      'is_trip_start'] !=
+                                                                  1 &&
+                                                              userRequestData[
+                                                                      'show_otp_feature'] ==
+                                                                  true)
                                                           ? Container(
                                                               padding: EdgeInsets
                                                                   .fromLTRB(
@@ -4549,7 +4565,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           ),
                                                         )
                                                       : Container(),
-                                                      (_cancellingError != '')
+                                                  (_cancellingError != '')
                                                       ? Container(
                                                           padding: EdgeInsets.only(
                                                               top: media.width *
@@ -4587,18 +4603,18 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                 '') {
                                                               if (_cancelReason ==
                                                                   'others') {
-                                                                    if (_cancelCustomReason !=
+                                                                if (_cancelCustomReason !=
                                                                         '' &&
                                                                     _cancelCustomReason
                                                                         .isNotEmpty) {
                                                                   _cancellingError =
                                                                       '';
-                                                                await cancelRequestWithReason(
-                                                                    _cancelCustomReason);
-                                                                setState(() {
-                                                                  _cancelling =
-                                                                      false;
-                                                                });
+                                                                  await cancelRequestWithReason(
+                                                                      _cancelCustomReason);
+                                                                  setState(() {
+                                                                    _cancelling =
+                                                                        false;
+                                                                  });
                                                                 } else {
                                                                   setState(() {
                                                                     _cancellingError =
@@ -4697,14 +4713,16 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                               12),
                                                       color: page),
                                                   child: CupertinoDatePicker(
-                                                      minimumDate:
-                                                          DateTime.now().add(
-                                                               Duration(
-                                                                  minutes: int.parse(userDetails['user_can_make_a_ride_after_x_miniutes']))),
-                                                      initialDateTime:
-                                                          DateTime.now().add(
-                                                               Duration(
-                                                                  minutes: int.parse(userDetails['user_can_make_a_ride_after_x_miniutes']))),
+                                                      minimumDate: DateTime.now()
+                                                          .add(Duration(
+                                                              minutes: int.parse(
+                                                                  userDetails[
+                                                                      'user_can_make_a_ride_after_x_miniutes']))),
+                                                      initialDateTime: DateTime.now()
+                                                          .add(Duration(
+                                                              minutes: int.parse(
+                                                                  userDetails[
+                                                                      'user_can_make_a_ride_after_x_miniutes']))),
                                                       maximumDate:
                                                           DateTime.now().add(
                                                               const Duration(
