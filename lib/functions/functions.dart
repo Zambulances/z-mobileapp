@@ -30,8 +30,6 @@ import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_year.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import '../pages/vehicleInformations/upload_docs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mqtt_client/mqtt_client.dart';
-import 'package:mqtt_client/mqtt_server_client.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -53,8 +51,6 @@ dynamic centerCheck;
 
 //base url
 String url = 'https://tagxi-server.ondemandappz.com/';
-String mqttUrl = '';
-int mqttPort = 1883;
 String mapkey = 'AIzaSyB4KttZBNVcz6Q52gaIgKK8-3h2Qk8RA3Y';
 String mapStyle = '';
 
@@ -64,9 +60,6 @@ getDetailsOfDevice() async {
     internet = false;
   } else {
     internet = true;
-    // if(client.connectionStatus!.state != ConnectionState.active){
-    // // mqttForDocuments();
-    // }
   }
   try {
     rootBundle.loadString('assets/map_style.json').then((value) {
@@ -226,15 +219,10 @@ getCountryCode() async {
 
     if (response.statusCode == 200) {
       countries = jsonDecode(response.body)['data'];
-      phcode = (countries
-              .where((element) =>
-                  element['default'] ==
-                  true)
-              .isNotEmpty)
-          ? countries.indexWhere((element) =>
-              element['default'] ==
-              true)
-          : 0;
+      phcode =
+          (countries.where((element) => element['default'] == true).isNotEmpty)
+              ? countries.indexWhere((element) => element['default'] == true)
+              : 0;
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -659,12 +647,6 @@ getUserDetails() async {
       userDetails = jsonDecode(response.body)['data'];
 
       sosData = userDetails['sos']['data'];
-      if (userDetails['mqtt_ip'] != null && userDetails['mqtt_ip'] != '') {
-        mqttUrl = userDetails['mqtt_ip'];
-        if (client == '') {
-          client = MqttServerClient.withPort(mqttUrl, '', mqttPort);
-        }
-      }
 
       if (userDetails['onTripRequest'] != null) {
         driverReq = userDetails['onTripRequest']['data'];
@@ -674,7 +656,8 @@ getUserDetails() async {
             arrivedTimer == null &&
             driverReq['is_rental'] != true) {
           waitingBeforeStart();
-        } else if (driverReq['is_completed'] == 0 &&
+        }
+        if (driverReq['is_completed'] == 0 &&
             driverReq['is_trip_start'] == 1 &&
             rideTimer == null &&
             driverReq['is_rental'] != true) {
@@ -688,36 +671,46 @@ getUserDetails() async {
       } else if (userDetails['metaRequest'] != null) {
         driverReq = userDetails['metaRequest']['data'];
 
-
         if (duration == 0 || duration == 0.0) {
-          AwesomeNotifications().createNotification(content: NotificationContent(id: 7425, channelKey: 'trip_request',
-        title: 'Pick Address',
-        body: driverReq['pick_address'],autoDismissible: false,
-        displayOnBackground: true,
-        displayOnForeground: false,
-        fullScreenIntent: true,
-        backgroundColor: page,
-        color: buttonColor,
-          
-        wakeUpScreen: true,
-        locked: true,
-        
-        notificationLayout: NotificationLayout.BigText
-        ),actionButtons: [
-          NotificationActionButton(key: 'reject', label: 'Reject Request',autoDismissible: true,buttonType: ActionButtonType.KeepOnTop,color: Colors.red),
-          NotificationActionButton(key: 'accept', label: 'Accept Request',buttonType: ActionButtonType.Default,color: Colors.green,showInCompactView: true),
+          AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                  id: 7425,
+                  channelKey: 'trip_request',
+                  title: 'Pick Address',
+                  body: driverReq['pick_address'],
+                  autoDismissible: false,
+                  displayOnBackground: true,
+                  displayOnForeground: false,
+                  fullScreenIntent: true,
+                  backgroundColor: page,
+                  color: buttonColor,
+                  wakeUpScreen: true,
+                  locked: true,
+                  notificationLayout: NotificationLayout.BigText),
+              actionButtons: [
+                NotificationActionButton(
+                    key: 'reject',
+                    label: 'Reject Request',
+                    autoDismissible: true,
+                    buttonType: ActionButtonType.KeepOnTop,
+                    color: Colors.red),
+                NotificationActionButton(
+                    key: 'accept',
+                    label: 'Accept Request',
+                    buttonType: ActionButtonType.Default,
+                    color: Colors.green,
+                    showInCompactView: true),
+              ]);
 
-        ]);
-         
-          duration = double.parse(userDetails['trip_accept_reject_duration_for_driver'].toString());
+          duration = double.parse(
+              userDetails['trip_accept_reject_duration_for_driver'].toString());
           sound();
-        
         }
 
         valueNotifierHome.incrementNotifier();
       } else {
         duration = 0;
-        if(driverReq.isNotEmpty){
+        if (driverReq.isNotEmpty) {
           audioPlayer.play(audio);
         }
         chatList.clear();
@@ -756,152 +749,7 @@ class BearerClass {
 }
 
 Map<String, dynamic> driverReq = {};
-dynamic client = '';
 bool userReject = false;
-
-
-
-//mqtt for documents approvals
-mqttForDocument() async {
-  client.setProtocolV311();
-  client.logging(on: true);
-  client.keepAlivePeriod = 120;
-  client.autoReconnect = true;
-
-  try {
-    await client.connect();
-  } on NoConnectionException catch (e) {
-    debugPrint(e.toString());
-    // Raised by the client when connection fails.
-    client.disconnect();
-  }
-
-  if (client.connectionStatus!.state == MqttConnectionState.connected) {
-    debugPrint('connected');
-  } else {
-    /// Use status here rather than state if you also want the broker return code.
-
-    client.disconnect();
-  }
-
-  void onconnected() {
-    debugPrint('connected');
-  }
-
-  client.subscribe(
-      'approval_status_' + userDetails['id'].toString(), MqttQos.atLeastOnce);
-  client.subscribe(
-      'create_request_' + userDetails['id'].toString(), MqttQos.atLeastOnce);
-  client.subscribe(
-      'request_handler_' + userDetails['id'].toString(), MqttQos.atLeastOnce);
-  client.subscribe(
-      'new_message_' + userDetails['id'].toString(), MqttQos.atLeastOnce);
-
-  client.updates!.listen((List<MqttReceivedMessage<MqttMessage?>>? c) async {
-    final MqttPublishMessage recMess = c![0].payload as MqttPublishMessage;
-
-    final pt =
-        MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-    if (c[0].topic == 'approval_status_' + userDetails['id'].toString()) {
-      Map<String, dynamic> val =
-          Map<String, dynamic>.from(jsonDecode(pt)['data']);
-      if (userDetails['approve'] == val['approve']) {
-        userDetails['declined_reason'] = val['declined_reason'];
-
-        valueNotifierHome.incrementNotifier();
-      } else if (userDetails['approve'] != val['approve'] &&
-          val['approve'] == true) {
-        userDetails['approve'] = val['approve'];
-        userDetails['declined_reason'] = val['declined_reason'];
-        audioPlayer.play(audio);
-        valueNotifierHome.incrementNotifier();
-      } else if (userDetails['approve'] != val['approve'] &&
-          val['approve'] == false) {
-        userDetails['declined_reason'] = val['declined_reason'];
-        userDetails['approve'] = val['approve'];
-        audioPlayer.play(audio);
-        valueNotifierHome.incrementNotifier();
-      } else {}
-    } else if (c[0].topic ==
-        'request_handler_' + userDetails['id'].toString()) {
-      await FirebaseDatabase.instance
-          .ref()
-          .child('requests/' + driverReq['id'])
-          .update({'is_cancelled': true});
-      driverReq = {};
-      getUserDetails();
-      if (jsonDecode(pt)['message'] != 'driver_cancelled_trip') {
-        userReject = true;
-        duration = 0;
-        audioPlayer.play(audio);
-        
-        AwesomeNotifications().cancel(7425);
-        
-      }
-      getStartOtp = false;
-
-      audioPlayers.stop();
-      audioPlayers.dispose();
-      valueNotifierHome.incrementNotifier();
-    } else if (c[0].topic == 'create_request_' + userDetails['id'].toString()) {
-      Map<String, dynamic> val =
-          Map<String, dynamic>.from(jsonDecode(pt)['result']['data']);
-
-      driverReq = val;
-      valueNotifierHome.incrementNotifier();
-      
-      if (duration == 0 || duration == 0.0) {
-      //  AndroidForegroundService.startForeground(
-      //    content: NotificationContent(id: 1, channelKey: 'call_channel',body: 'you got a new request',category: NotificationCategory.Service,autoDismissible: false,
-      //   displayOnBackground: true,
-      //   displayOnForeground: true,
-      //   fullScreenIntent: true,
-      //   wakeUpScreen: true,
-        
-      //   notificationLayout: NotificationLayout.Default
-      //   ),actionButtons: [
-      //     NotificationActionButton(key: '1', label: 'Reject'),
-      //     NotificationActionButton(key: '2', label: 'Accept'),
-
-      //   ]);
-       
-        AwesomeNotifications().createNotification(content: NotificationContent(id: 7425, channelKey: 'trip_request',
-        title: 'Pick Address',
-        body: driverReq['pick_address'],autoDismissible: false,
-        displayOnBackground: true,
-        displayOnForeground: false,
-        fullScreenIntent: true,
-        color: buttonColor,
-          
-        wakeUpScreen: true,
-        locked: true,
-        
-        notificationLayout: NotificationLayout.BigText
-        ),actionButtons: [
-          NotificationActionButton(key: 'reject', label: 'Reject Request',autoDismissible: true,buttonType: ActionButtonType.KeepOnTop,color: Colors.red),
-          NotificationActionButton(key: 'accept', label: 'Accept Request',buttonType: ActionButtonType.Default,color: Colors.green,showInCompactView: true),
-
-        ]);
-       
-
-        duration = double.parse(userDetails['trip_accept_reject_duration_for_driver'].toString());
-        sound();
-       
-      }
-    } else if (c[0].topic == 'new_message_' + userDetails['id'].toString()) {
-      if (jsonDecode(pt)["success_message"] == "new_message") {
-        chatList = jsonDecode(pt)['data'];
-        audioPlayer.play(audio);
-       
-        valueNotifierHome.incrementNotifier();
-      } else {
-        audioPlayer.play(audio);
-      }
-    }
-  });
-
-  client.onConnected = onconnected;
-}
 
 class ValueNotifying {
   ValueNotifier value = ValueNotifier(0);
@@ -964,25 +812,24 @@ currentPositionUpdate() async {
     if (userDetails.isNotEmpty) {
       serviceEnabled = await locs.serviceEnabled();
       permission = await locs.hasPermission();
-      
+
       if (userDetails['active'] == true &&
           serviceEnabled == true &&
-          mqttUrl != '' &&
-          client != '' &&
           permission == PermissionStatus.granted) {
-            if(driverReq.isEmpty){
-            if(requestStreamStart == null || requestStreamStart?.isPaused == true){
-              streamRequest();
-            }
-            }else if(driverReq.isNotEmpty && driverReq['accepted_at'] != null){
-              if(rideStreamStart == null || rideStreamStart?.isPaused == true || rideStreamChanges == null || rideStreamChanges?.isPaused == true){
-                streamRide();
-              }
-            }
-        if (client.connectionStatus!.state != MqttConnectionState.connected ||
-            client.connectionStatus == null) {
-          // mqttForDocuments();
+        if (driverReq.isEmpty) {
+          if (requestStreamStart == null ||
+              requestStreamStart?.isPaused == true) {
+            streamRequest();
+          }
+        } else if (driverReq.isNotEmpty && driverReq['accepted_at'] != null) {
+          if (rideStreamStart == null ||
+              rideStreamStart?.isPaused == true ||
+              rideStreamChanges == null ||
+              rideStreamChanges?.isPaused == true) {
+            streamRide();
+          }
         }
+
         if (positionStream == null || positionStream!.isPaused) {
           positionStreamData();
         }
@@ -1030,21 +877,24 @@ currentPositionUpdate() async {
         center = LatLng(double.parse(pos.latitude.toString()),
             double.parse(pos.longitude.toString()));
       }
-      var _driverStatus = await FirebaseDatabase.instance.ref('drivers/' + userDetails['id'].toString()).child('approve').get();
-      if(_driverStatus.value == 0 && userDetails['approve'] == true){
-       await getUserDetails();
-       if (userDetails['active'] == true) {
-        await driverStatus();
-      }
-      valueNotifierHome.incrementNotifier();
-       audioPlayer.play(audio);
-      }else if(_driverStatus.value == 1 && userDetails['approve'] == false){
-       await getUserDetails();
-       valueNotifierHome.incrementNotifier();
-       audioPlayer.play(audio);
+      var _driverStatus = await FirebaseDatabase.instance
+          .ref('drivers/' + userDetails['id'].toString())
+          .get();
+      if (_driverStatus.child('approve').value == 0 &&
+          userDetails['approve'] == true) {
+        await getUserDetails();
+        if (userDetails['active'] == true) {
+          await driverStatus();
+        }
+        valueNotifierHome.incrementNotifier();
+        audioPlayer.play(audio);
+      } else if (_driverStatus.child('approve').value == 1 &&
+          userDetails['approve'] == false) {
+        await getUserDetails();
+        valueNotifierHome.incrementNotifier();
+        audioPlayer.play(audio);
       }
     }
-    
   });
 }
 
@@ -1064,21 +914,17 @@ requestDetailsUpdate(
   if (driverReq['is_trip_start'] == 1 && driverReq['is_completed'] == 0) {
     if (totalDistance == null) {
       var _dist = await FirebaseDatabase.instance
-          .ref()
-          .child('requests/' + driverReq['id'])
-          .child('distance')
+          .ref('requests/' + driverReq['id'])
           .get();
       var _array = await FirebaseDatabase.instance
-          .ref()
-          .child('requests/' + driverReq['id'])
-          .child('lat_lng_array')
+          .ref('requests/' + driverReq['id'])
           .get();
-
-      if (_dist.value != null) {
-        totalDistance = _dist.value;
+      if (_dist.child('distance').value != null) {
+        totalDistance = _dist.child('distance').value;
       }
-      if (_array.value != null) {
-        latlngArray = jsonDecode(jsonEncode(_array.value));
+      if (_array.child('lat_lng_array').value != null) {
+        latlngArray =
+            jsonDecode(jsonEncode(_array.child('lat_lng_array').value));
         lastLat = latlngArray[latlngArray.length - 1]['lat'];
         lastLong = latlngArray[latlngArray.length - 1]['lng'];
       }
@@ -1108,7 +954,7 @@ requestDetailsUpdate(
       'bearing': bearing,
       'distance': (totalDistance == null) ? 0.0 : totalDistance,
       'driver_id': userDetails['id'],
-      'user_id':driverReq['userDetail']['data']['id'],
+      'user_id': driverReq['userDetail']['data']['id'],
       'is_cancelled': (driverReq['is_cancelled'] == 0) ? false : true,
       'is_completed': (driverReq['is_completed'] == 0) ? false : true,
       'lat': lat,
@@ -1175,33 +1021,37 @@ requestAccept() async {
         body: jsonEncode({'request_id': driverReq['id'], 'is_accept': 1}));
 
     if (response.statusCode == 200) {
-        AwesomeNotifications().cancel(7425);
-        
+      AwesomeNotifications().cancel(7425);
+
       if (jsonDecode(response.body)['message'] == 'success') {
         audioPlayers.stop();
         audioPlayers.dispose();
 
         await getUserDetails();
-        
-        if(driverReq.isNotEmpty){
 
-        FirebaseDatabase.instance
-            .ref()
-            .child('drivers/' + userDetails['id'].toString())
-            .update({'is_available': false});
-        duration = 0;
-        requestStreamStart?.cancel();
-        requestStreamStart = null;
-        requestStreamEnd?.cancel();
-        requestStreamEnd = null;
-        if(rideStreamStart == null || rideStreamStart?.isPaused == true || rideStreamChanges == null || rideStreamChanges?.isPaused == true){
-                streamRide();
-        }
-        requestDetailsUpdate(double.parse(heading.toString()), center.latitude, center.longitude);
+        if (driverReq.isNotEmpty) {
+          FirebaseDatabase.instance
+              .ref()
+              .child('drivers/' + userDetails['id'].toString())
+              .update({'is_available': false});
+          duration = 0;
+          requestStreamStart?.cancel();
+          requestStreamStart = null;
+          requestStreamEnd?.cancel();
+          requestStreamEnd = null;
+          if (rideStreamStart == null ||
+              rideStreamStart?.isPaused == true ||
+              rideStreamChanges == null ||
+              rideStreamChanges?.isPaused == true) {
+            streamRide();
+          }
+          requestDetailsUpdate(double.parse(heading.toString()),
+              center.latitude, center.longitude);
         }
         valueNotifierHome.incrementNotifier();
         FirebaseDatabase.instance
-            .ref('request-meta/' + driverReq['id'].toString()).remove();
+            .ref('request-meta/' + driverReq['id'].toString())
+            .remove();
       }
     } else {
       debugPrint(response.body);
@@ -1228,7 +1078,7 @@ requestReject() async {
         body: jsonEncode({'request_id': driverReq['id'], 'is_accept': 0}));
 
     if (response.statusCode == 200) {
-        AwesomeNotifications().cancel(7425);
+      AwesomeNotifications().cancel(7425);
       if (jsonDecode(response.body)['message'] == 'success') {
         audioPlayers.stop();
         audioPlayers.dispose();
@@ -1249,27 +1099,27 @@ requestReject() async {
   }
 }
 
-audioPlay()async{
+audioPlay() async {
   audioPlayers = await audioPlayer.play('audio/request_sound.mp3');
 }
-
 
 //sound
 
 sound() async {
   audioPlay();
-  
 
   Timer.periodic(const Duration(seconds: 1), (timer) async {
     if (duration > 0.0 &&
         driverReq['accepted_at'] == null &&
         driverReq.isNotEmpty) {
       duration--;
-      if(audioPlayers.state == PlayerState.COMPLETED){
+      if (audioPlayers.state == PlayerState.COMPLETED) {
         audioPlay();
       }
       valueNotifierHome.incrementNotifier();
-    } else if (driverReq.isNotEmpty && driverReq['accepted_at'] == null && duration <= 0.0) {
+    } else if (driverReq.isNotEmpty &&
+        driverReq['accepted_at'] == null &&
+        duration <= 0.0) {
       timer.cancel();
       audioPlayers.stop();
       audioPlayers.dispose();
@@ -1297,16 +1147,14 @@ driverArrived() async {
         },
         body: jsonEncode({'request_id': driverReq['id']}));
     if (response.statusCode == 200) {
-      
       if (jsonDecode(response.body)['message'] == 'driver_arrived') {
         waitingBeforeTime = 0;
         waitingTime = 0;
         await getUserDetails();
-        FirebaseDatabase.instance.ref('requests').child(driverReq['id']).update(
-          {
-            'trip_arrived':'1'
-          }
-        );
+        FirebaseDatabase.instance
+            .ref('requests')
+            .child(driverReq['id'])
+            .update({'trip_arrived': '1'});
         valueNotifierHome.incrementNotifier();
       }
     } else {
@@ -1356,9 +1204,10 @@ tripStart() async {
     if (response.statusCode == 200) {
       result = 'success';
       await getUserDetails();
-      FirebaseDatabase.instance.ref('requests').child(driverReq['id']).update({
-        'trip_start':'1'
-      });
+      FirebaseDatabase.instance
+          .ref('requests')
+          .child(driverReq['id'])
+          .update({'trip_start': '1'});
       valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1391,9 +1240,10 @@ tripStartDispatcher() async {
     if (response.statusCode == 200) {
       result = 'success';
       await getUserDetails();
-      FirebaseDatabase.instance.ref('requests').child(driverReq['id']).update({
-        'trip_start':'1'
-      });
+      FirebaseDatabase.instance
+          .ref('requests')
+          .child(driverReq['id'])
+          .update({'trip_start': '1'});
       valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -1434,22 +1284,20 @@ geoCoding(double lat, double lng) async {
 
 endTrip() async {
   try {
-    await requestDetailsUpdate(double.parse(heading.toString()), center.latitude, center.longitude);
+    await requestDetailsUpdate(
+        double.parse(heading.toString()), center.latitude, center.longitude);
     var dropAddress = await geoCoding(center.latitude, center.longitude);
     var db = await FirebaseDatabase.instance
-        .ref()
-        .child('requests/' + driverReq['id'] + '/distance')
+        .ref('requests/' + driverReq['id'])
         .get();
 
-    double dist =
-        double.parse(double.parse(db.value.toString()).toStringAsFixed(2));
-
-        var reqId = driverReq['id'];
+    double dist = double.parse(
+        double.parse(db.child('distance').value.toString()).toStringAsFixed(2));
+    var reqId = driverReq['id'];
 
     final _data = FirebaseDatabase.instance.ref();
     _data.child('requests/' + driverReq['id']).update({
       'bearing': heading,
-      'id': userDetails['id'],
       'is_cancelled': (driverReq['is_cancelled'] == 0) ? false : true,
       'is_completed': false,
       'lat': center.latitude,
@@ -1486,9 +1334,10 @@ endTrip() async {
         }));
     if (response.statusCode == 200) {
       await getUserDetails();
-      FirebaseDatabase.instance.ref('requests').child(reqId).update({
-      'is_completed': true
-    });
+      FirebaseDatabase.instance
+          .ref('requests')
+          .child(reqId)
+          .update({'is_completed': true});
       totalDistance = null;
       lastLat = null;
       lastLong = null;
@@ -1502,7 +1351,6 @@ endTrip() async {
       waitingAfterTime = null;
       waitingBeforeTime = null;
       waitingTime = null;
-      
 
       valueNotifierHome.incrementNotifier();
     } else {
@@ -1742,7 +1590,10 @@ getCurrentMessages() async {
     );
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
-        if(chatList.where((element) => element['from_type'] == 1).length != jsonDecode(response.body)['data'].where((element)=>element['from_type'] == 1).length){
+        if (chatList.where((element) => element['from_type'] == 1).length !=
+            jsonDecode(response.body)['data']
+                .where((element) => element['from_type'] == 1)
+                .length) {
           audioPlayer.play(audio);
         }
         chatList = jsonDecode(response.body)['data'];
@@ -1770,9 +1621,9 @@ sendMessage(chat) async {
         body: jsonEncode({'request_id': driverReq['id'], 'message': chat}));
     if (response.statusCode == 200) {
       getCurrentMessages();
-       FirebaseDatabase.instance.ref('requests/' + driverReq['id']).update({
-        'message_by_driver' : chatList.length
-      });
+      FirebaseDatabase.instance
+          .ref('requests/' + driverReq['id'])
+          .update({'message_by_driver': chatList.length});
     } else {
       debugPrint(response.body);
     }
@@ -2045,10 +1896,10 @@ Map<String, dynamic> walletBalance = {};
 List walletHistory = [];
 Map<String, dynamic> walletPages = {};
 
-void printWrapped(String text) {
-  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-  pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
-}
+// void printWrapped(String text) {
+//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+// }
 
 getWalletHistory() async {
   dynamic result;
@@ -2518,18 +2369,9 @@ checkInternetConnection() async {
       internet = false;
       valueNotifierHome.incrementNotifier();
       valueNotifierHome.incrementNotifier();
-      client.disconnect();
     } else {
       internet = true;
-      if (userDetails.isNotEmpty) {
-        if (client.connectionStatus!.state != ConnectionState.active &&
-            client.connectionStatus == null &&
-            userDetails.isNotEmpty &&
-            mqttUrl != '' &&
-            client != '') {
-          // mqttForDocuments();
-        }
-      }
+
       valueNotifierHome.incrementNotifier();
       valueNotifierHome.incrementNotifier();
     }
@@ -2902,22 +2744,20 @@ dynamic arrivedTimer;
 dynamic rideTimer;
 waitingBeforeStart() async {
   var _bWaitingTime = await FirebaseDatabase.instance
-      .ref()
-      .child('requests/' + driverReq['id'])
-      .child('waiting_time_before_start')
+      .ref('requests/' + driverReq['id'])
+      // .child('waiting_time_before_start')
       .get();
   var _waitingTime = await FirebaseDatabase.instance
-      .ref()
-      .child('requests/' + driverReq['id'])
-      .child('total_waiting_time')
+      .ref('requests/' + driverReq['id'])
+      // .child('total_waiting_time')
       .get();
-  if (_bWaitingTime.value != null) {
-    waitingBeforeTime = _bWaitingTime.value;
+  if (_bWaitingTime.child('waiting_time_before_start').value != null) {
+    waitingBeforeTime = _bWaitingTime.child('waiting_time_before_start').value;
   } else {
     waitingBeforeTime = 0;
   }
-  if (_waitingTime.value != null) {
-    waitingTime = _waitingTime.value;
+  if (_waitingTime.child('total_waiting_time').value != null) {
+    waitingTime = _waitingTime.child('total_waiting_time').value;
   } else {
     waitingTime = 0;
   }
@@ -2951,31 +2791,29 @@ dynamic startTimer;
 
 waitingAfterStart() async {
   var _bWaitingTime = await FirebaseDatabase.instance
-      .ref()
-      .child('requests/' + driverReq['id'])
-      .child('waiting_time_before_start')
+      .ref('requests/' + driverReq['id'])
+      // .child('waiting_time_before_start')
       .get();
   var _waitingTime = await FirebaseDatabase.instance
-      .ref()
-      .child('requests/' + driverReq['id'])
-      .child('total_waiting_time')
+      .ref('requests/' + driverReq['id'])
+      // .child('total_waiting_time')
       .get();
   var _aWaitingTime = await FirebaseDatabase.instance
-      .ref()
-      .child('requests/' + driverReq['id'])
-      .child('waiting_time_after_start')
+      .ref('requests/' + driverReq['id'])
+      // .child('waiting_time_after_start')
       .get();
-  if (_bWaitingTime.value != null && waitingBeforeTime == null) {
-    waitingBeforeTime = _bWaitingTime.value;
+  if (_bWaitingTime.child('waiting_time_before_start').value != null &&
+      waitingBeforeTime == null) {
+    waitingBeforeTime = _bWaitingTime.child('waiting_time_before_start').value;
   }
-  if (_waitingTime.value != null && waitingTime == null) {
-    waitingTime = _waitingTime.value;
+  if (_waitingTime.child('total_waiting_time').value != null) {
+    waitingTime = _waitingTime.child('total_waiting_time').value;
     // ignore: prefer_conditional_assignment
   } else if (waitingTime == null) {
     waitingTime = 0;
   }
-  if (_aWaitingTime.value != null) {
-    waitingAfterTime = _aWaitingTime.value;
+  if (_aWaitingTime.child('waiting_time_after_start').value != null) {
+    waitingAfterTime = _aWaitingTime.child('waiting_time_after_start').value;
   } else {
     waitingAfterTime = 0;
   }
@@ -3019,7 +2857,7 @@ StreamSubscription<DatabaseEvent>? requestStreamEnd;
 StreamSubscription<DatabaseEvent>? rideStreamStart;
 StreamSubscription<DatabaseEvent>? rideStreamChanges;
 
-streamRequest(){
+streamRequest() {
   rideStreamStart?.cancel();
   rideStreamChanges?.cancel();
   requestStreamEnd?.cancel();
@@ -3028,33 +2866,39 @@ streamRequest(){
   rideStreamChanges = null;
   requestStreamStart = null;
   requestStreamEnd = null;
-  requestStreamStart = FirebaseDatabase.instance.ref('request-meta').orderByChild('driver_id').equalTo(userDetails['id']).onChildAdded.handleError((onError){
+  requestStreamStart = FirebaseDatabase.instance
+      .ref('request-meta')
+      .orderByChild('driver_id')
+      .equalTo(userDetails['id'])
+      .onChildAdded
+      .handleError((onError) {
     requestStreamStart?.cancel();
-  }).listen((event) { 
-    
-    if(driverReq.isEmpty){
+  }).listen((event) {
+    if (driverReq.isEmpty) {
       streamEnd(event.snapshot.key.toString());
-       getUserDetails();
-        
+      getUserDetails();
     }
   });
-  
 }
 
-streamEnd(id){
-    requestStreamEnd = FirebaseDatabase.instance.ref('request-meta').child(id).onChildRemoved.handleError((onError){
+streamEnd(id) {
+  requestStreamEnd = FirebaseDatabase.instance
+      .ref('request-meta')
+      .child(id)
+      .onChildRemoved
+      .handleError((onError) {
     requestStreamEnd?.cancel();
-  }).listen((event) { 
-    if(driverReject != true){
-    userReject = true;
-    AwesomeNotifications().cancel(7425);
-    driverReq.clear();
-    getUserDetails();
+  }).listen((event) {
+    if (driverReject != true) {
+      userReject = true;
+      AwesomeNotifications().cancel(7425);
+      driverReq.clear();
+      getUserDetails();
     }
   });
 }
 
-streamRide(){
+streamRide() {
   requestStreamEnd?.cancel();
   requestStreamStart?.cancel();
   rideStreamStart?.cancel();
@@ -3063,31 +2907,34 @@ streamRide(){
   requestStreamEnd = null;
   rideStreamStart = null;
   rideStreamChanges = null;
-  rideStreamChanges = FirebaseDatabase.instance.ref('requests/' + driverReq['id'].toString()).onChildChanged.handleError((onError){
+  rideStreamChanges = FirebaseDatabase.instance
+      .ref('requests/' + driverReq['id'].toString())
+      .onChildChanged
+      .handleError((onError) {
     rideStreamChanges?.cancel();
-  }).listen((DatabaseEvent event) { 
-    if(event.snapshot.key.toString() == 'cancelled_by_user'){
+  }).listen((DatabaseEvent event) {
+    if (event.snapshot.key.toString() == 'cancelled_by_user') {
       getUserDetails();
-      if(driverReq.isEmpty){
-      userReject = true;
+      if (driverReq.isEmpty) {
+        userReject = true;
       }
-    }else if(event.snapshot.key.toString() == 'message_by_user'){
+    } else if (event.snapshot.key.toString() == 'message_by_user') {
       getCurrentMessages();
     }
-    
   });
-  rideStreamStart = FirebaseDatabase.instance.ref('requests/' + driverReq['id'].toString()).onChildAdded.handleError((onError){
+  rideStreamStart = FirebaseDatabase.instance
+      .ref('requests/' + driverReq['id'].toString())
+      .onChildAdded
+      .handleError((onError) {
     rideStreamChanges?.cancel();
-  }).listen((DatabaseEvent event) async { 
-    if(event.snapshot.key.toString() == 'cancelled_by_user'){
+  }).listen((DatabaseEvent event) async {
+    if (event.snapshot.key.toString() == 'cancelled_by_user') {
       getUserDetails();
-     
+
       userReject = true;
-      
-    }else if(event.snapshot.key.toString() == 'message_by_user'){
+    } else if (event.snapshot.key.toString() == 'message_by_user') {
       getCurrentMessages();
     }
-    
   });
 }
 
@@ -3124,17 +2971,17 @@ positionStreamData() {
   }).listen((geolocs.Position? position) {
     if (position != null) {
       center = LatLng(position.latitude, position.longitude);
-      
     } else {
       positionStream!.cancel();
     }
   });
 }
 
-userDelete()async{
+userDelete() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/user/delete-user-account'), headers: {
+    var response = await http
+        .post(Uri.parse(url + 'api/v1/user/delete-user-account'), headers: {
       'Authorization': 'Bearer ' + bearerToken[0].token,
       'Content-Type': 'application/json'
     });

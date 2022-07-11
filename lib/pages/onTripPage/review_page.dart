@@ -65,7 +65,9 @@ class _ReviewState extends State<Review> {
                           height: media.height * 0.02,
                         ),
                         Text(
-                          driverReq['userDetail']['data']['name'],
+                          (driverReq.isNotEmpty)
+                              ? driverReq['userDetail']['data']['name']
+                              : '',
                           style: GoogleFonts.roboto(
                               fontSize: media.width * twenty, color: textColor),
                         ),
@@ -185,7 +187,6 @@ class _ReviewState extends State<Review> {
                                 setState(() {
                                   _loading = true;
                                 });
-                                client.disconnect();
                                 var result = await userRating();
 
                                 if (result == true) {

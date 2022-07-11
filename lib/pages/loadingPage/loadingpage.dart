@@ -43,15 +43,14 @@ class _LoadingPageState extends State<LoadingPage> {
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
-  if (!isAllowed) {
-    // This is just a basic example. For real apps, you must show some
-    // friendly dialog box before call the request method.
-    // This is very important to not harm the user experience
-   await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
-});
+      if (!isAllowed) {
+        // This is just a basic example. For real apps, you must show some
+        // friendly dialog box before call the request method.
+        // This is very important to not harm the user experience
+        await AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
     _package = await PackageInfo.fromPlatform();
     if (platform == TargetPlatform.android) {
       _version = await FirebaseDatabase.instance
@@ -112,7 +111,6 @@ class _LoadingPageState extends State<LoadingPage> {
                 MaterialPageRoute(
                   builder: (context) => const DocsProcess(),
                 ));
-            // mqttForDocuments();
           } else if (userDetails['uploaded_document'] == true &&
               userDetails['approve'] == true) {
             //status approved
@@ -120,7 +118,6 @@ class _LoadingPageState extends State<LoadingPage> {
                 context,
                 MaterialPageRoute(builder: (context) => const Maps()),
                 (route) => false);
-            // mqttForDocuments();
           }
         }
         //if user is not login in this device

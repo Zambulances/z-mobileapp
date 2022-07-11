@@ -56,7 +56,6 @@ enableLights: true,
       }else if(event.buttonKeyPressed == 'reject'){
         requestReject();
       }
-      // printWrapped(jsonDecode(jsonEncode(event.toString())));
    });
 
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -65,7 +64,7 @@ enableLights: true,
       AwesomeNotifications().createNotification(content: NotificationContent(id: 12346, channelKey: 'normal_push',
       autoDismissible: true,
       title: notification.title,
-      body: notification.body,
+      body: notification.title,
       displayOnBackground: true,
       displayOnForeground: true,
       wakeUpScreen: true,

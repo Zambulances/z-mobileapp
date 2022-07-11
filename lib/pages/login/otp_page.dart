@@ -76,8 +76,6 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userDetails['uploaded_document'] == true &&
             userDetails['approve'] == true) {
-          // mqttForDocuments();
-
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const Maps()),
@@ -116,8 +114,6 @@ class _OtpState extends State<Otp> {
               (route) => false);
         } else if (userDetails['uploaded_document'] == true &&
             userDetails['approve'] == true) {
-          // mqttForDocuments();
-
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const Maps()),
@@ -326,7 +322,6 @@ class _OtpState extends State<Otp> {
                                                       'uploaded_document'] ==
                                                   true &&
                                               userDetails['approve'] == true) {
-                                            // mqttForDocuments();
                                             Future.delayed(
                                                 const Duration(seconds: 2), () {
                                               Navigator.pushAndRemoveUntil(
@@ -385,7 +380,6 @@ class _OtpState extends State<Otp> {
                                                     true &&
                                                 userDetails['approve'] ==
                                                     true) {
-                                              // mqttForDocuments();
                                               Future.delayed(
                                                   const Duration(seconds: 2),
                                                   () {

@@ -22,9 +22,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-
-
-
     platform = Theme.of(context).platform;
     return GestureDetector(
         onTap: () {
@@ -40,6 +37,6 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Tagxi Driver',
             theme: ThemeData(),
-            home:const LoadingPage()));
+            home: const LoadingPage()));
   }
 }

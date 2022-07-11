@@ -580,8 +580,9 @@ class _NavDrawerState extends State<NavDrawer> {
                             padding: EdgeInsets.all(media.width * 0.025),
                             child: Row(
                               children: [
-                                Icon(Icons.delete_forever,
-                                size: media.width*0.075,
+                                Icon(
+                                  Icons.delete_forever,
+                                  size: media.width * 0.075,
                                 ),
                                 SizedBox(
                                   width: media.width * 0.025,
@@ -589,7 +590,8 @@ class _NavDrawerState extends State<NavDrawer> {
                                 SizedBox(
                                   width: media.width * 0.55,
                                   child: Text(
-                                     languages[choosenLanguage]['text_delete_account'],
+                                    languages[choosenLanguage]
+                                        ['text_delete_account'],
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
