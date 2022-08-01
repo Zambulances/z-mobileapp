@@ -7,11 +7,13 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
+import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/editprofile.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
 import 'package:tagyourtaxi_driver/pages/login/get_started.dart';
 import 'package:tagyourtaxi_driver/pages/login/login.dart';
+// import 'package:tagyourtaxi_driver/pages/login/ownerregister.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/review_page.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/referral_code.dart';
@@ -32,7 +34,6 @@ import '../pages/vehicleInformations/upload_docs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 import 'geohash.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -77,7 +78,7 @@ getDetailsOfDevice() async {
 
 //validate email already exist
 
-validateEmail() async {
+validateEmail(email) async {
   dynamic result;
   try {
     var response = await http.post(
@@ -477,6 +478,52 @@ registerDriver() async {
   return result;
 }
 
+// //register owner
+
+// registerOwner() async {
+//   bearerToken.clear();
+//   dynamic result;
+//   try {
+//     final response = await http.post(Uri.parse(url + 'api/v1/owner/register'),
+//         headers: {'Content-Type': 'application/json'},
+//         body: jsonEncode({
+//           "name": ownerName,
+//           "mobile": phnumber,
+//           "email": ownerEmail,
+//           "address": companyAddress,
+//           "postal_code": postalCode,
+//           "city": city,
+//           "tax_number": taxNumber,
+//           "company_name" : companyName,
+//           "device_token": fcm,
+//           "terms_condition": true,
+//           "country": countries[phcode]['dial_code'],
+//           "service_location_id": ownerServiceLocation,
+//           "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
+//         }));
+
+//     if (response.statusCode == 200) {
+//       var jsonVal = jsonDecode(response.body);
+
+//       bearerToken.add(BearerClass(
+//           type: jsonVal['token_type'].toString(),
+//           token: jsonVal['access_token'].toString()));
+//       pref.setString('Bearer', bearerToken[0].token);
+//       await getUserDetails();
+//       result = 'true';
+//     } else {
+//       debugPrint(response.body);
+//       result = jsonDecode(response.body)['message'];
+//     }
+//   } catch (e) {
+//     if (e is SocketException) {
+//       internet = false;
+//       result = 'no internet';
+//     }
+//   }
+//   return result;
+// }
+
 //update referral code
 
 updateReferral() async {
@@ -631,6 +678,7 @@ driverLogin() async {
 // }
 
 Map<String, dynamic> userDetails = {};
+bool isBackground = false;
 
 //user current state
 getUserDetails() async {
@@ -645,82 +693,90 @@ getUserDetails() async {
     );
     if (response.statusCode == 200) {
       userDetails = jsonDecode(response.body)['data'];
-
-      sosData = userDetails['sos']['data'];
-
-      if (userDetails['onTripRequest'] != null) {
-        driverReq = userDetails['onTripRequest']['data'];
-
-        if (driverReq['is_driver_arrived'] == 1 &&
-            driverReq['is_trip_start'] == 0 &&
-            arrivedTimer == null &&
-            driverReq['is_rental'] != true) {
-          waitingBeforeStart();
-        }
-        if (driverReq['is_completed'] == 0 &&
-            driverReq['is_trip_start'] == 1 &&
-            rideTimer == null &&
-            driverReq['is_rental'] != true) {
-          waitingAfterStart();
+      if (userDetails['role'] != 'owner') {
+        if (userDetails['sos']['data'] != null) {
+          sosData = userDetails['sos']['data'];
         }
 
-        if (driverReq['accepted_at'] != null) {
-          getCurrentMessages();
-        }
-        valueNotifierHome.incrementNotifier();
-      } else if (userDetails['metaRequest'] != null) {
-        driverReq = userDetails['metaRequest']['data'];
+        if (userDetails['onTripRequest'] != null) {
+          driverReq = userDetails['onTripRequest']['data'];
 
-        if (duration == 0 || duration == 0.0) {
-          AwesomeNotifications().createNotification(
-              content: NotificationContent(
-                  id: 7425,
-                  channelKey: 'trip_request',
-                  title: 'Pick Address',
-                  body: driverReq['pick_address'],
-                  autoDismissible: false,
-                  displayOnBackground: true,
-                  displayOnForeground: false,
-                  fullScreenIntent: true,
-                  backgroundColor: page,
-                  color: buttonColor,
-                  wakeUpScreen: true,
-                  locked: true,
-                  notificationLayout: NotificationLayout.BigText),
-              actionButtons: [
-                NotificationActionButton(
-                    key: 'reject',
-                    label: 'Reject Request',
-                    autoDismissible: true,
-                    buttonType: ActionButtonType.KeepOnTop,
-                    color: Colors.red),
-                NotificationActionButton(
-                    key: 'accept',
-                    label: 'Accept Request',
-                    buttonType: ActionButtonType.Default,
-                    color: Colors.green,
-                    showInCompactView: true),
-              ]);
+          if (driverReq['is_driver_arrived'] == 1 &&
+              driverReq['is_trip_start'] == 0 &&
+              arrivedTimer == null &&
+              driverReq['is_rental'] != true) {
+            waitingBeforeStart();
+          }
+          if (driverReq['is_completed'] == 0 &&
+              driverReq['is_trip_start'] == 1 &&
+              rideTimer == null &&
+              driverReq['is_rental'] != true) {
+            waitingAfterStart();
+          }
 
-          duration = double.parse(
-              userDetails['trip_accept_reject_duration_for_driver'].toString());
-          sound();
+          if (driverReq['accepted_at'] != null) {
+            getCurrentMessages();
+          }
+          valueNotifierHome.incrementNotifier();
+        } else if (userDetails['metaRequest'] != null) {
+          driverReq = userDetails['metaRequest']['data'];
+
+          if (duration == 0 || duration == 0.0) {
+            if (isBackground == true && platform == TargetPlatform.android) {
+              launch('tagxidriver://');
+            } else if (platform != TargetPlatform.android) {
+              AwesomeNotifications().createNotification(
+                  content: NotificationContent(
+                      id: 7425,
+                      channelKey: 'trip_request',
+                      title: 'Pick Address',
+                      body: driverReq['pick_address'],
+                      autoDismissible: false,
+                      displayOnBackground: true,
+                      displayOnForeground: false,
+                      fullScreenIntent: true,
+                      backgroundColor: page,
+                      color: buttonColor,
+                      wakeUpScreen: true,
+                      locked: true,
+                      notificationLayout: NotificationLayout.BigText),
+                  actionButtons: [
+                    NotificationActionButton(
+                        key: 'reject',
+                        label: 'Reject Request',
+                        autoDismissible: true,
+                        buttonType: ActionButtonType.KeepOnTop,
+                        color: Colors.red),
+                    NotificationActionButton(
+                        key: 'accept',
+                        label: 'Accept Request',
+                        buttonType: ActionButtonType.Default,
+                        color: Colors.green,
+                        showInCompactView: true),
+                  ]);
+            }
+            duration = double.parse(
+                userDetails['trip_accept_reject_duration_for_driver']
+                    .toString());
+            sound();
+          }
+
+          valueNotifierHome.incrementNotifier();
+        } else {
+          duration = 0;
+          if (driverReq.isNotEmpty) {
+            audioPlayer.play(audio);
+          }
+          chatList.clear();
+          driverReq = {};
+          valueNotifierHome.incrementNotifier();
         }
 
-        valueNotifierHome.incrementNotifier();
-      } else {
-        duration = 0;
-        if (driverReq.isNotEmpty) {
-          audioPlayer.play(audio);
+        if (userDetails['active'] == false) {
+          isActive = 'false';
+        } else {
+          isActive = 'true';
         }
-        chatList.clear();
-        driverReq = {};
-        valueNotifierHome.incrementNotifier();
-      }
-      if (userDetails['active'] == false) {
-        isActive = 'false';
-      } else {
-        isActive = 'true';
       }
       result = true;
     } else {
@@ -787,6 +843,7 @@ driverStatus() async {
       } else {
         userActive();
       }
+      valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);
       result = false;
@@ -803,19 +860,19 @@ driverStatus() async {
 //update driver location in firebase
 
 currentPositionUpdate() async {
-  bool serviceEnabled;
-  PermissionStatus permission;
-  Location locs = Location();
+  geolocs.LocationPermission permission;
   GeoHasher geo = GeoHasher();
 
   Timer.periodic(const Duration(seconds: 5), (timer) async {
     if (userDetails.isNotEmpty) {
-      serviceEnabled = await locs.serviceEnabled();
-      permission = await locs.hasPermission();
+      serviceEnabled =
+          await geolocs.GeolocatorPlatform.instance.isLocationServiceEnabled();
+      permission = await geolocs.GeolocatorPlatform.instance.checkPermission();
 
       if (userDetails['active'] == true &&
           serviceEnabled == true &&
-          permission == PermissionStatus.granted) {
+          permission != geolocs.LocationPermission.denied &&
+          permission != geolocs.LocationPermission.deniedForever) {
         if (driverReq.isEmpty) {
           if (requestStreamStart == null ||
               requestStreamStart?.isPaused == true) {
@@ -851,7 +908,8 @@ currentPositionUpdate() async {
             'updated_at': ServerValue.timestamp,
             'vehicle_number': userDetails['car_number'],
             'vehicle_type_name': userDetails['car_make_name'],
-            'vehicle_type': userDetails['vehicle_type_id']
+            'vehicle_type': userDetails['vehicle_type_id'],
+            'service_location_id' : userDetails['service_location_id']
           });
           if (driverReq.isNotEmpty) {
             if (driverReq['accepted_at'] != null &&
@@ -871,11 +929,14 @@ currentPositionUpdate() async {
         }
       } else if (userDetails['active'] == false &&
           serviceEnabled == true &&
-          permission != PermissionStatus.denied) {
-        var pos = await geolocs.Geolocator.getCurrentPosition();
-        valueNotifierHome.incrementNotifier();
-        center = LatLng(double.parse(pos.latitude.toString()),
-            double.parse(pos.longitude.toString()));
+          permission != geolocs.LocationPermission.denied &&
+          permission != geolocs.LocationPermission.deniedForever) {
+        if (positionStream == null || positionStream!.isPaused) {
+          positionStreamData();
+        }
+      } else if (serviceEnabled == false && userDetails['active'] == true) {
+        await driverStatus();
+        await location.requestService();
       }
       var _driverStatus = await FirebaseDatabase.instance
           .ref('drivers/' + userDetails['id'].toString())
@@ -1121,15 +1182,19 @@ sound() async {
         driverReq['accepted_at'] == null &&
         duration <= 0.0) {
       timer.cancel();
-      audioPlayers.stop();
-      audioPlayers.dispose();
+      if (audioPlayers.state != PlayerState.STOPPED) {
+        audioPlayers.stop();
+        audioPlayers.dispose();
+      }
       Future.delayed(const Duration(seconds: 2), () {
         requestReject();
       });
       duration = 0;
     } else {
-      audioPlayers.stop();
-      audioPlayers.dispose();
+      if (audioPlayers.state != PlayerState.STOPPED) {
+        audioPlayers.stop();
+        audioPlayers.dispose();
+      }
       timer.cancel();
       duration = 0;
     }
@@ -1896,10 +1961,10 @@ Map<String, dynamic> walletBalance = {};
 List walletHistory = [];
 Map<String, dynamic> walletPages = {};
 
-// void printWrapped(String text) {
-//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
-// }
+void printWrapped(String text) {
+  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+  pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+}
 
 getWalletHistory() async {
   dynamic result;
@@ -2961,6 +3026,7 @@ geolocs.LocationSettings locationSettings = (platform == TargetPlatform.android)
       );
 
 dynamic testDistance = 0;
+Location location = Location();
 
 positionStreamData() {
   positionStream =

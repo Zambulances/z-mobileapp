@@ -128,7 +128,7 @@ class _LoadingPageState extends State<LoadingPage> {
           });
         } else {
           //user installing first time and didnt yet choosen language
-
+          printWrapped('working $val');
           Future.delayed(const Duration(seconds: 2), () {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const Languages()));

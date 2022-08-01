@@ -31,7 +31,9 @@ class Maps extends StatefulWidget {
   _MapsState createState() => _MapsState();
 }
 
+dynamic _center = const LatLng(41.4219057, -102.0840772);
 dynamic center;
+bool locationAllowed = false;
 
 List<Marker> myMarkers = [];
 Set<Circle> circles = {};
@@ -43,14 +45,15 @@ bool logout = false;
 bool deleteAccount = false;
 bool getStartOtp = false;
 String driverOtp = '';
+bool serviceEnabled = false;
 
 class _MapsState extends State<Maps>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   bool sosLoaded = false;
   bool cancelRequest = false;
   bool _pickAnimateDone = false;
-  late bool serviceEnabled;
-  late PermissionStatus permission;
+
+  late geolocator.LocationPermission permission;
   Location location = Location();
   String state = '';
   dynamic _controller;
@@ -73,6 +76,7 @@ class _MapsState extends State<Maps>
   bool _reqCancelled = false;
   dynamic pinLocationIcon;
   dynamic userLocationIcon;
+  bool makeOnline = false;
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
@@ -100,6 +104,11 @@ class _MapsState extends State<Maps>
         _controller!.setMapStyle(mapStyle);
         valueNotifierHome.incrementNotifier();
       }
+
+      isBackground = false;
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      isBackground = true;
     }
   }
 
@@ -108,9 +117,9 @@ class _MapsState extends State<Maps>
     if (_timer != null) {
       _timer.cancel();
     }
-    if (animationController != null) {
-      animationController.dispose();
-    }
+
+    animationController?.dispose();
+
     super.dispose();
   }
 
@@ -135,59 +144,124 @@ class _MapsState extends State<Maps>
 
 //getting permission and current location
   getLocs() async {
-    permission = await location.hasPermission();
-    serviceEnabled = await location.serviceEnabled();
+    permission = await geolocator.GeolocatorPlatform.instance.checkPermission();
+    serviceEnabled =
+        await geolocator.GeolocatorPlatform.instance.isLocationServiceEnabled();
 
-    if (permission == PermissionStatus.denied ||
-        permission == PermissionStatus.deniedForever ||
-        serviceEnabled == false) {
+    if (permission == geolocator.LocationPermission.denied ||
+        permission == geolocator.LocationPermission.deniedForever || serviceEnabled == false) {
       gettingPerm++;
-      if (gettingPerm >= 2) {
+
+      if (gettingPerm > 1) {
+        locationAllowed = false;
+        if (userDetails['active'] == true) {
+          await driverStatus();
+        }
+        state = '3';
+      } else {
+        state = '2';
+      }
+      setState(() {
+        _isLoading = false;
+      });
+    } else if (permission == geolocator.LocationPermission.whileInUse ||
+        permission == geolocator.LocationPermission.always) {
+      if (serviceEnabled == true) {
+        final Uint8List markerIcon =
+            await getBytesFromAsset('assets/images/top-taxi.png', 40);
+        if (center == null) {
+          var locs = await geolocator.Geolocator.getLastKnownPosition();
+          if (locs != null) {
+            center = LatLng(locs.latitude, locs.longitude);
+            heading = locs.heading;
+          } else {
+            loc = await geolocator.Geolocator.getCurrentPosition(
+                desiredAccuracy: geolocator.LocationAccuracy.low);
+            center = LatLng(double.parse(loc.latitude.toString()),
+                double.parse(loc.longitude.toString()));
+            heading = loc.heading;
+          }
+          _controller?.animateCamera(
+                 CameraUpdate
+                     .newLatLngZoom(
+                         center,
+                         14.0));
+        }
         setState(() {
-          _locationDenied = true;
+          pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
+
+          if (myMarkers.isEmpty) {
+            myMarkers = [
+              Marker(
+                  markerId: const MarkerId('1'),
+                  rotation: heading,
+                  position: center,
+                  icon: pinLocationIcon,
+                  anchor: const Offset(0.5, 0.5))
+            ];
+          }
         });
       }
-      setState(() {
-        state = '2';
 
-        _isLoading = false;
-      });
-    } else if (permission == PermissionStatus.granted ||
-        permission == PermissionStatus.grantedLimited) {
-      final Uint8List markerIcon =
-          await getBytesFromAsset('assets/images/top-taxi.png', 40);
-      if (center == null) {
-        var locs = await geolocator.Geolocator.getLastKnownPosition();
-        if (locs != null) {
-          center = LatLng(locs.latitude, locs.longitude);
-          heading = locs.heading;
-        } else {
-          loc = await geolocator.Geolocator.getCurrentPosition(
-              desiredAccuracy: geolocator.LocationAccuracy.low);
-          center = LatLng(double.parse(loc.latitude.toString()),
-              double.parse(loc.longitude.toString()));
-          heading = loc.heading;
-        }
-      }
-      setState(() {
-        pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
-
-        if (myMarkers.isEmpty) {
-          myMarkers = [
-            Marker(
-                markerId: const MarkerId('1'),
-                rotation: heading,
-                position: center,
-                icon: pinLocationIcon,
-                anchor: const Offset(0.5, 0.5))
-          ];
-        }
-      });
-      setState(() {
-        state = '3';
-        _isLoading = false;
-      });
+if(makeOnline == true && userDetails['active'] == false){
+  await driverStatus();
+ 
+}
+ makeOnline = false;
+        setState(() {
+          locationAllowed = true;
+          state = '3';
+          _isLoading = false;
+        });
+      
     }
+  }
+
+  getLocationService() async {
+    await location.requestService();
+    getLocs();
+  }
+
+  getLocationPermission() async {
+    if (serviceEnabled == false) {
+      await location.requestService();
+    }
+    if (await geolocator.GeolocatorPlatform.instance
+        .isLocationServiceEnabled()) {
+      if (permission == geolocator.LocationPermission.denied ||
+          permission == geolocator.LocationPermission.deniedForever) {
+        //  var _lpermission = await perm.Permission.location.shouldShowRequestRationale;
+        //  print(_lpermission);
+        if (permission != geolocator.LocationPermission.deniedForever &&
+            await geolocator.GeolocatorPlatform.instance
+                .isLocationServiceEnabled()) {
+          await perm.Permission.location.request();
+          await perm.Permission.locationAlways.request();
+        }
+
+        // await [
+        //   perm.Permission
+        //       .location,
+        //   perm.Permission
+        //       .locationAlways
+        // ].request();
+        //  geolocator.GeolocatorPlatform.instance.requestPermission();
+      }
+    }
+    setState(() {
+      _isLoading = true;
+    });
+    getLocs();
+    // else if(permission == geolocator.LocationPermission.deniedForever){
+    //   print('denied forver');
+    //   setState(() {
+    //     _locationDenied = true;
+    //   });
+    // }
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    // getLocs();
   }
 
   getLatLngBounds() {
@@ -212,7 +286,7 @@ class _MapsState extends State<Maps>
     }
 
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
-    _controller!.animateCamera(cameraUpdate);
+    _controller?.animateCamera(cameraUpdate);
   }
 
   int _bottom = 0;
@@ -301,54 +375,62 @@ class _MapsState extends State<Maps>
           ],
         ));
 
-    Future<BitmapDescriptor> getCustomIcon(GlobalKey iconKeys) async {
-      Future<Uint8List> _capturePng(GlobalKey iconKeys) async {
-        dynamic pngBytes;
+    _capturePng(GlobalKey iconKeys) async {
+      dynamic bitmap;
 
-        try {
-          RenderRepaintBoundary boundary = iconKeys.currentContext!
-              .findRenderObject() as RenderRepaintBoundary;
-          ui.Image image = await boundary.toImage(pixelRatio: 2.0);
-          ByteData? byteData =
-              await image.toByteData(format: ui.ImageByteFormat.png);
-          pngBytes = byteData!.buffer.asUint8List();
-          return pngBytes;
-        } catch (e) {
-          debugPrint(e.toString());
-        }
-        return pngBytes;
+      try {
+        RenderRepaintBoundary boundary = iconKeys.currentContext!
+            .findRenderObject() as RenderRepaintBoundary;
+        ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+        ByteData? byteData =
+            await image.toByteData(format: ui.ImageByteFormat.png);
+        var pngBytes = byteData!.buffer.asUint8List();
+        bitmap = BitmapDescriptor.fromBytes(pngBytes);
+        // return pngBytes;
+      } catch (e) {
+        debugPrint(e.toString());
       }
-
-      Uint8List imageData = await _capturePng(iconKeys);
-
-      return BitmapDescriptor.fromBytes(imageData);
+      return bitmap;
     }
 
+    // Future<BitmapDescriptor> getCustomIcon(GlobalKey iconKeys) async {
+
+    //   var imageData = await _capturePng(iconKeys);
+
+    //   return BitmapDescriptor.fromBytes(imageData);
+    // }
+
     addDropMarker() async {
-      BitmapDescriptor testIcon = await getCustomIcon(iconDropKey);
-      setState(() {
-        myMarkers.add(Marker(
-            markerId: const MarkerId('3'),
-            icon: testIcon,
-            position: LatLng(driverReq['drop_lat'], driverReq['drop_lng'])));
-      });
-      if (polyline
-          .where((element) => element.polylineId == const PolylineId('1'))
-          .isEmpty) {
-        getPolylines();
+      var testIcon = await _capturePng(iconDropKey);
+      if (testIcon != null) {
+        setState(() {
+          myMarkers.add(Marker(
+              markerId: const MarkerId('3'),
+              icon: testIcon,
+              position: LatLng(driverReq['drop_lat'], driverReq['drop_lng'])));
+        });
+        if (polyline
+            .where((element) => element.polylineId == const PolylineId('1'))
+            .isEmpty) {
+          getPolylines();
+        }
       }
+
       getLatLngBounds();
     }
 
     addMarker() async {
       if (driverReq.isNotEmpty) {
-        BitmapDescriptor testIcon = await getCustomIcon(iconKey);
-        setState(() {
-          myMarkers.add(Marker(
-              markerId: const MarkerId('2'),
-              icon: testIcon,
-              position: LatLng(driverReq['pick_lat'], driverReq['pick_lng'])));
-        });
+        var testIcon = await _capturePng(iconKey);
+        if (testIcon != null) {
+          setState(() {
+            myMarkers.add(Marker(
+                markerId: const MarkerId('2'),
+                icon: testIcon,
+                position:
+                    LatLng(driverReq['pick_lat'], driverReq['pick_lng'])));
+          });
+        }
       }
     }
 
@@ -360,7 +442,7 @@ class _MapsState extends State<Maps>
                     .where((element) => element.markerId == const MarkerId('1'))
                     .isNotEmpty &&
                 pinLocationIcon != null &&
-                _controller != null) {
+                _controller != null && center != null) {
               var dist = calculateDistance(
                   myMarkers
                       .firstWhere(
@@ -401,7 +483,7 @@ class _MapsState extends State<Maps>
             } else if (myMarkers
                     .where((element) => element.markerId == const MarkerId('1'))
                     .isEmpty &&
-                pinLocationIcon != null) {
+                pinLocationIcon != null && center != null) {
               myMarkers.add(Marker(
                   markerId: const MarkerId('1'),
                   rotation: heading,
@@ -410,10 +492,6 @@ class _MapsState extends State<Maps>
                   anchor: const Offset(0.5, 0.5)));
             }
             if (driverReq.isNotEmpty) {
-              // if(isBackground == true){
-              //   print('this is va');
-              //   // launch('app://open.my.app');
-              // }
               if (driverReq['is_trip_start'] != 1) {
                 if (myMarkers
                     .where((element) => element.markerId == const MarkerId('2'))
@@ -690,28 +768,7 @@ class _MapsState extends State<Maps>
                                                       media.width * 0.05),
                                                   child: Button(
                                                       onTap: () async {
-                                                        if (serviceEnabled ==
-                                                            false) {
-                                                          await location
-                                                              .requestService();
-                                                        }
-                                                        if (permission ==
-                                                                PermissionStatus
-                                                                    .denied ||
-                                                            permission ==
-                                                                PermissionStatus
-                                                                    .deniedForever) {
-                                                          await [
-                                                            perm.Permission
-                                                                .location,
-                                                            perm.Permission
-                                                                .locationAlways
-                                                          ].request();
-                                                        }
-                                                        setState(() {
-                                                          _isLoading = true;
-                                                        });
-                                                        getLocs();
+                                                        getLocationPermission();
                                                       },
                                                       text: languages[
                                                               choosenLanguage]
@@ -749,7 +806,7 @@ class _MapsState extends State<Maps>
                                                                 _onMapCreated,
                                                             initialCameraPosition:
                                                                 CameraPosition(
-                                                              target: center,
+                                                              target:(center == null) ? _center : center,
                                                               zoom: 11.0,
                                                             ),
                                                             markers:
@@ -953,153 +1010,200 @@ class _MapsState extends State<Maps>
                                                       ),
                                                     )),
                                                 //online or offline button
-                                                (userDetails['low_balance'] ==
-                                                        false)
-                                                    ? Positioned(
-                                                        bottom: 25,
-                                                        child: InkWell(
-                                                          onTap: () async {
-                                                            setState(() {
-                                                              _isLoading = true;
-                                                            });
+                                                (userDetails['role'] == 'owner')
+                                                    ? Container()
+                                                    : (userDetails[
+                                                                'low_balance'] ==
+                                                            false)
+                                                        ? Positioned(
+                                                            bottom: 25,
+                                                            child: InkWell(
+                                                              onTap: () async {
+                                                                if (locationAllowed ==
+                                                                        true &&
+                                                                    serviceEnabled ==
+                                                                        true) {
+                                                                  setState(() {
+                                                                    _isLoading =
+                                                                        true;
+                                                                  });
 
-                                                            await driverStatus();
-                                                            setState(() {
-                                                              _isLoading =
-                                                                  false;
-                                                            });
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets.only(
-                                                                left: media
+                                                                  await driverStatus();
+                                                                  setState(() {
+                                                                    _isLoading =
+                                                                        false;
+                                                                  });
+                                                                } else if (locationAllowed ==
+                                                                        true &&
+                                                                    serviceEnabled ==
+                                                                        false) {
+                                                                  await location
+                                                                      .requestService();
+                                                                  if (await geolocator
+                                                                      .GeolocatorPlatform
+                                                                      .instance
+                                                                      .isLocationServiceEnabled()) {
+                                                                    serviceEnabled =
+                                                                        true;
+                                                                    setState(
+                                                                        () {
+                                                                      _isLoading =
+                                                                          true;
+                                                                    });
+
+                                                                    await driverStatus();
+                                                                    setState(
+                                                                        () {
+                                                                      _isLoading =
+                                                                          false;
+                                                                    });
+                                                                  }
+                                                                } else {
+                                                                  if (serviceEnabled ==
+                                                                      true) {
+                                                                    setState(
+                                                                        () {
+                                                                          makeOnline = true;
+                                                                      _locationDenied =
+                                                                          true;
+                                                                    });
+                                                                  } else {
+                                                                    await location
+                                                                        .requestService();
+                                                                        setState(() {
+                                                                          _isLoading = true;
+                                                                        });
+                                                                        await getLocs();
+                                                                    if (serviceEnabled == true) {
+                                                                      setState(
+                                                                          () {
+                                                                            makeOnline = true;
+                                                                        _locationDenied =
+                                                                            true;
+                                                                      });
+                                                                    }
+                                                                  }
+                                                                }
+                                                              },
+                                                              child: Container(
+                                                                padding: EdgeInsets.only(
+                                                                    left: media
+                                                                            .width *
+                                                                        0.01,
+                                                                    right: media
+                                                                            .width *
+                                                                        0.01),
+                                                                height: media
                                                                         .width *
-                                                                    0.01,
-                                                                right: media
-                                                                        .width *
-                                                                    0.01),
-                                                            height:
-                                                                media.width *
                                                                     0.08,
-                                                            width: media.width *
-                                                                0.267,
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                      media.width *
-                                                                          0.04),
-                                                              color: (userDetails[
-                                                                          'active'] ==
-                                                                      false)
-                                                                  ? offline
-                                                                  : online,
-                                                            ),
-                                                            child: (userDetails[
-                                                                        'active'] ==
-                                                                    false)
-                                                                ? Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      Container(),
-                                                                      Text(
-                                                                        'OFF DUTY',
-                                                                        style: GoogleFonts.roboto(
-                                                                            fontSize: media.width *
-                                                                                twelve,
-                                                                            color:
-                                                                                onlineOfflineText),
-                                                                      ),
-                                                                      Container(
-                                                                        padding:
-                                                                            EdgeInsets.all(media.width *
-                                                                                0.01),
-                                                                        height: media.width *
-                                                                            0.07,
-                                                                        width: media.width *
-                                                                            0.07,
-                                                                        decoration: BoxDecoration(
-                                                                            shape:
-                                                                                BoxShape.circle,
-                                                                            color: onlineOfflineText),
-                                                                        child: Image.asset(
-                                                                            'assets/images/offline.png'),
-                                                                      )
-                                                                    ],
-                                                                  )
-                                                                : Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .spaceBetween,
-                                                                    children: [
-                                                                      Container(
-                                                                        padding:
-                                                                            EdgeInsets.all(media.width *
-                                                                                0.01),
-                                                                        height: media.width *
-                                                                            0.07,
-                                                                        width: media.width *
-                                                                            0.07,
-                                                                        decoration: BoxDecoration(
-                                                                            shape:
-                                                                                BoxShape.circle,
-                                                                            color: onlineOfflineText),
-                                                                        child: Image.asset(
-                                                                            'assets/images/online.png'),
-                                                                      ),
-                                                                      Text(
-                                                                        'ON DUTY',
-                                                                        style: GoogleFonts.roboto(
-                                                                            fontSize: media.width *
-                                                                                twelve,
-                                                                            color:
-                                                                                onlineOfflineText),
-                                                                      ),
-                                                                      Container(),
-                                                                    ],
-                                                                  ),
-                                                          ),
-                                                        ))
-                                                    : (userDetails.isNotEmpty &&
-                                                            userDetails[
-                                                                    'low_balance'] ==
-                                                                true)
-                                                        ?
-                                                        //low balance
-                                                        Positioned(
-                                                            bottom: 0,
-                                                            child: Container(
-                                                              color:
-                                                                  buttonColor,
-                                                              width:
-                                                                  media.width *
-                                                                      1,
-                                                              padding: EdgeInsets
-                                                                  .all(media
-                                                                          .width *
-                                                                      0.05),
-                                                              child: Text(
-                                                                languages[
-                                                                        choosenLanguage]
-                                                                    [
-                                                                    'text_low_balance'],
-                                                                style:
-                                                                    GoogleFonts
-                                                                        .roboto(
-                                                                  fontSize: media
-                                                                          .width *
-                                                                      fourteen,
-                                                                  color: Colors
-                                                                      .white,
+                                                                width: media
+                                                                        .width *
+                                                                    0.267,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                          media.width *
+                                                                              0.04),
+                                                                  color: (userDetails[
+                                                                              'active'] ==
+                                                                          false)
+                                                                      ? offline
+                                                                      : online,
                                                                 ),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
+                                                                child: (userDetails[
+                                                                            'active'] ==
+                                                                        false)
+                                                                    ? Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Container(),
+                                                                          Text(
+                                                                            'OFF DUTY',
+                                                                            style:
+                                                                                GoogleFonts.roboto(fontSize: media.width * twelve, color: onlineOfflineText),
+                                                                          ),
+                                                                          Container(
+                                                                            padding:
+                                                                                EdgeInsets.all(media.width * 0.01),
+                                                                            height:
+                                                                                media.width * 0.07,
+                                                                            width:
+                                                                                media.width * 0.07,
+                                                                            decoration:
+                                                                                BoxDecoration(shape: BoxShape.circle, color: onlineOfflineText),
+                                                                            child:
+                                                                                Image.asset('assets/images/offline.png'),
+                                                                          )
+                                                                        ],
+                                                                      )
+                                                                    : Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Container(
+                                                                            padding:
+                                                                                EdgeInsets.all(media.width * 0.01),
+                                                                            height:
+                                                                                media.width * 0.07,
+                                                                            width:
+                                                                                media.width * 0.07,
+                                                                            decoration:
+                                                                                BoxDecoration(shape: BoxShape.circle, color: onlineOfflineText),
+                                                                            child:
+                                                                                Image.asset('assets/images/online.png'),
+                                                                          ),
+                                                                          Text(
+                                                                            'ON DUTY',
+                                                                            style:
+                                                                                GoogleFonts.roboto(fontSize: media.width * twelve, color: onlineOfflineText),
+                                                                          ),
+                                                                          Container(),
+                                                                        ],
+                                                                      ),
                                                               ),
-                                                            ),
-                                                          )
-                                                        : Container(),
+                                                            ))
+                                                        : (userDetails
+                                                                    .isNotEmpty &&
+                                                                userDetails[
+                                                                        'low_balance'] ==
+                                                                    true)
+                                                            ?
+                                                            //low balance
+                                                            Positioned(
+                                                                bottom: 0,
+                                                                child:
+                                                                    Container(
+                                                                  color:
+                                                                      buttonColor,
+                                                                  width: media
+                                                                          .width *
+                                                                      1,
+                                                                  padding: EdgeInsets
+                                                                      .all(media
+                                                                              .width *
+                                                                          0.05),
+                                                                  child: Text(
+                                                                    languages[
+                                                                            choosenLanguage]
+                                                                        [
+                                                                        'text_low_balance'],
+                                                                    style: GoogleFonts
+                                                                        .roboto(
+                                                                      fontSize:
+                                                                          media.width *
+                                                                              fourteen,
+                                                                      color: Colors
+                                                                          .white,
+                                                                    ),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                  ),
+                                                                ),
+                                                              )
+                                                            : Container(),
 
                                                 //request popup accept or reject
                                                 Positioned(
@@ -1214,11 +1318,36 @@ class _MapsState extends State<Maps>
                                                         //animate to current location button
                                                         InkWell(
                                                           onTap: () async {
-                                                            _controller?.animateCamera(
-                                                                CameraUpdate
-                                                                    .newLatLngZoom(
-                                                                        center,
-                                                                        18.0));
+                                                            if (locationAllowed ==
+                                                                true) {
+                                                              _controller?.animateCamera(
+                                                                  CameraUpdate
+                                                                      .newLatLngZoom(
+                                                                          center,
+                                                                          18.0));
+                                                            } else {
+                                                              if (serviceEnabled ==
+                                                                  true) {
+                                                                setState(() {
+                                                                  _locationDenied =
+                                                                      true;
+                                                                });
+                                                              } else {
+                                                                await location
+                                                                    .requestService();
+                                                                    
+                                                                    setState(() {
+                                                                      _isLoading = true;
+                                                                    });
+                                                                    await getLocs();
+                                                                if (serviceEnabled == true) {
+                                                                  setState(() {
+                                                                    _locationDenied =
+                                                                        true;
+                                                                  });
+                                                                }
+                                                              }
+                                                            }
                                                           },
                                                           child: Container(
                                                             height:
@@ -2079,6 +2208,32 @@ class _MapsState extends State<Maps>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  SizedBox(
+                                    width: media.width * 0.9,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _locationDenied = false;
+                                            });
+                                          },
+                                          child: Container(
+                                            height: media.height * 0.05,
+                                            width: media.height * 0.05,
+                                            decoration: BoxDecoration(
+                                              color: page,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(Icons.cancel,
+                                                color: buttonColor),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: media.width * 0.025),
                                   Container(
                                     padding: EdgeInsets.all(media.width * 0.05),
                                     width: media.width * 0.9,
@@ -2113,6 +2268,12 @@ class _MapsState extends State<Maps>
                                             InkWell(
                                                 onTap: () async {
                                                   await perm.openAppSettings();
+                                                  // // await geolocator.Geolocator.;
+                                                  // if(await perm.Permission.location.isGranted){
+                                                  //   print('getting permission');
+                                                  //   gettingPerm = 1;
+                                                  //   getLocs();
+                                                  // }
                                                 },
                                                 child: Text(
                                                   languages[choosenLanguage]
@@ -2130,7 +2291,7 @@ class _MapsState extends State<Maps>
                                                     _locationDenied = false;
                                                     _isLoading = true;
                                                   });
-
+                                                  
                                                   getLocs();
                                                 },
                                                 child: Text(

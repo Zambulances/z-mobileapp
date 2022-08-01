@@ -198,7 +198,7 @@ class _GetStartedState extends State<GetStarted> {
                                         verifyEmailError = '';
                                         _loading = true;
                                       });
-                                      var result = await validateEmail();
+                                      var result = await validateEmail(email);
                                       setState(() {
                                         _loading = false;
                                       });

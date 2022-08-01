@@ -392,6 +392,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => const Sos()));
+
                             if (nav) {
                               setState(() {});
                             }
