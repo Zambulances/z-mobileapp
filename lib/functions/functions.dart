@@ -83,15 +83,19 @@ getDetailsOfDevice() async {
 }
 
 dynamic timerLocation;
+dynamic locationAllowed;
 //get current location
 getCurrentLocation() {
   timerLocation = Timer.periodic(const Duration(seconds: 5), (timer) async {
     var serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (serviceEnabled == true) {
+    if (serviceEnabled == true && locationAllowed == true) {
       var loc = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.medium);
 
       currentLocation = LatLng(loc.latitude, loc.longitude);
+    } else {
+      timer.cancel();
+      timerLocation = null;
     }
   });
 }

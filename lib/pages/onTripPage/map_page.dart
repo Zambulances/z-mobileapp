@@ -31,6 +31,7 @@ class Maps extends StatefulWidget {
   _MapsState createState() => _MapsState();
 }
 
+dynamic serviceEnabled;
 dynamic currentLocation;
 LatLng center = const LatLng(41.4219057, -102.0840772);
 String mapStyle = '';
@@ -61,7 +62,7 @@ class _MapsState extends State<Maps>
   bool _locationDenied = false;
   int gettingPerm = 0;
   Animation<double>? _animation;
-  late bool serviceEnabled;
+
   late PermissionStatus permission;
   Location location = Location();
   String state = '';
@@ -98,7 +99,7 @@ class _MapsState extends State<Maps>
       if (_controller != null) {
         _controller?.setMapStyle(mapStyle);
       }
-      if (timerLocation == null) {
+      if (timerLocation == null && locationAllowed == true) {
         getCurrentLocation();
       }
     }
@@ -106,9 +107,8 @@ class _MapsState extends State<Maps>
 
   @override
   void dispose() {
-    if (animationController != null) {
-      animationController.dispose();
-    }
+    animationController?.dispose();
+
     super.dispose();
   }
 
@@ -140,6 +140,9 @@ class _MapsState extends State<Maps>
     addressList.removeWhere((element) => element.id == 'drop');
     serviceEnabled = await location.serviceEnabled();
     polyline.clear();
+    final Uint8List markerIcon =
+        await getBytesFromAsset('assets/images/top-taxi.png', 40);
+    pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
 
     permission = await location.hasPermission();
 
@@ -147,15 +150,15 @@ class _MapsState extends State<Maps>
         permission == PermissionStatus.deniedForever ||
         serviceEnabled == false) {
       gettingPerm++;
-      if (gettingPerm >= 2) {
-        setState(() {
-          _locationDenied = true;
-        });
-      }
-      setState(() {
+
+      if (gettingPerm > 1 || locationAllowed == false) {
+        state = '3';
+        locationAllowed = false;
+      } else {
         state = '2';
-        _loading = false;
-      });
+      }
+      _loading = false;
+      setState(() {});
     } else if (permission == PermissionStatus.granted ||
         permission == PermissionStatus.grantedLimited) {
       var locs = await geolocs.Geolocator.getLastKnownPosition();
@@ -180,15 +183,22 @@ class _MapsState extends State<Maps>
               double.parse(loc.longitude.toString()));
         });
       }
-      BitmapDescriptor.fromAssetImage(
-              const ImageConfiguration(devicePixelRatio: 5),
-              'assets/images/userloc.png')
-          .then((value) {
-        setState(() {
-          userLocationIcon = value;
-        });
-      });
+      _controller?.animateCamera(
+               CameraUpdate
+                   .newLatLngZoom(
+                       center,
+                       14.0));
+
+      // BitmapDescriptor.fromAssetImage(
+      //         const ImageConfiguration(devicePixelRatio: 5),
+      //         'assets/images/userloc.png')
+      //     .then((value) {
+      //   setState(() {
+      //     userLocationIcon = value;
+      //   });
+      // });
       //remove in original
+      
       var val =
           await geoCoding(_centerLocation.latitude, _centerLocation.longitude);
       setState(() {
@@ -206,18 +216,52 @@ class _MapsState extends State<Maps>
         }
       });
       //remove in original
-      final Uint8List markerIcon =
-          await getBytesFromAsset('assets/images/top-taxi.png', 40);
-      pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
 
       setState(() {
+        locationAllowed = true;
         state = '3';
         _loading = false;
       });
-      if (timerLocation == null) {
+      if (timerLocation == null && locationAllowed == true) {
         getCurrentLocation();
       }
     }
+  }
+
+  getLocationPermission() async {
+    if (serviceEnabled == false) {
+      await location.requestService();
+    }
+    if (permission == geolocs.LocationPermission.denied ||
+        permission == geolocs.LocationPermission.deniedForever) {
+      //  var _lpermission = await perm.Permission.location.shouldShowRequestRationale;
+      //  print(_lpermission);
+      if (permission != geolocs.LocationPermission.deniedForever) {
+        await perm.Permission.location.request();
+      }
+
+      // await [
+      //   perm.Permission
+      //       .location,
+      //   perm.Permission
+      //       .locationAlways
+      // ].request();
+      //  geolocator.GeolocatorPlatform.instance.requestPermission();
+    }
+    setState(() {
+      _loading = true;
+    });
+    getLocs();
+    // else if(permission == geolocator.LocationPermission.deniedForever){
+    //   print('denied forver');
+    //   setState(() {
+    //     _locationDenied = true;
+    //   });
+    // }
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    // getLocs();
   }
 
   int _bottom = 0;
@@ -456,14 +500,19 @@ class _MapsState extends State<Maps>
                                                           await location
                                                               .requestService();
                                                         }
-                                                        if (permission ==
-                                                                PermissionStatus
-                                                                    .denied ||
-                                                            permission ==
-                                                                PermissionStatus
-                                                                    .deniedForever) {
-                                                          await location
-                                                              .requestPermission();
+                                                        if (await geolocs
+                                                            .GeolocatorPlatform
+                                                            .instance
+                                                            .isLocationServiceEnabled()) {
+                                                          if (permission ==
+                                                                  PermissionStatus
+                                                                      .denied ||
+                                                              permission ==
+                                                                  PermissionStatus
+                                                                      .deniedForever) {
+                                                            await location
+                                                                .requestPermission();
+                                                          }
                                                         }
                                                         setState(() {
                                                           _loading = true;
@@ -943,7 +992,7 @@ class _MapsState extends State<Maps>
                                                                               SizedBox(
                                                                                 width: media.width * 0.55,
                                                                                 child: Text(
-                                                                                  addressList.firstWhere((element) => element.id == 'pickup', orElse: () => AddressList(id: '', address: '', latlng: const LatLng(0.0, 0.0))).address,
+                                                                                  (addressList.where((element) => element.id == 'pickup').isNotEmpty) ? addressList.firstWhere((element) => element.id == 'pickup', orElse: () => AddressList(id: '', address: '', latlng: const LatLng(0.0, 0.0))).address : languages[choosenLanguage]['text_4lettersforautofill'],
                                                                                   style: GoogleFonts.roboto(
                                                                                     fontSize: media.width * twelve,
                                                                                     color: textColor,
@@ -1072,13 +1121,35 @@ class _MapsState extends State<Maps>
                                                               : Container(),
                                                           InkWell(
                                                             onTap: () async {
-                                                              setState(() {
+                                                              if (locationAllowed ==
+                                                                  true) {
                                                                 _controller?.animateCamera(
                                                                     CameraUpdate
                                                                         .newLatLngZoom(
-                                                                            currentLocation,
-                                                                            14.0));
-                                                              });
+                                                                            center,
+                                                                            18.0));
+                                                              } else {
+                                                                if (serviceEnabled ==
+                                                                    true) {
+                                                                  setState(() {
+                                                                    _locationDenied =
+                                                                        true;
+                                                                  });
+                                                                } else {
+                                                                  await location
+                                                                      .requestService();
+                                                                  if (await geolocs
+                                                                      .GeolocatorPlatform
+                                                                      .instance
+                                                                      .isLocationServiceEnabled()) {
+                                                                    setState(
+                                                                        () {
+                                                                      _locationDenied =
+                                                                          true;
+                                                                    });
+                                                                  }
+                                                                }
+                                                              }
                                                             },
                                                             child: Container(
                                                               height:
@@ -2201,6 +2272,32 @@ class _MapsState extends State<Maps>
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  SizedBox(
+                                    width: media.width * 0.9,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              _locationDenied = false;
+                                            });
+                                          },
+                                          child: Container(
+                                            height: media.height * 0.05,
+                                            width: media.height * 0.05,
+                                            decoration: BoxDecoration(
+                                              color: page,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(Icons.cancel,
+                                                color: buttonColor),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: media.width * 0.025),
                                   Container(
                                     padding: EdgeInsets.all(media.width * 0.05),
                                     width: media.width * 0.9,

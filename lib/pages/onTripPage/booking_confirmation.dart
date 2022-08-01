@@ -24,6 +24,8 @@ import 'package:vector_math/vector_math.dart' as vector;
 import 'dart:ui' as ui;
 import '../../functions/functions.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart' as perm;
+import 'package:geolocator/geolocator.dart' as geolocs;
 
 // ignore: must_be_immutable
 class BookingConfirmation extends StatefulWidget {
@@ -62,9 +64,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   Map myBearings = {};
   String _cancelReason = '';
   dynamic _controller;
-  late bool serviceEnabled;
   late PermissionStatus permission;
   Location location = Location();
+  bool _locationDenied = false;
   bool _isLoading = false;
   LatLng _center = const LatLng(41.4219057, -102.0840772);
   dynamic pinLocationIcon;
@@ -119,7 +121,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
           userRequestData['accepted_at'] == null) {
         timer();
       }
-      if (timerLocation == null) {
+      if (timerLocation == null && locationAllowed == true) {
         getCurrentLocation();
       }
     }
@@ -130,9 +132,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     if (timers != null) {
       timers.cancel;
     }
-    if (animationController != null) {
-      animationController.dispose();
-    }
+
+    animationController?.dispose();
+
     super.dispose();
   }
 
@@ -164,43 +166,43 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   }
 
 //create icon
-  Future<BitmapDescriptor> getCustomIcon(GlobalKey iconKeys) async {
-    Future<Uint8List> _capturePng(GlobalKey iconKeys) async {
-      dynamic pngBytes;
-      try {
-        RenderRepaintBoundary boundary = iconKeys.currentContext!
-            .findRenderObject() as RenderRepaintBoundary;
-        ui.Image image = await boundary.toImage(pixelRatio: 2.0);
-        ByteData? byteData =
-            await image.toByteData(format: ui.ImageByteFormat.png);
-        pngBytes = byteData!.buffer.asUint8List();
 
-        return pngBytes;
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-      return pngBytes;
+  _capturePng(GlobalKey iconKeys) async {
+    dynamic bitmap;
+
+    try {
+      RenderRepaintBoundary boundary =
+          iconKeys.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      var pngBytes = byteData!.buffer.asUint8List();
+      bitmap = BitmapDescriptor.fromBytes(pngBytes);
+      // return pngBytes;
+    } catch (e) {
+      debugPrint(e.toString());
     }
-
-    Uint8List imageData = await _capturePng(iconKeys);
-
-    return BitmapDescriptor.fromBytes(imageData);
+    return bitmap;
   }
 
   GlobalKey iconKey = GlobalKey();
   GlobalKey iconDropKey = GlobalKey();
 
   addDropMarker() async {
-    BitmapDescriptor testIcon = await getCustomIcon(iconDropKey);
-    setState(() {
-      myMarker.add(Marker(
-          markerId: const MarkerId('pointdrop'),
-          icon: testIcon,
-          position: (userRequestData.isEmpty)
-              ? addressList.firstWhere((element) => element.id == 'drop').latlng
-              : LatLng(
-                  userRequestData['drop_lat'], userRequestData['drop_lng'])));
-    });
+    var testIcon = await _capturePng(iconDropKey);
+    if (testIcon != null) {
+      setState(() {
+        myMarker.add(Marker(
+            markerId: const MarkerId('pointdrop'),
+            icon: testIcon,
+            position: (userRequestData.isEmpty)
+                ? addressList
+                    .firstWhere((element) => element.id == 'drop')
+                    .latlng
+                : LatLng(
+                    userRequestData['drop_lat'], userRequestData['drop_lng'])));
+      });
+    }
 
     if (widget.type != 1) {
       LatLngBounds bound;
@@ -326,18 +328,20 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   }
 
   addMarker() async {
-    BitmapDescriptor testIcon = await getCustomIcon(iconKey);
-    setState(() {
-      myMarker.add(Marker(
-          markerId: const MarkerId('pointpick'),
-          icon: testIcon,
-          position: (userRequestData.isEmpty)
-              ? addressList
-                  .firstWhere((element) => element.id == 'pickup')
-                  .latlng
-              : LatLng(
-                  userRequestData['pick_lat'], userRequestData['pick_lng'])));
-    });
+    var testIcon = await _capturePng(iconKey);
+    if (testIcon != null) {
+      setState(() {
+        myMarker.add(Marker(
+            markerId: const MarkerId('pointpick'),
+            icon: testIcon,
+            position: (userRequestData.isEmpty)
+                ? addressList
+                    .firstWhere((element) => element.id == 'pickup')
+                    .latlng
+                : LatLng(
+                    userRequestData['pick_lat'], userRequestData['pick_lng'])));
+      });
+    }
   }
 
 //add drop marker
@@ -376,6 +380,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
           ? addressList.firstWhere((element) => element.id == 'pickup').latlng
           : LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']);
     });
+    if (await geolocs.GeolocatorPlatform.instance.isLocationServiceEnabled()) {
+      serviceEnabled = true;
+    } else {
+      serviceEnabled = false;
+    }
+    final Uint8List markerIcon =
+        await getBytesFromAsset('assets/images/top-taxi.png', 40);
+    pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
+
     choosenVehicle = null;
     _dist = null;
     etaDetails.clear();
@@ -389,23 +402,21 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
     if (permission == PermissionStatus.denied ||
         permission == PermissionStatus.deniedForever) {
-      setState(() {});
+      setState(() {
+        locationAllowed = false;
+      });
     } else if (permission == PermissionStatus.granted ||
         permission == PermissionStatus.grantedLimited) {
       // var loc = await location.getLocation();
 
-      final Uint8List markerIcon =
-          await getBytesFromAsset('assets/images/top-taxi.png', 40);
-      pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
-
-      Future.delayed(const Duration(milliseconds: 2000), () async {
-        await addPickDropMarker();
-      });
-      if (timerLocation == null) {
+      if (timerLocation == null && locationAllowed == true) {
         getCurrentLocation();
       }
       setState(() {});
     }
+    Future.delayed(const Duration(milliseconds: 2000), () async {
+      await addPickDropMarker();
+    });
   }
 
   void _onMapCreated(GoogleMapController controller) async {
@@ -1016,13 +1027,34 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   userRequestData.isNotEmpty)
                                               ? InkWell(
                                                   onTap: () async {
-                                                    setState(() {
+                                                    if (locationAllowed ==
+                                                        true) {
                                                       _controller?.animateCamera(
                                                           CameraUpdate
                                                               .newLatLngZoom(
-                                                                  currentLocation,
-                                                                  14.0));
-                                                    });
+                                                                  center,
+                                                                  18.0));
+                                                    } else {
+                                                      if (serviceEnabled ==
+                                                          true) {
+                                                        setState(() {
+                                                          _locationDenied =
+                                                              true;
+                                                        });
+                                                      } else {
+                                                        await location
+                                                            .requestService();
+                                                        if (await geolocs
+                                                            .GeolocatorPlatform
+                                                            .instance
+                                                            .isLocationServiceEnabled()) {
+                                                          setState(() {
+                                                            _locationDenied =
+                                                                true;
+                                                          });
+                                                        }
+                                                      }
+                                                    }
                                                   },
                                                   child: Container(
                                                     height: media.width * 0.1,
@@ -5224,6 +5256,154 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   )
                                                 ]),
                                           ))
+                                      : Container(),
+
+                                  (_locationDenied == true)
+                                      ? Positioned(
+                                          child: Container(
+                                          height: media.height * 1,
+                                          width: media.width * 1,
+                                          color: Colors.transparent
+                                              .withOpacity(0.6),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                width: media.width * 0.9,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    InkWell(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          _locationDenied =
+                                                              false;
+                                                        });
+                                                      },
+                                                      child: Container(
+                                                        height:
+                                                            media.height * 0.05,
+                                                        width:
+                                                            media.height * 0.05,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: page,
+                                                          shape:
+                                                              BoxShape.circle,
+                                                        ),
+                                                        child: Icon(
+                                                            Icons.cancel,
+                                                            color: buttonColor),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  height: media.width * 0.025),
+                                              Container(
+                                                padding: EdgeInsets.all(
+                                                    media.width * 0.05),
+                                                width: media.width * 0.9,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    color: page,
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          blurRadius: 2.0,
+                                                          spreadRadius: 2.0,
+                                                          color: Colors.black
+                                                              .withOpacity(0.2))
+                                                    ]),
+                                                child: Column(
+                                                  children: [
+                                                    SizedBox(
+                                                        width:
+                                                            media.width * 0.8,
+                                                        child: Text(
+                                                          languages[
+                                                                  choosenLanguage]
+                                                              [
+                                                              'text_open_loc_settings'],
+                                                          style: GoogleFonts.roboto(
+                                                              fontSize:
+                                                                  media.width *
+                                                                      sixteen,
+                                                              color: textColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600),
+                                                        )),
+                                                    SizedBox(
+                                                        height:
+                                                            media.width * 0.05),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        InkWell(
+                                                            onTap: () async {
+                                                              await perm
+                                                                  .openAppSettings();
+                                                            },
+                                                            child: Text(
+                                                              languages[
+                                                                      choosenLanguage]
+                                                                  [
+                                                                  'text_open_settings'],
+                                                              style: GoogleFonts.roboto(
+                                                                  fontSize: media
+                                                                          .width *
+                                                                      sixteen,
+                                                                  color:
+                                                                      buttonColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            )),
+                                                        InkWell(
+                                                            onTap: () async {
+                                                              setState(() {
+                                                                _locationDenied =
+                                                                    false;
+                                                                _isLoading =
+                                                                    true;
+                                                              });
+
+                                                              if (timerLocation ==
+                                                                      null &&
+                                                                  locationAllowed ==
+                                                                      true) {
+                                                                getCurrentLocation();
+                                                              }
+                                                            },
+                                                            child: Text(
+                                                              languages[
+                                                                      choosenLanguage]
+                                                                  ['text_done'],
+                                                              style: GoogleFonts.roboto(
+                                                                  fontSize: media
+                                                                          .width *
+                                                                      sixteen,
+                                                                  color:
+                                                                      buttonColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ))
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ))
                                       : Container(),
 
                                   //loader

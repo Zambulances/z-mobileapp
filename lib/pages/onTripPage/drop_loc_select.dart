@@ -12,6 +12,7 @@ import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:uuid/uuid.dart';
+import 'package:permission_handler/permission_handler.dart' as perm;
 
 class DropLocation extends StatefulWidget {
   const DropLocation({Key? key}) : super(key: key);
@@ -23,7 +24,6 @@ class DropLocation extends StatefulWidget {
 class _DropLocationState extends State<DropLocation>
     with WidgetsBindingObserver {
   GoogleMapController? _controller;
-  late bool serviceEnabled;
   late PermissionStatus permission;
   Location location = Location();
   String _state = '';
@@ -33,6 +33,7 @@ class _DropLocationState extends State<DropLocation>
   LatLng _centerLocation = const LatLng(41.4219057, -102.0840772);
   TextEditingController search = TextEditingController();
   String favNameText = '';
+  bool _locationDenied = false;
   bool favAddressAdd = false;
   bool _showToast = false;
 
@@ -56,7 +57,7 @@ class _DropLocationState extends State<DropLocation>
       if (_controller != null) {
         _controller?.setMapStyle(mapStyle);
       }
-      if (timerLocation == null) {
+      if (timerLocation == null && locationAllowed == true) {
         getCurrentLocation();
       }
     }
@@ -81,7 +82,7 @@ class _DropLocationState extends State<DropLocation>
     if (permission == PermissionStatus.denied ||
         permission == PermissionStatus.deniedForever) {
       setState(() {
-        _state = '2';
+        _state = '3';
         _isLoading = false;
       });
     } else if (permission == PermissionStatus.granted ||
@@ -104,7 +105,11 @@ class _DropLocationState extends State<DropLocation>
               double.parse(loc.longitude.toString()));
         });
       }
-
+_controller?.animateCamera(
+               CameraUpdate
+                   .newLatLngZoom(
+                       center,
+                       14.0));
       setState(() {
         _state = '3';
         _isLoading = false;
@@ -260,9 +265,26 @@ class _DropLocationState extends State<DropLocation>
                                   const EdgeInsets.only(right: 20, left: 20),
                               child: InkWell(
                                 onTap: () async {
-                                  _controller?.animateCamera(
-                                      CameraUpdate.newLatLngZoom(
-                                          currentLocation, 14.0));
+                                  if (locationAllowed == true) {
+                                    _controller?.animateCamera(
+                                        CameraUpdate.newLatLngZoom(
+                                            center, 18.0));
+                                  } else {
+                                    if (serviceEnabled == true) {
+                                      setState(() {
+                                        _locationDenied = true;
+                                      });
+                                    } else {
+                                      await location.requestService();
+                                      if (await geolocs
+                                          .GeolocatorPlatform.instance
+                                          .isLocationServiceEnabled()) {
+                                        setState(() {
+                                          _locationDenied = true;
+                                        });
+                                      }
+                                    }
+                                  }
                                 },
                                 child: Container(
                                   height: media.width * 0.1,
@@ -408,34 +430,38 @@ class _DropLocationState extends State<DropLocation>
                                   ),
                                   Button(
                                       onTap: () async {
-                                        if (addressList
-                                            .where((element) =>
-                                                element.id == 'drop')
-                                            .isEmpty) {
-                                          addressList.add(AddressList(
-                                              id: 'drop',
-                                              address: dropAddressConfirmation,
-                                              latlng: _center));
-                                        } else {
-                                          addressList
-                                                  .firstWhere((element) =>
-                                                      element.id == 'drop')
-                                                  .address =
-                                              dropAddressConfirmation;
-                                          addressList
-                                              .firstWhere((element) =>
+                                        if (dropAddressConfirmation != '') {
+                                          //remove in envato
+                                          if (addressList
+                                              .where((element) =>
                                                   element.id == 'drop')
-                                              .latlng = _center;
-                                        }
-                                        if (addressList.length == 2) {
-                                          var val =
-                                              await Navigator.pushReplacement(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          BookingConfirmation()));
-                                          if (val) {
-                                            setState(() {});
+                                              .isEmpty) {
+                                            addressList.add(AddressList(
+                                                id: 'drop',
+                                                address:
+                                                    dropAddressConfirmation,
+                                                latlng: _center));
+                                          } else {
+                                            addressList
+                                                    .firstWhere((element) =>
+                                                        element.id == 'drop')
+                                                    .address =
+                                                dropAddressConfirmation;
+                                            addressList
+                                                .firstWhere((element) =>
+                                                    element.id == 'drop')
+                                                .latlng = _center;
+                                          }
+                                          if (addressList.length == 2) {
+                                            var val =
+                                                await Navigator.pushReplacement(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            BookingConfirmation()));
+                                            if (val) {
+                                              setState(() {});
+                                            }
                                           }
                                         }
                                       },
@@ -1010,6 +1036,114 @@ class _DropLocationState extends State<DropLocation>
                                 textAlign: TextAlign.center,
                               ),
                             ))
+                        : Container(),
+
+                    (_locationDenied == true)
+                        ? Positioned(
+                            child: Container(
+                            height: media.height * 1,
+                            width: media.width * 1,
+                            color: Colors.transparent.withOpacity(0.6),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: media.width * 0.9,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _locationDenied = false;
+                                          });
+                                        },
+                                        child: Container(
+                                          height: media.height * 0.05,
+                                          width: media.height * 0.05,
+                                          decoration: BoxDecoration(
+                                            color: page,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(Icons.cancel,
+                                              color: buttonColor),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: media.width * 0.025),
+                                Container(
+                                  padding: EdgeInsets.all(media.width * 0.05),
+                                  width: media.width * 0.9,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: page,
+                                      boxShadow: [
+                                        BoxShadow(
+                                            blurRadius: 2.0,
+                                            spreadRadius: 2.0,
+                                            color:
+                                                Colors.black.withOpacity(0.2))
+                                      ]),
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                          width: media.width * 0.8,
+                                          child: Text(
+                                            languages[choosenLanguage]
+                                                ['text_open_loc_settings'],
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                color: textColor,
+                                                fontWeight: FontWeight.w600),
+                                          )),
+                                      SizedBox(height: media.width * 0.05),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          InkWell(
+                                              onTap: () async {
+                                                await perm.openAppSettings();
+                                              },
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_open_settings'],
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: buttonColor,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              )),
+                                          InkWell(
+                                              onTap: () async {
+                                                setState(() {
+                                                  _locationDenied = false;
+                                                  _isLoading = true;
+                                                });
+
+                                                getLocs();
+                                              },
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_done'],
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: buttonColor,
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                              ))
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ))
                         : Container(),
 
                     //loader
