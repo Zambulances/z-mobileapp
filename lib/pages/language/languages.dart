@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import '../../functions/functions.dart';
 import '../../widgets/widgets.dart';
+import '../login/signupmethod.dart';
 
 class Languages extends StatefulWidget {
   const Languages({Key? key}) : super(key: key);
@@ -153,7 +153,7 @@ class _LanguagesState extends State<Languages> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Login()));
+                                builder: (context) => const SignupMethod()));
                       },
                       text: languages[choosenLanguage]['text_confirm'])
                   : Container(),

@@ -30,6 +30,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_year.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
+import '../pages/NavigatorPages/fleetdocuments.dart';
+import '../pages/login/ownerregister.dart';
 import '../pages/vehicleInformations/upload_docs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -49,6 +51,8 @@ AudioPlayer audioPlayers = AudioPlayer();
 String audio = 'audio/notification_sound.mp3';
 bool internet = true;
 dynamic centerCheck;
+
+String ischeckownerordriver = '';
 
 //base url
 String url = 'https://tagxi-server.ondemandappz.com/';
@@ -81,9 +85,44 @@ getDetailsOfDevice() async {
 validateEmail(email) async {
   dynamic result;
   try {
-    var response = await http.post(
-        Uri.parse(url + 'api/v1/driver/validate-mobile'),
-        body: {'email': email});
+    var response = await http
+        .post(Uri.parse(url + 'api/v1/driver/validate-mobile'), body: {
+      'email': email,
+      "role": userDetails.isNotEmpty
+          ? userDetails['role'].toString()
+          : ischeckownerordriver
+    });
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success'] == true) {
+        result = 'success';
+      } else {
+        debugPrint(response.body);
+        result = 'failed';
+      }
+    } else {
+      debugPrint(response.body);
+      result = jsonDecode(response.body)['message'];
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
+//lang
+getlangid() async {
+  dynamic result;
+  try {
+    var response = await http
+        .post(Uri.parse(url + 'api/v1/user/update-my-lang'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + bearerToken[0].token,
+    }, body: {
+      'lang': choosenLanguage,
+    });
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
@@ -177,7 +216,6 @@ List languagesCode = [
 
 uploadDocs() async {
   dynamic result;
-
   try {
     var response = http.MultipartRequest(
         'POST', Uri.parse(url + 'api/v1/driver/upload/documents'));
@@ -188,13 +226,73 @@ uploadDocs() async {
     if (documentsNeeded[choosenDocs]['has_expiry_date'] == true) {
       response.fields['expiry_date'] = expDate.toString().substring(0, 19);
     }
+
     if (documentsNeeded[choosenDocs]['has_identify_number'] == true) {
       response.fields['identify_number'] = docIdNumber;
     }
+
     response.fields['document_id'] = docsId.toString();
+    print('llllllllllllllllll');
+
+    var request = await response.send();
+    print('llllllllllllllllll');
+
+    var respon = await http.Response.fromStream(request);
+    print('llllllllllllllllll');
+
+    final val = jsonDecode(respon.body);
+    print('zzzzzzzzzzzzzzzzzzzz');
+
+    if (request.statusCode == 200) {
+      print('xxxxxxxxxxxxxxx');
+
+      result = val['message'];
+      print('ccccccccccccccccc');
+    } else {
+      print('bbbbbbbbbbbbbbbbbbbbb');
+
+      debugPrint(val);
+      result = val['message'];
+    }
+  } catch (e) {
+    print('nnnnnnnnnnnnnnnnnnnnnnnnnnn');
+
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+      print('mmmmmmmmmmmmmmmm');
+    }
+  }
+  return result;
+}
+
+uploadFleetDocs(fleetid) async {
+  dynamic result;
+  try {
+    var response = http.MultipartRequest(
+        'POST', Uri.parse(url + 'api/v1/driver/upload/documents'));
+    response.headers
+        .addAll({'Authorization': 'Bearer ' + bearerToken[0].token});
+
+    response.files
+        .add(await http.MultipartFile.fromPath('document', fleetimageFile));
+
+    if (fleetdocumentsNeeded[fleetchoosenDocs]['has_expiry_date'] == true) {
+      response.fields['expiry_date'] = fleetexpDate.toString().substring(0, 19);
+    }
+
+    if (fleetdocumentsNeeded[choosenDocs]['has_identify_number'] == true) {
+      response.fields['identify_number'] = fleetdocIdNumber;
+    }
+
+    response.fields['fleet_id'] = fleetid.toString();
+
+    response.fields['document_id'] = fleetdocsId.toString();
     var request = await response.send();
     var respon = await http.Response.fromStream(request);
+
     final val = jsonDecode(respon.body);
+
     if (request.statusCode == 200) {
       result = val['message'];
     } else {
@@ -390,6 +488,7 @@ getVehicleMake() async {
     if (response.statusCode == 200) {
       vehicleMake = jsonDecode(response.body)['data'];
       res = 'success';
+      print(vehicleMake);
     } else {
       debugPrint(response.body);
     }
@@ -436,24 +535,110 @@ registerDriver() async {
   bearerToken.clear();
   dynamic result;
   try {
-    final response = await http.post(Uri.parse(url + 'api/v1/driver/register'),
-        headers: {'Content-Type': 'application/json'},
+    final response = await http.MultipartRequest(
+        'POST', Uri.parse(url + 'api/v1/driver/register'));
+
+    response.headers.addAll({'Content-Type': 'application/json'});
+
+    response.files.add(
+        await http.MultipartFile.fromPath('profile_picture', proImageFile1));
+    response.fields.addAll({
+      "name": name,
+      "mobile": phnumber,
+      "email": email,
+      "device_token": fcm,
+      "country": countries[phcode]['dial_code'],
+      "service_location_id": myServiceId.toString(),
+      "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
+      "vehicle_type": myVehicleId.toString(),
+      "car_make": vehicleMakeId.toString(),
+      "car_model": vehicleModelId.toString(),
+      "car_color": vehicleColor,
+      "car_number": vehicleNumber,
+      "vehicle_year": modelYear,
+      'lang': choosenLanguage,
+    });
+    var request = await response.send();
+    var respon = await http.Response.fromStream(request);
+    final val = jsonDecode(respon.body);
+
+    if (request.statusCode == 200) {
+      var jsonVal = jsonDecode(respon.body);
+
+      bearerToken.add(BearerClass(
+          type: jsonVal['token_type'].toString(),
+          token: jsonVal['access_token'].toString()));
+      pref.setString('Bearer', bearerToken[0].token);
+      await getUserDetails();
+      result = 'true';
+    } else {
+      debugPrint(respon.body);
+      result = jsonDecode(respon.body)['message'];
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
+addDriver() async {
+  dynamic result;
+  try {
+    final response = await http.post(Uri.parse(url + 'api/v1/owner/add-fleet'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+        },
         body: jsonEncode({
-          "name": name,
-          "mobile": phnumber,
-          "email": email,
-          "device_token": fcm,
-          "terms_condition": true,
-          "country": countries[phcode]['dial_code'],
-          "service_location_id": myServiceId,
-          "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
-          "is_company_driver": false,
           "vehicle_type": myVehicleId,
           "car_make": vehicleMakeId,
           "car_model": vehicleModelId,
           "car_color": vehicleColor,
           "car_number": vehicleNumber,
-          "vehicle_year": modelYear
+        }));
+
+    if (response.statusCode == 200) {
+      debugPrint(response.body);
+      var jsonVal = jsonDecode(response.body);
+      result = 'true';
+    } else {
+      debugPrint(response.body);
+      result = jsonDecode(response.body)['message'];
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
+//register owner
+
+registerOwner() async {
+  bearerToken.clear();
+  dynamic result;
+  try {
+    final response = await http.post(Uri.parse(url + 'api/v1/owner/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "name": ownerName,
+          "mobile": phnumber,
+          "email": ownerEmail,
+          "address": companyAddress,
+          "postal_code": postalCode,
+          "city": city,
+          "tax_number": taxNumber,
+          "company_name": companyName,
+          "device_token": fcm,
+          "terms_condition": true,
+          "country": countries[phcode]['dial_code'],
+          "service_location_id": ownerServiceLocation,
+          "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
         }));
 
     if (response.statusCode == 200) {
@@ -478,51 +663,103 @@ registerDriver() async {
   return result;
 }
 
-// //register owner
+List fleetdriverList = [];
+fleetDriverDetails({fleetid, bool? isassigndriver}) async {
+  dynamic result;
+  try {
+    var response = await http.get(
+      Uri.parse(isassigndriver == true
+          ? url + 'api/v1/owner/list-drivers?fleet_id=$fleetid'
+          : url + 'api/v1/owner/list-drivers'),
+      headers: {
+        'Authorization': 'Bearer ' + bearerToken[0].token,
+        'Content-Type': 'application/json',
+      },
+    );
 
-// registerOwner() async {
-//   bearerToken.clear();
-//   dynamic result;
-//   try {
-//     final response = await http.post(Uri.parse(url + 'api/v1/owner/register'),
-//         headers: {'Content-Type': 'application/json'},
-//         body: jsonEncode({
-//           "name": ownerName,
-//           "mobile": phnumber,
-//           "email": ownerEmail,
-//           "address": companyAddress,
-//           "postal_code": postalCode,
-//           "city": city,
-//           "tax_number": taxNumber,
-//           "company_name" : companyName,
-//           "device_token": fcm,
-//           "terms_condition": true,
-//           "country": countries[phcode]['dial_code'],
-//           "service_location_id": ownerServiceLocation,
-//           "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
-//         }));
+    if (response.statusCode == 200) {
+      fleetdriverList = jsonDecode(response.body)['data'];
+      result = true;
+      printWrapped(fleetdriverList.toString());
+    } else {
+      debugPrint(response.body);
+      result = false;
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
 
-//     if (response.statusCode == 200) {
-//       var jsonVal = jsonDecode(response.body);
+assignDriver(driverid, fleet) async {
+  dynamic result;
+  try {
+    final response =
+        await http.post(Uri.parse(url + 'api/v1/owner/assign-driver/$fleet'),
+            headers: {
+              'Authorization': 'Bearer ' + bearerToken[0].token,
+              'Content-Type': 'application/json'
+            },
+            body: jsonEncode({'driver_id': driverid}));
 
-//       bearerToken.add(BearerClass(
-//           type: jsonVal['token_type'].toString(),
-//           token: jsonVal['access_token'].toString()));
-//       pref.setString('Bearer', bearerToken[0].token);
-//       await getUserDetails();
-//       result = 'true';
-//     } else {
-//       debugPrint(response.body);
-//       result = jsonDecode(response.body)['message'];
-//     }
-//   } catch (e) {
-//     if (e is SocketException) {
-//       internet = false;
-//       result = 'no internet';
-//     }
-//   }
-//   return result;
-// }
+    if (response.statusCode == 200) {
+      var jsonVal = jsonDecode(response.body);
+
+      bearerToken.add(BearerClass(
+          type: jsonVal['token_type'].toString(),
+          token: jsonVal['access_token'].toString()));
+      pref.setString('Bearer', bearerToken[0].token);
+      print('yessssssssssssssssssssssssssssssssss');
+      printWrapped(response.body);
+      print('noooooooooooooooooooooooooooooooooooooo');
+      result = 'true';
+    } else {
+      debugPrint(response.body);
+      result = jsonDecode(response.body)['message'];
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
+fleetDriver(Map<String, dynamic> map) async {
+  dynamic result;
+  try {
+    final response =
+        await http.post(Uri.parse(url + 'api/v1/owner/add-drivers'),
+            headers: {
+              'Authorization': 'Bearer ' + bearerToken[0].token,
+              'Content-Type': 'application/json'
+            },
+            body: jsonEncode(map));
+
+    if (response.statusCode == 200) {
+      var jsonVal = jsonDecode(response.body);
+
+      bearerToken.add(BearerClass(
+          type: jsonVal['token_type'].toString(),
+          token: jsonVal['access_token'].toString()));
+      pref.setString('Bearer', bearerToken[0].token);
+      result = 'true';
+    } else {
+      debugPrint(response.body);
+      result = jsonDecode(response.body)['message'];
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
 
 //update referral code
 
@@ -570,8 +807,12 @@ getDocumentsNeeded() async {
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
+      print('ttttttttttttttttttttttttttttttttttttttt');
+
       documentsNeeded = jsonDecode(response.body)['data'];
       enableDocumentSubmit = jsonDecode(response.body)['enable_submit_button'];
+      print('yyyyyyyyyyyyyyyyyyyyyyyyyyy');
+
       result = 'success';
     } else {
       debugPrint(response.body);
@@ -586,6 +827,37 @@ getDocumentsNeeded() async {
   return result;
 }
 
+List fleetdocumentsNeeded = [];
+bool enablefleetDocumentSubmit = false;
+
+getFleetDocumentsNeeded(fleetid) async {
+  dynamic result;
+  try {
+    final response = await http.get(
+        Uri.parse(
+            url + 'api/v1/owner/fleet/documents/needed?fleet_id=$fleetid'),
+        headers: {
+          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Content-Type': 'application/json'
+        });
+    if (response.statusCode == 200) {
+      fleetdocumentsNeeded = jsonDecode(response.body)['data'];
+      enablefleetDocumentSubmit =
+          jsonDecode(response.body)['enable_submit_button'];
+      result = 'success';
+      print(jsonDecode(response.body));
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+    }
+  }
+  return result;
+}
 //call firebase otp
 
 otpCall() async {
@@ -610,15 +882,19 @@ verifyUser(String number) async {
   try {
     var response = await http.post(
         Uri.parse(url + 'api/v1/driver/validate-mobile-for-login'),
-        body: {"mobile": number});
+        body: {"mobile": number, "role": ischeckownerordriver});
 
     if (response.statusCode == 200) {
       val = jsonDecode(response.body)['success'];
       if (val == true) {
+        print('222222222222222');
+
         var check = await driverLogin();
         if (check == true) {
+          print('1111111111111');
           var uCheck = await getUserDetails();
           val = uCheck;
+          print('7777777777777777777');
         } else {
           val = false;
         }
@@ -643,6 +919,8 @@ driverLogin() async {
   bearerToken.clear();
   dynamic result;
   try {
+    print('333333333333');
+
     var response = await http.post(Uri.parse(url + 'api/v1/driver/login'),
         headers: {
           'Content-Type': 'application/json',
@@ -651,14 +929,18 @@ driverLogin() async {
           "mobile": phnumber,
           'device_token': fcm,
           "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
+          "role": ischeckownerordriver,
         }));
     if (response.statusCode == 200) {
+      print('4444444444444');
+      print(response.body);
       var jsonVal = jsonDecode(response.body);
       bearerToken.add(BearerClass(
           type: jsonVal['token_type'].toString(),
           token: jsonVal['access_token'].toString()));
       result = true;
       pref.setString('Bearer', bearerToken[0].token);
+      print('55555555555');
     } else {
       debugPrint(response.body);
       result = false;
@@ -683,6 +965,8 @@ bool isBackground = false;
 //user current state
 getUserDetails() async {
   dynamic result;
+  print('88888888888888');
+
   try {
     var response = await http.get(
       Uri.parse(url + 'api/v1/user'),
@@ -692,6 +976,11 @@ getUserDetails() async {
       },
     );
     if (response.statusCode == 200) {
+      printWrapped('data is ' + response.body);
+      print(jsonDecode(response.body)['data'].toString());
+
+      print('9999999999999999999999999');
+
       userDetails = jsonDecode(response.body)['data'];
       if (userDetails['role'] != 'owner') {
         if (userDetails['sos']['data'] != null) {
@@ -765,6 +1054,8 @@ getUserDetails() async {
         } else {
           duration = 0;
           if (driverReq.isNotEmpty) {
+            print('qqqqqqqqqqq');
+
             audioPlayer.play(audio);
           }
           chatList.clear();
@@ -864,7 +1155,7 @@ currentPositionUpdate() async {
   GeoHasher geo = GeoHasher();
 
   Timer.periodic(const Duration(seconds: 5), (timer) async {
-    if (userDetails.isNotEmpty) {
+    if (userDetails.isNotEmpty && userDetails['role'] == 'driver') {
       serviceEnabled =
           await geolocs.GeolocatorPlatform.instance.isLocationServiceEnabled();
       permission = await geolocs.GeolocatorPlatform.instance.checkPermission();
@@ -909,7 +1200,8 @@ currentPositionUpdate() async {
             'vehicle_number': userDetails['car_number'],
             'vehicle_type_name': userDetails['car_make_name'],
             'vehicle_type': userDetails['vehicle_type_id'],
-            'service_location_id' : userDetails['service_location_id']
+            'ownerid': userDetails['owner_id'],
+            'service_location_id': userDetails['service_location_id']
           });
           if (driverReq.isNotEmpty) {
             if (driverReq['accepted_at'] != null &&
@@ -938,21 +1230,61 @@ currentPositionUpdate() async {
         await driverStatus();
         await location.requestService();
       }
-      var _driverStatus = await FirebaseDatabase.instance
-          .ref('drivers/' + userDetails['id'].toString())
+      if (userDetails['role'] == 'driver') {
+        var _driverStatus = await FirebaseDatabase.instance
+            .ref('drivers/' + userDetails['id'].toString())
+            .get();
+        if (_driverStatus.child('approve').value == 0 &&
+            userDetails['approve'] == true) {
+          await getUserDetails();
+          if (userDetails['active'] == true) {
+            await driverStatus();
+          }
+          valueNotifierHome.incrementNotifier();
+          print('11111111111111111');
+          audioPlayer.play(audio);
+        } else if (_driverStatus.child('approve').value == 1 &&
+            userDetails['approve'] == false) {
+          await getUserDetails();
+          valueNotifierHome.incrementNotifier();
+          print(_driverStatus.child('approve').value.toString());
+          print('22222222222222');
+
+          audioPlayer.play(audio);
+        }
+        if (_driverStatus.child('fleet_changed').value == 1) {
+          FirebaseDatabase.instance
+              .ref()
+              .child('drivers/' + userDetails['id'].toString())
+              .update({'fleet_changed': 0});
+          await getUserDetails();
+          valueNotifierHome.incrementNotifier();
+          print('333333333333');
+
+          audioPlayer.play(audio);
+        }
+      }
+    } else if (userDetails['role'] == 'owner') {
+      print('yesssssssssssssssssss its ownerrrrrrrrrrrrr');
+      var _ownerStatus = await FirebaseDatabase.instance
+          .ref('owners/' + userDetails['id'].toString())
           .get();
-      if (_driverStatus.child('approve').value == 0 &&
+      if (_ownerStatus.child('approve').value == 0 &&
           userDetails['approve'] == true) {
         await getUserDetails();
-        if (userDetails['active'] == true) {
-          await driverStatus();
-        }
+        // if (userDetails['active'] == true) {
+        //   await driverStatus();
+        // }
         valueNotifierHome.incrementNotifier();
+        print('4444444444444');
+
         audioPlayer.play(audio);
-      } else if (_driverStatus.child('approve').value == 1 &&
+      } else if (_ownerStatus.child('approve').value == 1 &&
           userDetails['approve'] == false) {
         await getUserDetails();
         valueNotifierHome.incrementNotifier();
+        print('5555555555555');
+
         audioPlayer.play(audio);
       }
     }
@@ -1659,6 +1991,8 @@ getCurrentMessages() async {
             jsonDecode(response.body)['data']
                 .where((element) => element['from_type'] == 1)
                 .length) {
+          print('wwwwwwwwwwwwwwwwwww');
+
           audioPlayer.play(audio);
         }
         chatList = jsonDecode(response.body)['data'];
@@ -1758,6 +2092,65 @@ openBrowser(browseUrl) async {
       internet = false;
     }
   }
+}
+
+//manage vehicle
+
+List vehicledata = [];
+
+getVehicleInfo() async {
+  dynamic result;
+  try {
+    var response = await http.get(
+      Uri.parse(url + 'api/v1/owner/list-fleets'),
+      headers: {
+        'Authorization': 'Bearer ' + bearerToken[0].token,
+        'Content-Type': 'application/json'
+      },
+    );
+    if (response.statusCode == 200) {
+      result = 'success';
+      vehicledata = jsonDecode(response.body)['data'];
+      // printWrapped(vehicledata.toString());
+    } else {
+      printWrapped(vehicledata.toString());
+      result = 'failure';
+    }
+    printWrapped(response.body);
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+    }
+  }
+  return result;
+}
+
+deletefleetdriver(driverid) async {
+  dynamic result;
+  try {
+    var response = await http.get(
+      Uri.parse(url + 'api/v1/owner/delete-driver/$driverid'),
+      headers: {
+        'Authorization': 'Bearer ' + bearerToken[0].token,
+        'Content-Type': 'application/json'
+      },
+    );
+    if (response.statusCode == 200) {
+      result = 'success';
+      // printWrapped(vehicledata.toString());
+    } else {
+      // printWrapped(vehicledata.toString());
+      result = 'failure';
+    }
+    printWrapped(response.body);
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+    }
+  }
+  return result;
 }
 
 //update driver vehicle
@@ -1907,6 +2300,7 @@ getHistory(id) async {
       myHistory = jsonDecode(response.body)['data'];
       myHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
+      printWrapped(myHistory.toString());
       valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);

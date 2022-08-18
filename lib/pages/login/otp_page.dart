@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/login/get_started.dart';
 import 'package:tagyourtaxi_driver/pages/login/login.dart';
+import 'package:tagyourtaxi_driver/pages/login/ownerregister.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/docs_onprocess.dart';
@@ -82,8 +83,13 @@ class _OtpState extends State<Otp> {
               (route) => false);
         }
       } else {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const GetStarted()));
+        if (ischeckownerordriver == 'driver') {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const GetStarted()));
+        } else if (ischeckownerordriver == 'owner') {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const OwnersRegister()));
+        }
       }
     }
   }
@@ -120,8 +126,13 @@ class _OtpState extends State<Otp> {
               (route) => false);
         }
       } else {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const GetStarted()));
+        if (ischeckownerordriver == 'driver') {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const GetStarted()));
+        } else if (ischeckownerordriver == 'owner') {
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => const OwnersRegister()));
+        }
       }
     } on FirebaseAuthException catch (error) {
       if (error.code == 'invalid-verification-code') {
@@ -333,11 +344,21 @@ class _OtpState extends State<Otp> {
                                             });
                                           }
                                         } else {
-                                          Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const GetStarted()));
+                                          if (ischeckownerordriver ==
+                                              'driver') {
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const GetStarted()));
+                                          } else if (ischeckownerordriver ==
+                                              'owner') {
+                                            Navigator.pushReplacement(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const OwnersRegister()));
+                                          }
                                         }
                                       } else {
                                         // firebase code send true
@@ -392,11 +413,21 @@ class _OtpState extends State<Otp> {
                                               });
                                             }
                                           } else {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const GetStarted()));
+                                            if (ischeckownerordriver ==
+                                                'driver') {
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const GetStarted()));
+                                            } else if (ischeckownerordriver ==
+                                                'owner') {
+                                              Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const OwnersRegister()));
+                                            }
                                           }
                                         } on FirebaseAuthException catch (error) {
                                           if (error.code ==

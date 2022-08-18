@@ -378,6 +378,23 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                       SizedBox(
                         height: media.width * 0.04,
                       ),
+                      if (userDetails['role'] == 'owner')
+                        Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(languages[choosenLanguage]['text_user'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        fontWeight: FontWeight.bold,
+                                        color: textColor))
+                              ],
+                            ),
+                            SizedBox(
+                              height: media.width * 0.04,
+                            ),
+                          ],
+                        ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -422,6 +439,76 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ))
                         ],
                       ),
+                      if (userDetails['role'] == 'owner')
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: media.width * 0.04,
+                            ),
+                            Row(
+                              children: [
+                                Text(languages[choosenLanguage]['text_driver'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        fontWeight: FontWeight.bold,
+                                        color: textColor))
+                              ],
+                            ),
+                            SizedBox(
+                              height: media.width * 0.04,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  height: media.width * 0.13,
+                                  width: media.width * 0.13,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: NetworkImage(
+                                              myHistory[selectedHistory]
+                                                      ['driverDetail']['data']
+                                                  ['profile_picture']),
+                                          fit: BoxFit.cover)),
+                                ),
+                                SizedBox(
+                                  width: media.width * 0.05,
+                                ),
+                                Text(
+                                  myHistory[selectedHistory]['driverDetail']
+                                      ['data']['name'],
+                                  style: GoogleFonts.roboto(
+                                    fontSize: media.width * eighteen,
+                                  ),
+                                ),
+                                Expanded(
+                                    child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      myHistory[selectedHistory]
+                                                  ['ride_user_rating'] !=
+                                              null
+                                          ? myHistory[selectedHistory]
+                                                  ['ride_user_rating']
+                                              .toString()
+                                          : '-',
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * eighteen,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    Icon(
+                                      Icons.star,
+                                      size: media.width * twenty,
+                                      color: buttonColor,
+                                    )
+                                  ],
+                                ))
+                              ],
+                            ),
+                          ],
+                        ),
                       SizedBox(
                         height: media.height * 0.05,
                       ),

@@ -8,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tagyourtaxi_driver/pages/language/languages.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/docs_onprocess.dart';
@@ -17,6 +16,8 @@ import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import '../../styles/styles.dart';
 import '../../functions/functions.dart';
 import 'package:http/http.dart' as http;
+
+import '../login/signupmethod.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -124,7 +125,7 @@ class _LoadingPageState extends State<LoadingPage> {
         else if (val == '2') {
           Future.delayed(const Duration(seconds: 2), () {
             Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const Login()));
+                MaterialPageRoute(builder: (context) => const SignupMethod()));
           });
         } else {
           //user installing first time and didnt yet choosen language

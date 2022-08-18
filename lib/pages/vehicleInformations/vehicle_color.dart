@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
+import 'package:tagyourtaxi_driver/pages/NavigatorPages/managevehicles.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/referral_code.dart';
+import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_number.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
@@ -130,6 +132,50 @@ class _VehicleColorState extends State<VehicleColor> {
                                       uploadError =
                                           uploadError = reg.toString();
                                     });
+                                  }
+                                } else if (userDetails['role'] == 'owner') {
+                                  var reg = await addDriver();
+                                  setState(() {
+                                    _isLoading = false;
+                                  });
+                                  if (reg == 'true') {
+                                    showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) {
+                                          var searchVal = '';
+                                          return AlertDialog(
+                                            content: Container(
+                                              width: media.width * 0.8,
+                                              color: Colors.white,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_vehicle_added'],
+                                                style:
+                                                    TextStyle(color: textColor),
+                                              ),
+                                            ),
+                                            actions: [
+                                              Button(
+                                                  width: media.width * 0.2,
+                                                  height: media.width * 0.1,
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const ManageVehicles()),
+                                                    );
+                                                  },
+                                                  text: "OK")
+                                            ],
+                                          );
+                                        });
+
+                                    serviceLocations.clear();
+                                    vehicleMake.clear();
+                                    vehicleModel.clear();
+                                    vehicleType.clear();
                                   }
                                 } else {
                                   var update = await updateVehicle();

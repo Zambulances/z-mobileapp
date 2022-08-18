@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../styles/styles.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,15 +13,17 @@ class Button extends StatefulWidget {
   dynamic borcolor;
   dynamic textcolor;
   dynamic width;
-
+  dynamic height;
   // ignore: use_key_in_widget_constructors
-  Button(
-      {required this.onTap,
-      required this.text,
-      this.color,
-      this.borcolor,
-      this.textcolor,
-      this.width});
+  Button({
+    required this.onTap,
+    required this.text,
+    this.color,
+    this.borcolor,
+    this.textcolor,
+    this.width,
+    this.height,
+  });
 
   @override
   _ButtonState createState() => _ButtonState();
@@ -34,7 +37,7 @@ class _ButtonState extends State<Button> {
     return InkWell(
       onTap: widget.onTap,
       child: Container(
-        height: media.width * 0.12,
+        height: widget.height ?? media.width * 0.12,
         width: (widget.width != null) ? widget.width : null,
         padding: EdgeInsets.only(
             left: media.width * twenty, right: media.width * twenty),

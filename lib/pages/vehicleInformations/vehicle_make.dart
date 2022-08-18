@@ -87,7 +87,7 @@ class _VehicleMakeState extends State<VehicleMake> {
                   const SizedBox(
                     height: 10,
                   ),
-                  (_loaded != false && serviceLocations.isNotEmpty)
+                  (_loaded != false && vehicleMake.isNotEmpty)
                       ? Expanded(
                           child: SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),

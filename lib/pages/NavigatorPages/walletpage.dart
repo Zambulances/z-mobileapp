@@ -232,7 +232,8 @@ class _WalletPageState extends State<WalletPage> {
                                                             ),
                                                             Text(
                                                               walletHistory[i][
-                                                                  'created_at'],
+                                                                      'created_at']
+                                                                  .toString(),
                                                               style: GoogleFonts
                                                                   .roboto(
                                                                 fontSize: media
@@ -447,7 +448,8 @@ class _WalletPageState extends State<WalletPage> {
                                                 alignment: Alignment.center,
                                                 child: Text(
                                                   walletBalance[
-                                                      'currency_symbol'],
+                                                          'currency_symbol']
+                                                      .toString(),
                                                   style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * fifteen,

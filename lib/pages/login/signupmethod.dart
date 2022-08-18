@@ -1,72 +1,220 @@
-// import 'package:flutter/material.dart';
-// import 'package:tagyourtaxi_driver/functions/functions.dart';
-// import 'package:tagyourtaxi_driver/pages/login/get_started.dart';
-// import 'package:tagyourtaxi_driver/pages/login/ownerregister.dart';
-// import 'package:tagyourtaxi_driver/styles/styles.dart';
-// import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:tagyourtaxi_driver/functions/functions.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
+import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 
-// class SignupMethod extends StatefulWidget {
-//   const SignupMethod({ Key? key }) : super(key: key);
+import '../../translation/translation.dart';
 
-//   @override
-//   State<SignupMethod> createState() => _SignupMethodState();
-// }
+class SignupMethod extends StatefulWidget {
+  const SignupMethod({Key? key}) : super(key: key);
 
-// class _SignupMethodState extends State<SignupMethod> {
-//   @override
-//   Widget build(BuildContext context) {
+  @override
+  State<SignupMethod> createState() => _SignupMethodState();
+}
 
-//     var media = MediaQuery.of(context).size;
-//     return Material(
-//       child: Directionality(
-//         textDirection: (languageDirection == 'rtl')
-//             ? TextDirection.rtl
-//             : TextDirection.ltr,
-//         child: Container(
-//           padding: EdgeInsets.fromLTRB(media.width*0.08, MediaQuery.of(context).padding.top + media.width*0.05, media.width*0.08, media.width*0.05),
-//           height: media.height*1,
-//           width: media.width*1,
-//           color: page,
-//           child: Column(
-//             children: [
-//               Container(
+class _SignupMethodState extends State<SignupMethod> {
+  @override
+  void initState() {
+    ischeckownerordriver = '';
+    super.initState();
+  }
 
-//                         // height: media.height * 0.12,
-//                         width: media.width * 1,
-//                         color: topBar,
-//                         child: Row(
-//                           mainAxisAlignment: MainAxisAlignment.start,
-//                           children: [
-//                             InkWell(
-//                                 onTap: () {
-//                                   Navigator.pop(context);
-//                                 },
-//                                 child: const Icon(Icons.arrow_back)),
-//                           ],
-//                         )),
-//                         SizedBox(height: media.width*0.1,),
-//               Expanded(
-//                 child: SingleChildScrollView(
-//                   child: Column(
-//                     children: [
-//                       Button(
+  @override
+  Widget build(BuildContext context) {
+    var media = MediaQuery.of(context).size;
+    return Material(
+      color: page,
+      child: Directionality(
+        textDirection: (languageDirection == 'rtl')
+            ? TextDirection.rtl
+            : TextDirection.ltr,
+        child: Column(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        ischeckownerordriver = 'driver';
+                      });
+                    },
+                    child: Container(
+                      height: media.width * 0.18,
+                      width: media.width * 0.8,
+                      padding: EdgeInsets.only(left: media.width * 0.02),
 
-//                         onTap: (){
-//                           Navigator.push(context, MaterialPageRoute(builder: (context)=>GetStarted()));
-//                         }, text: 'Register as Driver'),
-//                       SizedBox(height: media.width*0.05,),
-//                       Button(onTap: (){
-//                         Navigator.push(context, MaterialPageRoute(builder: (context)=>OwnersRegister()));
-//                       }, text: 'Register as Fleet Owner'),
+                      decoration: BoxDecoration(
+                        color: page,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.grey,
+                            offset: Offset(0.0, 1.0), //(x,y)
+                            blurRadius: 5.0,
+                          ),
+                        ],
+                        border: ischeckownerordriver == 'driver'
+                            ? Border.all(color: buttonColor, width: 3)
+                            : null,
+                      ),
+                      // border: Border.all(color: Colors.blue, width: 3)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(media.width * 0.05),
+                            height: media.width * 0.12,
+                            width: media.width * 0.12,
+                            decoration: BoxDecoration(
+                              color: page,
+                              shape: BoxShape.circle,
+                              image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/cardriver.png'),
+                                  fit: BoxFit.contain),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  offset: Offset(0.0, 1.0), //(x,y)
+                                  blurRadius: 5.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: media.width * 0.04,
+                          ),
+                          Expanded(
+                            child: Text(
+                              languages[choosenLanguage]['text_login_driver'],
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.roboto(
+                                  fontSize: media.width * sixteen,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: media.width * 0.1,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        ischeckownerordriver = 'owner';
+                      });
+                    },
+                    child: Container(
+                      height: media.width * 0.18,
+                      width: media.width * 0.8,
+                      padding: EdgeInsets.only(left: media.width * 0.02),
+                      decoration: BoxDecoration(
+                        color: page,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(20)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.grey,
+                            offset: Offset(0.0, 1.0), //(x,y)
+                            blurRadius: 5.0,
+                          ),
+                        ],
+                        border: ischeckownerordriver == 'owner'
+                            ? Border.all(color: buttonColor, width: 3)
+                            : null,
+                      ),
+                      // border: Border.all(color: Colors.blue, width: 3)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(media.width * 0.05),
+                            height: media.width * 0.12,
+                            width: media.width * 0.12,
+                            decoration: BoxDecoration(
+                              color: page,
+                              shape: BoxShape.circle,
+                              image: const DecorationImage(
+                                  image:
+                                      AssetImage('assets/images/carowner.png'),
+                                  fit: BoxFit.contain),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.grey,
+                                  offset: Offset(0.0, 1.0), //(x,y)
+                                  blurRadius: 5.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: media.width * 0.04,
+                          ),
+                          Expanded(
+                            child: Text(
+                              languages[choosenLanguage]['text_login_owner'],
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.roboto(
+                                  fontSize: media.width * sixteen,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
 
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+                  // Button(
+                  //     onTap: () {
+                  //       ischeckownerordriver = 'driver';
+                  //       Navigator.push(
+                  //           context,
+                  //           MaterialPageRoute(
+                  //               builder: (context) => const Login()));
+                  //     },
+                  //     text: 'Register as Driver'),
+                  // SizedBox(
+                  //   height: media.width * 0.05,
+                  // ),
+                  // Button(
+                  //     onTap: () {
+                  //       ischeckownerordriver = 'owner';
+                  //       Navigator.push(
+                  //           context,
+                  //           MaterialPageRoute(
+                  //               builder: (context) => const Login()));
+                  //     },
+                  //     text: 'Register as Fleet Owner'),
+                ],
+              ),
+            ),
+            ischeckownerordriver != ''
+                ? Container(
+                    padding: EdgeInsets.all(media.width * 0.05),
+                    child: Button(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Login()));
+                        },
+                        text: languages[choosenLanguage]['text_continue']),
+                  )
+                : Container(),
+          ],
+        ),
+      ),
+    );
+  }
+}

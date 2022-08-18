@@ -289,41 +289,41 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                       ),
                                     ],
                                   ),
-                                  Container(
-                                    width: 1,
-                                    height: media.width * 0.1,
-                                    color: borderLines,
-                                  ),
-                                  Column(
-                                    children: [
-                                      Container(
-                                        width: media.width * 0.17,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_hours'],
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: hintColor),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: media.width * 0.015,
-                                      ),
-                                      Container(
-                                        width: media.width * 0.17,
-                                        alignment: Alignment.center,
-                                        child: Text(
-                                          driverTodayEarnings[
-                                                  'total_hours_worked']
-                                              .toString(),
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                  // Container(
+                                  //   width: 1,
+                                  //   height: media.width * 0.1,
+                                  //   color: borderLines,
+                                  // ),
+                                  // Column(
+                                  //   children: [
+                                  //     Container(
+                                  //       width: media.width * 0.17,
+                                  //       alignment: Alignment.center,
+                                  //       child: Text(
+                                  //         languages[choosenLanguage]
+                                  //             ['text_hours'],
+                                  //         style: GoogleFonts.roboto(
+                                  //             fontSize: media.width * sixteen,
+                                  //             color: hintColor),
+                                  //       ),
+                                  //     ),
+                                  //     SizedBox(
+                                  //       height: media.width * 0.015,
+                                  //     ),
+                                  //     Container(
+                                  //       width: media.width * 0.17,
+                                  //       alignment: Alignment.center,
+                                  //       child: Text(
+                                  //         driverTodayEarnings[
+                                  //                 'total_hours_worked']
+                                  //             .toString(),
+                                  //         style: GoogleFonts.roboto(
+                                  //             fontSize: media.width * sixteen,
+                                  //             color: textColor),
+                                  //       ),
+                                  //     ),
+                                  //   ],
+                                  // ),
                                   Container(
                                     width: 1,
                                     height: media.width * 0.1,
@@ -566,7 +566,7 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                   Container(
                                                     width: media.width * 0.1,
                                                     height: (val.last > 0)
-                                                        ? (media.width * 0.4) /
+                                                        ? (media.width * 0.35) /
                                                             (val.last /
                                                                 double.parse(
                                                                     weekDays[i]
@@ -642,43 +642,43 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                         height: media.width * 0.1,
                                         color: borderLines,
                                       ),
-                                      Column(
-                                        children: [
-                                          Container(
-                                            width: media.width * 0.17,
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              languages[choosenLanguage]
-                                                  ['text_hours'],
-                                              style: GoogleFonts.roboto(
-                                                  fontSize:
-                                                      media.width * sixteen,
-                                                  color: hintColor),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: media.width * 0.015,
-                                          ),
-                                          Container(
-                                            width: media.width * 0.17,
-                                            alignment: Alignment.center,
-                                            child: Text(
-                                              driverWeeklyEarnings[
-                                                      'total_hours_worked']
-                                                  .toString(),
-                                              style: GoogleFonts.roboto(
-                                                  fontSize:
-                                                      media.width * sixteen,
-                                                  color: textColor),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      Container(
-                                        width: 1,
-                                        height: media.width * 0.1,
-                                        color: borderLines,
-                                      ),
+                                      // Column(
+                                      //   children: [
+                                      //     Container(
+                                      //       width: media.width * 0.17,
+                                      //       alignment: Alignment.center,
+                                      //       child: Text(
+                                      //         languages[choosenLanguage]
+                                      //             ['text_hours'],
+                                      //         style: GoogleFonts.roboto(
+                                      //             fontSize:
+                                      //                 media.width * sixteen,
+                                      //             color: hintColor),
+                                      //       ),
+                                      //     ),
+                                      //     SizedBox(
+                                      //       height: media.width * 0.015,
+                                      //     ),
+                                      //     Container(
+                                      //       width: media.width * 0.17,
+                                      //       alignment: Alignment.center,
+                                      //       child: Text(
+                                      //         driverWeeklyEarnings[
+                                      //                 'total_hours_worked']
+                                      //             .toString(),
+                                      //         style: GoogleFonts.roboto(
+                                      //             fontSize:
+                                      //                 media.width * sixteen,
+                                      //             color: textColor),
+                                      //       ),
+                                      //     ),
+                                      //   ],
+                                      // ),
+                                      // Container(
+                                      //   width: 1,
+                                      //   height: media.width * 0.1,
+                                      //   color: borderLines,
+                                      // ),
                                       Column(
                                         children: [
                                           Container(
@@ -1092,56 +1092,56 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                             media.width * 0.1,
                                                         color: borderLines,
                                                       ),
-                                                      Column(
-                                                        children: [
-                                                          Container(
-                                                            width: media.width *
-                                                                0.17,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: Text(
-                                                              languages[
-                                                                      choosenLanguage]
-                                                                  [
-                                                                  'text_hours'],
-                                                              style: GoogleFonts.roboto(
-                                                                  fontSize: media
-                                                                          .width *
-                                                                      sixteen,
-                                                                  color:
-                                                                      hintColor),
-                                                            ),
-                                                          ),
-                                                          SizedBox(
-                                                            height:
-                                                                media.width *
-                                                                    0.015,
-                                                          ),
-                                                          Container(
-                                                            width: media.width *
-                                                                0.17,
-                                                            alignment: Alignment
-                                                                .center,
-                                                            child: Text(
-                                                              driverReportEarnings[
-                                                                      'total_hours_worked']
-                                                                  .toString(),
-                                                              style: GoogleFonts.roboto(
-                                                                  fontSize: media
-                                                                          .width *
-                                                                      sixteen,
-                                                                  color:
-                                                                      textColor),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Container(
-                                                        width: 1,
-                                                        height:
-                                                            media.width * 0.1,
-                                                        color: borderLines,
-                                                      ),
+                                                      // Column(
+                                                      //   children: [
+                                                      //     Container(
+                                                      //       width: media.width *
+                                                      //           0.17,
+                                                      //       alignment: Alignment
+                                                      //           .center,
+                                                      //       child: Text(
+                                                      //         languages[
+                                                      //                 choosenLanguage]
+                                                      //             [
+                                                      //             'text_hours'],
+                                                      //         style: GoogleFonts.roboto(
+                                                      //             fontSize: media
+                                                      //                     .width *
+                                                      //                 sixteen,
+                                                      //             color:
+                                                      //                 hintColor),
+                                                      //       ),
+                                                      //     ),
+                                                      //     SizedBox(
+                                                      //       height:
+                                                      //           media.width *
+                                                      //               0.015,
+                                                      //     ),
+                                                      //     Container(
+                                                      //       width: media.width *
+                                                      //           0.17,
+                                                      //       alignment: Alignment
+                                                      //           .center,
+                                                      //       child: Text(
+                                                      //         driverReportEarnings[
+                                                      //                 'total_hours_worked']
+                                                      //             .toString(),
+                                                      //         style: GoogleFonts.roboto(
+                                                      //             fontSize: media
+                                                      //                     .width *
+                                                      //                 sixteen,
+                                                      //             color:
+                                                      //                 textColor),
+                                                      //       ),
+                                                      //     ),
+                                                      //   ],
+                                                      // ),
+                                                      // Container(
+                                                      //   width: 1,
+                                                      //   height:
+                                                      //       media.width * 0.1,
+                                                      //   color: borderLines,
+                                                      // ),
                                                       Column(
                                                         children: [
                                                           Container(

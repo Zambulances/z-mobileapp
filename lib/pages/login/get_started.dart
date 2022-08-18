@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
@@ -18,6 +22,7 @@ class GetStarted extends StatefulWidget {
 
 String name = ''; //name of user
 String email = ''; // email of user
+dynamic proImageFile1;
 
 class _GetStartedState extends State<GetStarted> {
   bool _loading = false;
@@ -27,6 +32,67 @@ class _GetStartedState extends State<GetStarted> {
       TextEditingController(); //email textediting controller
   TextEditingController nameText =
       TextEditingController(); //name textediting controller
+
+  ImagePicker picker = ImagePicker();
+  bool _isLoading = false;
+  bool _error = false;
+  bool _pickImage = false;
+  String _permission = '';
+
+  getGalleryPermission() async {
+    var status = await Permission.photos.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.photos.request();
+    }
+    return status;
+  }
+
+//get camera permission
+  getCameraPermission() async {
+    var status = await Permission.camera.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.camera.request();
+    }
+    return status;
+  }
+
+//pick image from gallery
+  pickImageFromGallery() async {
+    var permission = await getGalleryPermission();
+    if (permission == PermissionStatus.granted) {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      setState(() {
+        proImageFile1 = pickedFile?.path;
+        _pickImage = false;
+      });
+    } else {
+      setState(() {
+        _permission = 'noPhotos';
+      });
+    }
+  }
+
+//pick image from camera
+  pickImageFromCamera() async {
+    var permission = await getCameraPermission();
+    if (permission == PermissionStatus.granted) {
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      setState(() {
+        proImageFile1 = pickedFile?.path;
+        _pickImage = false;
+      });
+    } else {
+      setState(() {
+        _permission = 'noCamera';
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    proImageFile1 = null;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +161,45 @@ class _GetStartedState extends State<GetStarted> {
                             fontSize: media.width * sixteen,
                             color: textColor.withOpacity(0.3)),
                       ),
+                      SizedBox(height: media.height * 0.04),
+
+                      Center(
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _pickImage = true;
+                            });
+                          },
+                          child: proImageFile1 != null
+                              ? Container(
+                                  height: media.width * 0.4,
+                                  width: media.width * 0.4,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: backgroundColor,
+                                      image: DecorationImage(
+                                          image: FileImage(File(proImageFile1)),
+                                          fit: BoxFit.cover)),
+                                )
+                              : Container(
+                                  alignment: Alignment.center,
+                                  height: media.width * 0.4,
+                                  width: media.width * 0.4,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: backgroundColor,
+                                  ),
+                                  child: Text(
+                                    languages[choosenLanguage]
+                                        ['text_add_photo'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        color: textColor),
+                                  ),
+                                ),
+                        ),
+                      ),
+
                       SizedBox(height: media.height * 0.04),
 
                       // name input field
@@ -182,7 +287,9 @@ class _GetStartedState extends State<GetStarted> {
                       SizedBox(
                         height: media.height * 0.065,
                       ),
-                      (nameText.text.isNotEmpty && emailText.text.isNotEmpty)
+                      (nameText.text.isNotEmpty &&
+                              emailText.text.isNotEmpty &&
+                              proImageFile1 != null)
                           ? Container(
                               width: media.width * 1,
                               alignment: Alignment.center,
@@ -233,6 +340,131 @@ class _GetStartedState extends State<GetStarted> {
                 ],
               ),
             ),
+
+            //image pick
+
+            (_pickImage == true)
+                ? Positioned(
+                    bottom: 0,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _pickImage = false;
+                        });
+                      },
+                      child: Container(
+                        height: media.height * 1,
+                        width: media.width * 1,
+                        color: Colors.transparent.withOpacity(0.6),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(media.width * 0.05),
+                              width: media.width * 1,
+                              decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.only(
+                                      topLeft: Radius.circular(25),
+                                      topRight: Radius.circular(25)),
+                                  border: Border.all(
+                                    color: borderLines,
+                                    width: 1.2,
+                                  ),
+                                  color: page),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    height: media.width * 0.02,
+                                    width: media.width * 0.15,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(
+                                          media.width * 0.01),
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Column(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              pickImageFromCamera();
+                                            },
+                                            child: Container(
+                                                height: media.width * 0.171,
+                                                width: media.width * 0.171,
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: borderLines,
+                                                        width: 1.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12)),
+                                                child: Icon(
+                                                  Icons.camera_alt_outlined,
+                                                  size: media.width * 0.064,
+                                                )),
+                                          ),
+                                          SizedBox(
+                                            height: media.width * 0.01,
+                                          ),
+                                          Text(
+                                            languages[choosenLanguage]
+                                                ['text_camera'],
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * ten,
+                                                color: const Color(0xff666666)),
+                                          )
+                                        ],
+                                      ),
+                                      Column(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              pickImageFromGallery();
+                                            },
+                                            child: Container(
+                                                height: media.width * 0.171,
+                                                width: media.width * 0.171,
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                        color: borderLines,
+                                                        width: 1.2),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12)),
+                                                child: Icon(
+                                                  Icons.image_outlined,
+                                                  size: media.width * 0.064,
+                                                )),
+                                          ),
+                                          SizedBox(
+                                            height: media.width * 0.01,
+                                          ),
+                                          Text(
+                                            languages[choosenLanguage]
+                                                ['text_gallery'],
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * ten,
+                                                color: const Color(0xff666666)),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ))
+                : Container(),
 
             //internet not connected
             (internet == false)

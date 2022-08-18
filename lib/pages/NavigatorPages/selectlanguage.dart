@@ -140,7 +140,8 @@ class _SelectLanguageState extends State<SelectLanguage> {
                   ),
                 ),
                 Button(
-                    onTap: () {
+                    onTap: () async {
+                      await getlangid();
                       choosenLanguage = _choosenLanguage;
                       if (choosenLanguage == 'ar' ||
                           choosenLanguage == 'ur' ||

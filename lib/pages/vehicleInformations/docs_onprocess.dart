@@ -122,7 +122,7 @@ class _DocsProcessState extends State<DocsProcess> {
                                       const SizedBox(height: 20),
                                       Text(
                                         languages[choosenLanguage]
-                                            ['text_document_suspended'],
+                                            ['text_account_blocked'],
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * twenty,
                                             color: textColor,

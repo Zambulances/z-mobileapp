@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/docs_onprocess.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
@@ -12,32 +11,28 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // ignore: must_be_immutable
-class Docs extends StatefulWidget {
+class FleetDocuments extends StatefulWidget {
   // const Docs({ Key? key }) : super(key: key);
-  dynamic fromPage;
-
-  // ignore: use_key_in_widget_constructors
-  Docs({this.fromPage});
-
+  final String fleetid;
+  const FleetDocuments({Key? key, required this.fleetid}) : super(key: key);
   @override
-  _DocsState createState() => _DocsState();
+  _FleetDocumentsState createState() => _FleetDocumentsState();
 }
 
-int docsId = 0;
-int choosenDocs = 0;
+int fleetdocsId = 0;
+int fleetchoosenDocs = 0;
 
-class _DocsState extends State<Docs> {
+class _FleetDocumentsState extends State<FleetDocuments> {
   bool _loaded = false;
 
   @override
   void initState() {
-    getDocs();
+    getdata();
     super.initState();
   }
 
-//get needed docs
-  getDocs() async {
-    await getDocumentsNeeded();
+  getdata() async {
+    await getFleetDocumentsNeeded(widget.fleetid);
     setState(() {
       _loaded = true;
     });
@@ -72,19 +67,17 @@ class _DocsState extends State<Docs> {
                     Container(
                         width: media.width * 1,
                         color: topBar,
-                        child: (widget.fromPage != null)
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context, false);
-                                      },
-                                      child: const Icon(Icons.arrow_back)),
-                                ],
-                              )
-                            : Container()),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            InkWell(
+                                onTap: () {
+                                  Navigator.pop(context, false);
+                                },
+                                child: const Icon(Icons.arrow_back)),
+                          ],
+                        )),
                     SizedBox(
                       height: media.height * 0.04,
                     ),
@@ -98,11 +91,11 @@ class _DocsState extends State<Docs> {
                               fontWeight: FontWeight.bold),
                         )),
                     const SizedBox(height: 10),
-                    (documentsNeeded.isNotEmpty)
+                    (fleetdocumentsNeeded.isNotEmpty)
                         ? Expanded(
                             child: SingleChildScrollView(
                               child: Column(
-                                children: documentsNeeded
+                                children: fleetdocumentsNeeded
                                     .asMap()
                                     .map((i, value) {
                                       return MapEntry(
@@ -120,18 +113,22 @@ class _DocsState extends State<Docs> {
                                                           12)),
                                               child: InkWell(
                                                 onTap: () async {
-                                                  docsId =
-                                                      documentsNeeded[i]['id'];
-                                                  choosenDocs = i;
+                                                  fleetdocsId =
+                                                      fleetdocumentsNeeded[i]
+                                                          ['id'];
+                                                  fleetchoosenDocs = i;
                                                   await Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                           builder: (context) =>
-                                                              const UploadDocs()));
+                                                              UploadDocs(
+                                                                fleetid: widget
+                                                                    .fleetid,
+                                                              )));
 
                                                   setState(() {});
                                                 },
-                                                child: (documentsNeeded[i]
+                                                child: (fleetdocumentsNeeded[i]
                                                             ['is_uploaded'] ==
                                                         false)
                                                     ? Row(
@@ -149,15 +146,15 @@ class _DocsState extends State<Docs> {
                                                                         .width *
                                                                     0.6,
                                                                 child: Text(
-                                                                  (languages[choosenLanguage][documentsNeeded[i]['name']
+                                                                  (languages[choosenLanguage][fleetdocumentsNeeded[i]['name']
                                                                               .toString()] !=
                                                                           null)
                                                                       ? languages[
-                                                                          choosenLanguage][documentsNeeded[i]
+                                                                          choosenLanguage][fleetdocumentsNeeded[i]
                                                                               [
                                                                               'name']
                                                                           .toString()]
-                                                                      : documentsNeeded[i]
+                                                                      : fleetdocumentsNeeded[i]
                                                                               [
                                                                               'name']
                                                                           .toString(),
@@ -177,15 +174,15 @@ class _DocsState extends State<Docs> {
                                                                         .width *
                                                                     0.6,
                                                                 child: Text(
-                                                                  (languages[choosenLanguage][documentsNeeded[i]['document_status_string']
+                                                                  (languages[choosenLanguage][fleetdocumentsNeeded[i]['document_status_string']
                                                                               .toString()] !=
                                                                           null)
                                                                       ? languages[
-                                                                          choosenLanguage][documentsNeeded[i]
+                                                                          choosenLanguage][fleetdocumentsNeeded[i]
                                                                               [
                                                                               'document_status_string']
                                                                           .toString()]
-                                                                      : documentsNeeded[i]
+                                                                      : fleetdocumentsNeeded[i]
                                                                               [
                                                                               'document_status_string']
                                                                           .toString(),
@@ -235,7 +232,7 @@ class _DocsState extends State<Docs> {
                                                                     shape: BoxShape
                                                                         .circle,
                                                                     image: DecorationImage(
-                                                                        image: NetworkImage(documentsNeeded[i]['driver_document']['data']
+                                                                        image: NetworkImage(fleetdocumentsNeeded[i]['fleet_document']['data']
                                                                             [
                                                                             'document']),
                                                                         fit: BoxFit
@@ -260,11 +257,11 @@ class _DocsState extends State<Docs> {
                                                                             .width *
                                                                         0.57,
                                                                     child: Text(
-                                                                      (languages[choosenLanguage][documentsNeeded[i]['name'].toString()] !=
+                                                                      (languages[choosenLanguage][fleetdocumentsNeeded[i]['name'].toString()] !=
                                                                               null)
-                                                                          ? languages[choosenLanguage][documentsNeeded[i]['name']
+                                                                          ? languages[choosenLanguage][fleetdocumentsNeeded[i]['name']
                                                                               .toString()]
-                                                                          : documentsNeeded[i]['name']
+                                                                          : fleetdocumentsNeeded[i]['name']
                                                                               .toString(),
                                                                       style: GoogleFonts.roboto(
                                                                           fontSize: media.width *
@@ -281,25 +278,25 @@ class _DocsState extends State<Docs> {
                                                                             .width *
                                                                         0.57,
                                                                     child: Text(
-                                                                      (languages[choosenLanguage][documentsNeeded[i]['document_status_string'].toString()] !=
+                                                                      (languages[choosenLanguage][fleetdocumentsNeeded[i]['document_status_string'].toString()] !=
                                                                               null)
-                                                                          ? languages[choosenLanguage][documentsNeeded[i]['document_status_string']
+                                                                          ? languages[choosenLanguage][fleetdocumentsNeeded[i]['document_status_string']
                                                                               .toString()]
-                                                                          : documentsNeeded[i]['document_status_string']
+                                                                          : fleetdocumentsNeeded[i]['document_status_string']
                                                                               .toString(),
                                                                       style: GoogleFonts
                                                                           .roboto(
                                                                         fontSize:
                                                                             media.width *
                                                                                 twelve,
-                                                                        color: (documentsNeeded[i]['driver_document']['data']['comment'] ==
+                                                                        color: (fleetdocumentsNeeded[i]['fleet_document']['data']['comment'] ==
                                                                                 null)
                                                                             ? notUploadedColor
                                                                             : verifyDeclined,
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                  (documentsNeeded[i]['driver_document']['data'][
+                                                                  (fleetdocumentsNeeded[i]['fleet_document']['data'][
                                                                               'comment'] !=
                                                                           null)
                                                                       ? Container(
@@ -310,7 +307,7 @@ class _DocsState extends State<Docs> {
                                                                                   0.025),
                                                                           child:
                                                                               Text(
-                                                                            documentsNeeded[i]['driver_document']['data']['comment'],
+                                                                            fleetdocumentsNeeded[i]['fleet_document']['data']['comment'],
                                                                             style:
                                                                                 GoogleFonts.roboto(
                                                                               fontSize: media.width * twelve,
@@ -351,25 +348,17 @@ class _DocsState extends State<Docs> {
                     SizedBox(height: media.height * 0.02),
 
                     //submit documents
-                    (enableDocumentSubmit == true)
-                        ? (documentsNeeded.isNotEmpty)
+                    (enablefleetDocumentSubmit == true)
+                        ? (fleetdocumentsNeeded.isNotEmpty)
                             ? Button(
                                 onTap: () async {
-                                  if (widget.fromPage == '2') {
-                                    setState(() {
-                                      _loaded = false;
-                                    });
+                                  print('lllllll');
+                                  setState(() {
+                                    _loaded = false;
+                                  });
 
-                                    await getUserDetails();
-                                    Navigator.pop(context, true);
-                                  } else {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const DocsProcess()),
-                                        (route) => false);
-                                  }
+                                  // await getUserDetails();
+                                  Navigator.pop(context, true);
                                 },
                                 text: languages[choosenLanguage]['text_submit'])
                             : Container()
@@ -403,17 +392,18 @@ class _DocsState extends State<Docs> {
 }
 
 class UploadDocs extends StatefulWidget {
-  const UploadDocs({Key? key}) : super(key: key);
+  final String fleetid;
+  const UploadDocs({Key? key, required this.fleetid}) : super(key: key);
 
   @override
   _UploadDocsState createState() => _UploadDocsState();
 }
 
-String docIdNumber = '';
-String date = '';
-DateTime expDate = DateTime.now();
-final ImagePicker _picker = ImagePicker();
-dynamic imageFile;
+String fleetdocIdNumber = '';
+String fleetdate = '';
+DateTime fleetexpDate = DateTime.now();
+final ImagePicker _fleetpicker = ImagePicker();
+dynamic fleetimageFile;
 
 class _UploadDocsState extends State<UploadDocs> {
   bool _uploadImage = false;
@@ -434,8 +424,8 @@ class _UploadDocsState extends State<UploadDocs> {
         lastDate: DateTime(2100));
     if (picker != null) {
       setState(() {
-        expDate = picker;
-        date = picker.toString().split(" ")[0];
+        fleetexpDate = picker;
+        fleetdate = picker.toString().split(" ")[0];
       });
     }
   }
@@ -462,9 +452,10 @@ class _UploadDocsState extends State<UploadDocs> {
   imagePick() async {
     var permission = await getGalleryPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+      final pickedFile =
+          await _fleetpicker.pickImage(source: ImageSource.gallery);
       setState(() {
-        imageFile = pickedFile?.path;
+        fleetimageFile = pickedFile?.path;
         _uploadImage = false;
       });
     } else {
@@ -478,9 +469,10 @@ class _UploadDocsState extends State<UploadDocs> {
   cameraPick() async {
     var permission = await getCameraPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+      final pickedFile =
+          await _fleetpicker.pickImage(source: ImageSource.camera);
       setState(() {
-        imageFile = pickedFile?.path;
+        fleetimageFile = pickedFile?.path;
         _uploadImage = false;
       });
     } else {
@@ -492,8 +484,8 @@ class _UploadDocsState extends State<UploadDocs> {
 
   @override
   void initState() {
-    imageFile = null;
-    date = '';
+    fleetimageFile = null;
+    fleetdate = '';
     super.initState();
   }
 
@@ -545,7 +537,7 @@ class _UploadDocsState extends State<UploadDocs> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: buttonColor, width: 1.2)),
-                      child: (imageFile == null)
+                      child: (fleetimageFile == null)
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -573,12 +565,13 @@ class _UploadDocsState extends State<UploadDocs> {
                               ],
                             )
                           : Image.file(
-                              File(imageFile),
+                              File(fleetimageFile),
                               fit: BoxFit.contain,
                             ),
                     ),
                   ),
-                  (documentsNeeded[choosenDocs]['has_expiry_date'] == true)
+                  (fleetdocumentsNeeded[fleetchoosenDocs]['has_expiry_date'] ==
+                          true)
                       ? Container(
                           padding: EdgeInsets.only(top: media.height * 0.04),
                           child: InkWell(
@@ -595,9 +588,9 @@ class _UploadDocsState extends State<UploadDocs> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  (date != '')
+                                  (fleetdate != '')
                                       ? Text(
-                                          date,
+                                          fleetdate,
                                           style: GoogleFonts.roboto(
                                               color: textColor,
                                               fontSize: media.width * sixteen),
@@ -615,26 +608,30 @@ class _UploadDocsState extends State<UploadDocs> {
                           ),
                         )
                       : Container(),
-                  (documentsNeeded[choosenDocs]['has_identify_number'] == true)
+                  (fleetdocumentsNeeded[fleetchoosenDocs]
+                              ['has_identify_number'] ==
+                          true)
                       ? Container(
                           padding: EdgeInsets.only(top: media.height * 0.02),
                           child: InputField(
-                            text: (languages[choosenLanguage][documentsNeeded
-                                        .firstWhere(
-                                            (element) =>
-                                                element['id'] == docsId)[
-                                            'identify_number_locale_key']
-                                        .toString()] !=
+                            text: (languages[choosenLanguage][
+                                        fleetdocumentsNeeded
+                                            .firstWhere(
+                                                (element) =>
+                                                    element['id'] ==
+                                                    fleetdocsId)[
+                                                'identify_number_locale_key']
+                                            .toString()] !=
                                     null)
                                 ? languages[choosenLanguage][
-                                    documentsNeeded[docsId]
+                                    fleetdocumentsNeeded[fleetdocsId]
                                             ['identify_number_locale_key']
                                         .toString()]
                                 : 'Identification Number',
                             textController: idNumber,
                             onTap: (val) {
                               setState(() {
-                                docIdNumber = idNumber.text;
+                                fleetdocIdNumber = idNumber.text;
                               });
                             },
                           ),
@@ -654,33 +651,28 @@ class _UploadDocsState extends State<UploadDocs> {
                                 color: Colors.red),
                           )),
                   SizedBox(height: media.height * 0.04),
-                  (imageFile != null &&
-                              (documentsNeeded[choosenDocs]
+                  (fleetimageFile != null &&
+                              (fleetdocumentsNeeded[fleetchoosenDocs]
                                       ['has_identify_number'] ==
                                   true)
                           ? idNumber.text.isNotEmpty
                           : 1 + 1 == 2 &&
-                                  (documentsNeeded[choosenDocs]
+                                  (fleetdocumentsNeeded[fleetchoosenDocs]
                                           ['has_expiry_date'] ==
                                       true)
-                              ? date != ''
+                              ? fleetdate != ''
                               : 1 + 1 == 2)
                       ? Button(
                           onTap: () async {
+                            print('222222222');
+
                             FocusManager.instance.primaryFocus?.unfocus();
                             setState(() {
                               _loading = true;
                             });
-                            print('yessssssssssssssssss');
-                            var result = await uploadDocs();
-                            print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
-
+                            var result = await uploadFleetDocs(widget.fleetid);
                             if (result == 'success') {
-                              print('wwwwwwwwwwwwwwwwwwwwwwwwwwwww');
-
-                              await getDocumentsNeeded();
-                              print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
-
+                              await getFleetDocumentsNeeded(widget.fleetid);
                               Navigator.pop(context);
                             } else {
                               setState(() {

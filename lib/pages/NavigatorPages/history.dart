@@ -312,9 +312,12 @@ class _HistoryState extends State<History> {
                                                                     shape: BoxShape
                                                                         .circle,
                                                                     image: DecorationImage(
-                                                                        image: NetworkImage(myHistory[i]['userDetail']['data']
-                                                                            [
-                                                                            'profile_picture']),
+                                                                        image: NetworkImage(userDetails['role'] ==
+                                                                                'owner'
+                                                                            ? myHistory[i]['driverDetail']['data'][
+                                                                                'profile_picture']
+                                                                            : myHistory[i]['userDetail']['data'][
+                                                                                'profile_picture']),
                                                                         fit: BoxFit
                                                                             .cover)),
                                                               ),
@@ -333,11 +336,14 @@ class _HistoryState extends State<History> {
                                                                             .width *
                                                                         0.3,
                                                                     child: Text(
-                                                                      myHistory[i]['userDetail']
+                                                                      userDetails['role'] ==
+                                                                              'owner'
+                                                                          ? myHistory[i]['driverDetail']['data']
                                                                               [
-                                                                              'data']
-                                                                          [
-                                                                          'name'],
+                                                                              'name']
+                                                                          : myHistory[i]['userDetail']['data']
+                                                                              [
+                                                                              'name'],
                                                                       style: GoogleFonts.roboto(
                                                                           fontSize: media.width *
                                                                               eighteen,
@@ -717,7 +723,7 @@ class _HistoryState extends State<History> {
                                                                               media.width * 0.16,
                                                                           decoration: BoxDecoration(
                                                                               shape: BoxShape.circle,
-                                                                              image: DecorationImage(image: NetworkImage(myHistory[i]['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
+                                                                              image: DecorationImage(image: NetworkImage(userDetails['role'] == 'owner' ? myHistory[i]['driverDetail']['data']['profile_picture'] : myHistory[i]['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
                                                                         ),
                                                                         SizedBox(
                                                                           width:
@@ -730,7 +736,7 @@ class _HistoryState extends State<History> {
                                                                             SizedBox(
                                                                               width: media.width * 0.3,
                                                                               child: Text(
-                                                                                myHistory[i]['userDetail']['data']['name'],
+                                                                                userDetails['role'] == 'owner' ? myHistory[i]['driverDetail']['data']['name'] : myHistory[i]['userDetail']['data']['name'],
                                                                                 style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
                                                                               ),
                                                                             ),
