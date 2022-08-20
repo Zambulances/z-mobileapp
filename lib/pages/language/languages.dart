@@ -142,7 +142,8 @@ class _LanguagesState extends State<Languages> {
             //button
             (choosenLanguage != '')
                 ? Button(
-                    onTap: () {
+                    onTap: ()async {
+                      await getlangid();
                       pref.setString('languageDirection', languageDirection);
                       pref.setString('choosenLanguage', choosenLanguage);
                       Navigator.pushReplacement(

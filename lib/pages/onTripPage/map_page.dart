@@ -137,7 +137,7 @@ class _MapsState extends State<Maps>
 //get location permission and location details
   getLocs() async {
     myBearings.clear;
-    addressList.removeWhere((element) => element.id == 'drop');
+    addressList.clear();
     serviceEnabled = await location.serviceEnabled();
     polyline.clear();
     final Uint8List markerIcon =

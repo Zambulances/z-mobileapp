@@ -139,7 +139,7 @@ class _SelectLanguageState extends State<SelectLanguage> {
                   ),
                 ),
                 Button(
-                    onTap: () {
+                    onTap: () async{
                       choosenLanguage = _choosenLanguage;
                       if (choosenLanguage == 'ar' ||
                           choosenLanguage == 'ur' ||
@@ -148,6 +148,7 @@ class _SelectLanguageState extends State<SelectLanguage> {
                       } else {
                         languageDirection = 'ltr';
                       }
+                      await getlangid();
                       pref.setString('languageDirection', languageDirection);
                       pref.setString('choosenLanguage', _choosenLanguage);
                       valueNotifierHome.incrementNotifier();

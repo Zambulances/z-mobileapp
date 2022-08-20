@@ -316,20 +316,25 @@ registerUser() async {
   bearerToken.clear();
   dynamic result;
   try {
-    final response = await http.post(Uri.parse(url + 'api/v1/user/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "name": name,
-          "mobile": phnumber,
-          "email": email,
-          "device_token": fcm,
-          "terms_condition": true,
-          "country": countries[phcode]['dial_code'],
-          "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
-        }));
+    final response =  http.MultipartRequest('POST', Uri.parse(url + 'api/v1/user/register'));
+        response.headers.addAll({'Content-Type': 'application/json'});
+        response.files.add(
+        await http.MultipartFile.fromPath('profile_picture', proImageFile1));
+      response.fields.addAll({
+      "name": name,
+      "mobile": phnumber,
+      "email": email,
+      "device_token": fcm,
+      "country": countries[phcode]['dial_code'],
+      "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
+      'lang': choosenLanguage,
+    });
 
-    if (response.statusCode == 200) {
-      var jsonVal = jsonDecode(response.body);
+    var request = await response.send();
+    var respon = await http.Response.fromStream(request);
+
+    if (respon.statusCode == 200) {
+      var jsonVal = jsonDecode(respon.body);
 
       bearerToken.add(BearerClass(
           type: jsonVal['token_type'].toString(),
@@ -338,8 +343,8 @@ registerUser() async {
       await getUserDetails();
       result = 'true';
     } else {
-      debugPrint(response.body);
-      result = jsonDecode(response.body)['message'];
+      debugPrint(respon.body);
+      result = jsonDecode(respon.body)['message'];
     }
     return result;
   } catch (e) {
@@ -638,6 +643,37 @@ geoCoding(double lat, double lng) async {
     } else {
       debugPrint(response.body);
       result = '';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
+//lang
+getlangid() async {
+  dynamic result;
+  try {
+    var response = await http
+        .post(Uri.parse(url + 'api/v1/user/update-my-lang'), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + bearerToken[0].token,
+    }, body: {
+      'lang': choosenLanguage,
+    });
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success'] == true) {
+        result = 'success';
+      } else {
+        debugPrint(response.body);
+        result = 'failed';
+      }
+    } else {
+      debugPrint(response.body);
+      result = jsonDecode(response.body)['message'];
     }
   } catch (e) {
     if (e is SocketException) {
