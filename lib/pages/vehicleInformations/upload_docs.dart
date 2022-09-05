@@ -20,7 +20,7 @@ class Docs extends StatefulWidget {
   Docs({this.fromPage});
 
   @override
-  _DocsState createState() => _DocsState();
+  State<Docs> createState() => _DocsState();
 }
 
 int docsId = 0;
@@ -41,6 +41,11 @@ class _DocsState extends State<Docs> {
     setState(() {
       _loaded = true;
     });
+  }
+
+  //navigate
+  pop() {
+    Navigator.pop(context, true);
   }
 
   @override
@@ -361,7 +366,7 @@ class _DocsState extends State<Docs> {
                                     });
 
                                     await getUserDetails();
-                                    Navigator.pop(context, true);
+                                    pop();
                                   } else {
                                     Navigator.pushAndRemoveUntil(
                                         context,
@@ -406,7 +411,7 @@ class UploadDocs extends StatefulWidget {
   const UploadDocs({Key? key}) : super(key: key);
 
   @override
-  _UploadDocsState createState() => _UploadDocsState();
+  State<UploadDocs> createState() => _UploadDocsState();
 }
 
 String docIdNumber = '';
@@ -488,6 +493,11 @@ class _UploadDocsState extends State<UploadDocs> {
         _permission = 'noCamera';
       });
     }
+  }
+
+  //navigate
+  pop() {
+    Navigator.pop(context);
   }
 
   @override
@@ -645,6 +655,7 @@ class _UploadDocsState extends State<UploadDocs> {
                   (_error == '')
                       ? Container()
                       : Container(
+                          width: media.width * 0.9,
                           alignment: Alignment.center,
                           margin: const EdgeInsets.only(top: 20),
                           child: Text(
@@ -670,22 +681,17 @@ class _UploadDocsState extends State<UploadDocs> {
                             FocusManager.instance.primaryFocus?.unfocus();
                             setState(() {
                               _loading = true;
+                              _error = '';
                             });
-                            print('yessssssssssssssssss');
                             var result = await uploadDocs();
-                            print('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq');
 
                             if (result == 'success') {
-                              print('wwwwwwwwwwwwwwwwwwwwwwwwwwwww');
-
                               await getDocumentsNeeded();
-                              print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
 
-                              Navigator.pop(context);
+                              pop();
                             } else {
                               setState(() {
-                                _error = languages[choosenLanguage]
-                                    ['text_somethingwentwrong'];
+                                _error = result.toString();
                               });
                             }
                             setState(() {

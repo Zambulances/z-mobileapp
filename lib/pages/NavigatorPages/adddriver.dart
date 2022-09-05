@@ -28,6 +28,11 @@ class _AddDriverState extends State<AddDriver> {
   TextEditingController address =
       TextEditingController(); //name textediting controller
 
+  //navigate
+  pop() {
+    Navigator.pop(context);
+  }
+
   countryCode() async {
     var result = await getCountryCode();
     if (result == 'success') {
@@ -93,8 +98,7 @@ class _AddDriverState extends State<AddDriver> {
                                 width: media.width * 0.9,
                                 alignment: Alignment.center,
                                 child: Text(
-                                  languages[choosenLanguage]
-                                      ['text_manage_vehicle'],
+                                  languages[choosenLanguage]['text_add_driver'],
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
@@ -105,7 +109,7 @@ class _AddDriverState extends State<AddDriver> {
                                       onTap: () async {
                                         await fleetDriverDetails();
 
-                                        Navigator.pop(context);
+                                        pop();
                                       },
                                       child: const Icon(Icons.arrow_back)))
                             ],
@@ -485,6 +489,7 @@ class _AddDriverState extends State<AddDriver> {
                                             setState(() {
                                               verifyEmailError =
                                                   result.toString();
+                                              error = result.toString();
                                             });
                                             debugPrint('failed');
                                           }
@@ -496,6 +501,8 @@ class _AddDriverState extends State<AddDriver> {
                                             verifyEmailError =
                                                 languages[choosenLanguage]
                                                     ['text_email_validation'];
+                                            error = languages[choosenLanguage]
+                                                ['text_email_validation'];
                                           });
                                         }
                                       },

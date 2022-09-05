@@ -12,7 +12,7 @@ class Referral extends StatefulWidget {
   const Referral({Key? key}) : super(key: key);
 
   @override
-  _ReferralState createState() => _ReferralState();
+  State<Referral> createState() => _ReferralState();
 }
 
 dynamic referralCode;
@@ -21,6 +21,11 @@ class _ReferralState extends State<Referral> {
   bool _loading = false;
   String _error = '';
   TextEditingController controller = TextEditingController();
+
+  navigate() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Docs()));
+  }
 
   @override
   void initState() {
@@ -116,10 +121,7 @@ class _ReferralState extends State<Referral> {
                             });
                             var result = await updateReferral();
                             if (result == 'true') {
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Docs()));
+                              navigate();
                             } else {
                               setState(() {
                                 _error = languages[choosenLanguage]

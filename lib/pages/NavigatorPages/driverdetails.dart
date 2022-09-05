@@ -371,11 +371,7 @@ class _DriverListState extends State<DriverList> {
                                                                       'null'
                                                                   ? Container()
                                                                   : Text(
-                                                                      fleetdriverList[i]['car_make_name']
-                                                                              .toString() +
-                                                                          ',' +
-                                                                          fleetdriverList[i]['car_model_name']
-                                                                              .toString(),
+                                                                      '${fleetdriverList[i]['car_make_name']},${fleetdriverList[i]['car_model_name']}',
                                                                       style: GoogleFonts
                                                                           .roboto(
                                                                         fontSize:
@@ -443,13 +439,41 @@ class _DriverListState extends State<DriverList> {
                                     ),
                                   ],
                                 )
-                              : Center(
-                                  child: Container(
-                                  decoration: const BoxDecoration(
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/images/nodatafound.gif'))),
-                                )),
+                              : (_isLoading == false)
+                                  ? Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          height: media.width * 0.3,
+                                        ),
+                                        Container(
+                                          height: media.width * 0.7,
+                                          width: media.width * 0.7,
+                                          decoration: const BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      'assets/images/nodatafound.gif'),
+                                                  fit: BoxFit.contain)),
+                                        ),
+                                        SizedBox(
+                                          height: media.width * 0.02,
+                                        ),
+                                        SizedBox(
+                                          width: media.width * 0.9,
+                                          child: Text(
+                                            languages[choosenLanguage]
+                                                ['text_noDataFound'],
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                fontWeight: FontWeight.bold,
+                                                color: textColor),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  : Container(),
                         ),
                       ),
                       Container(

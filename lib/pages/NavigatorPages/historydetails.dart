@@ -11,7 +11,7 @@ class HistoryDetails extends StatefulWidget {
   const HistoryDetails({Key? key}) : super(key: key);
 
   @override
-  _HistoryDetailsState createState() => _HistoryDetailsState();
+  State<HistoryDetails> createState() => _HistoryDetailsState();
 }
 
 class _HistoryDetailsState extends State<HistoryDetails> {
@@ -244,15 +244,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 alignment: Alignment.center,
                                 width: media.width * 0.16,
                                 child: Text(
-                                  myHistory[selectedHistory]['accepted_at']
-                                          .toString()
-                                          .split(' ')
-                                          .toList()[2] +
-                                      ' ' +
-                                      myHistory[selectedHistory]['accepted_at']
-                                          .toString()
-                                          .split(' ')
-                                          .toList()[3],
+                                  '${myHistory[selectedHistory]['accepted_at'].toString().split(' ').toList()[2]} ${myHistory[selectedHistory]['accepted_at'].toString().split(' ').toList()[3]}',
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * twelve,
                                       color: textColor.withOpacity(0.4)),
@@ -300,16 +292,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 alignment: Alignment.center,
                                 width: media.width * 0.16,
                                 child: Text(
-                                  myHistory[selectedHistory]['trip_start_time']
-                                          .toString()
-                                          .split(' ')
-                                          .toList()[2] +
-                                      ' ' +
-                                      myHistory[selectedHistory]
-                                              ['trip_start_time']
-                                          .toString()
-                                          .split(' ')
-                                          .toList()[3],
+                                  '${myHistory[selectedHistory]['trip_start_time'].toString().split(' ').toList()[2]} ${myHistory[selectedHistory]['trip_start_time'].toString().split(' ').toList()[3]}',
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * twelve,
                                       color: textColor.withOpacity(0.4)),
@@ -357,15 +340,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 alignment: Alignment.center,
                                 width: media.width * 0.16,
                                 child: Text(
-                                  myHistory[selectedHistory]['completed_at']
-                                          .toString()
-                                          .split(' ')
-                                          .toList()[2] +
-                                      ' ' +
-                                      myHistory[selectedHistory]['completed_at']
-                                          .toString()
-                                          .split(' ')
-                                          .toList()[3],
+                                  '${myHistory[selectedHistory]['completed_at'].toString().split(' ').toList()[2]} ${myHistory[selectedHistory]['completed_at'].toString().split(' ').toList()[3]}',
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * twelve,
                                       color: textColor.withOpacity(0.4)),
@@ -617,9 +592,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                       height: media.width * 0.02,
                                     ),
                                     Text(
-                                      myHistory[selectedHistory]['total_time']
-                                              .toString() +
-                                          ' mins',
+                                      '${myHistory[selectedHistory]['total_time']} mins',
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * fourteen,
                                           color: textColor),

@@ -10,7 +10,7 @@ class Invoice extends StatefulWidget {
   const Invoice({Key? key}) : super(key: key);
 
   @override
-  _InvoiceState createState() => _InvoiceState();
+  State<Invoice> createState() => _InvoiceState();
 }
 
 class _InvoiceState extends State<Invoice> {
@@ -177,8 +177,7 @@ class _InvoiceState extends State<Invoice> {
                                       height: media.width * 0.02,
                                     ),
                                     Text(
-                                      driverReq['total_time'].toString() +
-                                          ' mins',
+                                      '${driverReq['total_time']} mins',
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * fourteen,
                                           color: textColor),

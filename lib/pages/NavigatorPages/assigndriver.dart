@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../functions/functions.dart';
@@ -7,8 +6,6 @@ import '../../styles/styles.dart';
 import '../../translation/translation.dart';
 import '../../widgets/widgets.dart';
 import '../loadingPage/loading.dart';
-import '../onTripPage/map_page.dart';
-import 'managevehicles.dart';
 
 class AssignDriver extends StatefulWidget {
   final String? fleetid;
@@ -60,6 +57,11 @@ class _AssignDriverState extends State<AssignDriver> {
 
   String fleetid = '';
 
+  //navigate
+  pop() {
+    Navigator.pop(context, true);
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -108,6 +110,9 @@ class _AssignDriverState extends State<AssignDriver> {
                           physics: const BouncingScrollPhysics(),
                           child: Column(
                             children: [
+                              SizedBox(
+                                height: media.width * 0.025,
+                              ),
                               SizedBox(
                                 height: media.width * 0.35,
                                 child: Padding(
@@ -173,15 +178,15 @@ class _AssignDriverState extends State<AssignDriver> {
                                                                       0.20,
                                                               decoration:
                                                                   BoxDecoration(
-                                                                // image:
-                                                                //     DecorationImage(
-                                                                //         image:
-                                                                //             NetworkImage(
-                                                                //           vehicledata[widget.i!]['driverDetail']['data']['profile_picture']
-                                                                //               .toString(),
-                                                                //         ),
-                                                                //         fit: BoxFit
-                                                                //             .fill),
+                                                                image:
+                                                                    DecorationImage(
+                                                                        image:
+                                                                            NetworkImage(
+                                                                          vehicledata[widget.i!]['driverDetail']['data']['profile_picture']
+                                                                              .toString(),
+                                                                        ),
+                                                                        fit: BoxFit
+                                                                            .fill),
                                                                 borderRadius:
                                                                     const BorderRadius
                                                                             .all(
@@ -281,14 +286,7 @@ class _AssignDriverState extends State<AssignDriver> {
                                                           ),
                                                         ),
                                                         Text(
-                                                          vehicledata[widget.i!]
-                                                                      ['brand']
-                                                                  .toString() +
-                                                              ',' +
-                                                              vehicledata[widget
-                                                                          .i!]
-                                                                      ['model']
-                                                                  .toString(),
+                                                          '${vehicledata[widget.i!]['brand']},${vehicledata[widget.i!]['model']}',
                                                           style: GoogleFonts
                                                               .roboto(
                                                             fontSize:
@@ -303,17 +301,18 @@ class _AssignDriverState extends State<AssignDriver> {
                                                                     0.1,
                                                             width: media.width *
                                                                 0.2,
-                                                            decoration: BoxDecoration(
-                                                                // image:
-                                                                //     DecorationImage(
-                                                                //         image:
-                                                                //             NetworkImage(
-                                                                //           vehicledata[widget.i!]['type_icon']
-                                                                //               .toString(),
-                                                                //         ),
-                                                                //         fit: BoxFit
-                                                                //             .cover),
-                                                                )),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              image:
+                                                                  DecorationImage(
+                                                                      image:
+                                                                          NetworkImage(
+                                                                        vehicledata[widget.i!]['type_icon']
+                                                                            .toString(),
+                                                                      ),
+                                                                      fit: BoxFit
+                                                                          .cover),
+                                                            )),
                                                       ],
                                                     ))),
                                           ],
@@ -323,28 +322,27 @@ class _AssignDriverState extends State<AssignDriver> {
                                   ),
                                 ),
                               ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    right: media.width * 0.01,
+                                    left: media.width * 0.01,
+                                    bottom: media.width * 0.03),
+                                child: Text(
+                                  languages[choosenLanguage]
+                                      ['text_assign_new_driver'],
+                                  style: GoogleFonts.roboto(
+                                    fontSize: media.width * eighteen,
+                                    color: textColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
                               Container(
                                 child: fleetdriverList.isNotEmpty
                                     ? Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                right: media.width * 0.01,
-                                                left: media.width * 0.01,
-                                                bottom: media.width * 0.03),
-                                            child: Text(
-                                              languages[choosenLanguage]
-                                                  ['text_assign_new_driver'],
-                                              style: GoogleFonts.roboto(
-                                                fontSize:
-                                                    media.width * eighteen,
-                                                color: textColor,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
                                           for (var i = 0;
                                               i < fleetdriverList.length;
                                               i++)
@@ -429,11 +427,11 @@ class _AssignDriverState extends State<AssignDriver> {
                                                                           0.20,
                                                                       decoration:
                                                                           BoxDecoration(
-                                                                        // image: DecorationImage(
-                                                                        //     image: NetworkImage(
-                                                                        //       fleetdriverList[i]['profile_picture'].toString(),
-                                                                        //     ),
-                                                                        //     fit: BoxFit.fill),
+                                                                        image: DecorationImage(
+                                                                            image: NetworkImage(
+                                                                              fleetdriverList[i]['profile_picture'].toString(),
+                                                                            ),
+                                                                            fit: BoxFit.fill),
                                                                         borderRadius:
                                                                             const BorderRadius.all(Radius.circular(10)),
                                                                       ),
@@ -500,22 +498,23 @@ class _AssignDriverState extends State<AssignDriver> {
                                                                               'null'
                                                                           ? Container()
                                                                           : Text(
-                                                                              fleetdriverList[i]['car_make_name'].toString() + ',' + fleetdriverList[i]['car_model_name'].toString(),
+                                                                              '${fleetdriverList[i]['car_make_name']},${fleetdriverList[i]['car_model_name']}',
                                                                               style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor, letterSpacing: 1),
                                                                             ),
 
                                                                       Container(
                                                                           height: media.width *
                                                                               0.1,
-                                                                          width:
-                                                                              media.width * 0.2,
-                                                                          decoration: BoxDecoration(
-                                                                              // image: DecorationImage(
-                                                                              //     image: NetworkImage(
-                                                                              //       fleetdriverList[i]['vehicle_type_icon'].toString(),
-                                                                              //     ),
-                                                                              //     fit: BoxFit.cover),
-                                                                              )),
+                                                                          width: media.width *
+                                                                              0.2,
+                                                                          decoration:
+                                                                              BoxDecoration(
+                                                                            image: DecorationImage(
+                                                                                image: NetworkImage(
+                                                                                  fleetdriverList[i]['vehicle_type_icon'].toString(),
+                                                                                ),
+                                                                                fit: BoxFit.cover),
+                                                                          )),
                                                                     ],
                                                                   ))),
                                                           Expanded(
@@ -565,15 +564,43 @@ class _AssignDriverState extends State<AssignDriver> {
                                           ),
                                         ],
                                       )
-                                    : Center(
-                                        child: Container(
-                                        height: media.width * 0.5,
-                                        width: media.width * 0.5,
-                                        decoration: const BoxDecoration(
-                                            image: DecorationImage(
-                                                image: AssetImage(
-                                                    'assets/images/nodatafound.gif'))),
-                                      )),
+                                    : (_isLoadingassigndriver == false)
+                                        ? Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                height: media.width * 0.05,
+                                              ),
+                                              Container(
+                                                height: media.width * 0.7,
+                                                width: media.width * 0.7,
+                                                decoration: const BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage(
+                                                            'assets/images/nodatafound.gif'),
+                                                        fit: BoxFit.contain)),
+                                              ),
+                                              SizedBox(
+                                                height: media.width * 0.02,
+                                              ),
+                                              SizedBox(
+                                                width: media.width * 0.9,
+                                                child: Text(
+                                                  languages[choosenLanguage]
+                                                      ['text_noDataFound'],
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * sixteen,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: textColor),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        : Container(),
                                 // Column(
                                 //     mainAxisAlignment:
                                 //         MainAxisAlignment.center,
@@ -595,7 +622,7 @@ class _AssignDriverState extends State<AssignDriver> {
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.all(media.width * 0.05),
+                        padding: EdgeInsets.all(media.width * 0.02),
                         child: Button(
                           onTap: () async {
                             setState(() {
@@ -610,7 +637,7 @@ class _AssignDriverState extends State<AssignDriver> {
                               //     isassigndriver: true);
                               await getVehicleInfo();
 
-                              Navigator.pop(context, true);
+                              pop();
                             } else {
                               setState(() {
                                 _isLoadingassigndriver = false;

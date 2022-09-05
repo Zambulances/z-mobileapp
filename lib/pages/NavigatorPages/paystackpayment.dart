@@ -5,77 +5,39 @@ import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:flutter_paystack/flutter_paystack.dart';
+// import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class PayStackPage extends StatefulWidget {
   const PayStackPage({Key? key}) : super(key: key);
 
   @override
-  _PayStackPageState createState() => _PayStackPageState();
+  State<PayStackPage> createState() => _PayStackPageState();
 }
 
 class _PayStackPageState extends State<PayStackPage> {
   bool _isLoading = false;
   bool _success = false;
-  bool _failed = false;
-  final plugin = PaystackPlugin();
+  String _error = '';
+  // final plugin = PaystackPlugin();
   @override
   void initState() {
-    if (walletBalance['paystack_environment'] == 'test') {
-      plugin.initialize(
-          publicKey: walletBalance['paystack_test_publishable_key']);
-    } else {
-      plugin.initialize(
-          publicKey: walletBalance['paystack_live_publishable_key']);
-    }
     payMoney();
     super.initState();
   }
 
-//payment gateway code
+// //payment gateway code
   payMoney() async {
     setState(() {
       _isLoading = true;
+      _error = '';
     });
     var val = await getPaystackPayment(addMoney * 100);
-    if (val == 'success') {
-      Charge charge = Charge()
-        ..amount = addMoney * 100
-        ..reference = paystackCode['reference']
-        ..accessCode = paystackCode['access_code']
-        ..currency = walletBalance['currency_code']
-        ..email = userDetails['email'];
-      var response = await plugin.checkout(
-        context,
-        method:
-            CheckoutMethod.selectable, // Defaults to CheckoutMethod.selectable
-        charge: charge,
-      );
-      if (response.message == 'Transaction terminated') {
-        Navigator.pop(context, true);
-      }
-      if (response.message == 'Success') {
-        var val = await addMoneyPaystack(addMoney, response.reference);
-        if (val == 'success') {
-          setState(() {
-            _success = true;
-          });
-        } else {
-          setState(() {
-            _failed = true;
-          });
-        }
-      } else {
-        setState(() {
-          _failed = true;
-        });
-      }
-    } else {
-      setState(() {
-        _failed = true;
-      });
+//
+    if (val != 'success') {
+      _error = val.toString();
     }
 
     setState(() {
@@ -134,11 +96,22 @@ class _PayStackPageState extends State<PayStackPage> {
                           SizedBox(
                             height: media.width * 0.05,
                           ),
+                          Expanded(
+                            child: (paystackCode['authorization_url'] != null &&
+                                    _error == '')
+                                ? WebView(
+                                    initialUrl:
+                                        paystackCode['authorization_url'],
+                                    javascriptMode: JavascriptMode.unrestricted,
+                                    userAgent: 'Flutter;Webview',
+                                  )
+                                : Container(),
+                          )
                         ],
                       ),
                     ),
                     //payment failed
-                    (_failed == true)
+                    (_error != '')
                         ? Positioned(
                             top: 0,
                             child: Container(
@@ -156,14 +129,16 @@ class _PayStackPageState extends State<PayStackPage> {
                                         color: page),
                                     child: Column(
                                       children: [
-                                        Text(
-                                          languages[choosenLanguage]
-                                              ['text_somethingwentwrong'],
-                                          textAlign: TextAlign.center,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor,
-                                              fontWeight: FontWeight.w600),
+                                        SizedBox(
+                                          width: media.width * 0.8,
+                                          child: Text(
+                                            _error.toString(),
+                                            textAlign: TextAlign.center,
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                color: textColor,
+                                                fontWeight: FontWeight.w600),
+                                          ),
                                         ),
                                         SizedBox(
                                           height: media.width * 0.05,
@@ -171,8 +146,9 @@ class _PayStackPageState extends State<PayStackPage> {
                                         Button(
                                             onTap: () async {
                                               setState(() {
-                                                _failed = false;
+                                                _error = '';
                                               });
+                                              Navigator.pop(context, false);
                                             },
                                             text: languages[choosenLanguage]
                                                 ['text_ok'])

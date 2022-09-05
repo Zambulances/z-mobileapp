@@ -16,7 +16,7 @@ class FleetDocuments extends StatefulWidget {
   final String fleetid;
   const FleetDocuments({Key? key, required this.fleetid}) : super(key: key);
   @override
-  _FleetDocumentsState createState() => _FleetDocumentsState();
+  State<FleetDocuments> createState() => _FleetDocumentsState();
 }
 
 int fleetdocsId = 0;
@@ -43,7 +43,7 @@ class _FleetDocumentsState extends State<FleetDocuments> {
     var media = MediaQuery.of(context).size;
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pop(context, false);
+        Navigator.pop(context, true);
         return true;
       },
       child: Material(
@@ -73,7 +73,7 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                           children: [
                             InkWell(
                                 onTap: () {
-                                  Navigator.pop(context, false);
+                                  Navigator.pop(context, true);
                                 },
                                 child: const Icon(Icons.arrow_back)),
                           ],
@@ -352,7 +352,6 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                         ? (fleetdocumentsNeeded.isNotEmpty)
                             ? Button(
                                 onTap: () async {
-                                  print('lllllll');
                                   setState(() {
                                     _loaded = false;
                                   });
@@ -396,7 +395,7 @@ class UploadDocs extends StatefulWidget {
   const UploadDocs({Key? key, required this.fleetid}) : super(key: key);
 
   @override
-  _UploadDocsState createState() => _UploadDocsState();
+  State<UploadDocs> createState() => _UploadDocsState();
 }
 
 String fleetdocIdNumber = '';
@@ -437,6 +436,11 @@ class _UploadDocsState extends State<UploadDocs> {
       status = await Permission.photos.request();
     }
     return status;
+  }
+
+// navigate pop
+  pop() {
+    Navigator.pop(context);
   }
 
 //get camera permission
@@ -664,8 +668,6 @@ class _UploadDocsState extends State<UploadDocs> {
                               : 1 + 1 == 2)
                       ? Button(
                           onTap: () async {
-                            print('222222222');
-
                             FocusManager.instance.primaryFocus?.unfocus();
                             setState(() {
                               _loading = true;
@@ -673,7 +675,7 @@ class _UploadDocsState extends State<UploadDocs> {
                             var result = await uploadFleetDocs(widget.fleetid);
                             if (result == 'success') {
                               await getFleetDocumentsNeeded(widget.fleetid);
-                              Navigator.pop(context);
+                              pop();
                             } else {
                               setState(() {
                                 _error = languages[choosenLanguage]

@@ -8,19 +8,10 @@ class FleetDetails extends StatefulWidget {
   const FleetDetails({Key? key}) : super(key: key);
 
   @override
-  _FleetDetailsState createState() => _FleetDetailsState();
+  State<FleetDetails> createState() => _FleetDetailsState();
 }
 
 class _FleetDetailsState extends State<FleetDetails> {
-  @override
-  void initState() {
-    print(userDetails['car_make_name'].toString());
-    print(userDetails['car_model_name'].toString());
-    print(userDetails['car_number'].toString());
-    print(userDetails['car_color'].toString());
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -70,128 +61,161 @@ class _FleetDetailsState extends State<FleetDetails> {
               Expanded(
                   child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
-                      child: Container(
-                        width: media.width * 0.9,
-                        padding: EdgeInsets.all(media.width * 0.025),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                  blurRadius: 2,
-                                  color: Colors.black.withOpacity(0.2),
-                                  spreadRadius: 2),
-                            ],
-                            color: page),
-                        child: Column(
-                          children: [
-                            Text(
-                              languages[choosenLanguage]['text_type'],
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * sixteen,
-                                  color: hintColor),
-                            ),
-                            SizedBox(
-                              height: media.width * 0.025,
-                            ),
-                            userDetails['vehicle_type_name'] != null
-                                ? Text(
-                                    userDetails['vehicle_type_name'],
+                      child: (userDetails['vehicle_type_id'] != null)
+                          ? Container(
+                              width: media.width * 0.9,
+                              padding: EdgeInsets.all(media.width * 0.025),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                        blurRadius: 2,
+                                        color: Colors.black.withOpacity(0.2),
+                                        spreadRadius: 2),
+                                  ],
+                                  color: page),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    languages[choosenLanguage]['text_type'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: textColor,
-                                        fontWeight: FontWeight.w600),
-                                  )
-                                : const Text(''),
-                            SizedBox(
-                              height: media.width * 0.05,
-                            ),
-                            Text(
-                              languages[choosenLanguage]['text_make'],
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * sixteen,
-                                  color: hintColor),
-                            ),
-                            SizedBox(
-                              height: media.width * 0.025,
-                            ),
-                            userDetails['car_make_name'] != null
-                                ? Text(
-                                    userDetails['car_make_name'],
+                                        color: hintColor),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.025,
+                                  ),
+                                  userDetails['vehicle_type_name'] != null
+                                      ? Text(
+                                          userDetails['vehicle_type_name'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w600),
+                                        )
+                                      : const Text(''),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Text(
+                                    languages[choosenLanguage]['text_make'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: textColor,
-                                        fontWeight: FontWeight.w600),
-                                  )
-                                : const Text(''),
-                            SizedBox(
-                              height: media.width * 0.05,
-                            ),
-                            Text(
-                              languages[choosenLanguage]['text_model'],
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * sixteen,
-                                  color: hintColor),
-                            ),
-                            SizedBox(
-                              height: media.width * 0.025,
-                            ),
-                            userDetails['car_model_name'] != null
-                                ? Text(
-                                    userDetails['car_model_name'],
+                                        color: hintColor),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.025,
+                                  ),
+                                  userDetails['car_make_name'] != null
+                                      ? Text(
+                                          userDetails['car_make_name'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w600),
+                                        )
+                                      : const Text(''),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Text(
+                                    languages[choosenLanguage]['text_model'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: textColor,
-                                        fontWeight: FontWeight.w600),
-                                  )
-                                : const Text(''),
-                            SizedBox(
-                              height: media.width * 0.05,
-                            ),
-                            Text(
-                              languages[choosenLanguage]['text_number'],
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * sixteen,
-                                  color: hintColor),
-                            ),
-                            SizedBox(
-                              height: media.width * 0.025,
-                            ),
-                            userDetails['car_number'] != null
-                                ? Text(
-                                    userDetails['car_number'],
+                                        color: hintColor),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.025,
+                                  ),
+                                  userDetails['car_model_name'] != null
+                                      ? Text(
+                                          userDetails['car_model_name'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w600),
+                                        )
+                                      : const Text(''),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Text(
+                                    languages[choosenLanguage]['text_number'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: textColor,
-                                        fontWeight: FontWeight.w600),
-                                  )
-                                : const Text(''),
-                            SizedBox(
-                              height: media.width * 0.05,
-                            ),
-                            Text(
-                              languages[choosenLanguage]['text_color'],
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * sixteen,
-                                  color: hintColor),
-                            ),
-                            SizedBox(
-                              height: media.width * 0.025,
-                            ),
-                            userDetails['car_color'] != null
-                                ? Text(
-                                    userDetails['car_color'],
+                                        color: hintColor),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.025,
+                                  ),
+                                  userDetails['car_number'] != null
+                                      ? Text(
+                                          userDetails['car_number'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w600),
+                                        )
+                                      : const Text(''),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Text(
+                                    languages[choosenLanguage]['text_color'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: textColor,
-                                        fontWeight: FontWeight.w600),
-                                  )
-                                : const Text(''),
-                            SizedBox(
-                              height: media.width * 0.05,
-                            ),
-                          ],
-                        ),
-                      ))),
+                                        color: hintColor),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.025,
+                                  ),
+                                  userDetails['car_color'] != null
+                                      ? Text(
+                                          userDetails['car_color'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                              fontWeight: FontWeight.w600),
+                                        )
+                                      : const Text(''),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  height: media.width * 0.3,
+                                ),
+                                Container(
+                                  height: media.width * 0.7,
+                                  width: media.width * 0.7,
+                                  decoration: const BoxDecoration(
+                                      image: DecorationImage(
+                                          image: AssetImage(
+                                              'assets/images/nodatafound.gif'),
+                                          fit: BoxFit.contain)),
+                                ),
+                                SizedBox(
+                                  height: media.width * 0.02,
+                                ),
+                                SizedBox(
+                                  width: media.width * 0.9,
+                                  child: Text(
+                                    languages[choosenLanguage]
+                                        ['text_no_fleet_assigned'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        fontWeight: FontWeight.bold,
+                                        color: textColor),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                )
+                              ],
+                            ))),
             ],
           ),
         ),

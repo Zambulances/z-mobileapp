@@ -6,7 +6,6 @@ import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/referral_code.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_number.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
@@ -15,7 +14,7 @@ class VehicleColor extends StatefulWidget {
   const VehicleColor({Key? key}) : super(key: key);
 
   @override
-  _VehicleColorState createState() => _VehicleColorState();
+  State<VehicleColor> createState() => _VehicleColorState();
 }
 
 dynamic vehicleColor;
@@ -25,6 +24,21 @@ class _VehicleColorState extends State<VehicleColor> {
   TextEditingController controller = TextEditingController();
 
   String uploadError = '';
+
+//navigate
+  navigateRef() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Referral()),
+        (route) => false);
+  }
+
+  navigateMap() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Maps()),
+        (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,20 +131,14 @@ class _VehicleColorState extends State<VehicleColor> {
                                     _isLoading = false;
                                   });
                                   if (reg == 'true') {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const Referral()),
-                                        (route) => false);
+                                    navigateRef();
                                     serviceLocations.clear();
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
                                   } else {
                                     setState(() {
-                                      uploadError =
-                                          uploadError = reg.toString();
+                                      uploadError = reg.toString();
                                     });
                                   }
                                 } else if (userDetails['role'] == 'owner') {
@@ -143,7 +151,6 @@ class _VehicleColorState extends State<VehicleColor> {
                                         context: context,
                                         barrierDismissible: false,
                                         builder: (context) {
-                                          var searchVal = '';
                                           return AlertDialog(
                                             content: Container(
                                               width: media.width * 0.8,
@@ -176,15 +183,15 @@ class _VehicleColorState extends State<VehicleColor> {
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
+                                  } else {
+                                    setState(() {
+                                      uploadError = reg.toString();
+                                    });
                                   }
                                 } else {
                                   var update = await updateVehicle();
                                   if (update == 'success') {
-                                    Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => const Maps()),
-                                        (route) => false);
+                                    navigateMap();
                                     serviceLocations.clear();
                                     vehicleMake.clear();
                                     vehicleModel.clear();

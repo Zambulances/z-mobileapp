@@ -14,7 +14,7 @@ class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
 
   @override
-  _EditProfileState createState() => _EditProfileState();
+  State<EditProfile> createState() => _EditProfileState();
 }
 
 dynamic proImageFile;
@@ -22,7 +22,7 @@ dynamic proImageFile;
 class _EditProfileState extends State<EditProfile> {
   ImagePicker picker = ImagePicker();
   bool _isLoading = false;
-  bool _error = false;
+  String _error = '';
   bool _pickImage = false;
   String _permission = '';
   TextEditingController name = TextEditingController();
@@ -80,10 +80,15 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   void initState() {
+    _error = '';
     proImageFile = null;
     name.text = userDetails['name'];
     email.text = userDetails['email'];
     super.initState();
+  }
+
+  pop() {
+    Navigator.pop(context, true);
   }
 
   @override
@@ -225,10 +230,10 @@ class _EditProfileState extends State<EditProfile> {
                               val = await updateProfile(name.text, email.text);
                             }
                             if (val == 'success') {
-                              Navigator.pop(context, true);
+                              pop();
                             } else {
                               setState(() {
-                                _error = true;
+                                _error = val.toString();
                               });
                             }
                             setState(() {
@@ -475,7 +480,7 @@ class _EditProfileState extends State<EditProfile> {
                 : Container(),
 
             //error
-            (_error == true)
+            (_error != '')
                 ? Positioned(
                     child: Container(
                     height: media.height * 1,
@@ -492,14 +497,16 @@ class _EditProfileState extends State<EditProfile> {
                               color: page),
                           child: Column(
                             children: [
-                              Text(
-                                languages[choosenLanguage]
-                                    ['text_somethingwentwrong'],
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * sixteen,
-                                    color: textColor,
-                                    fontWeight: FontWeight.w600),
+                              SizedBox(
+                                width: media.width * 0.8,
+                                child: Text(
+                                  _error.toString(),
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * sixteen,
+                                      color: textColor,
+                                      fontWeight: FontWeight.w600),
+                                ),
                               ),
                               SizedBox(
                                 height: media.width * 0.05,
@@ -507,7 +514,7 @@ class _EditProfileState extends State<EditProfile> {
                               Button(
                                   onTap: () async {
                                     setState(() {
-                                      _error = false;
+                                      _error = '';
                                     });
                                   },
                                   text: languages[choosenLanguage]['text_ok'])

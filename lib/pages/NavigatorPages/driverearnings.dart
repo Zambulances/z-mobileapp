@@ -12,7 +12,7 @@ class DriverEarnings extends StatefulWidget {
   const DriverEarnings({Key? key}) : super(key: key);
 
   @override
-  _DriverEarningsState createState() => _DriverEarningsState();
+  State<DriverEarnings> createState() => _DriverEarningsState();
 }
 
 class _DriverEarningsState extends State<DriverEarnings> {
@@ -289,41 +289,6 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                       ),
                                     ],
                                   ),
-                                  // Container(
-                                  //   width: 1,
-                                  //   height: media.width * 0.1,
-                                  //   color: borderLines,
-                                  // ),
-                                  // Column(
-                                  //   children: [
-                                  //     Container(
-                                  //       width: media.width * 0.17,
-                                  //       alignment: Alignment.center,
-                                  //       child: Text(
-                                  //         languages[choosenLanguage]
-                                  //             ['text_hours'],
-                                  //         style: GoogleFonts.roboto(
-                                  //             fontSize: media.width * sixteen,
-                                  //             color: hintColor),
-                                  //       ),
-                                  //     ),
-                                  //     SizedBox(
-                                  //       height: media.width * 0.015,
-                                  //     ),
-                                  //     Container(
-                                  //       width: media.width * 0.17,
-                                  //       alignment: Alignment.center,
-                                  //       child: Text(
-                                  //         driverTodayEarnings[
-                                  //                 'total_hours_worked']
-                                  //             .toString(),
-                                  //         style: GoogleFonts.roboto(
-                                  //             fontSize: media.width * sixteen,
-                                  //             color: textColor),
-                                  //       ),
-                                  //     ),
-                                  //   ],
-                                  // ),
                                   Container(
                                     width: 1,
                                     height: media.width * 0.1,

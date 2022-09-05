@@ -9,11 +9,16 @@ class SelectLanguage extends StatefulWidget {
   const SelectLanguage({Key? key}) : super(key: key);
 
   @override
-  _SelectLanguageState createState() => _SelectLanguageState();
+  State<SelectLanguage> createState() => _SelectLanguageState();
 }
 
 class _SelectLanguageState extends State<SelectLanguage> {
   var _choosenLanguage = choosenLanguage;
+
+  //navigate pop
+  pop() {
+    Navigator.pop(context, true);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +146,6 @@ class _SelectLanguageState extends State<SelectLanguage> {
                 ),
                 Button(
                     onTap: () async {
-                      await getlangid();
                       choosenLanguage = _choosenLanguage;
                       if (choosenLanguage == 'ar' ||
                           choosenLanguage == 'ur' ||
@@ -150,10 +154,11 @@ class _SelectLanguageState extends State<SelectLanguage> {
                       } else {
                         languageDirection = 'ltr';
                       }
+                      await getlangid();
                       pref.setString('languageDirection', languageDirection);
                       pref.setString('choosenLanguage', _choosenLanguage);
                       valueNotifierHome.incrementNotifier();
-                      Navigator.pop(context, true);
+                      pop();
                     },
                     text: languages[choosenLanguage]['text_confirm'])
               ],

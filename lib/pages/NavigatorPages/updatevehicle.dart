@@ -10,7 +10,7 @@ class UpdateVehicle extends StatefulWidget {
   const UpdateVehicle({Key? key}) : super(key: key);
 
   @override
-  _UpdateVehicleState createState() => _UpdateVehicleState();
+  State<UpdateVehicle> createState() => _UpdateVehicleState();
 }
 
 class _UpdateVehicleState extends State<UpdateVehicle> {

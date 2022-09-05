@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../styles/styles.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -26,7 +25,7 @@ class Button extends StatefulWidget {
   });
 
   @override
-  _ButtonState createState() => _ButtonState();
+  State<Button> createState() => _ButtonState();
 }
 
 class _ButtonState extends State<Button> {
@@ -49,13 +48,16 @@ class _ButtonState extends State<Button> {
               width: 1,
             )),
         alignment: Alignment.center,
-        child: Text(
-          widget.text,
-          style: GoogleFonts.roboto(
-              fontSize: media.width * sixteen,
-              color: (widget.textcolor != null) ? widget.textcolor : buttonText,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1),
+        child: FittedBox(
+          fit: BoxFit.contain,
+          child: Text(
+            widget.text,
+            style: GoogleFonts.roboto(
+                fontSize: media.width * sixteen,
+                color: (widget.textcolor != null) ? widget.textcolor : buttonText,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1),
+          ),
         ),
       ),
     );
@@ -85,7 +87,7 @@ class InputField extends StatefulWidget {
       this.color});
 
   @override
-  _InputFieldState createState() => _InputFieldState();
+  State<InputField> createState() => _InputFieldState();
 }
 
 class _InputFieldState extends State<InputField> {

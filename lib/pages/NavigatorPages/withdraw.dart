@@ -12,7 +12,7 @@ class Withdraw extends StatefulWidget {
   const Withdraw({Key? key}) : super(key: key);
 
   @override
-  _WithdrawState createState() => _WithdrawState();
+  State<Withdraw> createState() => _WithdrawState();
 }
 
 dynamic withDrawMoney;
@@ -48,6 +48,18 @@ class _WithdrawState extends State<Withdraw> {
         _error = null;
       });
     });
+  }
+
+  //navigate
+  navigate() async {
+    var nav = await Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const BankDetails()));
+    if (nav) {
+      setState(() {
+        addMoneyController.text = withDrawMoney;
+        addBank = false;
+      });
+    }
   }
 
   @override
@@ -585,18 +597,7 @@ class _WithdrawState extends State<Withdraw> {
                                             _isLoading = false;
                                           });
 
-                                          var nav = await Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const BankDetails()));
-                                          if (nav) {
-                                            setState(() {
-                                              addMoneyController.text =
-                                                  withDrawMoney;
-                                              addBank = false;
-                                            });
-                                          }
+                                          navigate();
                                         }
                                         setState(() {
                                           addMoneyController.clear();

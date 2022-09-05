@@ -174,28 +174,6 @@ class _SignupMethodState extends State<SignupMethod> {
                       ),
                     ),
                   ),
-
-                  // Button(
-                  //     onTap: () {
-                  //       ischeckownerordriver = 'driver';
-                  //       Navigator.push(
-                  //           context,
-                  //           MaterialPageRoute(
-                  //               builder: (context) => const Login()));
-                  //     },
-                  //     text: 'Register as Driver'),
-                  // SizedBox(
-                  //   height: media.width * 0.05,
-                  // ),
-                  // Button(
-                  //     onTap: () {
-                  //       ischeckownerordriver = 'owner';
-                  //       Navigator.push(
-                  //           context,
-                  //           MaterialPageRoute(
-                  //               builder: (context) => const Login()));
-                  //     },
-                  //     text: 'Register as Fleet Owner'),
                 ],
               ),
             ),

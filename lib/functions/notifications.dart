@@ -54,14 +54,15 @@ void initMessaging() {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
-    if (notification != null) {
+    AndroidNotification? android = message.notification?.android;
+    if (notification != null && android != null) {
       AwesomeNotifications().createNotification(
           content: NotificationContent(
               id: 12346,
               channelKey: 'normal_push',
               autoDismissible: true,
               title: notification.title,
-              body: notification.title,
+              body: notification.body,
               displayOnBackground: true,
               displayOnForeground: true,
               wakeUpScreen: true,

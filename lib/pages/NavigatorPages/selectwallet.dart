@@ -13,7 +13,7 @@ class SelectWallet extends StatefulWidget {
   const SelectWallet({Key? key}) : super(key: key);
 
   @override
-  _SelectWalletState createState() => _SelectWalletState();
+  State<SelectWallet> createState() => _SelectWalletState();
 }
 
 CardEditController cardController = CardEditController();
@@ -116,9 +116,13 @@ class _SelectWalletState extends State<SelectWallet> {
                                               .confirmPayment(
                                             stripeToken['client_token'],
                                             PaymentMethodParams.card(
-                                              billingDetails: BillingDetails(
-                                                  name: userDetails['name'],
-                                                  phone: userDetails['mobile']),
+                                              paymentMethodData:
+                                                  PaymentMethodData(
+                                                billingDetails: BillingDetails(
+                                                    name: userDetails['name'],
+                                                    phone:
+                                                        userDetails['mobile']),
+                                              ),
                                             ),
                                           );
                                         } catch (e) {

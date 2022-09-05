@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/adddriver.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/assigndriver.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/fleetdocuments.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_color.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_type.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
@@ -18,7 +15,7 @@ class ManageVehicles extends StatefulWidget {
   const ManageVehicles({Key? key}) : super(key: key);
 
   @override
-  _ManageVehiclesState createState() => _ManageVehiclesState();
+  State<ManageVehicles> createState() => _ManageVehiclesState();
 }
 
 class _ManageVehiclesState extends State<ManageVehicles> {
@@ -39,7 +36,6 @@ class _ManageVehiclesState extends State<ManageVehicles> {
     setState(() {
       _isLoading = true;
     });
-    printWrapped(isclickmenu);
     await getVehicleInfo();
     setState(() {
       _isLoading = false;
@@ -410,8 +406,6 @@ class _ManageVehiclesState extends State<ManageVehicles> {
                                                             InkWell(
                                                               onTap: () {
                                                                 setState(() {
-                                                                  print(
-                                                                      'inside ontappppppppppppppppp');
                                                                   if (isclickmenu ==
                                                                       i.toString()) {
                                                                     isclickmenu =
@@ -493,6 +487,8 @@ class _ManageVehiclesState extends State<ManageVehicles> {
                                                                   if (nav !=
                                                                       null) {
                                                                     if (nav) {
+                                                                      isclickmenu =
+                                                                          '';
                                                                       getvehicledata();
                                                                     }
                                                                   }
@@ -503,13 +499,23 @@ class _ManageVehiclesState extends State<ManageVehicles> {
                                                                     'text_assign_driver'],
                                                               ),
                                                             MenuClass(
-                                                              ontap: () {
-                                                                Navigator.push(
+                                                              ontap: () async {
+                                                                var nav = await Navigator.push(
                                                                     context,
                                                                     MaterialPageRoute(
                                                                         builder:
                                                                             (context) =>
                                                                                 FleetDocuments(fleetid: fleetid)));
+                                                                if (nav !=
+                                                                    null) {
+                                                                  if (nav) {
+                                                                    setState(
+                                                                        () {
+                                                                      isclickmenu =
+                                                                          '';
+                                                                    });
+                                                                  }
+                                                                }
                                                               },
                                                               text: languages[
                                                                       choosenLanguage]
@@ -531,19 +537,40 @@ class _ManageVehiclesState extends State<ManageVehicles> {
                                   ),
                                 ],
                               )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    languages[choosenLanguage]
-                                        ['text_no_vehicle_found'],
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor,
-                                        fontWeight: FontWeight.bold),
+                            : (_isLoading == false)
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      SizedBox(
+                                        height: media.width * 0.3,
+                                      ),
+                                      Container(
+                                        height: media.width * 0.7,
+                                        width: media.width * 0.7,
+                                        decoration: const BoxDecoration(
+                                            image: DecorationImage(
+                                                image: AssetImage(
+                                                    'assets/images/nodatafound.gif'),
+                                                fit: BoxFit.contain)),
+                                      ),
+                                      SizedBox(
+                                        height: media.width * 0.02,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.9,
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_noDataFound'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              fontWeight: FontWeight.bold,
+                                              color: textColor),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      )
+                                    ],
                                   )
-                                ],
-                              ),
+                                : Container(),
                       ),
                     ),
 
@@ -553,7 +580,6 @@ class _ManageVehiclesState extends State<ManageVehicles> {
                       child: Button(
                           onTap: () {
                             myServiceId = userDetails['service_location_id'];
-                            print(myServiceId);
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(

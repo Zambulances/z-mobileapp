@@ -17,7 +17,7 @@ class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
 
   @override
-  _WalletPageState createState() => _WalletPageState();
+  State<WalletPage> createState() => _WalletPageState();
 }
 
 dynamic addMoney;
@@ -287,14 +287,40 @@ class _WalletPageState extends State<WalletPage> {
                                             .toList(),
                                       )
                                     : (_completed == true)
-                                        ? Text(
-                                            languages[choosenLanguage]
-                                                ['text_noDataFound'],
-                                            style: GoogleFonts.roboto(
-                                                fontSize:
-                                                    media.width * eighteen,
-                                                fontWeight: FontWeight.w600,
-                                                color: textColor),
+                                        ? Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                height: media.width * 0.05,
+                                              ),
+                                              Container(
+                                                height: media.width * 0.7,
+                                                width: media.width * 0.7,
+                                                decoration: const BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage(
+                                                            'assets/images/nodatafound.gif'),
+                                                        fit: BoxFit.contain)),
+                                              ),
+                                              SizedBox(
+                                                height: media.width * 0.02,
+                                              ),
+                                              SizedBox(
+                                                width: media.width * 0.9,
+                                                child: Text(
+                                                  languages[choosenLanguage]
+                                                      ['text_noDataFound'],
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * sixteen,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: textColor),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              )
+                                            ],
                                           )
                                         : Container(),
                                 (walletPages.isNotEmpty)
@@ -796,7 +822,10 @@ class _WalletPageState extends State<WalletPage> {
                                                                       null;
                                                                   addMoneyController
                                                                       .clear();
+                                                                  _isLoading =
+                                                                      true;
                                                                 });
+                                                                getWallet();
                                                               }
                                                             },
                                                             child: Container(

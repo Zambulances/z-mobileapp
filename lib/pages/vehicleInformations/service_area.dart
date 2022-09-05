@@ -12,7 +12,7 @@ class ServiceArea extends StatefulWidget {
   const ServiceArea({Key? key}) : super(key: key);
 
   @override
-  _ServiceAreaState createState() => _ServiceAreaState();
+  State<ServiceArea> createState() => _ServiceAreaState();
 }
 
 dynamic myServiceLocation;

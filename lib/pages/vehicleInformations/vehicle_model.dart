@@ -12,7 +12,7 @@ class VehicleModel extends StatefulWidget {
   const VehicleModel({Key? key}) : super(key: key);
 
   @override
-  _VehicleModelState createState() => _VehicleModelState();
+  State<VehicleModel> createState() => _VehicleModelState();
 }
 
 dynamic vehicleModelId;

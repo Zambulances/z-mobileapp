@@ -13,7 +13,7 @@ class ReferralPage extends StatefulWidget {
   const ReferralPage({Key? key}) : super(key: key);
 
   @override
-  _ReferralPageState createState() => _ReferralPageState();
+  State<ReferralPage> createState() => _ReferralPageState();
 }
 
 class _ReferralPageState extends State<ReferralPage> {

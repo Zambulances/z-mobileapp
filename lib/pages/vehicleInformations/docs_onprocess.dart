@@ -12,7 +12,7 @@ class DocsProcess extends StatefulWidget {
   const DocsProcess({Key? key}) : super(key: key);
 
   @override
-  _DocsProcessState createState() => _DocsProcessState();
+  State<DocsProcess> createState() => _DocsProcessState();
 }
 
 class _DocsProcessState extends State<DocsProcess> {

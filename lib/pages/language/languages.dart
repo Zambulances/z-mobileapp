@@ -10,7 +10,7 @@ class Languages extends StatefulWidget {
   const Languages({Key? key}) : super(key: key);
 
   @override
-  _LanguagesState createState() => _LanguagesState();
+  State<Languages> createState() => _LanguagesState();
 }
 
 class _LanguagesState extends State<Languages> {
@@ -19,6 +19,11 @@ class _LanguagesState extends State<Languages> {
     choosenLanguage = 'en';
     languageDirection = 'ltr';
     super.initState();
+  }
+
+  navigate() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const SignupMethod()));
   }
 
   @override
@@ -48,6 +53,7 @@ class _LanguagesState extends State<Languages> {
                     Container(
                       height: media.width * 0.11,
                       width: media.width * 1,
+                      alignment: Alignment.center,
                       child: Text(
                         (choosenLanguage.isEmpty)
                             ? 'Choose Language'
@@ -58,7 +64,6 @@ class _LanguagesState extends State<Languages> {
                             fontSize: media.width * sixteen,
                             fontWeight: FontWeight.bold),
                       ),
-                      alignment: Alignment.center,
                     ),
                   ],
                 ),
@@ -146,14 +151,12 @@ class _LanguagesState extends State<Languages> {
               const SizedBox(height: 20),
               (choosenLanguage != '')
                   ? Button(
-                      onTap: () {
+                      onTap: () async {
+                        await getlangid();
                         //saving language settings in local
                         pref.setString('languageDirection', languageDirection);
                         pref.setString('choosenLanguage', choosenLanguage);
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignupMethod()));
+                        navigate();
                       },
                       text: languages[choosenLanguage]['text_confirm'])
                   : Container(),

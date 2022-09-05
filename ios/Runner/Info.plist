@@ -24,8 +24,6 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>FlutterDeepLinkingEnabled</key>
-    <true/>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -36,19 +34,13 @@
 				<string>com.googleusercontent.apps.214496791559-69n81e5605p5hcf42if08unq4krqi5md</string>
 			</array>
 		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>tagxidriver</string>
-			</array>
-		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
+	<key>FlutterDeepLinkingEnabled</key>
+	<true/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>https</string>
@@ -104,5 +96,7 @@
 	</array>
 	<key>reve</key>
 	<string></string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 </dict>
 </plist>

@@ -12,7 +12,7 @@ class BankDetails extends StatefulWidget {
   const BankDetails({Key? key}) : super(key: key);
 
   @override
-  _BankDetailsState createState() => _BankDetailsState();
+  State<BankDetails> createState() => _BankDetailsState();
 }
 
 class _BankDetailsState extends State<BankDetails> {
@@ -23,7 +23,7 @@ class _BankDetailsState extends State<BankDetails> {
   TextEditingController bankCode = TextEditingController();
 
   bool _isLoading = true;
-  bool _showError = false;
+  String _showError = '';
   bool _edit = false;
 
   @override
@@ -43,9 +43,14 @@ class _BankDetailsState extends State<BankDetails> {
   _errorClear() async {
     Future.delayed(const Duration(seconds: 4), () {
       setState(() {
-        _showError = false;
+        _showError = '';
       });
     });
+  }
+
+  //navigate pop
+  pop() {
+    Navigator.pop(context, true);
   }
 
   @override
@@ -287,18 +292,18 @@ class _BankDetailsState extends State<BankDetails> {
                                           accountNumber.text,
                                           bankCode.text,
                                           bankName.text);
-                                      if (val == 'failure') {
-                                        setState(() {
-                                          _showError = true;
-                                          _errorClear();
-                                        });
-                                      } else if (val == 'success') {
+                                      if (val == 'success') {
                                         setState(() {
                                           _edit = false;
                                         });
                                         if (addBank == true) {
-                                          Navigator.pop(context, true);
+                                          pop();
                                         }
+                                      } else {
+                                        setState(() {
+                                          _showError = val.toString();
+                                          _errorClear();
+                                        });
                                       }
                                       setState(() {
                                         _isLoading = false;
@@ -327,7 +332,7 @@ class _BankDetailsState extends State<BankDetails> {
                   ],
                 ),
               ),
-              (_showError == true)
+              (_showError != '')
                   ? Positioned(
                       top: 0,
                       child: Container(
@@ -350,12 +355,14 @@ class _BankDetailsState extends State<BankDetails> {
                                           blurRadius: 2)
                                     ]),
                                 padding: EdgeInsets.all(media.width * 0.05),
-                                child: Text(
-                                  languages[choosenLanguage]
-                                      ['text_somethingwentwrong'],
-                                  style: GoogleFonts.roboto(
-                                      fontSize: media.width * sixteen,
-                                      color: textColor),
+                                child: SizedBox(
+                                  width: media.width * 0.7,
+                                  child: Text(
+                                    _showError.toString(),
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        color: textColor),
+                                  ),
                                 ),
                               )
                             ]),

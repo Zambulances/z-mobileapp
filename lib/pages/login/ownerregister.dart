@@ -1,13 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/get_started.dart';
 import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/pages/vehicleInformations/referral_code.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:image_picker/image_picker.dart';
 
 class OwnersRegister extends StatefulWidget {
   const OwnersRegister({Key? key}) : super(key: key);
@@ -30,6 +35,9 @@ class _OwnersRegisterState extends State<OwnersRegister> {
   bool _chooseLocation = false;
   var verifyEmailError = '';
   var error = '';
+  ImagePicker picker = ImagePicker();
+  bool _pickImage = false;
+  String _permission = '';
 
   TextEditingController emailText =
       TextEditingController(); //email textediting controller
@@ -46,17 +54,76 @@ class _OwnersRegisterState extends State<OwnersRegister> {
   TextEditingController taxText =
       TextEditingController(); //name textediting controller
 
-  @override
-  void initState() {
-    getLocations();
-    super.initState();
-  }
-
   getLocations() async {
     await getServiceLocation();
     setState(() {
       _loading = false;
     });
+  }
+
+  getGalleryPermission() async {
+    var status = await Permission.photos.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.photos.request();
+    }
+    return status;
+  }
+
+//get camera permission
+  getCameraPermission() async {
+    var status = await Permission.camera.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.camera.request();
+    }
+    return status;
+  }
+
+//pick image from gallery
+  pickImageFromGallery() async {
+    var permission = await getGalleryPermission();
+    if (permission == PermissionStatus.granted) {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      setState(() {
+        proImageFile1 = pickedFile?.path;
+        _pickImage = false;
+      });
+    } else {
+      setState(() {
+        _permission = 'noPhotos';
+      });
+    }
+  }
+
+  //navigate
+
+  navigate() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Referral()),
+        (route) => false);
+  }
+
+//pick image from camera
+  pickImageFromCamera() async {
+    var permission = await getCameraPermission();
+    if (permission == PermissionStatus.granted) {
+      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      setState(() {
+        proImageFile1 = pickedFile?.path;
+        _pickImage = false;
+      });
+    } else {
+      setState(() {
+        _permission = 'noCamera';
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    proImageFile1 = null;
+    getLocations();
+    super.initState();
   }
 
   @override
@@ -132,6 +199,45 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
                                   color: textColor.withOpacity(0.3)),
+                            ),
+                            SizedBox(height: media.height * 0.04),
+
+                            Center(
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _pickImage = true;
+                                  });
+                                },
+                                child: proImageFile1 != null
+                                    ? Container(
+                                        height: media.width * 0.4,
+                                        width: media.width * 0.4,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: backgroundColor,
+                                            image: DecorationImage(
+                                                image: FileImage(
+                                                    File(proImageFile1)),
+                                                fit: BoxFit.cover)),
+                                      )
+                                    : Container(
+                                        alignment: Alignment.center,
+                                        height: media.width * 0.4,
+                                        width: media.width * 0.4,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: backgroundColor,
+                                        ),
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_add_photo'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * fourteen,
+                                              color: textColor),
+                                        ),
+                                      ),
+                              ),
                             ),
                             SizedBox(height: media.height * 0.04),
 
@@ -212,12 +318,15 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                                           width: media.width * 0.5,
                                           child: Text(
                                             (ownerServiceLocation == '')
-                                                ? 'choose area'
-                                                : serviceLocations.firstWhere(
-                                                        (element) =>
-                                                            element['id'] ==
-                                                            ownerServiceLocation)[
-                                                    'name'],
+                                                ? languages[choosenLanguage]
+                                                    ['text_choose_area']
+                                                : (serviceLocations.isNotEmpty)
+                                                    ? serviceLocations.firstWhere(
+                                                            (element) =>
+                                                                element['id'] ==
+                                                                ownerServiceLocation)[
+                                                        'name']
+                                                    : '',
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen,
                                                 color: textColor),
@@ -245,46 +354,48 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                                     ], color: page),
                                     height: media.width * 0.4,
                                     child: (serviceLocations.isNotEmpty)
-                                        ? Column(
-                                            children: serviceLocations
-                                                .asMap()
-                                                .map((i, value) {
-                                                  return MapEntry(
-                                                      i,
-                                                      InkWell(
-                                                        onTap: () {
-                                                          ownerServiceLocation =
-                                                              serviceLocations[
-                                                                  i]['id'];
-                                                          _chooseLocation =
-                                                              false;
-                                                          setState(() {});
-                                                        },
-                                                        child: Container(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  media.width *
-                                                                      0.05),
-                                                          width:
-                                                              media.width * 0.9,
-                                                          child: Text(
-                                                            serviceLocations[i]
-                                                                ['name'],
-                                                            style: GoogleFonts.roboto(
-                                                                fontSize: media
+                                        ? SingleChildScrollView(
+                                            child: Column(
+                                              children: serviceLocations
+                                                  .asMap()
+                                                  .map((i, value) {
+                                                    return MapEntry(
+                                                        i,
+                                                        InkWell(
+                                                          onTap: () {
+                                                            ownerServiceLocation =
+                                                                serviceLocations[
+                                                                    i]['id'];
+                                                            _chooseLocation =
+                                                                false;
+                                                            setState(() {});
+                                                          },
+                                                          child: Container(
+                                                            padding: EdgeInsets
+                                                                .all(media
                                                                         .width *
-                                                                    fourteen,
-                                                                color:
-                                                                    textColor,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
+                                                                    0.05),
+                                                            width: media.width *
+                                                                0.9,
+                                                            child: Text(
+                                                              serviceLocations[
+                                                                  i]['name'],
+                                                              style: GoogleFonts.roboto(
+                                                                  fontSize: media
+                                                                          .width *
+                                                                      fourteen,
+                                                                  color:
+                                                                      textColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
                                                           ),
-                                                        ),
-                                                      ));
-                                                })
-                                                .values
-                                                .toList(),
+                                                        ));
+                                                  })
+                                                  .values
+                                                  .toList(),
+                                            ),
                                           )
                                         : Container(
                                             padding: EdgeInsets.all(
@@ -352,7 +463,8 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                             // name input field
                             InputField(
                               icon: Icons.home_work_outlined,
-                              text: 'Company Name',
+                              text: languages[choosenLanguage]
+                                  ['text_company_name'],
                               onTap: (val) {
                                 setState(() {
                                   companyName = companyText.text;
@@ -366,7 +478,7 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                             // name input field
                             InputField(
                               icon: Icons.home_outlined,
-                              text: 'Address',
+                              text: languages[choosenLanguage]['text_address'],
                               onTap: (val) {
                                 setState(() {
                                   companyAddress = addressText.text;
@@ -380,7 +492,7 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                             // name input field
                             InputField(
                               icon: Icons.home_outlined,
-                              text: 'City',
+                              text: languages[choosenLanguage]['text_city'],
                               onTap: (val) {
                                 setState(() {
                                   city = cityText.text;
@@ -395,7 +507,8 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                             InputField(
                               icon: Icons.post_add,
                               inputType: TextInputType.number,
-                              text: 'Postal Code',
+                              text: languages[choosenLanguage]
+                                  ['text_postal_code'],
                               onTap: (val) {
                                 setState(() {
                                   postalCode = postalText.text;
@@ -409,7 +522,8 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                             // name input field
                             InputField(
                               icon: Icons.document_scanner_outlined,
-                              text: 'Tax Number',
+                              text: languages[choosenLanguage]
+                                  ['text_tax_number'],
                               onTap: (val) {
                                 setState(() {
                                   taxNumber = taxText.text;
@@ -449,7 +563,8 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                             addressText.text.isNotEmpty &&
                             cityText.text.isNotEmpty &&
                             postalText.text.isNotEmpty &&
-                            taxText.text.isNotEmpty)
+                            taxText.text.isNotEmpty &&
+                            proImageFile1 != null)
                         ? Container(
                             width: media.width * 1,
                             alignment: Alignment.center,
@@ -475,12 +590,7 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                                       });
                                       var val = await registerOwner();
                                       if (val == 'true') {
-                                        Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const Referral()),
-                                            (route) => false);
+                                        navigate();
                                         serviceLocations.clear();
                                       } else {
                                         error = val.toString();
@@ -507,6 +617,240 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                   ],
                 ),
               ),
+
+              //image pick
+
+              (_pickImage == true)
+                  ? Positioned(
+                      bottom: 0,
+                      child: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _pickImage = false;
+                          });
+                        },
+                        child: Container(
+                          height: media.height * 1,
+                          width: media.width * 1,
+                          color: Colors.transparent.withOpacity(0.6),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.all(media.width * 0.05),
+                                width: media.width * 1,
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.only(
+                                        topLeft: Radius.circular(25),
+                                        topRight: Radius.circular(25)),
+                                    border: Border.all(
+                                      color: borderLines,
+                                      width: 1.2,
+                                    ),
+                                    color: page),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: media.width * 0.02,
+                                      width: media.width * 0.15,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(
+                                            media.width * 0.01),
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: media.width * 0.05,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Column(
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                pickImageFromCamera();
+                                              },
+                                              child: Container(
+                                                  height: media.width * 0.171,
+                                                  width: media.width * 0.171,
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: borderLines,
+                                                          width: 1.2),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12)),
+                                                  child: Icon(
+                                                    Icons.camera_alt_outlined,
+                                                    size: media.width * 0.064,
+                                                  )),
+                                            ),
+                                            SizedBox(
+                                              height: media.width * 0.01,
+                                            ),
+                                            Text(
+                                              languages[choosenLanguage]
+                                                  ['text_camera'],
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: media.width * ten,
+                                                  color:
+                                                      const Color(0xff666666)),
+                                            )
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            InkWell(
+                                              onTap: () {
+                                                pickImageFromGallery();
+                                              },
+                                              child: Container(
+                                                  height: media.width * 0.171,
+                                                  width: media.width * 0.171,
+                                                  decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                          color: borderLines,
+                                                          width: 1.2),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12)),
+                                                  child: Icon(
+                                                    Icons.image_outlined,
+                                                    size: media.width * 0.064,
+                                                  )),
+                                            ),
+                                            SizedBox(
+                                              height: media.width * 0.01,
+                                            ),
+                                            Text(
+                                              languages[choosenLanguage]
+                                                  ['text_gallery'],
+                                              style: GoogleFonts.roboto(
+                                                  fontSize: media.width * ten,
+                                                  color:
+                                                      const Color(0xff666666)),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ))
+                  : Container(),
+
+              //permission denied popup
+              (_permission != '')
+                  ? Positioned(
+                      child: Container(
+                      height: media.height * 1,
+                      width: media.width * 1,
+                      color: Colors.transparent.withOpacity(0.6),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: media.width * 0.9,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _permission = '';
+                                      _pickImage = false;
+                                    });
+                                  },
+                                  child: Container(
+                                    height: media.width * 0.1,
+                                    width: media.width * 0.1,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle, color: page),
+                                    child: const Icon(Icons.cancel_outlined),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: media.width * 0.05,
+                          ),
+                          Container(
+                            padding: EdgeInsets.all(media.width * 0.05),
+                            width: media.width * 0.9,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: page,
+                                boxShadow: [
+                                  BoxShadow(
+                                      blurRadius: 2.0,
+                                      spreadRadius: 2.0,
+                                      color: Colors.black.withOpacity(0.2))
+                                ]),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                    width: media.width * 0.8,
+                                    child: Text(
+                                      (_permission == 'noPhotos')
+                                          ? languages[choosenLanguage]
+                                              ['text_open_photos_setting']
+                                          : languages[choosenLanguage]
+                                              ['text_open_camera_setting'],
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * sixteen,
+                                          color: textColor,
+                                          fontWeight: FontWeight.w600),
+                                    )),
+                                SizedBox(height: media.width * 0.05),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                        onTap: () async {
+                                          await openAppSettings();
+                                        },
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_open_settings'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: buttonColor,
+                                              fontWeight: FontWeight.w600),
+                                        )),
+                                    InkWell(
+                                        onTap: () async {
+                                          (_permission == 'noCamera')
+                                              ? pickImageFromCamera()
+                                              : pickImageFromGallery();
+                                          setState(() {
+                                            _permission = '';
+                                          });
+                                        },
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_done'],
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: buttonColor,
+                                              fontWeight: FontWeight.w600),
+                                        ))
+                                  ],
+                                )
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ))
+                  : Container(),
 
               //internet not connected
               (internet == false)

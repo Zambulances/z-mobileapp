@@ -9,7 +9,7 @@ class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
 
   @override
-  _ChatPageState createState() => _ChatPageState();
+  State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
@@ -43,7 +43,7 @@ class _ChatPageState extends State<ChatPage> {
             body: ValueListenableBuilder(
                 valueListenable: valueNotifierHome.value,
                 builder: (context, value, child) {
-                  WidgetsBinding.instance?.addPostFrameCallback((_) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
                     controller.animateTo(controller.position.maxScrollExtent,
                         duration: const Duration(milliseconds: 500),
                         curve: Curves.ease);
@@ -73,7 +73,7 @@ class _ChatPageState extends State<ChatPage> {
                                   alignment: Alignment.center,
                                   child: Text(
                                     languages[choosenLanguage]
-                                        ['text_chatwithdriver'],
+                                        ['text_chatwithuser'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * twenty,
                                         color: textColor,

@@ -98,8 +98,10 @@ class _NavDrawerState extends State<NavDrawer> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   const EditProfile()));
-                                      if (val) {
-                                        setState(() {});
+                                      if (val != null) {
+                                        if (val) {
+                                          setState(() {});
+                                        }
                                       }
                                     },
                                     child: Icon(

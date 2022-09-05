@@ -17,10 +17,8 @@ import Firebase
 }
 var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0);
     override func applicationDidEnterBackground(_ application: UIApplication) {
-        let url = URL(string: "tagxidriver://")!
         
                 bgTask = application.beginBackgroundTask()
-        application.open(url)
     }
     override func applicationDidBecomeActive(_ application: UIApplication) {
         application.endBackgroundTask(bgTask);

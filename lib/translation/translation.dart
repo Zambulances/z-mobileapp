@@ -358,7 +358,13 @@ Map<String, dynamic> languages = {
         "Your owner wallet balance is low, please contact your owner",
     "text_add_vehicle": "Add Vehicle",
     "text_address": "Address",
-    "text_add_driver": "Add Driver"
+    "text_add_driver": "Add Driver",
+    "text_choose_area": "Choose Area",
+    "text_company_name": "Company Name",
+    "text_city": "City",
+    "text_postal_code": "Postal Code",
+    "text_tax_number": "Tax Number",
+    "text_no_fleet_assigned": "No Fleet Assigned"
   },
   "hi": {
     "text_enter_social": "या सोशल मीडिया में प्रवेश करें",
@@ -607,7 +613,7 @@ Map<String, dynamic> languages = {
     "text_startridewithotp": "ओटीपी के साथ सवारी शुरू करें",
     "text_loadingLocalization": "स्थानीयकरण लोड करना",
     "text_background_permission":
-        "पृष्ठभूमि स्थान सक्षम करें - यदि आपका ऐप पृष्ठभूमि में है तो भी आपको सवारी अनुरोध देने के लिए",
+        "पृष्ठभूमि स्थान सक्षम करें - यदि आपका ऐप पृष्ठभूमि में है, तो भी आपको सवारी अनुरोध देने के लिए",
     "Admin Commission For Trip": "यात्रा के लिए व्यवस्थापक आयोग",
     "Trip Commission": "यात्रा आयोग",
     "Cancellation Fee": "रद्दीकरण शुल्क",
@@ -724,7 +730,13 @@ Map<String, dynamic> languages = {
         "आपका मालिक बटुआ संतुलन कम है, कृपया अपने मालिक से संपर्क करें",
     "text_add_vehicle": "वाहन जोड़ें",
     "text_address": "पता",
-    "text_add_driver": "ड्राइवर जोड़ें"
+    "text_add_driver": "ड्राइवर जोड़ें",
+    "text_choose_area": "क्षेत्र चुनें",
+    "text_company_name": "कंपनी का नाम",
+    "text_city": "शहर",
+    "text_postal_code": "डाक कोड",
+    "text_tax_number": "कर संख्या",
+    "text_no_fleet_assigned": "कोई बेड़ा सौंपा नहीं गया"
   },
   "ar": {
     "text_enter_social": "أو أدخل وسائل التواصل الاجتماعي",
@@ -1083,7 +1095,13 @@ Map<String, dynamic> languages = {
         "رصيد محفظة المالك الخاص بك منخفض ، يرجى الاتصال بمالكك",
     "text_add_vehicle": "أضف السيارة",
     "text_address": "تبوك",
-    "text_add_driver": "أضف سائق"
+    "text_add_driver": "أضف سائق",
+    "text_choose_area": "اختر المنطقة",
+    "text_company_name": "اسم الشركة",
+    "text_city": "مدينة",
+    "text_postal_code": "رمز بريدي",
+    "text_tax_number": "الرقم الضريبي",
+    "text_no_fleet_assigned": "لم يتم تعيين أسطول"
   },
   "fr": {
     "text_enter_social": "ou entrez les médias sociaux",
@@ -1455,7 +1473,13 @@ Map<String, dynamic> languages = {
         "Votre solde de portefeuille est faible, veuillez contacter votre propriétaire",
     "text_add_vehicle": "Ajouter un véhicule",
     "text_address": "Adresse",
-    "text_add_driver": "Ajouter le conducteur"
+    "text_add_driver": "Ajouter le conducteur",
+    "text_choose_area": "Choisir la zone",
+    "text_company_name": "Nom de l'entreprise",
+    "text_city": "Ville",
+    "text_postal_code": "code postal",
+    "text_tax_number": "Numéro d'identification fiscale",
+    "text_no_fleet_assigned": "Aucune flotte affectée"
   },
   "tr": {
     "text_enter_social": "veya sosyal medyaya girin",
@@ -1817,7 +1841,13 @@ Map<String, dynamic> languages = {
         "Sahibi cüzdan bakiyeniz düşüktür, lütfen sahibinizle iletişime geçin",
     "text_add_vehicle": "Araç ekle",
     "text_address": "Adres",
-    "text_add_driver": "Sürücü Ekle"
+    "text_add_driver": "Sürücü Ekle",
+    "text_choose_area": "Alanı Seçin",
+    "text_company_name": "Firma Adı",
+    "text_city": "Şehir",
+    "text_postal_code": "Posta Kodu",
+    "text_tax_number": "Vergi numarası",
+    "text_no_fleet_assigned": "Filo atandı"
   },
   "ru": {
     "text_enter_social": "или войти в социальные сети",
@@ -2186,7 +2216,13 @@ Map<String, dynamic> languages = {
         "Ваша владельца баланса кошелька низкий, пожалуйста, свяжитесь с вашим владельцем",
     "text_add_vehicle": "Добавить автомобиль",
     "text_address": "Адрес",
-    "text_add_driver": "Добавить драйвер"
+    "text_add_driver": "Добавить драйвер",
+    "text_choose_area": "Выберите область",
+    "text_company_name": "Название компании",
+    "text_city": "Город",
+    "text_postal_code": "Почтовый Код",
+    "text_tax_number": "Налоговый номер",
+    "text_no_fleet_assigned": "Не назначен флот"
   },
   "it": {
     "text_enter_social": "o inserisci i social media",
@@ -2552,7 +2588,13 @@ Map<String, dynamic> languages = {
         "Il saldo del portafoglio del tuo proprietario è basso, contatta il proprietario",
     "text_add_vehicle": "Aggiungi veicolo",
     "text_address": "Indirizzo",
-    "text_add_driver": "Aggiungi driver"
+    "text_add_driver": "Aggiungi driver",
+    "text_choose_area": "Scegli l'area",
+    "text_company_name": "Nome della ditta",
+    "text_city": "Città",
+    "text_postal_code": "Codice Postale",
+    "text_tax_number": "Numero fiscale",
+    "text_no_fleet_assigned": "Nessuna flotta assegnata"
   },
   "de": {
     "text_enter_social": "Oder betreten Sie soziale Medien",
@@ -2925,7 +2967,13 @@ Map<String, dynamic> languages = {
         "Ihr Eigentümer Brieftaschenbalance ist niedrig. Bitte wenden Sie sich an Ihren Besitzer",
     "text_add_vehicle": "Fahrzeug hinzufügen",
     "text_address": "Adresse",
-    "text_add_driver": "Fahrer hinzufügen"
+    "text_add_driver": "Fahrer hinzufügen",
+    "text_choose_area": "Wählen Sie den Bereich",
+    "text_company_name": "Name der Firma",
+    "text_city": "Stadt",
+    "text_postal_code": "Postleitzahl",
+    "text_tax_number": "Steuernummer",
+    "text_no_fleet_assigned": "Keine Flotte zugewiesen"
   },
   "ko": {
     "text_enter_social": "또는 소셜 미디어를 입력하십시오",
@@ -2977,7 +3025,7 @@ Map<String, dynamic> languages = {
     "text_not_uploaded": "업로드되지 않았습니다",
     "text_uploaded": "업로드",
     "text_upload": "업로드",
-    "text_approval_waiting": "확인중인 확인",
+    "text_approval_waiting": "검증 보류",
     "text_send_approval":
         "귀하의 문서는 여전히 확인을 위해 보류 중입니다. 모든 것이 확인되면 타기를 시작합니다. 꽉 앉으세요",
     "text_upload_docs": "문서를 업로드하십시오",
@@ -3272,7 +3320,13 @@ Map<String, dynamic> languages = {
     "text_fleet_diver_low_bal": "소유자 지갑 잔액은 낮습니다. 소유자에게 문의하십시오.",
     "text_add_vehicle": "차량을 추가하십시오",
     "text_address": "주소",
-    "text_add_driver": "드라이버를 추가하십시오"
+    "text_add_driver": "드라이버를 추가하십시오",
+    "text_choose_area": "영역을 선택하십시오",
+    "text_company_name": "회사 이름",
+    "text_city": "도시",
+    "text_postal_code": "우편 번호",
+    "text_tax_number": "세금 번호",
+    "text_no_fleet_assigned": "함대가 할당되지 않았습니다"
   },
   "zh": {
     "text_enter_social": "或进入社交媒体",
@@ -3528,7 +3582,7 @@ Map<String, dynamic> languages = {
     "text_open_settings": "打开设置",
     "text_done": "完毕",
     "text_open_contact_setting": "需要接触访问才能选择SOS的联系人，请在设置中启用它，然后点击完成",
-    "text_open_camera_setting": "捕获图像需要摄像机访问，请在设置中启用并点击完成",
+    "text_open_camera_setting": "捕获图像需要相机访问，请在设置中启用并点击完成",
     "text_open_photos_setting": "需要访问照片以选择图像，请在设置中启用并点击完成",
     "text_enter_otp_login": "输入OTP",
     "text_add_by_card": "添加卡",
@@ -3614,7 +3668,13 @@ Map<String, dynamic> languages = {
     "text_fleet_diver_low_bal": "您的主人钱包余额较低，请联系您的主人",
     "text_add_vehicle": "添加车辆",
     "text_address": "地址",
-    "text_add_driver": "添加驱动程序"
+    "text_add_driver": "添加驱动程序",
+    "text_choose_area": "选择区域",
+    "text_company_name": "公司名称",
+    "text_city": "城市",
+    "text_postal_code": "邮政编码",
+    "text_tax_number": "税号",
+    "text_no_fleet_assigned": "没有舰队分配"
   },
   "es": {
     "text_enter_social": "o entrar en las redes sociales",
@@ -3981,7 +4041,13 @@ Map<String, dynamic> languages = {
         "El saldo de su billetera de su propietario es bajo, comuníquese con su propietario",
     "text_add_vehicle": "Agregar vehículo",
     "text_address": "Dirección",
-    "text_add_driver": "Agregar controlador"
+    "text_add_driver": "Agregar controlador",
+    "text_choose_area": "Elegir el área",
+    "text_company_name": "nombre de empresa",
+    "text_city": "Ciudad",
+    "text_postal_code": "Código postal",
+    "text_tax_number": "Número de impuesto",
+    "text_no_fleet_assigned": "No se asigna flota"
   },
   "iw": {
     "text_enter_social": "או להיכנס למדיה חברתית",
@@ -4337,7 +4403,13 @@ Map<String, dynamic> languages = {
         "יתרת הארנק של הבעלים שלך נמוכה, אנא צור קשר עם הבעלים שלך",
     "text_add_vehicle": "הוסף רכב",
     "text_address": "כתובת",
-    "text_add_driver": "הוסף את הנהג"
+    "text_add_driver": "הוסף את הנהג",
+    "text_choose_area": "בחר אזור",
+    "text_company_name": "שם החברה",
+    "text_city": "עִיר",
+    "text_postal_code": "מיקוד",
+    "text_tax_number": "מספר מס",
+    "text_no_fleet_assigned": "אין צי שהוקצה"
   },
   "bn": {
     "text_enter_social": "বা সোশ্যাল মিডিয়া প্রবেশ করুন",
@@ -4700,6 +4772,12 @@ Map<String, dynamic> languages = {
         "আপনার মালিকের মানিব্যাগের ভারসাম্য কম, দয়া করে আপনার মালিকের সাথে যোগাযোগ করুন",
     "text_add_vehicle": "যানবাহন যোগ করুন",
     "text_address": "ঠিকানা",
-    "text_add_driver": "ড্রাইভার যোগ করুন"
+    "text_add_driver": "ড্রাইভার যোগ করুন",
+    "text_choose_area": "অঞ্চল চয়ন করুন",
+    "text_company_name": "কোমপানির নাম",
+    "text_city": "শহর",
+    "text_postal_code": "পোস্ট অফিসের নাম্বার",
+    "text_tax_number": "কর নম্বর",
+    "text_no_fleet_assigned": "কোন বহর বরাদ্দ করা হয়নি"
   }
 };

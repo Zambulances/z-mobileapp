@@ -5,7 +5,6 @@ import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:tagyourtaxi_driver/translation/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -14,14 +13,13 @@ class RazorPayPage extends StatefulWidget {
   const RazorPayPage({Key? key}) : super(key: key);
 
   @override
-  _RazorPayPageState createState() => _RazorPayPageState();
+  State<RazorPayPage> createState() => _RazorPayPageState();
 }
 
 class _RazorPayPageState extends State<RazorPayPage> {
   bool _isLoading = false;
   bool _success = false;
   bool _failed = false;
-  final plugin = PaystackPlugin();
   dynamic _razorpay;
 
   @override

@@ -11,7 +11,7 @@ class VehicleNumber extends StatefulWidget {
   const VehicleNumber({Key? key}) : super(key: key);
 
   @override
-  _VehicleNumberState createState() => _VehicleNumberState();
+  State<VehicleNumber> createState() => _VehicleNumberState();
 }
 
 dynamic vehicleNumber;

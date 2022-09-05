@@ -11,7 +11,7 @@ class History extends StatefulWidget {
   const History({Key? key}) : super(key: key);
 
   @override
-  _HistoryState createState() => _HistoryState();
+  State<History> createState() => _HistoryState();
 }
 
 dynamic selectedHistory;
@@ -507,13 +507,7 @@ class _HistoryState extends State<History> {
                                                                         .end,
                                                                 children: [
                                                                   Text(
-                                                                    myHistory[i]['trip_start_time'].toString().split(' ').toList()[
-                                                                            2] +
-                                                                        ' ' +
-                                                                        myHistory[i]['accepted_at']
-                                                                            .toString()
-                                                                            .split(' ')
-                                                                            .toList()[3],
+                                                                    '${myHistory[i]['trip_start_time'].toString().split(' ').toList()[2]} ${myHistory[i]['accepted_at'].toString().split(' ').toList()[3]}',
                                                                     style: GoogleFonts.roboto(
                                                                         fontSize:
                                                                             media.width *
@@ -595,13 +589,7 @@ class _HistoryState extends State<History> {
                                                                         .end,
                                                                 children: [
                                                                   Text(
-                                                                    myHistory[i]['completed_at'].toString().split(' ').toList()[
-                                                                            2] +
-                                                                        ' ' +
-                                                                        myHistory[i]['completed_at']
-                                                                            .toString()
-                                                                            .split(' ')
-                                                                            .toList()[3],
+                                                                    '${myHistory[i]['completed_at'].toString().split(' ').toList()[2]} ${myHistory[i]['completed_at'].toString().split(' ').toList()[3]}',
                                                                     style: GoogleFonts.roboto(
                                                                         fontSize:
                                                                             media.width *
@@ -704,9 +692,11 @@ class _HistoryState extends State<History> {
                                                                   media.width *
                                                                       0.02,
                                                             ),
-                                                            (myHistory[i][
-                                                                        'userDetail'] !=
-                                                                    null)
+                                                            (myHistory[i]['userDetail'] !=
+                                                                        null &&
+                                                                    userDetails[
+                                                                            'role'] !=
+                                                                        'owner')
                                                                 ? Container(
                                                                     padding: EdgeInsets.only(
                                                                         bottom: media.width *
@@ -723,7 +713,7 @@ class _HistoryState extends State<History> {
                                                                               media.width * 0.16,
                                                                           decoration: BoxDecoration(
                                                                               shape: BoxShape.circle,
-                                                                              image: DecorationImage(image: NetworkImage(userDetails['role'] == 'owner' ? myHistory[i]['driverDetail']['data']['profile_picture'] : myHistory[i]['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
+                                                                              image: DecorationImage(image: NetworkImage(myHistory[i]['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
                                                                         ),
                                                                         SizedBox(
                                                                           width:
@@ -736,7 +726,7 @@ class _HistoryState extends State<History> {
                                                                             SizedBox(
                                                                               width: media.width * 0.3,
                                                                               child: Text(
-                                                                                userDetails['role'] == 'owner' ? myHistory[i]['driverDetail']['data']['name'] : myHistory[i]['userDetail']['data']['name'],
+                                                                                myHistory[i]['userDetail']['data']['name'],
                                                                                 style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
                                                                               ),
                                                                             ),
@@ -765,7 +755,60 @@ class _HistoryState extends State<History> {
                                                                       ],
                                                                     ),
                                                                   )
-                                                                : Container(),
+                                                                : (myHistory[i]['driverDetail'] !=
+                                                                            null &&
+                                                                        userDetails['role'] ==
+                                                                            'owner')
+                                                                    ? Container(
+                                                                        padding:
+                                                                            EdgeInsets.only(bottom: media.width * 0.05),
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.start,
+                                                                          children: [
+                                                                            Container(
+                                                                              height: media.width * 0.16,
+                                                                              width: media.width * 0.16,
+                                                                              decoration: BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NetworkImage(myHistory[i]['driverDetail']['data']['profile_picture']), fit: BoxFit.cover)),
+                                                                            ),
+                                                                            SizedBox(
+                                                                              width: media.width * 0.02,
+                                                                            ),
+                                                                            Column(
+                                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                                              children: [
+                                                                                SizedBox(
+                                                                                  width: media.width * 0.3,
+                                                                                  child: Text(
+                                                                                    myHistory[i]['driverDetail']['data']['name'],
+                                                                                    style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                            Expanded(
+                                                                              child: Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                children: [
+                                                                                  Column(
+                                                                                    children: [
+                                                                                      const Icon(
+                                                                                        Icons.cancel,
+                                                                                        color: Color(0xffFF0000),
+                                                                                      ),
+                                                                                      SizedBox(
+                                                                                        height: media.width * 0.01,
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                          ],
+                                                                        ),
+                                                                      )
+                                                                    : Container(),
                                                             Row(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
@@ -1110,13 +1153,37 @@ class _HistoryState extends State<History> {
                                   .toList(),
                             )
                           : (_isLoading == false)
-                              ? Text(
-                                  languages[choosenLanguage]
-                                      ['text_noDataFound'],
-                                  style: GoogleFonts.roboto(
-                                      fontSize: media.width * eighteen,
-                                      fontWeight: FontWeight.w600,
-                                      color: textColor),
+                              ? Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      height: media.width * 0.05,
+                                    ),
+                                    Container(
+                                      height: media.width * 0.7,
+                                      width: media.width * 0.7,
+                                      decoration: const BoxDecoration(
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  'assets/images/nodatafound.gif'),
+                                              fit: BoxFit.contain)),
+                                    ),
+                                    SizedBox(
+                                      height: media.width * 0.02,
+                                    ),
+                                    SizedBox(
+                                      width: media.width * 0.9,
+                                      child: Text(
+                                        languages[choosenLanguage]
+                                            ['text_noDataFound'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * sixteen,
+                                            fontWeight: FontWeight.bold,
+                                            color: textColor),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    )
+                                  ],
                                 )
                               : Container(),
                       //load more button
@@ -1129,25 +1196,14 @@ class _HistoryState extends State<History> {
                                       _isLoading = true;
                                     });
                                     if (_showHistory == 0) {
-                                      await getHistoryPages('is_later=1&page=' +
-                                          (myHistoryPage['pagination']
-                                                      ['current_page'] +
-                                                  1)
-                                              .toString());
+                                      await getHistoryPages(
+                                          'is_later=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                     } else if (_showHistory == 1) {
                                       await getHistoryPages(
-                                          'is_completed=1&page=' +
-                                              (myHistoryPage['pagination']
-                                                          ['current_page'] +
-                                                      1)
-                                                  .toString());
+                                          'is_completed=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                     } else if (_showHistory == 2) {
                                       await getHistoryPages(
-                                          'is_cancelled=1&page=' +
-                                              (myHistoryPage['pagination']
-                                                          ['current_page'] +
-                                                      1)
-                                                  .toString());
+                                          'is_cancelled=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                     }
                                     setState(() {
                                       _isLoading = false;

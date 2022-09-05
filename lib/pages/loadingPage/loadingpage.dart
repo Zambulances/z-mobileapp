@@ -23,7 +23,7 @@ class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
 
   @override
-  _LoadingPageState createState() => _LoadingPageState();
+  State<LoadingPage> createState() => _LoadingPageState();
 }
 
 class _LoadingPageState extends State<LoadingPage> {
@@ -34,6 +34,28 @@ class _LoadingPageState extends State<LoadingPage> {
   bool _isLoading = false;
 
   var demopage = TextEditingController();
+
+  //navigate
+  navigate() {
+    if (userDetails['uploaded_document'] == false) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => Docs()));
+    } else if (userDetails['uploaded_document'] == true &&
+        userDetails['approve'] == false) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const DocsProcess(),
+          ));
+    } else if (userDetails['uploaded_document'] == true &&
+        userDetails['approve'] == true) {
+      //status approved
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Maps()),
+          (route) => false);
+    }
+  }
 
   @override
   void initState() {
@@ -102,24 +124,7 @@ class _LoadingPageState extends State<LoadingPage> {
 
         //if user is login and check waiting for approval status and send accordingly
         if (val == '3') {
-          if (userDetails['uploaded_document'] == false) {
-            Navigator.pushReplacement(
-                context, MaterialPageRoute(builder: (context) => Docs()));
-          } else if (userDetails['uploaded_document'] == true &&
-              userDetails['approve'] == false) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const DocsProcess(),
-                ));
-          } else if (userDetails['uploaded_document'] == true &&
-              userDetails['approve'] == true) {
-            //status approved
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const Maps()),
-                (route) => false);
-          }
+          navigate();
         }
         //if user is not login in this device
         else if (val == '2') {
@@ -129,7 +134,6 @@ class _LoadingPageState extends State<LoadingPage> {
           });
         } else {
           //user installing first time and didnt yet choosen language
-          printWrapped('working $val');
           Future.delayed(const Duration(seconds: 2), () {
             Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => const Languages()));
@@ -208,21 +212,17 @@ class _LoadingPageState extends State<LoadingPage> {
                                         if (platform ==
                                             TargetPlatform.android) {
                                           openBrowser(
-                                              'https://play.google.com/store/apps/details?id=' +
-                                                  _package.packageName);
+                                              'https://play.google.com/store/apps/details?id=${_package.packageName}');
                                         } else {
                                           setState(() {
                                             _isLoading = true;
                                           });
                                           var response = await http.get(Uri.parse(
-                                              'http://itunes.apple.com/lookup?bundleId=' +
-                                                  _package.packageName));
+                                              'http://itunes.apple.com/lookup?bundleId=${_package.packageName}'));
                                           if (response.statusCode == 200) {
                                             openBrowser(jsonDecode(
                                                     response.body)['results'][0]
                                                 ['trackViewUrl']);
-
-                                            // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
                                           }
 
                                           setState(() {
