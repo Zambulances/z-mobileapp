@@ -13,7 +13,7 @@ class RazorPayPage extends StatefulWidget {
   const RazorPayPage({Key? key}) : super(key: key);
 
   @override
-  _RazorPayPageState createState() => _RazorPayPageState();
+  State<RazorPayPage> createState() => _RazorPayPageState();
 }
 
 class _RazorPayPageState extends State<RazorPayPage> {

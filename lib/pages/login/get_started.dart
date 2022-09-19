@@ -1,5 +1,3 @@
-
-
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,7 +17,7 @@ class GetStarted extends StatefulWidget {
   const GetStarted({Key? key}) : super(key: key);
 
   @override
-  _GetStartedState createState() => _GetStartedState();
+  State<GetStarted> createState() => _GetStartedState();
 }
 
 String name = ''; //name of user
@@ -34,7 +32,7 @@ class _GetStartedState extends State<GetStarted> {
   bool _pickImage = false;
   String _permission = '';
 
-    getGalleryPermission() async {
+  getGalleryPermission() async {
     var status = await Permission.photos.status;
     if (status != PermissionStatus.granted) {
       status = await Permission.photos.request();
@@ -83,12 +81,20 @@ class _GetStartedState extends State<GetStarted> {
     }
   }
 
+  //navigate
+  navigate() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Referral()),
+        (route) => false);
+  }
+
   TextEditingController emailText =
       TextEditingController(); //email textediting controller
   TextEditingController nameText =
       TextEditingController(); //name textediting controller
 
-        @override
+  @override
   void initState() {
     proImageFile1 = null;
     super.initState();
@@ -130,9 +136,9 @@ class _GetStartedState extends State<GetStarted> {
                         )),
                     Expanded(
                         child: SingleChildScrollView(
-                          child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           SizedBox(
                             height: media.height * 0.04,
                           ),
@@ -156,7 +162,7 @@ class _GetStartedState extends State<GetStarted> {
                                 color: textColor.withOpacity(0.3)),
                           ),
                           SizedBox(height: media.height * 0.04),
-                              
+
                           Center(
                             child: InkWell(
                               onTap: () {
@@ -172,7 +178,8 @@ class _GetStartedState extends State<GetStarted> {
                                           shape: BoxShape.circle,
                                           color: backgroundColor,
                                           image: DecorationImage(
-                                              image: FileImage(File(proImageFile1)),
+                                              image: FileImage(
+                                                  File(proImageFile1)),
                                               fit: BoxFit.cover)),
                                     )
                                   : Container(
@@ -221,11 +228,11 @@ class _GetStartedState extends State<GetStarted> {
                           SizedBox(
                             height: media.height * 0.012,
                           ),
-                              
+
                           Container(
                             decoration: BoxDecoration(
-                                border:
-                                    Border(bottom: BorderSide(color: underline))),
+                                border: Border(
+                                    bottom: BorderSide(color: underline))),
                             padding: const EdgeInsets.only(left: 5, right: 5),
                             child: Row(
                               children: [
@@ -233,7 +240,8 @@ class _GetStartedState extends State<GetStarted> {
                                   height: 50,
                                   alignment: Alignment.center,
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text(
                                         countries[phcode]['dial_code'],
@@ -263,7 +271,8 @@ class _GetStartedState extends State<GetStarted> {
                           (_error != '')
                               ? Container(
                                   width: media.width * 0.8,
-                                  margin: EdgeInsets.only(top: media.height * 0.03),
+                                  margin:
+                                      EdgeInsets.only(top: media.height * 0.03),
                                   alignment: Alignment.center,
                                   child: Text(
                                     _error,
@@ -273,11 +282,12 @@ class _GetStartedState extends State<GetStarted> {
                                   ),
                                 )
                               : Container(),
-                              
+
                           SizedBox(
                             height: media.height * 0.065,
                           ),
-                          (nameText.text.isNotEmpty && emailText.text.isNotEmpty && proImageFile1 != null)
+                          (nameText.text.isNotEmpty &&
+                                  emailText.text.isNotEmpty)
                               ? Container(
                                   width: media.width * 1,
                                   alignment: Alignment.center,
@@ -289,7 +299,7 @@ class _GetStartedState extends State<GetStarted> {
                                         if (regex.hasMatch(emailText.text)) {
                                           FocusManager.instance.primaryFocus
                                               ?.unfocus();
-                              
+
                                           setState(() {
                                             verifyEmailError = '';
                                             _error = '';
@@ -297,29 +307,25 @@ class _GetStartedState extends State<GetStarted> {
                                           });
                                           //validate email already exist
                                           var result = await validateEmail();
-                              
+
                                           if (result == 'success') {
                                             setState(() {
                                               verifyEmailError = '';
                                               _error = '';
                                             });
-                                            var _register = await registerUser();
-                                            if (_register == 'true') {
+                                            var register = await registerUser();
+                                            if (register == 'true') {
                                               //referral page
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const Referral()),
-                                                  (route) => false);
+                                              navigate();
                                             } else {
                                               setState(() {
-                                                _error = _register.toString();  
+                                                _error = register.toString();
                                               });
                                             }
                                           } else {
                                             setState(() {
-                                              verifyEmailError = result.toString();
+                                              verifyEmailError =
+                                                  result.toString();
                                               _error = result.toString();
                                             });
                                           }
@@ -332,20 +338,20 @@ class _GetStartedState extends State<GetStarted> {
                                                 languages[choosenLanguage]
                                                     ['text_email_validation'];
                                             _error = languages[choosenLanguage]
-                                                    ['text_email_validation'];
+                                                ['text_email_validation'];
                                           });
                                         }
                                       },
                                       text: languages[choosenLanguage]
                                           ['text_next']))
                               : Container()
-                                              ],
-                                            ),
-                        )),
+                        ],
+                      ),
+                    )),
                   ],
                 ),
               ),
-      
+
               (_pickImage == true)
                   ? Positioned(
                       bottom: 0,
@@ -421,7 +427,8 @@ class _GetStartedState extends State<GetStarted> {
                                                   ['text_camera'],
                                               style: GoogleFonts.roboto(
                                                   fontSize: media.width * ten,
-                                                  color: const Color(0xff666666)),
+                                                  color:
+                                                      const Color(0xff666666)),
                                             )
                                           ],
                                         ),
@@ -454,7 +461,8 @@ class _GetStartedState extends State<GetStarted> {
                                                   ['text_gallery'],
                                               style: GoogleFonts.roboto(
                                                   fontSize: media.width * ten,
-                                                  color: const Color(0xff666666)),
+                                                  color:
+                                                      const Color(0xff666666)),
                                             )
                                           ],
                                         ),
@@ -469,7 +477,7 @@ class _GetStartedState extends State<GetStarted> {
                       ))
                   : Container(),
 
-                  //permission denied popup
+              //permission denied popup
               (_permission != '')
                   ? Positioned(
                       child: Container(
@@ -575,8 +583,8 @@ class _GetStartedState extends State<GetStarted> {
                       ),
                     ))
                   : Container(),
-      
-                  //internet not connected
+
+              //internet not connected
               (internet == false)
                   ? Positioned(
                       top: 0,
@@ -588,7 +596,7 @@ class _GetStartedState extends State<GetStarted> {
                         },
                       ))
                   : Container(),
-      
+
               //loader
               (_loading == true)
                   ? const Positioned(top: 0, child: Loading())

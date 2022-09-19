@@ -15,7 +15,7 @@ class CashFreePage extends StatefulWidget {
   const CashFreePage({Key? key}) : super(key: key);
 
   @override
-  _CashFreePageState createState() => _CashFreePageState();
+  State<CashFreePage> createState() => _CashFreePageState();
 }
 
 class _CashFreePageState extends State<CashFreePage> {

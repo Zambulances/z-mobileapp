@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'dart:math';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,7 +21,6 @@ import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:vector_math/vector_math.dart' as vector;
 import 'dart:ui' as ui;
-import '../../functions/functions.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
 import 'package:geolocator/geolocator.dart' as geolocs;
@@ -36,7 +34,7 @@ class BookingConfirmation extends StatefulWidget {
   BookingConfirmation({Key? key, this.type}) : super(key: key);
 
   @override
-  _BookingConfirmationState createState() => _BookingConfirmationState();
+  State<BookingConfirmation> createState() => _BookingConfirmationState();
 }
 
 bool serviceNotAvailable = false;
@@ -45,10 +43,11 @@ dynamic promoStatus;
 dynamic choosenVehicle;
 int payingVia = 0;
 dynamic timing;
+dynamic mapPadding = 0.0;
 
 bool noDriverFound = false;
 var driverData = {};
-var driversData = {};
+var driversData = [];
 dynamic choosenDateTime;
 bool lowWalletBalance = false;
 bool tripReqError = false;
@@ -97,13 +96,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     promoCode = '';
+    mapPadding = 0.0;
     promoStatus = null;
     serviceNotAvailable = false;
     tripReqError = false;
     myBearings.clear();
     noDriverFound = false;
+    etaDetails.clear();
     getLocs();
 
     super.initState();
@@ -391,7 +392,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
     choosenVehicle = null;
     _dist = null;
-    etaDetails.clear();
+
     if (widget.type != 1) {
       etaRequest();
     } else {
@@ -408,7 +409,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     } else if (permission == PermissionStatus.granted ||
         permission == PermissionStatus.grantedLimited) {
       // var loc = await location.getLocation();
-
+locationAllowed = true;
       if (timerLocation == null && locationAllowed == true) {
         getCurrentLocation();
       }
@@ -536,12 +537,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
             child: ValueListenableBuilder(
                 valueListenable: valueNotifierBook.value,
                 builder: (context, value, child) {
+                  if (_controller != null) {
+                    mapPadding = media.width * 1;
+                  }
                   if (requestCancelledByDriver == true ||
                       cancelRequestByUser == true) {
                     myMarker.clear();
                     polyline.clear();
                     addressList.removeWhere((element) => element.id == 'drop');
-                    WidgetsBinding.instance?.addPostFrameCallback((_) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(builder: (context) => const Maps()),
@@ -549,7 +553,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                     });
                   }
                   if (userRequestData['is_completed'] == 1) {
-                    WidgetsBinding.instance?.addPostFrameCallback((_) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
@@ -574,16 +578,19 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                               DataSnapshot snapshots = event.data!.snapshot;
                               // ignore: unnecessary_null_comparison
                               if (snapshots != null) {
-                                driversData = Map<String, dynamic>.from(
-                                    jsonDecode(jsonEncode(snapshots.value)));
-                                if (driversData != {}) {
-                                  driversData.forEach((i, value) {
-                                    if (driversData[i]['is_active'] == 1 &&
-                                        driversData[i]['is_available'] ==
+                                driversData = [];
+                                // ignore: avoid_function_literals_in_foreach_calls
+                                snapshots.children.forEach((element) { 
+                                  driversData.add(element.value);
+                                });
+                                  // ignore: avoid_function_literals_in_foreach_calls
+                                  driversData.forEach((e) {
+                                    if (e['is_active'] == 1 &&
+                                        e['is_available'] ==
                                             true) {
                                       DateTime dt =
                                           DateTime.fromMillisecondsSinceEpoch(
-                                              driversData[i]['updated_at']);
+                                              e['updated_at']);
                                       if (DateTime.now()
                                               .difference(dt)
                                               .inMinutes <=
@@ -591,75 +598,64 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         if (myMarker
                                             .where((element) => element.markerId
                                                 .toString()
-                                                .contains('car' +
-                                                    driversData[i]['id']
-                                                        .toString()))
+                                                .contains(
+                                                    'car${e['id']}'))
                                             .isEmpty) {
                                           myMarker.add(Marker(
-                                            markerId: MarkerId('car' +
-                                                driversData[i]['id']
-                                                    .toString()),
-                                            rotation: (myBearings[driversData[i]
+                                            markerId: MarkerId(
+                                                'car${e['id']}'),
+                                            rotation: (myBearings[e
                                                             ['id']
                                                         .toString()] !=
                                                     null)
-                                                ? myBearings[driversData[i]
+                                                ? myBearings[e
                                                         ['id']
                                                     .toString()]
                                                 : 0.0,
                                             position: LatLng(
-                                                driversData[i]['l'][0],
-                                                driversData[i]['l'][1]),
+                                                e['l'][0],
+                                                e['l'][1]),
                                             icon: pinLocationIcon,
                                           ));
                                         } else if (_controller != null) {
                                           var dist = calculateDistance(
                                               myMarker
-                                                  .lastWhere((element) =>
-                                                      element.markerId
-                                                          .toString()
-                                                          .contains('car' +
-                                                              driversData[i]
-                                                                      ['id']
-                                                                  .toString()))
+                                                  .lastWhere((element) => element
+                                                      .markerId
+                                                      .toString()
+                                                      .contains(
+                                                          'car${e['id']}'))
                                                   .position
                                                   .latitude,
                                               myMarker
-                                                  .lastWhere((element) =>
-                                                      element
-                                                          .markerId
-                                                          .toString()
-                                                          .contains('car' +
-                                                              driversData[i]
-                                                                      ['id']
-                                                                  .toString()))
+                                                  .lastWhere((element) => element
+                                                      .markerId
+                                                      .toString()
+                                                      .contains(
+                                                          'car${e['id']}'))
                                                   .position
                                                   .longitude,
-                                              driversData[i]['l'][0],
-                                              driversData[i]['l'][1]);
+                                              e['l'][0],
+                                              e['l'][1]);
                                           if (dist > 100) {
                                             if (myMarker
-                                                        .lastWhere((element) => element
-                                                            .markerId
-                                                            .toString()
-                                                            .contains('car' +
-                                                                driversData[i]
-                                                                        ['id']
-                                                                    .toString()))
+                                                        .lastWhere((element) =>
+                                                            element.markerId
+                                                                .toString()
+                                                                .contains(
+                                                                    'car${e['id']}'))
                                                         .position
                                                         .latitude !=
-                                                    driversData[i]['l'][0] ||
+                                                    e['l'][0] ||
                                                 myMarker
-                                                        .lastWhere((element) => element
-                                                            .markerId
-                                                            .toString()
-                                                            .contains('car' +
-                                                                driversData[i]
-                                                                        ['id']
-                                                                    .toString()))
+                                                        .lastWhere((element) =>
+                                                            element.markerId
+                                                                .toString()
+                                                                .contains(
+                                                                    'car${e['id']}'))
                                                         .position
                                                         .longitude !=
-                                                    driversData[i]['l'][1]) {
+                                                    e['l'][1]) {
                                               animationController =
                                                   AnimationController(
                                                 duration: const Duration(
@@ -673,31 +669,25 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       .lastWhere((element) =>
                                                           element.markerId
                                                               .toString()
-                                                              .contains('car' +
-                                                                  driversData[i]
-                                                                          ['id']
-                                                                      .toString()))
+                                                              .contains(
+                                                                  'car${e['id']}'))
                                                       .position
                                                       .latitude,
                                                   myMarker
                                                       .lastWhere((element) =>
                                                           element.markerId
                                                               .toString()
-                                                              .contains('car' +
-                                                                  driversData[i]
-                                                                          ['id']
-                                                                      .toString()))
+                                                              .contains(
+                                                                  'car${e['id']}'))
                                                       .position
                                                       .longitude,
-                                                  driversData[i]['l'][0],
-                                                  driversData[i]['l'][1],
+                                                  e['l'][0],
+                                                  e['l'][1],
                                                   _mapMarkerSink,
                                                   this,
                                                   _controller,
-                                                  'car' +
-                                                      driversData[i]['id']
-                                                          .toString(),
-                                                  driversData[i]['id']);
+                                                  'car${e['id']}',
+                                                  e['id']);
                                             }
                                           }
                                         }
@@ -706,21 +696,17 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                       if (myMarker
                                           .where((element) => element.markerId
                                               .toString()
-                                              .contains('car' +
-                                                  driversData[i]['id']
-                                                      .toString()))
+                                              .contains(
+                                                  'car${e['id']}'))
                                           .isNotEmpty) {
                                         myMarker.removeWhere((element) =>
-                                            element.markerId
-                                                .toString()
-                                                .contains('car' +
-                                                    driversData[i]['id']
-                                                        .toString()));
+                                            element.markerId.toString().contains(
+                                                'car${e['id']}'));
                                       }
                                     }
                                   });
                                 }
-                              }
+                              
                             }
                           }
                         }
@@ -729,10 +715,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                             stream: (userRequestData['driverDetail'] != null &&
                                     pinLocationIcon != null)
                                 ? FirebaseDatabase.instance
-                                    .ref('drivers/' +
-                                        userRequestData['driverDetail']['data']
-                                                ['id']
-                                            .toString())
+                                    .ref(
+                                        'drivers/${userRequestData['driverDetail']['data']['id']}')
                                     .onValue
                                 : null,
                             builder:
@@ -768,13 +752,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         if (myMarker
                                             .where((element) => element.markerId
                                                 .toString()
-                                                .contains('car' +
-                                                    driverData['id']
-                                                        .toString()))
+                                                .contains(
+                                                    'car${driverData['id']}'))
                                             .isEmpty) {
                                           myMarker.add(Marker(
-                                            markerId: MarkerId('car' +
-                                                driverData['id'].toString()),
+                                            markerId: MarkerId(
+                                                'car${driverData['id']}'),
                                             rotation: (myBearings[
                                                         driverData['id']
                                                             .toString()] !=
@@ -789,21 +772,19 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         } else if (_controller != null) {
                                           var dist = calculateDistance(
                                               myMarker
-                                                  .lastWhere((element) =>
-                                                      element.markerId
-                                                          .toString()
-                                                          .contains('car' +
-                                                              driverData['id']
-                                                                  .toString()))
+                                                  .lastWhere((element) => element
+                                                      .markerId
+                                                      .toString()
+                                                      .contains(
+                                                          'car${driverData['id']}'))
                                                   .position
                                                   .latitude,
                                               myMarker
-                                                  .lastWhere((element) =>
-                                                      element.markerId
-                                                          .toString()
-                                                          .contains('car' +
-                                                              driverData['id']
-                                                                  .toString()))
+                                                  .lastWhere((element) => element
+                                                      .markerId
+                                                      .toString()
+                                                      .contains(
+                                                          'car${driverData['id']}'))
                                                   .position
                                                   .longitude,
                                               driverData['l'][0],
@@ -813,10 +794,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         .lastWhere((element) =>
                                                             element.markerId
                                                                 .toString()
-                                                                .contains('car' +
-                                                                    driverData[
-                                                                            'id']
-                                                                        .toString()))
+                                                                .contains(
+                                                                    'car${driverData['id']}'))
                                                         .position
                                                         .latitude !=
                                                     driverData['l'][0] ||
@@ -824,10 +803,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         .lastWhere((element) =>
                                                             element.markerId
                                                                 .toString()
-                                                                .contains('car' +
-                                                                    driverData[
-                                                                            'id']
-                                                                        .toString()))
+                                                                .contains(
+                                                                    'car${driverData['id']}'))
                                                         .position
                                                         .longitude !=
                                                     driverData['l'][1]) {
@@ -845,20 +822,16 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       .lastWhere((element) =>
                                                           element.markerId
                                                               .toString()
-                                                              .contains('car' +
-                                                                  driverData[
-                                                                          'id']
-                                                                      .toString()))
+                                                              .contains(
+                                                                  'car${driverData['id']}'))
                                                       .position
                                                       .latitude,
                                                   myMarker
                                                       .firstWhere((element) =>
                                                           element.markerId
                                                               .toString()
-                                                              .contains('car' +
-                                                                  driverData[
-                                                                          'id']
-                                                                      .toString()))
+                                                              .contains(
+                                                                  'car${driverData['id']}'))
                                                       .position
                                                       .longitude,
                                                   driverData['l'][0],
@@ -866,9 +839,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   _mapMarkerSink,
                                                   this,
                                                   _controller,
-                                                  'car' +
-                                                      driverData['id']
-                                                          .toString(),
+                                                  'car${driverData['id']}',
                                                   driverData['id']);
                                             }
                                           }
@@ -890,7 +861,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           builder: (context, snapshot) {
                                             return GoogleMap(
                                               padding: EdgeInsets.only(
-                                                  bottom: media.width * 1,
+                                                  bottom: mapPadding,
                                                   top: media.height * 0.1 +
                                                       MediaQuery.of(context)
                                                           .padding
@@ -1029,11 +1000,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   onTap: () async {
                                                     if (locationAllowed ==
                                                         true) {
+                                                      if(currentLocation != null){
+                                                            center = currentLocation;
+                                                          
                                                       _controller?.animateCamera(
                                                           CameraUpdate
                                                               .newLatLngZoom(
                                                                   center,
                                                                   18.0));
+                                                          }
                                                     } else {
                                                       if (serviceEnabled ==
                                                           true) {
@@ -1329,7 +1304,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                             style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor, fontWeight: FontWeight.w600, decoration: TextDecoration.lineThrough),
                                                                                                           ),
                                                                                                           Text(
-                                                                                                            ' ' + etaDetails[i]['discounted_totel'].toStringAsFixed(2),
+                                                                                                            ' ${etaDetails[i]['discounted_totel'].toStringAsFixed(2)}',
                                                                                                             style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor, fontWeight: FontWeight.w600),
                                                                                                           )
                                                                                                         ],
@@ -1564,7 +1539,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                                       style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor, fontWeight: FontWeight.w600, decoration: TextDecoration.lineThrough),
                                                                                                                     ),
                                                                                                                     Text(
-                                                                                                                      ' ' + rentalOption[i]['discounted_totel'].toStringAsFixed(2),
+                                                                                                                      ' ${rentalOption[i]['discounted_totel'].toStringAsFixed(2)}',
                                                                                                                       style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor, fontWeight: FontWeight.w600),
                                                                                                                     )
                                                                                                                   ],
@@ -2148,7 +2123,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             setState(() {
                                                               _isLoading = true;
                                                             });
-                                                            dynamic _result;
+                                                            dynamic result;
                                                             if (choosenVehicle !=
                                                                 null) {
                                                               if (widget.type !=
@@ -2158,10 +2133,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         [
                                                                         'has_discount'] ==
                                                                     false) {
-                                                                  _result =
+                                                                  result =
                                                                       await createRequest();
                                                                 } else {
-                                                                  _result =
+                                                                  result =
                                                                       await createRequestWithPromo();
                                                                 }
                                                               } else {
@@ -2170,15 +2145,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         [
                                                                         'has_discount'] ==
                                                                     false) {
-                                                                  _result =
+                                                                  result =
                                                                       await createRentalRequest();
                                                                 } else {
-                                                                  _result =
+                                                                  result =
                                                                       await createRentalRequestWithPromo();
                                                                 }
                                                               }
                                                             }
-                                                            if (_result ==
+                                                            if (result ==
                                                                 'success') {
                                                               timer();
                                                             }
@@ -2399,8 +2374,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                 decoration: TextDecoration.lineThrough),
                                                                           ),
                                                                           Text(
-                                                                            ' ' +
-                                                                                etaDetails[_showInfoInt]['discounted_totel'].toStringAsFixed(2),
+                                                                            ' ${etaDetails[_showInfoInt]['discounted_totel'].toStringAsFixed(2)}',
                                                                             style: GoogleFonts.roboto(
                                                                                 fontSize: media.width * fourteen,
                                                                                 color: textColor,
@@ -2543,8 +2517,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                 fontWeight: FontWeight.w600),
                                                                           ),
                                                                           Text(
-                                                                            ' ' +
-                                                                                rentalOption[_showInfoInt]['fare_amount'].toStringAsFixed(2),
+                                                                            ' ${rentalOption[_showInfoInt]['fare_amount'].toStringAsFixed(2)}',
                                                                             style: GoogleFonts.roboto(
                                                                                 fontSize: media.width * fourteen,
                                                                                 color: textColor,
@@ -2552,8 +2525,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                 decoration: TextDecoration.lineThrough),
                                                                           ),
                                                                           Text(
-                                                                            ' ' +
-                                                                                rentalOption[_showInfoInt]['discounted_totel'].toStringAsFixed(2),
+                                                                            ' ${rentalOption[_showInfoInt]['discounted_totel'].toStringAsFixed(2)}',
                                                                             style: GoogleFonts.roboto(
                                                                                 fontSize: media.width * fourteen,
                                                                                 color: textColor,
@@ -3576,13 +3548,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   children: [
                                                     (timing != null)
                                                         ? Text(
-                                                            Duration(
-                                                                        seconds:
-                                                                            timing)
-                                                                    .toString()
-                                                                    .substring(
-                                                                        3, 7) +
-                                                                ' mins',
+                                                            '${Duration(seconds: timing).toString().substring(3, 7)} mins',
                                                             style: GoogleFonts.roboto(
                                                                 fontSize: media
                                                                         .width *
@@ -3632,12 +3598,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           child: GestureDetector(
                                             onPanUpdate: (val) {
                                               // print(val.delta.dy);
-                                              if (val.delta.dy > 0) {
+                                              if (val.delta.dy > 0 && _ontripBottom == true) {
                                                 setState(() {
                                                   _ontripBottom = false;
                                                 });
                                               }
-                                              if (val.delta.dy < 0) {
+                                              if (val.delta.dy < 0 && _ontripBottom == false) {
                                                 setState(() {
                                                   _ontripBottom = true;
                                                 });

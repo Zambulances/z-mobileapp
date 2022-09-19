@@ -22,7 +22,7 @@ class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
 
   @override
-  _LoadingPageState createState() => _LoadingPageState();
+  State<LoadingPage> createState() => _LoadingPageState();
 }
 
 class _LoadingPageState extends State<LoadingPage> {
@@ -37,6 +37,40 @@ class _LoadingPageState extends State<LoadingPage> {
     getLanguageDone();
 
     super.initState();
+  }
+
+  //navigate
+  navigate() {
+    if (userRequestData.isNotEmpty && userRequestData['is_completed'] == 1) {
+      //invoice page of ride
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Invoice()),
+          (route) => false);
+    } else if (userRequestData.isNotEmpty &&
+        userRequestData['is_completed'] != 1) {
+      //searching ride page
+      if (userRequestData['is_rental'] == true) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BookingConfirmation(
+                      type: 1,
+                    )),
+            (route) => false);
+      } else {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => BookingConfirmation()),
+            (route) => false);
+      }
+    } else {
+      //home page
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const Maps()),
+          (route) => false);
+    }
   }
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
@@ -97,38 +131,7 @@ class _LoadingPageState extends State<LoadingPage> {
         var val = await getLocalData();
 
         if (val == '3') {
-          if (userRequestData.isNotEmpty &&
-              userRequestData['is_completed'] == 1) {
-            //invoice page of ride
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const Invoice()),
-                (route) => false);
-          } else if (userRequestData.isNotEmpty &&
-              userRequestData['is_completed'] != 1) {
-            //searching ride page
-            if (userRequestData['is_rental'] == true) {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BookingConfirmation(
-                            type: 1,
-                          )),
-                  (route) => false);
-            } else {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BookingConfirmation()),
-                  (route) => false);
-            }
-          } else {
-            //home page
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const Maps()),
-                (route) => false);
-          }
+          navigate();
         } else if (val == '2') {
           Future.delayed(const Duration(seconds: 2), () {
             //login page
@@ -215,15 +218,13 @@ class _LoadingPageState extends State<LoadingPage> {
                                         if (platform ==
                                             TargetPlatform.android) {
                                           openBrowser(
-                                              'https://play.google.com/store/apps/details?id=' +
-                                                  _package.packageName);
+                                              'https://play.google.com/store/apps/details?id=${_package.packageName}');
                                         } else {
                                           setState(() {
                                             _isLoading = true;
                                           });
                                           var response = await http.get(Uri.parse(
-                                              'http://itunes.apple.com/lookup?bundleId=' +
-                                                  _package.packageName));
+                                              'http://itunes.apple.com/lookup?bundleId=${_package.packageName}'));
                                           if (response.statusCode == 200) {
                                             openBrowser(jsonDecode(
                                                     response.body)['results'][0]

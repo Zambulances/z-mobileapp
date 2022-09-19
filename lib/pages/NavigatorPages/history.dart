@@ -12,7 +12,7 @@ class History extends StatefulWidget {
   const History({Key? key}) : super(key: key);
 
   @override
-  _HistoryState createState() => _HistoryState();
+  State<History> createState() => _HistoryState();
 }
 
 dynamic selectedHistory;
@@ -474,7 +474,7 @@ class _HistoryState extends State<History> {
                                                                               MainAxisAlignment.end,
                                                                           children: [
                                                                             Text(
-                                                                              myHistory[i]['trip_start_time'].toString().split(' ').toList()[2] + ' ' + myHistory[i]['accepted_at'].toString().split(' ').toList()[3],
+                                                                              '${myHistory[i]['trip_start_time'].toString().split(' ').toList()[2]} ${myHistory[i]['accepted_at'].toString().split(' ').toList()[3]}',
                                                                               style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xff898989)),
                                                                               textDirection: TextDirection.ltr,
                                                                             )
@@ -531,7 +531,7 @@ class _HistoryState extends State<History> {
                                                                               MainAxisAlignment.end,
                                                                           children: [
                                                                             Text(
-                                                                              myHistory[i]['completed_at'].toString().split(' ').toList()[2] + ' ' + myHistory[i]['completed_at'].toString().split(' ').toList()[3],
+                                                                              '${myHistory[i]['completed_at'].toString().split(' ').toList()[2]} ${myHistory[i]['completed_at'].toString().split(' ').toList()[3]}',
                                                                               style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xff898989)),
                                                                               textDirection: TextDirection.ltr,
                                                                             )
@@ -946,14 +946,40 @@ class _HistoryState extends State<History> {
                                             .toList(),
                                       )
                                     : (_isLoading == false)
-                                        ? Text(
-                                            languages[choosenLanguage]
-                                                ['text_noDataFound'],
-                                            style: GoogleFonts.roboto(
-                                                fontSize:
-                                                    media.width * eighteen,
-                                                fontWeight: FontWeight.w600,
-                                                color: textColor),
+                                        ? Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                height: media.width * 0.05,
+                                              ),
+                                              Container(
+                                                height: media.width * 0.7,
+                                                width: media.width * 0.7,
+                                                decoration: const BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage(
+                                                            'assets/images/nodatafound.gif'),
+                                                        fit: BoxFit.contain)),
+                                              ),
+                                              SizedBox(
+                                                height: media.width * 0.02,
+                                              ),
+                                              SizedBox(
+                                                width: media.width * 0.9,
+                                                child: Text(
+                                                  languages[choosenLanguage]
+                                                      ['text_noDataFound'],
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * sixteen,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: textColor),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              )
+                                            ],
                                           )
                                         : Container(),
                                 (myHistoryPage['pagination'] != null)
@@ -968,28 +994,13 @@ class _HistoryState extends State<History> {
                                               });
                                               if (_showHistory == 0) {
                                                 await getHistoryPages(
-                                                    'is_later=1&page=' +
-                                                        (myHistoryPage['pagination']
-                                                                    [
-                                                                    'current_page'] +
-                                                                1)
-                                                            .toString());
+                                                    'is_later=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                               } else if (_showHistory == 1) {
                                                 await getHistoryPages(
-                                                    'is_completed=1&page=' +
-                                                        (myHistoryPage['pagination']
-                                                                    [
-                                                                    'current_page'] +
-                                                                1)
-                                                            .toString());
+                                                    'is_completed=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                               } else if (_showHistory == 2) {
                                                 await getHistoryPages(
-                                                    'is_cancelled=1&page=' +
-                                                        (myHistoryPage['pagination']
-                                                                    [
-                                                                    'current_page'] +
-                                                                1)
-                                                            .toString());
+                                                    'is_cancelled=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                               }
                                               setState(() {
                                                 _isLoading = false;

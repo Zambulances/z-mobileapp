@@ -12,7 +12,7 @@ class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  State<Login> createState() => _LoginState();
 }
 
 //code as int for getting phone dial code of choosen country
@@ -42,6 +42,12 @@ class _LoginState extends State<Login> {
         _isLoading = false;
       });
     }
+  }
+
+  //navigate
+  navigate() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const Otp()));
   }
 
   @override
@@ -389,9 +395,7 @@ class _LoginState extends State<Login> {
                                     ),
                                   ),
                                   Text(
-                                    ' ' +
-                                        languages[choosenLanguage]['text_and'] +
-                                        ' ',
+                                    ' ${languages[choosenLanguage]['text_and']} ',
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
                                         color: textColor.withOpacity(0.7)),
@@ -437,18 +441,10 @@ class _LoginState extends State<Login> {
                                               ['dial_code'] +
                                           phnumber);
 
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Otp()));
+                                      navigate();
                                     } else {
                                       phoneAuthCheck = false;
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const Otp()));
+                                      navigate();
                                     }
                                     setState(() {
                                       _isLoading = false;

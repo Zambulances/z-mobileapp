@@ -12,7 +12,7 @@ class Faq extends StatefulWidget {
   const Faq({Key? key}) : super(key: key);
 
   @override
-  _FaqState createState() => _FaqState();
+  State<Faq> createState() => _FaqState();
 }
 
 class _FaqState extends State<Faq> {

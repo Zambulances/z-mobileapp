@@ -14,7 +14,7 @@ class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
 
   @override
-  _EditProfileState createState() => _EditProfileState();
+  State<EditProfile> createState() => _EditProfileState();
 }
 
 dynamic imageFile;
@@ -76,6 +76,11 @@ class _EditProfileState extends State<EditProfile> {
         _permission = 'noCamera';
       });
     }
+  }
+
+  //navigate pop
+  pop() {
+    Navigator.pop(context, true);
   }
 
   @override
@@ -225,7 +230,7 @@ class _EditProfileState extends State<EditProfile> {
                               val = await updateProfile(name.text, email.text);
                             }
                             if (val == 'success') {
-                              Navigator.pop(context, true);
+                              pop();
                             } else {
                               setState(() {
                                 _error = true;

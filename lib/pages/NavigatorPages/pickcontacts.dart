@@ -13,7 +13,7 @@ class PickContact extends StatefulWidget {
   const PickContact({Key? key}) : super(key: key);
 
   @override
-  _PickContactState createState() => _PickContactState();
+  State<PickContact> createState() => _PickContactState();
 }
 
 List contacts = [];
@@ -67,6 +67,11 @@ class _PickContactState extends State<PickContact> {
         });
       }
     }
+  }
+
+  //navigate pop
+  pop() {
+    Navigator.pop(context, true);
   }
 
   @override
@@ -256,7 +261,7 @@ class _PickContactState extends State<PickContact> {
                                 var val =
                                     await addSos(pickedName, pickedNumber);
                                 if (val == 'success') {
-                                  Navigator.pop(context, true);
+                                  pop();
                                 }
                                 setState(() {
                                   _isLoading = false;

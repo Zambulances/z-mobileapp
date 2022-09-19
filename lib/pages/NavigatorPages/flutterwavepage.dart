@@ -13,7 +13,7 @@ class FlutterWavePage extends StatefulWidget {
   const FlutterWavePage({Key? key}) : super(key: key);
 
   @override
-  _FlutterWavePageState createState() => _FlutterWavePageState();
+  State<FlutterWavePage> createState() => _FlutterWavePageState();
 }
 
 class _FlutterWavePageState extends State<FlutterWavePage> {
@@ -25,6 +25,11 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
   void initState() {
     payMoney();
     super.initState();
+  }
+
+  //navigate pop
+  pop() {
+    Navigator.pop(context, true);
   }
 
 //payment gateway code
@@ -59,20 +64,20 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
         email: userDetails['email']);
 
     flutterwave = Flutterwave(
-      context: context,
-      style: style,
-      publicKey: (walletBalance['flutterwave_environment'] == 'test')
-          ? walletBalance['flutter_wave_test_secret_key']
-          : walletBalance['flutter_wave_live_secret_key'],
-      currency: "NGN", //walletBalance['currency_code'],
-      txRef: userDetails['id'].toString() + '_' + DateTime.now().toString(),
-      amount: addMoney.toString(),
-      customer: customer,
-      paymentOptions: "ussd, card, barter, payattitude, account",
-      customization: Customization(title: "Payment"),
-      isTestMode:
-          (walletBalance['flutterwave_environment'] == 'test') ? true : false,
-    );
+        context: context,
+        style: style,
+        publicKey: (walletBalance['flutterwave_environment'] == 'test')
+            ? walletBalance['flutter_wave_test_secret_key']
+            : walletBalance['flutter_wave_live_secret_key'],
+        currency: "NGN", //walletBalance['currency_code'],
+        txRef: '${userDetails['id']}_${DateTime.now()}',
+        amount: addMoney.toString(),
+        customer: customer,
+        paymentOptions: "ussd, card, barter, payattitude, account",
+        customization: Customization(title: "Payment"),
+        isTestMode:
+            (walletBalance['flutterwave_environment'] == 'test') ? true : false,
+        redirectUrl: '');
 
     setState(() {
       _isLoading = false;
@@ -168,7 +173,7 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
                                   }
                                 } else {
                                   _isLoading = false;
-                                  Navigator.pop(context, true);
+                                  pop();
                                 }
                               },
                               text: 'Pay')

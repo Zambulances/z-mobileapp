@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:typed_data';
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/drop_loc_select.dart';
 import 'package:tagyourtaxi_driver/pages/login/login.dart';
@@ -28,7 +27,7 @@ class Maps extends StatefulWidget {
   const Maps({Key? key}) : super(key: key);
 
   @override
-  _MapsState createState() => _MapsState();
+  State<Maps> createState() => _MapsState();
 }
 
 dynamic serviceEnabled;
@@ -87,7 +86,7 @@ class _MapsState extends State<Maps>
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
 
     getLocs();
     super.initState();
@@ -120,6 +119,12 @@ class _MapsState extends State<Maps>
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
         .buffer
         .asUint8List();
+  }
+
+//navigate
+  navigate() {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => BookingConfirmation()));
   }
 
 //show toast for demo
@@ -183,11 +188,7 @@ class _MapsState extends State<Maps>
               double.parse(loc.longitude.toString()));
         });
       }
-      _controller?.animateCamera(
-               CameraUpdate
-                   .newLatLngZoom(
-                       center,
-                       14.0));
+      _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
 
       // BitmapDescriptor.fromAssetImage(
       //         const ImageConfiguration(devicePixelRatio: 5),
@@ -198,7 +199,7 @@ class _MapsState extends State<Maps>
       //   });
       // });
       //remove in original
-      
+
       var val =
           await geoCoding(_centerLocation.latitude, _centerLocation.longitude);
       setState(() {
@@ -574,14 +575,14 @@ class _MapsState extends State<Maps>
                                                                       .where((e) => e
                                                                           .markerId
                                                                           .toString()
-                                                                          .contains('car' +
-                                                                              element['id'].toString()))
+                                                                          .contains(
+                                                                              'car${element['id']}'))
                                                                       .isEmpty) {
                                                                     myMarkers.add(
                                                                         Marker(
-                                                                      markerId: MarkerId(
-                                                                          'car' +
-                                                                              element['id'].toString()),
+                                                                      markerId:
+                                                                          MarkerId(
+                                                                              'car${element['id']}'),
                                                                       rotation: (myBearings[element['id'].toString()] !=
                                                                               null)
                                                                           ? myBearings[
@@ -599,19 +600,28 @@ class _MapsState extends State<Maps>
                                                                     ));
                                                                   } else if (_controller !=
                                                                       null) {
-                                                                    if (myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude !=
+                                                                    if (myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).position.latitude !=
                                                                             element['l'][
                                                                                 0] ||
-                                                                        myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude !=
+                                                                        myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).position.longitude !=
                                                                             element['l'][1]) {
                                                                       var dist = calculateDistance(
                                                                           myMarkers
-                                                                              .lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString()))
+                                                                              .lastWhere((e) => e.markerId.toString().contains(
+                                                                                  'car${element['id']}'))
                                                                               .position
                                                                               .latitude,
-                                                                          myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
-                                                                          element['l'][0],
-                                                                          element['l'][1]);
+                                                                          myMarkers
+                                                                              .lastWhere((e) => e.markerId.toString().contains(
+                                                                                  'car${element['id']}'))
+                                                                              .position
+                                                                              .longitude,
+                                                                          element['l']
+                                                                              [
+                                                                              0],
+                                                                          element['l']
+                                                                              [
+                                                                              1]);
                                                                       if (dist >
                                                                           100) {
                                                                         animationController =
@@ -624,14 +634,14 @@ class _MapsState extends State<Maps>
                                                                         );
 
                                                                         animateCar(
-                                                                            myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude,
-                                                                            myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
+                                                                            myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).position.latitude,
+                                                                            myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).position.longitude,
                                                                             element['l'][0],
                                                                             element['l'][1],
                                                                             _mapMarkerSink,
                                                                             this,
                                                                             _controller,
-                                                                            'car' + element['id'].toString(),
+                                                                            'car${element['id']}',
                                                                             element['id']);
                                                                       }
                                                                     }
@@ -642,15 +652,14 @@ class _MapsState extends State<Maps>
                                                                     .where((e) => e
                                                                         .markerId
                                                                         .toString()
-                                                                        .contains('car' +
-                                                                            element['id'].toString()))
+                                                                        .contains(
+                                                                            'car${element['id']}'))
                                                                     .isNotEmpty) {
                                                                   myMarkers.removeWhere((e) => e
                                                                       .markerId
                                                                       .toString()
                                                                       .contains(
-                                                                          'car' +
-                                                                              element['id'].toString()));
+                                                                          'car${element['id']}'));
                                                                 }
                                                               }
                                                             });
@@ -1078,6 +1087,7 @@ class _MapsState extends State<Maps>
                                                                           () {
                                                                         Scaffold.of(context)
                                                                             .openDrawer();
+                                                                            print(userDetails['country_code']);
                                                                       },
                                                                       child: const Icon(
                                                                           Icons
@@ -1411,7 +1421,7 @@ class _MapsState extends State<Maps>
                                                                                                                   }
                                                                                                                 });
                                                                                                                 if (addressList.length == 2) {
-                                                                                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => BookingConfirmation()));
+                                                                                                                  navigate();
                                                                                                                 }
                                                                                                               }
                                                                                                               setState(() {

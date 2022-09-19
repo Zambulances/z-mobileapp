@@ -23,7 +23,7 @@ class Button extends StatefulWidget {
       this.width});
 
   @override
-  _ButtonState createState() => _ButtonState();
+  State<Button> createState() => _ButtonState();
 }
 
 class _ButtonState extends State<Button> {
@@ -86,7 +86,7 @@ class InputField extends StatefulWidget {
       this.color});
 
   @override
-  _InputFieldState createState() => _InputFieldState();
+  State<InputField> createState() => _InputFieldState();
 }
 
 class _InputFieldState extends State<InputField> {

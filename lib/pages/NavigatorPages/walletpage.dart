@@ -16,7 +16,7 @@ class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
 
   @override
-  _WalletPageState createState() => _WalletPageState();
+  State<WalletPage> createState() => _WalletPageState();
 }
 
 dynamic addMoney;
@@ -27,6 +27,7 @@ class _WalletPageState extends State<WalletPage> {
   bool _isLoading = true;
   bool _addPayment = false;
   bool _choosePayment = false;
+  bool _completed = false;
   @override
   void initState() {
     getWallet();
@@ -38,7 +39,7 @@ class _WalletPageState extends State<WalletPage> {
     var val = await getWalletHistory();
     if (val == 'success') {
       _isLoading = false;
-
+      _completed = true;
       valueNotifierBook.incrementNotifier();
     }
   }
@@ -137,120 +138,173 @@ class _WalletPageState extends State<WalletPage> {
                             physics: const BouncingScrollPhysics(),
                             child: Column(
                               children: [
-                                Column(
-                                  children: walletHistory
-                                      .asMap()
-                                      .map((i, value) {
-                                        return MapEntry(
-                                            i,
-                                            Container(
-                                              margin: EdgeInsets.only(
-                                                  top: media.width * 0.02,
-                                                  bottom: media.width * 0.02),
-                                              width: media.width * 0.9,
-                                              padding: EdgeInsets.all(
-                                                  media.width * 0.025),
-                                              decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                      color: borderLines,
-                                                      width: 1.2),
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  color: page),
-                                              child: Row(
-                                                children: [
+                                (walletHistory.isNotEmpty)
+                                    ? Column(
+                                        children: walletHistory
+                                            .asMap()
+                                            .map((i, value) {
+                                              return MapEntry(
+                                                  i,
                                                   Container(
-                                                    height:
-                                                        media.width * 0.1067,
-                                                    width: media.width * 0.1067,
+                                                    margin: EdgeInsets.only(
+                                                        top: media.width * 0.02,
+                                                        bottom:
+                                                            media.width * 0.02),
+                                                    width: media.width * 0.9,
+                                                    padding: EdgeInsets.all(
+                                                        media.width * 0.025),
                                                     decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                            color: borderLines,
+                                                            width: 1.2),
                                                         borderRadius:
                                                             BorderRadius
-                                                                .circular(10),
-                                                        color: const Color(
-                                                                0xff000000)
-                                                            .withOpacity(0.05)),
-                                                    alignment: Alignment.center,
-                                                    child: Text(
-                                                      (walletHistory[i][
-                                                                  'is_credit'] ==
-                                                              1)
-                                                          ? '+'
-                                                          : '-',
-                                                      style: GoogleFonts.roboto(
-                                                          fontSize:
-                                                              media.width *
-                                                                  twentyfour,
-                                                          color: textColor),
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: media.width * 0.025,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      Text(
-                                                        languages[
-                                                                choosenLanguage]
-                                                            [walletHistory[i]
-                                                                ['remarks']],
-                                                        style:
-                                                            GoogleFonts.roboto(
+                                                                .circular(12),
+                                                        color: page),
+                                                    child: Row(
+                                                      children: [
+                                                        Container(
+                                                          height: media.width *
+                                                              0.1067,
+                                                          width: media.width *
+                                                              0.1067,
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              color: const Color(
+                                                                      0xff000000)
+                                                                  .withOpacity(
+                                                                      0.05)),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          child: Text(
+                                                            (walletHistory[i][
+                                                                        'is_credit'] ==
+                                                                    1)
+                                                                ? '+'
+                                                                : '-',
+                                                            style: GoogleFonts.roboto(
                                                                 fontSize: media
                                                                         .width *
-                                                                    fourteen,
+                                                                    twentyfour,
                                                                 color:
-                                                                    textColor,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                      ),
-                                                      SizedBox(
-                                                        height:
-                                                            media.width * 0.01,
-                                                      ),
-                                                      Text(
-                                                        walletHistory[i]
-                                                            ['created_at'],
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                          fontSize:
-                                                              media.width * ten,
-                                                          color: hintColor,
+                                                                    textColor),
+                                                          ),
                                                         ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  Expanded(
-                                                      child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    children: [
-                                                      Text(
-                                                        walletHistory[i][
-                                                                'currency_symbol'] +
-                                                            ' ' +
-                                                            walletHistory[i]
-                                                                    ['amount']
-                                                                .toString(),
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                          fontSize:
-                                                              media.width *
-                                                                  twelve,
-                                                          color: const Color(
-                                                              0xffE60000),
+                                                        SizedBox(
+                                                          width: media.width *
+                                                              0.025,
                                                         ),
-                                                      )
-                                                    ],
-                                                  ))
-                                                ],
+                                                        Column(
+                                                          children: [
+                                                            Text(
+                                                              languages[
+                                                                      choosenLanguage]
+                                                                  [
+                                                                  walletHistory[
+                                                                          i][
+                                                                      'remarks']],
+                                                              style: GoogleFonts.roboto(
+                                                                  fontSize: media
+                                                                          .width *
+                                                                      fourteen,
+                                                                  color:
+                                                                      textColor,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                            SizedBox(
+                                                              height:
+                                                                  media.width *
+                                                                      0.01,
+                                                            ),
+                                                            Text(
+                                                              walletHistory[i][
+                                                                  'created_at'],
+                                                              style: GoogleFonts
+                                                                  .roboto(
+                                                                fontSize: media
+                                                                        .width *
+                                                                    ten,
+                                                                color:
+                                                                    hintColor,
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                        Expanded(
+                                                            child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          children: [
+                                                            Text(
+                                                              walletHistory[i][
+                                                                      'currency_symbol'] +
+                                                                  ' ' +
+                                                                  walletHistory[
+                                                                              i]
+                                                                          [
+                                                                          'amount']
+                                                                      .toString(),
+                                                              style: GoogleFonts
+                                                                  .roboto(
+                                                                fontSize: media
+                                                                        .width *
+                                                                    twelve,
+                                                                color: const Color(
+                                                                    0xffE60000),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ))
+                                                      ],
+                                                    ),
+                                                  ));
+                                            })
+                                            .values
+                                            .toList(),
+                                      )
+                                    : (_completed == true)
+                                        ? Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              SizedBox(
+                                                height: media.width * 0.05,
                                               ),
-                                            ));
-                                      })
-                                      .values
-                                      .toList(),
-                                ),
+                                              Container(
+                                                height: media.width * 0.7,
+                                                width: media.width * 0.7,
+                                                decoration: const BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage(
+                                                            'assets/images/nodatafound.gif'),
+                                                        fit: BoxFit.contain)),
+                                              ),
+                                              SizedBox(
+                                                height: media.width * 0.02,
+                                              ),
+                                              SizedBox(
+                                                width: media.width * 0.9,
+                                                child: Text(
+                                                  languages[choosenLanguage]
+                                                      ['text_noDataFound'],
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * sixteen,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: textColor),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        : Container(),
 
                                 //load more button
                                 (walletPages.isNotEmpty)

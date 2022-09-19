@@ -11,7 +11,7 @@ class Review extends StatefulWidget {
   const Review({Key? key}) : super(key: key);
 
   @override
-  _ReviewState createState() => _ReviewState();
+  State<Review> createState() => _ReviewState();
 }
 
 double review = 0.0;
@@ -24,6 +24,14 @@ class _ReviewState extends State<Review> {
   void initState() {
     review = 0.0;
     super.initState();
+  }
+
+  //navigate
+  navigate() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Maps()),
+        (route) => false);
   }
 
   @override
@@ -172,11 +180,7 @@ class _ReviewState extends State<Review> {
                           var result = await userRating();
 
                           if (result == true) {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Maps()),
-                                (route) => false);
+                            navigate();
                             _loading = false;
                           } else {
                             setState(() {

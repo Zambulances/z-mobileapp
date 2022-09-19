@@ -15,7 +15,6 @@ import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/review_page.dart';
 import 'package:tagyourtaxi_driver/pages/referralcode/referral_code.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -25,6 +24,7 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 //languages code
 dynamic phcode;
@@ -106,7 +106,7 @@ validateEmail() async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/user/validate-mobile'),
+        Uri.parse('${url}api/v1/user/validate-mobile'),
         body: {'email': email});
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
@@ -115,6 +115,14 @@ validateEmail() async {
         debugPrint(response.body);
         result = 'failed';
       }
+    } else if (response.statusCode == 422) {
+      debugPrint(response.body);
+      var error = jsonDecode(response.body)['errors'];
+      result = error[error.keys.toList()[0]]
+          .toString()
+          .replaceAll('[', '')
+          .replaceAll(']', '')
+          .toString();
     } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
@@ -202,7 +210,7 @@ List countries = [];
 getCountryCode() async {
   dynamic result;
   try {
-    final response = await http.get(Uri.parse(url + 'api/v1/countries'));
+    final response = await http.get(Uri.parse('${url}api/v1/countries'));
 
     if (response.statusCode == 200) {
       countries = jsonDecode(response.body)['data'];
@@ -316,11 +324,14 @@ registerUser() async {
   bearerToken.clear();
   dynamic result;
   try {
-    final response =  http.MultipartRequest('POST', Uri.parse(url + 'api/v1/user/register'));
-        response.headers.addAll({'Content-Type': 'application/json'});
-        response.files.add(
+    final response =
+        http.MultipartRequest('POST', Uri.parse('${url}api/v1/user/register'));
+    response.headers.addAll({'Content-Type': 'application/json'});
+    if(proImageFile1 != null){
+    response.files.add(
         await http.MultipartFile.fromPath('profile_picture', proImageFile1));
-      response.fields.addAll({
+    }
+    response.fields.addAll({
       "name": name,
       "mobile": phnumber,
       "email": email,
@@ -342,6 +353,14 @@ registerUser() async {
       pref.setString('Bearer', bearerToken[0].token);
       await getUserDetails();
       result = 'true';
+    } else if (respon.statusCode == 422) {
+      debugPrint(respon.body);
+      var error = jsonDecode(respon.body)['errors'];
+      result = error[error.keys.toList()[0]]
+          .toString()
+          .replaceAll('[', '')
+          .replaceAll(']', '')
+          .toString();
     } else {
       debugPrint(respon.body);
       result = jsonDecode(respon.body)['message'];
@@ -360,9 +379,9 @@ updateReferral() async {
   dynamic result;
   try {
     var response =
-        await http.post(Uri.parse(url + 'api/v1/update/user/referral'),
+        await http.post(Uri.parse('${url}api/v1/update/user/referral'),
             headers: {
-              'Authorization': 'Bearer ' + bearerToken[0].token,
+              'Authorization': 'Bearer ${bearerToken[0].token}',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({"refferal_code": referralCode}));
@@ -408,7 +427,7 @@ verifyUser(String number) async {
   dynamic val;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/user/validate-mobile-for-login'),
+        Uri.parse('${url}api/v1/user/validate-mobile-for-login'),
         body: {"mobile": number});
 
     if (response.statusCode == 200) {
@@ -420,7 +439,7 @@ verifyUser(String number) async {
           var uCheck = await getUserDetails();
           val = uCheck;
         } else {
-          val = false;
+          val = check;
         }
       } else {
         val = false;
@@ -442,7 +461,7 @@ userLogin() async {
   bearerToken.clear();
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/user/login'),
+    var response = await http.post(Uri.parse('${url}api/v1/user/login'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -458,6 +477,14 @@ userLogin() async {
           token: jsonVal['access_token'].toString()));
       result = true;
       pref.setString('Bearer', bearerToken[0].token);
+    } else if (response.statusCode == 422) {
+      debugPrint(response.body);
+      var error = jsonDecode(response.body)['errors'];
+      result = error[error.keys.toList()[0]]
+          .toString()
+          .replaceAll('[', '')
+          .replaceAll(']', '')
+          .toString();
     } else {
       debugPrint(response.body);
       result = false;
@@ -478,13 +505,14 @@ getUserDetails() async {
   dynamic result;
   try {
     var response = await http.get(
-      Uri.parse(url + 'api/v1/user'),
+      Uri.parse('${url}api/v1/user'),
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + bearerToken[0].token
+        'Authorization': 'Bearer ${bearerToken[0].token}'
       },
     );
     if (response.statusCode == 200) {
+      printWrapped(response.body);
       userDetails =
           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
       favAddress = userDetails['favouriteLocations']['data'];
@@ -527,13 +555,15 @@ getUserDetails() async {
               latlng: LatLng(
                   userRequestData['pick_lat'], userRequestData['pick_lng'])),
         );
-        addressList.add(
-          AddressList(
-              id: 'drop',
-              address: userRequestData['drop_address'],
-              latlng: LatLng(
-                  userRequestData['drop_lat'], userRequestData['drop_lng'])),
-        );
+        if (userRequestData['drop_address'] != null) {
+          addressList.add(
+            AddressList(
+                id: 'drop',
+                address: userRequestData['drop_address'],
+                latlng: LatLng(
+                    userRequestData['drop_lat'], userRequestData['drop_lng'])),
+          );
+        }
 
         if (requestStreamStart == null ||
             requestStreamStart?.isPaused == true ||
@@ -658,9 +688,8 @@ getlangid() async {
   dynamic result;
   try {
     var response = await http
-        .post(Uri.parse(url + 'api/v1/user/update-my-lang'), headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + bearerToken[0].token,
+        .post(Uri.parse('${url}api/v1/user/update-my-lang'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
     }, body: {
       'lang': choosenLanguage,
     });
@@ -671,6 +700,14 @@ getlangid() async {
         debugPrint(response.body);
         result = 'failed';
       }
+    } else if (response.statusCode == 422) {
+      debugPrint(response.body);
+      var error = jsonDecode(response.body)['errors'];
+      result = error[error.keys.toList()[0]]
+          .toString()
+          .replaceAll('[', '')
+          .replaceAll(']', '')
+          .toString();
     } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
@@ -878,9 +915,9 @@ List etaDetails = [];
 etaRequest() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/eta'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -928,9 +965,9 @@ etaRequestWithPromo() async {
   dynamic result;
   // etaDetails.clear();
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/eta'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/eta'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -973,9 +1010,9 @@ rentalEta() async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/request/list-packages'),
+        Uri.parse('${url}api/v1/request/list-packages'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1012,9 +1049,9 @@ rentalRequestWithPromo() async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/request/list-packages'),
+        Uri.parse('${url}api/v1/request/list-packages'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1067,9 +1104,9 @@ Map<String, dynamic> userRequestData = {};
 createRequest() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1133,9 +1170,9 @@ createRequest() async {
 createRequestWithPromo() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1198,9 +1235,9 @@ createRequestWithPromo() async {
 createRequestLater() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1263,9 +1300,9 @@ createRequestLater() async {
 createRequestLaterPromo() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1331,9 +1368,9 @@ createRequestLaterPromo() async {
 createRentalRequest() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1391,9 +1428,9 @@ createRentalRequest() async {
 createRentalRequestWithPromo() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1451,9 +1488,9 @@ createRentalRequestWithPromo() async {
 createRentalRequestLater() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1510,9 +1547,9 @@ createRentalRequestLater() async {
 createRentalRequestLaterPromo() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/create'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/create'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
@@ -1615,9 +1652,9 @@ class RequestCreate {
 cancelRequest() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/cancel'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({'request_id': userRequestData['id']}));
@@ -1651,9 +1688,9 @@ cancelRequest() async {
 
 cancelLaterRequest(val) async {
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/cancel'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode({'request_id': val}));
@@ -1681,9 +1718,9 @@ cancelLaterRequest(val) async {
 
 cancelRequestWithReason(reason) async {
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/cancel'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/cancel'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
         body: jsonEncode(
@@ -1691,7 +1728,7 @@ cancelRequestWithReason(reason) async {
     if (response.statusCode == 200) {
       cancelRequestByUser = true;
       FirebaseDatabase.instance
-          .ref('requests/' + userRequestData['id'])
+          .ref('requests/${userRequestData['id']}')
           .update({'cancelled_by_user': true});
       userRequestData = {};
       if (rideStreamUpdate?.isPaused == false ||
@@ -1715,9 +1752,9 @@ cancelRequestWithReason(reason) async {
 //making call to user
 
 makingPhoneCall(phnumber) async {
-  var mobileCall = 'tel:' + phnumber;
-  if (await canLaunch(mobileCall)) {
-    await launch(mobileCall);
+  var mobileCall = 'tel:$phnumber';
+  if (await canLaunchUrlString(mobileCall)) {
+    await launchUrlString(mobileCall);
   } else {
     throw 'Could not launch $mobileCall';
   }
@@ -1729,9 +1766,9 @@ cancelReason(reason) async {
   dynamic result;
   try {
     var response = await http.get(
-      Uri.parse(url + 'api/v1/common/cancallation/reasons?arrived=$reason'),
+      Uri.parse('${url}api/v1/common/cancallation/reasons?arrived=$reason'),
       headers: {
-        'Authorization': 'Bearer ' + bearerToken[0].token,
+        'Authorization': 'Bearer ${bearerToken[0].token}',
         'Content-Type': 'application/json',
       },
     );
@@ -1770,9 +1807,9 @@ class CancelReasonJson {
 userRating() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/rating'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/rating'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({
@@ -1828,9 +1865,9 @@ addFavLocation(lat, lng, add, name) async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/user/add-favourite-location'),
+        Uri.parse('${url}api/v1/user/add-favourite-location'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({
@@ -1862,9 +1899,9 @@ getSosData(lat, lng) async {
   dynamic result;
   try {
     var response = await http.get(
-      Uri.parse(url + 'api/v1/common/sos/list/$lat/$lng'),
+      Uri.parse('${url}api/v1/common/sos/list/$lat/$lng'),
       headers: {
-        'Authorization': 'Bearer ' + bearerToken[0].token,
+        'Authorization': 'Bearer ${bearerToken[0].token}',
         'Content-Type': 'application/json'
       },
     );
@@ -1893,7 +1930,7 @@ notifyAdmin() async {
   // var result;
 
   try {
-    await db.child('SOS/' + userRequestData['id']).update({
+    await db.child('SOS/${userRequestData['id']}').update({
       "is_driver": "0",
       "is_user": "1",
       "req_id": userRequestData['id'],
@@ -1915,9 +1952,9 @@ List chatList = [];
 getCurrentMessages() async {
   try {
     var response = await http.get(
-      Uri.parse(url + 'api/v1/request/chat-history/' + userRequestData['id']),
+      Uri.parse('${url}api/v1/request/chat-history/${userRequestData['id']}'),
       headers: {
-        'Authorization': 'Bearer ' + bearerToken[0].token,
+        'Authorization': 'Bearer ${bearerToken[0].token}',
         'Content-Type': 'application/json'
       },
     );
@@ -1946,9 +1983,9 @@ getCurrentMessages() async {
 
 sendMessage(chat) async {
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/request/send'),
+    var response = await http.post(Uri.parse('${url}api/v1/request/send'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body:
@@ -1956,7 +1993,7 @@ sendMessage(chat) async {
     if (response.statusCode == 200) {
       await getCurrentMessages();
       FirebaseDatabase.instance
-          .ref('requests/' + userRequestData['id'])
+          .ref('requests/${userRequestData['id']}')
           .update({'message_by_user': chatList.length});
     } else {
       debugPrint(response.body);
@@ -1971,9 +2008,9 @@ sendMessage(chat) async {
 //message seen
 
 messageSeen() async {
-  var response = await http.post(Uri.parse(url + 'api/v1/request/seen'),
+  var response = await http.post(Uri.parse('${url}api/v1/request/seen'),
       headers: {
-        'Authorization': 'Bearer ' + bearerToken[0].token,
+        'Authorization': 'Bearer ${bearerToken[0].token}',
         'Content-Type': 'application/json'
       },
       body: jsonEncode({'request_id': userRequestData['id']}));
@@ -1989,9 +2026,9 @@ messageSeen() async {
 addSos(name, number) async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/common/sos/store'),
+    var response = await http.post(Uri.parse('${url}api/v1/common/sos/store'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({'name': name, 'number': number}));
@@ -2018,8 +2055,8 @@ deleteSos(id) async {
   dynamic result;
   try {
     var response = await http
-        .post(Uri.parse(url + 'api/v1/common/sos/delete/' + id), headers: {
-      'Authorization': 'Bearer ' + bearerToken[0].token,
+        .post(Uri.parse('${url}api/v1/common/sos/delete/$id'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -2041,8 +2078,8 @@ deleteSos(id) async {
 //open url in browser
 
 openBrowser(browseUrl) async {
-  if (await canLaunch(browseUrl)) {
-    await launch(browseUrl);
+  if (await canLaunchUrlString(browseUrl)) {
+    await launchUrlString(browseUrl);
   } else {
     throw 'Could not launch $browseUrl';
   }
@@ -2055,8 +2092,8 @@ getFaqData(lat, lng) async {
   dynamic result;
   try {
     var response = await http
-        .get(Uri.parse(url + 'api/v1/common/faq/list/$lat/$lng'), headers: {
-      'Authorization': 'Bearer ' + bearerToken[0].token,
+        .get(Uri.parse('${url}api/v1/common/faq/list/$lat/$lng'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -2082,9 +2119,9 @@ removeFavAddress(id) async {
   dynamic result;
   try {
     var response = await http.get(
-        Uri.parse(url + 'api/v1/user/delete-favourite-location/$id'),
+        Uri.parse('${url}api/v1/user/delete-favourite-location/$id'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         });
     if (response.statusCode == 200) {
@@ -2110,8 +2147,8 @@ getReferral() async {
   dynamic result;
   try {
     var response =
-        await http.get(Uri.parse(url + 'api/v1/get/referral'), headers: {
-      'Authorization': 'Bearer ' + bearerToken[0].token,
+        await http.get(Uri.parse('${url}api/v1/get/referral'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -2136,8 +2173,8 @@ getReferral() async {
 userLogout() async {
   dynamic result;
   try {
-    var response = await http.post(Uri.parse(url + 'api/v1/logout'), headers: {
-      'Authorization': 'Bearer ' + bearerToken[0].token,
+    var response = await http.post(Uri.parse('${url}api/v1/logout'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
@@ -2165,8 +2202,8 @@ getHistory(id) async {
   dynamic result;
 
   try {
-    var response = await http.get(Uri.parse(url + 'api/v1/request/history?$id'),
-        headers: {'Authorization': 'Bearer ' + bearerToken[0].token});
+    var response = await http.get(Uri.parse('${url}api/v1/request/history?$id'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
     if (response.statusCode == 200) {
       myHistory = jsonDecode(response.body)['data'];
       myHistoryPage = jsonDecode(response.body)['meta'];
@@ -2192,8 +2229,8 @@ getHistoryPages(id) async {
   dynamic result;
 
   try {
-    var response = await http.get(Uri.parse(url + 'api/v1/request/history?$id'),
-        headers: {'Authorization': 'Bearer ' + bearerToken[0].token});
+    var response = await http.get(Uri.parse('${url}api/v1/request/history?$id'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
     if (response.statusCode == 200) {
       List list = jsonDecode(response.body)['data'];
       // ignore: avoid_function_literals_in_foreach_calls
@@ -2229,8 +2266,8 @@ getWalletHistory() async {
   dynamic result;
   try {
     var response = await http.get(
-        Uri.parse(url + 'api/v1/payment/wallet/history'),
-        headers: {'Authorization': 'Bearer ' + bearerToken[0].token});
+        Uri.parse('${url}api/v1/payment/wallet/history'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
     if (response.statusCode == 200) {
       walletBalance = jsonDecode(response.body);
       walletHistory = walletBalance['wallet_history']['data'];
@@ -2256,8 +2293,8 @@ getWalletHistoryPage(page) async {
   dynamic result;
   try {
     var response = await http.get(
-        Uri.parse(url + 'api/v1/payment/wallet/history?page=$page'),
-        headers: {'Authorization': 'Bearer ' + bearerToken[0].token});
+        Uri.parse('${url}api/v1/payment/wallet/history?page=$page'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
     if (response.statusCode == 200) {
       walletBalance = jsonDecode(response.body);
       List list = walletBalance['wallet_history']['data'];
@@ -2289,8 +2326,8 @@ getClientToken() async {
   dynamic result;
   try {
     var response = await http.get(
-        Uri.parse(url + 'api/v1/payment/client/token'),
-        headers: {'Authorization': 'Bearer ' + bearerToken[0].token});
+        Uri.parse('${url}api/v1/payment/client/token'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
     if (response.statusCode == 200) {
       result = 'success';
     } else {
@@ -2314,9 +2351,9 @@ getStripePayment(money) async {
   dynamic results;
   try {
     var response =
-        await http.post(Uri.parse(url + 'api/v1/payment/stripe/intent'),
+        await http.post(Uri.parse('${url}api/v1/payment/stripe/intent'),
             headers: {
-              'Authorization': 'Bearer ' + bearerToken[0].token,
+              'Authorization': 'Bearer ${bearerToken[0].token}',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({'amount': money}));
@@ -2342,9 +2379,9 @@ addMoneyStripe(amount, nonce) async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/payment/stripe/add/money'),
+        Uri.parse('${url}api/v1/payment/stripe/add/money'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -2374,18 +2411,23 @@ getPaystackPayment(money) async {
   paystackCode.clear();
   try {
     var response =
-        await http.post(Uri.parse(url + 'api/v1/payment/paystack/initialize'),
+        await http.post(Uri.parse('${url}api/v1/payment/paystack/initialize'),
             headers: {
-              'Authorization': 'Bearer ' + bearerToken[0].token,
+              'Authorization': 'Bearer ${bearerToken[0].token}',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({'amount': money}));
     if (response.statusCode == 200) {
-      results = 'success';
-      paystackCode = jsonDecode(response.body)['data'];
+      if (jsonDecode(response.body)['status'] == false) {
+        results = jsonDecode(response.body)['message'];
+      } else {
+        printWrapped(response.body);
+        results = 'success';
+        paystackCode = jsonDecode(response.body)['data'];
+      }
     } else {
       debugPrint(response.body);
-      results = 'failure';
+      results = jsonDecode(response.body)['message'];
     }
   } catch (e) {
     if (e is SocketException) {
@@ -2400,9 +2442,9 @@ addMoneyPaystack(amount, nonce) async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/payment/paystack/add-money'),
+        Uri.parse('${url}api/v1/payment/paystack/add-money'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -2431,9 +2473,9 @@ addMoneyFlutterwave(amount, nonce) async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/payment/flutter-wave/add-money'),
+        Uri.parse('${url}api/v1/payment/flutter-wave/add-money'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -2461,9 +2503,9 @@ addMoneyRazorpay(amount, nonce) async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/payment/razerpay/add-money'),
+        Uri.parse('${url}api/v1/payment/razerpay/add-money'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode(
@@ -2495,9 +2537,9 @@ getCfToken(money, currency) async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/payment/cashfree/generate-cftoken'),
+        Uri.parse('${url}api/v1/payment/cashfree/generate-cftoken'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({'order_amount': money, 'order_currency': currency}));
@@ -2528,9 +2570,9 @@ cashFreePaymentSuccess() async {
   dynamic result;
   try {
     var response = await http.post(
-        Uri.parse(url + 'api/v1/payment/cashfree/add-money-to-wallet-webhooks'),
+        Uri.parse('${url}api/v1/payment/cashfree/add-money-to-wallet-webhooks'),
         headers: {
-          'Authorization': 'Bearer ' + bearerToken[0].token,
+          'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json'
         },
         body: jsonEncode({
@@ -2572,10 +2614,10 @@ updateProfile(name, email) async {
   try {
     var response = http.MultipartRequest(
       'POST',
-      Uri.parse(url + 'api/v1/user/profile'),
+      Uri.parse('${url}api/v1/user/profile'),
     );
     response.headers
-        .addAll({'Authorization': 'Bearer ' + bearerToken[0].token});
+        .addAll({'Authorization': 'Bearer ${bearerToken[0].token}'});
     response.files
         .add(await http.MultipartFile.fromPath('profile_picture', imageFile));
     response.fields['email'] = email;
@@ -2605,10 +2647,10 @@ updateProfileWithoutImage(name, email) async {
   try {
     var response = http.MultipartRequest(
       'POST',
-      Uri.parse(url + 'api/v1/user/profile'),
+      Uri.parse('${url}api/v1/user/profile'),
     );
     response.headers
-        .addAll({'Authorization': 'Bearer ' + bearerToken[0].token});
+        .addAll({'Authorization': 'Bearer ${bearerToken[0].token}'});
     response.fields['email'] = email;
     response.fields['name'] = name;
     var request = await response.send();
@@ -2644,8 +2686,8 @@ getGeneralComplaint(type) async {
   dynamic result;
   try {
     var response = await http.get(
-      Uri.parse(url + 'api/v1/common/complaint-titles?complaint_type=$type'),
-      headers: {'Authorization': 'Bearer ' + bearerToken[0].token},
+      Uri.parse('${url}api/v1/common/complaint-titles?complaint_type=$type'),
+      headers: {'Authorization': 'Bearer ${bearerToken[0].token}'},
     );
     if (response.statusCode == 200) {
       generalComplaintList = jsonDecode(response.body)['data'];
@@ -2667,9 +2709,9 @@ makeGeneralComplaint() async {
   dynamic result;
   try {
     var response =
-        await http.post(Uri.parse(url + 'api/v1/common/make-complaint'),
+        await http.post(Uri.parse('${url}api/v1/common/make-complaint'),
             headers: {
-              'Authorization': 'Bearer ' + bearerToken[0].token,
+              'Authorization': 'Bearer ${bearerToken[0].token}',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({
@@ -2695,9 +2737,9 @@ makeRequestComplaint() async {
   dynamic result;
   try {
     var response =
-        await http.post(Uri.parse(url + 'api/v1/common/make-complaint'),
+        await http.post(Uri.parse('${url}api/v1/common/make-complaint'),
             headers: {
-              'Authorization': 'Bearer ' + bearerToken[0].token,
+              'Authorization': 'Bearer ${bearerToken[0].token}',
               'Content-Type': 'application/json'
             },
             body: jsonEncode({
@@ -2735,9 +2777,9 @@ streamRequest() {
   rideStreamUpdate = null;
   rideStreamStart = null;
   requestStreamStart = FirebaseDatabase.instance
-      .ref('requests')
+      .ref('request-meta')
       .child(userRequestData['id'])
-      .onChildAdded
+      .onChildRemoved
       .handleError((onError) {
     requestStreamStart?.cancel();
   }).listen((event) async {
@@ -2760,7 +2802,7 @@ streamRide() {
   rideStreamUpdate = null;
   rideStreamStart = null;
   rideStreamUpdate = FirebaseDatabase.instance
-      .ref('requests/' + userRequestData['id'])
+      .ref('requests/${userRequestData['id']}')
       .onChildChanged
       .handleError((onError) {
     rideStreamUpdate?.cancel();
@@ -2778,7 +2820,7 @@ streamRide() {
   });
 
   rideStreamStart = FirebaseDatabase.instance
-      .ref('requests/' + userRequestData['id'])
+      .ref('requests/${userRequestData['id']}')
       .onChildAdded
       .handleError((onError) {
     rideStreamStart?.cancel();
@@ -2796,8 +2838,8 @@ userDelete() async {
   dynamic result;
   try {
     var response = await http
-        .post(Uri.parse(url + 'api/v1/user/delete-user-account'), headers: {
-      'Authorization': 'Bearer ' + bearerToken[0].token,
+        .post(Uri.parse('${url}api/v1/user/delete-user-account'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {

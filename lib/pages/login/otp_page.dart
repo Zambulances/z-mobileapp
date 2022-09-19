@@ -11,7 +11,6 @@ import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import '../../styles/styles.dart';
 import '../../functions/functions.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
@@ -19,7 +18,7 @@ class Otp extends StatefulWidget {
   const Otp({Key? key}) : super(key: key);
 
   @override
-  _OtpState createState() => _OtpState();
+  State<Otp> createState() => _OtpState();
 }
 
 class _OtpState extends State<Otp> {
@@ -53,6 +52,49 @@ class _OtpState extends State<Otp> {
     super.dispose();
   }
 
+  //navigate
+  navigate(verify) {
+    if (verify == true) {
+      if (userRequestData.isNotEmpty && userRequestData['is_completed'] == 1) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Invoice()),
+            (route) => false);
+      } else if (userRequestData.isNotEmpty &&
+          userRequestData['is_completed'] != 1) {
+        Future.delayed(const Duration(seconds: 2), () {
+          if (userRequestData['is_rental'] == true) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BookingConfirmation(
+                          type: 1,
+                        )),
+                (route) => false);
+          } else {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => BookingConfirmation()),
+                (route) => false);
+          }
+        });
+      } else {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const Maps()),
+            (route) => false);
+      }
+    }  else if(verify == false) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const GetStarted()));
+    } else {
+      _error = verify.toString();
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
   //otp is false
   otpFalse() async {
     if (phoneAuthCheck == false) {
@@ -61,42 +103,7 @@ class _OtpState extends State<Otp> {
       otpNumber = otpController.text;
       var verify = await verifyUser(phnumber);
 
-      if (verify == true) {
-        if (userRequestData.isNotEmpty &&
-            userRequestData['is_completed'] == 1) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Invoice()),
-              (route) => false);
-        } else if (userRequestData.isNotEmpty &&
-            userRequestData['is_completed'] != 1) {
-          Future.delayed(const Duration(seconds: 2), () {
-            if (userRequestData['is_rental'] == true) {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BookingConfirmation(
-                            type: 1,
-                          )),
-                  (route) => false);
-            } else {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BookingConfirmation()),
-                  (route) => false);
-            }
-          });
-        } else {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Maps()),
-              (route) => false);
-        }
-      } else {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const GetStarted()));
-      }
+      navigate(verify);
     }
   }
 
@@ -109,42 +116,7 @@ class _OtpState extends State<Otp> {
       await FirebaseAuth.instance.signInWithCredential(credentials);
 
       var verify = await verifyUser(phnumber);
-      if (verify == true) {
-        if (userRequestData.isNotEmpty &&
-            userRequestData['is_completed'] == 1) {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Invoice()),
-              (route) => false);
-        } else if (userRequestData.isNotEmpty &&
-            userRequestData['is_completed'] != 1) {
-          Future.delayed(const Duration(seconds: 2), () {
-            if (userRequestData['is_rental'] == true) {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BookingConfirmation(
-                            type: 1,
-                          )),
-                  (route) => false);
-            } else {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BookingConfirmation()),
-                  (route) => false);
-            }
-          });
-        } else {
-          Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const Maps()),
-              (route) => false);
-        }
-      } else {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => const GetStarted()));
-      }
+      navigate(verify);
     } on FirebaseAuthException catch (error) {
       if (error.code == 'invalid-verification-code') {
         setState(() {
@@ -317,61 +289,7 @@ class _OtpState extends State<Otp> {
                                       if (phoneAuthCheck == false) {
                                         var verify = await verifyUser(phnumber);
 
-                                        if (verify == true) {
-                                          if (userRequestData.isNotEmpty &&
-                                              userRequestData['is_completed'] ==
-                                                  1) {
-                                            //invoice page
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const Invoice()),
-                                                (route) => false);
-                                          } else if (userRequestData
-                                                  .isNotEmpty &&
-                                              userRequestData['is_completed'] !=
-                                                  1) {
-                                            Future.delayed(
-                                                const Duration(seconds: 2), () {
-                                              // ride page
-                                              if (userRequestData[
-                                                      'is_rental'] ==
-                                                  true) {
-                                                Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            BookingConfirmation(
-                                                              type: 1,
-                                                            )),
-                                                    (route) => false);
-                                              } else {
-                                                Navigator.pushAndRemoveUntil(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            BookingConfirmation()),
-                                                    (route) => false);
-                                              }
-                                            });
-                                          } else {
-                                            //home page
-                                            Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const Maps()),
-                                                (route) => false);
-                                          }
-                                        } else {
-                                          //get started
-                                          Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const GetStarted()));
-                                        }
+                                        navigate(verify);
                                       } else {
                                         // firebase code send true
                                         try {
@@ -386,60 +304,7 @@ class _OtpState extends State<Otp> {
 
                                           var verify =
                                               await verifyUser(phnumber);
-                                          if (verify == true) {
-                                            if (userRequestData.isNotEmpty &&
-                                                userRequestData[
-                                                        'is_completed'] ==
-                                                    1) {
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const Invoice()),
-                                                  (route) => false);
-                                            } else if (userRequestData
-                                                    .isNotEmpty &&
-                                                userRequestData[
-                                                        'is_completed'] !=
-                                                    1) {
-                                              Future.delayed(
-                                                  const Duration(seconds: 2),
-                                                  () {
-                                                if (userRequestData[
-                                                        'is_rental'] ==
-                                                    true) {
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              BookingConfirmation(
-                                                                type: 1,
-                                                              )),
-                                                      (route) => false);
-                                                } else {
-                                                  Navigator.pushAndRemoveUntil(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              BookingConfirmation()),
-                                                      (route) => false);
-                                                }
-                                              });
-                                            } else {
-                                              Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const Maps()),
-                                                  (route) => false);
-                                            }
-                                          } else {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const GetStarted()));
-                                          }
+                                          navigate(verify);
                                         } on FirebaseAuthException catch (error) {
                                           if (error.code ==
                                               'invalid-verification-code') {

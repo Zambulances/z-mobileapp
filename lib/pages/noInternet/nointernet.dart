@@ -12,7 +12,7 @@ class NoInternet extends StatefulWidget {
   NoInternet({required this.onTap});
 
   @override
-  _NoInternetState createState() => _NoInternetState();
+  State<NoInternet> createState() => _NoInternetState();
 }
 
 class _NoInternetState extends State<NoInternet> {

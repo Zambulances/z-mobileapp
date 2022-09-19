@@ -11,7 +11,7 @@ class Sos extends StatefulWidget {
   const Sos({Key? key}) : super(key: key);
 
   @override
-  _SosState createState() => _SosState();
+  State<Sos> createState() => _SosState();
 }
 
 class _SosState extends State<Sos> {

@@ -18,7 +18,7 @@ class DropLocation extends StatefulWidget {
   const DropLocation({Key? key}) : super(key: key);
 
   @override
-  _DropLocationState createState() => _DropLocationState();
+  State<DropLocation> createState() => _DropLocationState();
 }
 
 class _DropLocationState extends State<DropLocation>
@@ -46,7 +46,7 @@ class _DropLocationState extends State<DropLocation>
 
   @override
   void initState() {
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     getLocs();
     super.initState();
   }
@@ -105,11 +105,7 @@ class _DropLocationState extends State<DropLocation>
               double.parse(loc.longitude.toString()));
         });
       }
-_controller?.animateCamera(
-               CameraUpdate
-                   .newLatLngZoom(
-                       center,
-                       14.0));
+      _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
       setState(() {
         _state = '3';
         _isLoading = false;
