@@ -522,7 +522,7 @@ class _MapsState extends State<Maps>
                                                       },
                                                       text: languages[
                                                               choosenLanguage]
-                                                          ['text_allow']))
+                                                          ['text_continue']))
                                             ],
                                           ),
                                         )
