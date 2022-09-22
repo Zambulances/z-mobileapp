@@ -563,8 +563,7 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                             addressText.text.isNotEmpty &&
                             cityText.text.isNotEmpty &&
                             postalText.text.isNotEmpty &&
-                            taxText.text.isNotEmpty &&
-                            proImageFile1 != null)
+                            taxText.text.isNotEmpty)
                         ? Container(
                             width: media.width * 1,
                             alignment: Alignment.center,

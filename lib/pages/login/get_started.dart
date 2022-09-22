@@ -299,8 +299,7 @@ class _GetStartedState extends State<GetStarted> {
                             height: media.height * 0.065,
                           ),
                           (nameText.text.isNotEmpty &&
-                                  emailText.text.isNotEmpty &&
-                                  proImageFile1 != null)
+                                  emailText.text.isNotEmpty)
                               ? Container(
                                   width: media.width * 1,
                                   alignment: Alignment.center,

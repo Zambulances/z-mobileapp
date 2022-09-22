@@ -124,14 +124,16 @@ validateEmail(email) async {
 getlangid() async {
   dynamic result;
   try {
+    print('started');
     var response = await http
         .post(Uri.parse('${url}api/v1/user/update-my-lang'), headers: {
-      'Content-Type': 'application/json',
       'Authorization': 'Bearer ${bearerToken[0].token}',
     }, body: {
       'lang': choosenLanguage,
     });
+    print('completed');
     if (response.statusCode == 200) {
+      print(response.body);
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
       } else {
@@ -549,9 +551,10 @@ registerDriver() async {
         'POST', Uri.parse('${url}api/v1/driver/register'));
 
     response.headers.addAll({'Content-Type': 'application/json'});
-
+ if(proImageFile1 != null){
     response.files.add(
         await http.MultipartFile.fromPath('profile_picture', proImageFile1));
+ }
     response.fields.addAll({
       "name": name,
       "mobile": phnumber,
@@ -649,8 +652,10 @@ registerOwner() async {
     final response =
         http.MultipartRequest('POST', Uri.parse('${url}api/v1/owner/register'));
     response.headers.addAll({'Content-Type': 'application/json'});
+    if(proImageFile1 != null){
     response.files.add(
         await http.MultipartFile.fromPath('profile_picture', proImageFile1));
+    }
     response.fields.addAll({
       "name": ownerName,
       "mobile": phnumber,
@@ -937,7 +942,7 @@ verifyUser(String number) async {
           var uCheck = await getUserDetails();
           val = uCheck;
         } else {
-          val = false;
+          val = check;
         }
       } else {
         val = false;
@@ -977,7 +982,15 @@ driverLogin() async {
           token: jsonVal['access_token'].toString()));
       result = true;
       pref.setString('Bearer', bearerToken[0].token);
-    } else {
+    }else if (response.statusCode == 422) {
+      debugPrint(response.body);
+      var error = jsonDecode(response.body)['errors'];
+      result = error[error.keys.toList()[0]]
+          .toString()
+          .replaceAll('[', '')
+          .replaceAll(']', '')
+          .toString();
+    }else {
       debugPrint(response.body);
       result = false;
     }

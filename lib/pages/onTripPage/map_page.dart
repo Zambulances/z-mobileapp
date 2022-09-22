@@ -66,7 +66,7 @@ class _MapsState extends State<Maps>
   Animation<double>? _animation;
   dynamic animationController;
   String _cancellingError = '';
-  double mapPadding = 0;
+  double mapPadding = 0.0;
 
   String _cancelReason = '';
   bool _locationDenied = false;
@@ -1584,7 +1584,7 @@ class _MapsState extends State<Maps>
                                                             },
                                                             text: languages[
                                                                     choosenLanguage]
-                                                                ['text_allow']))
+                                                                ['text_continue']))
                                                   ],
                                                 ),
                                               )
