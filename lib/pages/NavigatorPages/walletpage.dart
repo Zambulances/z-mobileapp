@@ -24,25 +24,59 @@ dynamic addMoney;
 
 class _WalletPageState extends State<WalletPage> {
   TextEditingController addMoneyController = TextEditingController();
+  TextEditingController phonenumber = TextEditingController();
+  TextEditingController amount = TextEditingController();
 
-  bool _completed = false;
   bool _isLoading = true;
   bool _addPayment = false;
   bool _choosePayment = false;
+  bool _completed = false;
+  bool showtoast = false;
+
   @override
   void initState() {
     getWallet();
     super.initState();
   }
 
+//get wallet details
   getWallet() async {
     var val = await getWalletHistory();
+    await getCountryCode();
+
     if (val == 'success') {
       _isLoading = false;
       _completed = true;
       valueNotifierHome.incrementNotifier();
     }
   }
+
+  List<DropdownMenuItem<String>> get dropdownItems {
+    List<DropdownMenuItem<String>> menuItems = const [
+      DropdownMenuItem(value: "user", child: Text("User")),
+      DropdownMenuItem(value: "driver", child: Text("Driver")),
+      DropdownMenuItem(value: "owner", child: Text("Owner")),
+    ];
+    return menuItems;
+  }
+
+  showToast() {
+    setState(() {
+      showtoast = true;
+    });
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        showtoast = false;
+      });
+    });
+  }
+
+  String dropdownValue = 'user';
+  bool error = false;
+  String errortext = '';
+  bool ispop = false;
+
+  //show toast for copy
 
   @override
   Widget build(BuildContext context) {
@@ -115,6 +149,22 @@ class _WalletPageState extends State<WalletPage> {
                                       style: GoogleFonts.roboto(
                                           fontSize: media.width * fourty,
                                           fontWeight: FontWeight.w600),
+                                    ),
+                                    SizedBox(
+                                      height: media.width * 0.05,
+                                    ),
+                                    Button(
+                                      onTap: () {
+                                        setState(() {
+                                          ispop = true;
+                                        });
+                                      },
+                                      text: languages[choosenLanguage]
+                                          ['text_share_money'],
+                                      width: media.width * 0.3,
+                                    ),
+                                    SizedBox(
+                                      height: media.width * 0.05,
                                     ),
                                     SizedBox(
                                       height: media.width * 0.05,
@@ -208,12 +258,10 @@ class _WalletPageState extends State<WalletPage> {
                                                                   media.width *
                                                                       0.55,
                                                               child: Text(
-                                                                languages[
-                                                                        choosenLanguage]
-                                                                    [
-                                                                    walletHistory[
-                                                                            i][
-                                                                        'remarks']],
+                                                                walletHistory[i]
+                                                                        [
+                                                                        'remarks']
+                                                                    .toString(),
                                                                 style: GoogleFonts.roboto(
                                                                     fontSize: media
                                                                             .width *
@@ -1019,9 +1067,218 @@ class _WalletPageState extends State<WalletPage> {
                             ))
                         : Container(),
 
+                    (ispop == true)
+                        ? Positioned(
+                            top: 0,
+                            child: Container(
+                              height: media.height * 1,
+                              width: media.width * 1,
+                              color: Colors.transparent.withOpacity(0.6),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                      padding:
+                                          EdgeInsets.all(media.width * 0.05),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: page),
+                                      width: media.width * 0.8,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          DropdownButtonFormField(
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                fillColor: page,
+                                              ),
+                                              dropdownColor: page,
+                                              value: dropdownValue,
+                                              onChanged: (String? newValue) {
+                                                setState(() {
+                                                  dropdownValue = newValue!;
+                                                });
+                                              },
+                                              items: dropdownItems),
+                                          InputField(
+                                              text: languages[choosenLanguage]
+                                                  ['text_enteramount'],
+                                              textController: amount,
+                                              inputType: TextInputType.number),
+                                          // InputField(
+                                          //     text: languages[choosenLanguage]
+                                          //         ['text_phone_number'],
+                                          //     textController: phonenumber,
+                                          //     inputType: TextInputType.number),
+                                          TextFormField(
+                                            controller: phonenumber,
+                                            onChanged: (val) {
+                                              if (phonenumber.text.length ==
+                                                  countries[phcode]
+                                                      ['dial_max_length']) {
+                                                FocusManager
+                                                    .instance.primaryFocus
+                                                    ?.unfocus();
+                                              }
+                                            },
+                                            // maxLength: countries[phcode]
+                                            //     ['dial_max_length'],
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                color: textColor,
+                                                letterSpacing: 1),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  languages[choosenLanguage]
+                                                      ['text_phone_number'],
+                                              counterText: '',
+                                              hintStyle: GoogleFonts.roboto(
+                                                  fontSize:
+                                                      media.width * sixteen,
+                                                  color: textColor
+                                                      .withOpacity(0.7)),
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                color: inputfocusedUnderline,
+                                                width: 1.2,
+                                                style: BorderStyle.solid,
+                                              )),
+                                              enabledBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                color: inputUnderline,
+                                                width: 1.2,
+                                                style: BorderStyle.solid,
+                                              )),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: media.width * 0.05,
+                                          ),
+                                          error == true
+                                              ? Text(
+                                                  errortext,
+                                                  style: const TextStyle(
+                                                      color: Colors.red),
+                                                )
+                                              : Container(),
+                                          SizedBox(
+                                            height: media.width * 0.05,
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Button(
+                                                  width: media.width * 0.2,
+                                                  height: media.width * 0.09,
+                                                  onTap: () {
+                                                    setState(() {
+                                                      ispop = false;
+                                                      dropdownValue = 'user';
+                                                      error = false;
+                                                      errortext = '';
+                                                      phonenumber.text = '';
+                                                      amount.text = '';
+                                                    });
+                                                  },
+                                                  text:
+                                                      languages[choosenLanguage]
+                                                          ['text_close']),
+                                              SizedBox(
+                                                width: media.width * 0.05,
+                                              ),
+                                              Button(
+                                                  width: media.width * 0.2,
+                                                  height: media.width * 0.09,
+                                                  onTap: () async {
+                                                    setState(() {
+                                                      _isLoading = true;
+                                                    });
+                                                    if (phonenumber.text ==
+                                                            '' ||
+                                                        amount.text == '') {
+                                                      setState(() {
+                                                        error = true;
+                                                        errortext = languages[
+                                                                choosenLanguage]
+                                                            [
+                                                            'text_fill_fileds'];
+                                                        _isLoading = false;
+                                                      });
+                                                    } else {
+                                                      var result =
+                                                          await sharewalletfun(
+                                                              amount:
+                                                                  amount.text,
+                                                              mobile:
+                                                                  phonenumber
+                                                                      .text,
+                                                              role:
+                                                                  dropdownValue);
+                                                      if (result == 'success') {
+                                                        // navigate();
+                                                        setState(() {
+                                                          ispop = false;
+                                                          dropdownValue =
+                                                              'user';
+                                                          error = false;
+                                                          errortext = '';
+                                                          phonenumber.text = '';
+                                                          amount.text = '';
+                                                          getWallet();
+                                                          showToast();
+                                                        });
+                                                      } else {
+                                                        setState(() {
+                                                          error = true;
+                                                          errortext =
+                                                              result.toString();
+                                                          _isLoading = false;
+                                                        });
+                                                      }
+                                                    }
+                                                  },
+                                                  text:
+                                                      languages[choosenLanguage]
+                                                          ['text_share']),
+                                            ],
+                                          )
+                                        ],
+                                      )),
+                                ],
+                              ),
+                            ),
+                          )
+                        : Container(),
+
                     //loader
                     (_isLoading == true)
                         ? const Positioned(child: Loading())
+                        : Container(),
+                    (showtoast == true)
+                        ? Positioned(
+                            bottom: media.height * 0.2,
+                            left: media.width * 0.2,
+                            right: media.width * 0.2,
+                            child: Container(
+                              alignment: Alignment.center,
+                              padding: EdgeInsets.all(media.width * 0.025),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.transparent.withOpacity(0.6)),
+                              child: Text(
+                                languages[choosenLanguage]
+                                    ['text_transferred_successfully'],
+                                style: GoogleFonts.roboto(
+                                    fontSize: media.width * twelve,
+                                    color: Colors.white),
+                              ),
+                            ))
                         : Container()
                   ],
                 ),

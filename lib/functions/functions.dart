@@ -551,10 +551,10 @@ registerDriver() async {
         'POST', Uri.parse('${url}api/v1/driver/register'));
 
     response.headers.addAll({'Content-Type': 'application/json'});
- if(proImageFile1 != null){
-    response.files.add(
-        await http.MultipartFile.fromPath('profile_picture', proImageFile1));
- }
+    if (proImageFile1 != null) {
+      response.files.add(
+          await http.MultipartFile.fromPath('profile_picture', proImageFile1));
+    }
     response.fields.addAll({
       "name": name,
       "mobile": phnumber,
@@ -643,6 +643,100 @@ addDriver() async {
   return result;
 }
 
+//request notification
+List notificationHistory = [];
+Map<String, dynamic> notificationHistoryPage = {};
+
+getnotificationHistory() async {
+  dynamic result;
+
+  try {
+    var response = await http.get(
+        Uri.parse('${url}api/v1/notifications/get-notification'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+    if (response.statusCode == 200) {
+      notificationHistory = jsonDecode(response.body)['data'];
+      notificationHistoryPage = jsonDecode(response.body)['meta'];
+      result = 'success';
+      print(notificationHistory.toString());
+      printWrapped(notificationHistoryPage.toString());
+      valueNotifierHome.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+      valueNotifierHome.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+
+      internet = false;
+      valueNotifierHome.incrementNotifier();
+    }
+  }
+  return result;
+}
+
+//delete notification
+deleteNotification(id) async {
+  dynamic result;
+
+  try {
+    var response = await http.get(
+        Uri.parse('${url}api/v1/notifications/delete-notification/$id'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+    if (response.statusCode == 200) {
+      // notificationHistory = jsonDecode(response.body)['data'];
+      // notificationHistoryPage = jsonDecode(response.body)['meta'];
+      result = 'success';
+      valueNotifierHome.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+      valueNotifierHome.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+
+      internet = false;
+      valueNotifierHome.incrementNotifier();
+    }
+  }
+  return result;
+}
+
+sharewalletfun({mobile, role, amount}) async {
+  dynamic result;
+  try {
+    var response = await http.post(
+        Uri.parse('${url}api/v1/payment/wallet/transfer-money-from-wallet'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${bearerToken[0].token}',
+        },
+        body: jsonEncode({'mobile': mobile, 'role': role, 'amount': amount}));
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success'] == true) {
+        result = 'success';
+      } else {
+        debugPrint(response.body);
+        result = 'failed';
+      }
+    } else {
+      debugPrint(response.body);
+      result = jsonDecode(response.body)['message'];
+      print(result.toString());
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
 //register owner
 
 registerOwner() async {
@@ -652,9 +746,9 @@ registerOwner() async {
     final response =
         http.MultipartRequest('POST', Uri.parse('${url}api/v1/owner/register'));
     response.headers.addAll({'Content-Type': 'application/json'});
-    if(proImageFile1 != null){
-    response.files.add(
-        await http.MultipartFile.fromPath('profile_picture', proImageFile1));
+    if (proImageFile1 != null) {
+      response.files.add(
+          await http.MultipartFile.fromPath('profile_picture', proImageFile1));
     }
     response.fields.addAll({
       "name": ownerName,
@@ -982,7 +1076,7 @@ driverLogin() async {
           token: jsonVal['access_token'].toString()));
       result = true;
       pref.setString('Bearer', bearerToken[0].token);
-    }else if (response.statusCode == 422) {
+    } else if (response.statusCode == 422) {
       debugPrint(response.body);
       var error = jsonDecode(response.body)['errors'];
       result = error[error.keys.toList()[0]]
@@ -990,7 +1084,7 @@ driverLogin() async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else {
+    } else {
       debugPrint(response.body);
       result = false;
     }
@@ -1842,6 +1936,27 @@ getPolylines() async {
   return polyList;
 }
 
+getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
+  polyList.clear();
+
+  try {
+    var response = await http.get(Uri.parse(
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
+    if (response.statusCode == 200) {
+      var steps =
+          jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
+      decodeEncodedPolyline(steps);
+    } else {
+      debugPrint(response.body);
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+  return polyList;
+}
+
 //polyline decode
 
 Set<Polyline> polyline = {};
@@ -2133,16 +2248,10 @@ cancelReason(reason) async {
 //open url in browser
 
 openBrowser(browseUrl) async {
-  try {
-    if (await canLaunch(browseUrl)) {
-      await launch(browseUrl);
-    } else {
-      throw 'Could not launch $browseUrl';
-    }
-  } catch (e) {
-    if (e is SocketException) {
-      internet = false;
-    }
+  if (await canLaunch(browseUrl)) {
+    await launch(browseUrl);
+  } else {
+    throw 'Could not launch $browseUrl';
   }
 }
 

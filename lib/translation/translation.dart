@@ -364,7 +364,17 @@ Map<String, dynamic> languages = {
     "text_city": "City",
     "text_postal_code": "Postal Code",
     "text_tax_number": "Tax Number",
-    "text_no_fleet_assigned": "No Fleet Assigned"
+    "text_no_fleet_assigned": "No Fleet Assigned",
+    "text_ridewithout_destination": "Ride without Destination",
+    "text_notification": "Notification",
+    "text_delete_notification": "Are you sure want to Delete the Notication",
+    "text_share": "Share",
+    "text_share_money": "Share Money",
+    "text_close": "Close",
+    "text_fill_fileds": "Fill The Fields",
+    "text_admin_commision": "Admin Commission",
+    "text_notification_deleted": "Notification  Deleted",
+    "text_transferred_successfully": "Transferred Successfully"
   },
   "hi": {
     "text_enter_social": "या सोशल मीडिया में प्रवेश करें",
@@ -613,7 +623,7 @@ Map<String, dynamic> languages = {
     "text_startridewithotp": "ओटीपी के साथ सवारी शुरू करें",
     "text_loadingLocalization": "स्थानीयकरण लोड करना",
     "text_background_permission":
-        "पृष्ठभूमि स्थान सक्षम करें - यदि आपका ऐप पृष्ठभूमि में है, तो भी आपको सवारी अनुरोध देने के लिए",
+        "पृष्ठभूमि स्थान सक्षम करें - यदि आपका ऐप पृष्ठभूमि में है तो भी आपको सवारी अनुरोध देने के लिए",
     "Admin Commission For Trip": "यात्रा के लिए व्यवस्थापक आयोग",
     "Trip Commission": "यात्रा आयोग",
     "Cancellation Fee": "रद्दीकरण शुल्क",
@@ -736,7 +746,17 @@ Map<String, dynamic> languages = {
     "text_city": "शहर",
     "text_postal_code": "डाक कोड",
     "text_tax_number": "कर संख्या",
-    "text_no_fleet_assigned": "कोई बेड़ा सौंपा नहीं गया"
+    "text_no_fleet_assigned": "कोई बेड़ा सौंपा नहीं गया",
+    "text_ridewithout_destination": "गंतव्य के बिना सवारी",
+    "text_notification": "अधिसूचना",
+    "text_delete_notification": "क्या आप निश्चित रूप से ध्यान हटाना चाहते हैं",
+    "text_share": "शेयर करना",
+    "text_share_money": "शेयर मुद्रा",
+    "text_close": "बंद करना",
+    "text_fill_fileds": "फील्ड भरें",
+    "text_admin_commision": "व्यवस्थापक आयोग",
+    "text_notification_deleted": "अधिसूचना हटा दी गई",
+    "text_transferred_successfully": "सफलतापूर्वक स्थानांतरित किया गया"
   },
   "ar": {
     "text_enter_social": "أو أدخل وسائل التواصل الاجتماعي",
@@ -1101,7 +1121,17 @@ Map<String, dynamic> languages = {
     "text_city": "مدينة",
     "text_postal_code": "رمز بريدي",
     "text_tax_number": "الرقم الضريبي",
-    "text_no_fleet_assigned": "لم يتم تعيين أسطول"
+    "text_no_fleet_assigned": "لم يتم تعيين أسطول",
+    "text_ridewithout_destination": "ركوب بدون وجهة",
+    "text_notification": "تنبيه",
+    "text_delete_notification": "هل أنت متأكد من حذف الإشعار",
+    "text_share": "يشارك",
+    "text_share_money": "مشاركة المال",
+    "text_close": "قريب",
+    "text_fill_fileds": "ملء الحقول",
+    "text_admin_commision": "اللجنة الإدارية",
+    "text_notification_deleted": "تم حذف الإخطار",
+    "text_transferred_successfully": "نقل بنجاح"
   },
   "fr": {
     "text_enter_social": "ou entrez les médias sociaux",
@@ -1479,7 +1509,17 @@ Map<String, dynamic> languages = {
     "text_city": "Ville",
     "text_postal_code": "code postal",
     "text_tax_number": "Numéro d'identification fiscale",
-    "text_no_fleet_assigned": "Aucune flotte affectée"
+    "text_no_fleet_assigned": "Aucune flotte affectée",
+    "text_ridewithout_destination": "Rouler sans destination",
+    "text_notification": "Notification",
+    "text_delete_notification": "Êtes-vous sûr de supprimer le notification",
+    "text_share": "Partager",
+    "text_share_money": "Partager de l'argent",
+    "text_close": "proche",
+    "text_fill_fileds": "Remplissez les champs",
+    "text_admin_commision": "Commission administrative",
+    "text_notification_deleted": "Notification supprimée",
+    "text_transferred_successfully": "Transféré avec succès"
   },
   "tr": {
     "text_enter_social": "veya sosyal medyaya girin",
@@ -1847,7 +1887,17 @@ Map<String, dynamic> languages = {
     "text_city": "Şehir",
     "text_postal_code": "Posta Kodu",
     "text_tax_number": "Vergi numarası",
-    "text_no_fleet_assigned": "Filo atandı"
+    "text_no_fleet_assigned": "Filo atandı",
+    "text_ridewithout_destination": "Hedefsiz sürüş",
+    "text_notification": "Bildirim",
+    "text_delete_notification": "Bildirimi silmek istiyorsunuz?",
+    "text_share": "Paylaşmak",
+    "text_share_money": "Paylaş",
+    "text_close": "Kapat",
+    "text_fill_fileds": "Tarlaları doldurun",
+    "text_admin_commision": "Yönetici komisyonu",
+    "text_notification_deleted": "Bildirim silindi",
+    "text_transferred_successfully": "Başarıyla aktarıldı"
   },
   "ru": {
     "text_enter_social": "или войти в социальные сети",
@@ -2222,7 +2272,17 @@ Map<String, dynamic> languages = {
     "text_city": "Город",
     "text_postal_code": "Почтовый Код",
     "text_tax_number": "Налоговый номер",
-    "text_no_fleet_assigned": "Не назначен флот"
+    "text_no_fleet_assigned": "Не назначен флот",
+    "text_ridewithout_destination": "Ездить без места назначения",
+    "text_notification": "Уведомление",
+    "text_delete_notification": "Вы уверены, что хотите удалить уведомление",
+    "text_share": "Делиться",
+    "text_share_money": "Делиться деньгами",
+    "text_close": "Закрывать",
+    "text_fill_fileds": "Заполните поля",
+    "text_admin_commision": "Административная комиссия",
+    "text_notification_deleted": "Уведомление удалено",
+    "text_transferred_successfully": "Переведен успешно"
   },
   "it": {
     "text_enter_social": "o inserisci i social media",
@@ -2594,7 +2654,17 @@ Map<String, dynamic> languages = {
     "text_city": "Città",
     "text_postal_code": "Codice Postale",
     "text_tax_number": "Numero fiscale",
-    "text_no_fleet_assigned": "Nessuna flotta assegnata"
+    "text_no_fleet_assigned": "Nessuna flotta assegnata",
+    "text_ridewithout_destination": "Cavalcare senza destinazione",
+    "text_notification": "Notifica",
+    "text_delete_notification": "Sei sicuro che vuoi eliminare la nota",
+    "text_share": "Condividere",
+    "text_share_money": "Condividere denaro",
+    "text_close": "Chiudere",
+    "text_fill_fileds": "Riempire i campi",
+    "text_admin_commision": "Commissione amministrativa",
+    "text_notification_deleted": "Notifica eliminata",
+    "text_transferred_successfully": "Trasferito con successo"
   },
   "de": {
     "text_enter_social": "Oder betreten Sie soziale Medien",
@@ -2973,7 +3043,17 @@ Map<String, dynamic> languages = {
     "text_city": "Stadt",
     "text_postal_code": "Postleitzahl",
     "text_tax_number": "Steuernummer",
-    "text_no_fleet_assigned": "Keine Flotte zugewiesen"
+    "text_no_fleet_assigned": "Keine Flotte zugewiesen",
+    "text_ridewithout_destination": "Fahren Sie ohne Ziel",
+    "text_notification": "Benachrichtigung",
+    "text_delete_notification": "Sind Sie sicher die Notization löschen?",
+    "text_share": "Teilen",
+    "text_share_money": "Geld teilen",
+    "text_close": "Nah dran",
+    "text_fill_fileds": "Füllen Sie die Felder",
+    "text_admin_commision": "Administratorkommission",
+    "text_notification_deleted": "Benachrichtigung gelöscht",
+    "text_transferred_successfully": "Erfolgreich übertragen"
   },
   "ko": {
     "text_enter_social": "또는 소셜 미디어를 입력하십시오",
@@ -3326,7 +3406,17 @@ Map<String, dynamic> languages = {
     "text_city": "도시",
     "text_postal_code": "우편 번호",
     "text_tax_number": "세금 번호",
-    "text_no_fleet_assigned": "함대가 할당되지 않았습니다"
+    "text_no_fleet_assigned": "함대가 할당되지 않았습니다",
+    "text_ridewithout_destination": "목적지없이 타십시오",
+    "text_notification": "공고",
+    "text_delete_notification": "알림을 삭제하고 싶습니까?",
+    "text_share": "공유하다",
+    "text_share_money": "돈을 나누십시오",
+    "text_close": "닫다",
+    "text_fill_fileds": "필드를 채우십시오",
+    "text_admin_commision": "관리자위원회",
+    "text_notification_deleted": "알림이 삭제되었습니다",
+    "text_transferred_successfully": "성공적으로 전송되었습니다"
   },
   "zh": {
     "text_enter_social": "或进入社交媒体",
@@ -3582,7 +3672,7 @@ Map<String, dynamic> languages = {
     "text_open_settings": "打开设置",
     "text_done": "完毕",
     "text_open_contact_setting": "需要接触访问才能选择SOS的联系人，请在设置中启用它，然后点击完成",
-    "text_open_camera_setting": "捕获图像需要相机访问，请在设置中启用并点击完成",
+    "text_open_camera_setting": "捕获图像需要摄像机访问，请在设置中启用并点击完成",
     "text_open_photos_setting": "需要访问照片以选择图像，请在设置中启用并点击完成",
     "text_enter_otp_login": "输入OTP",
     "text_add_by_card": "添加卡",
@@ -3674,7 +3764,17 @@ Map<String, dynamic> languages = {
     "text_city": "城市",
     "text_postal_code": "邮政编码",
     "text_tax_number": "税号",
-    "text_no_fleet_assigned": "没有舰队分配"
+    "text_no_fleet_assigned": "没有舰队分配",
+    "text_ridewithout_destination": "骑无目的地",
+    "text_notification": "通知",
+    "text_delete_notification": "您确定要删除注意事项吗",
+    "text_share": "分享",
+    "text_share_money": "分享钱",
+    "text_close": "关",
+    "text_fill_fileds": "填写字段",
+    "text_admin_commision": "管理委员会",
+    "text_notification_deleted": "已删除通知",
+    "text_transferred_successfully": "成功转移"
   },
   "es": {
     "text_enter_social": "o entrar en las redes sociales",
@@ -3824,7 +3924,7 @@ Map<String, dynamic> languages = {
     "text_finddriverdesc":
         "Estamos buscando conductores cercanos para aceptar su viaje. ¡Una vez aceptado, puedes viajar con nosotros! ¡Nosotros apreciamos su paciencia!",
     "text_pickup_instruction": "Cualquier instrucción para recoger",
-    "text_shareride": "Compartir un paseo",
+    "text_shareride": "Compartir viaje",
     "text_ridecancel": "¿Estás seguro de cancelar el paseo?",
     "text_ridecancel_desc":
         "Su viaje será cancelado y devuelto al menú principal. Esto conducirá a una tarifa de cancelación",
@@ -3963,7 +4063,7 @@ Map<String, dynamic> languages = {
     "text_subscriptions": "Suscripciones",
     "text_select_sub_plan": "Seleccione un plan para continuar",
     "text_sub_text1": "Pago spot a su billetera",
-    "text_sub_text2": "Beneficios de obtener la cantidad total",
+    "text_sub_text2": "Beneficios de obtener toda la cantidad",
     "text_sub_text3": "Obtener atención al cliente prioritaria",
     "text_sub_text4": "0% de comisión",
     "text_sub_ended": "Su suscripción finaliza",
@@ -4047,7 +4147,18 @@ Map<String, dynamic> languages = {
     "text_city": "Ciudad",
     "text_postal_code": "Código postal",
     "text_tax_number": "Número de impuesto",
-    "text_no_fleet_assigned": "No se asigna flota"
+    "text_no_fleet_assigned": "No se asigna flota",
+    "text_ridewithout_destination": "Viaje sin destino",
+    "text_notification": "Notificación",
+    "text_delete_notification":
+        "¿Está seguro de que desea eliminar la notificación?",
+    "text_share": "Cuota",
+    "text_share_money": "Compartir dinero",
+    "text_close": "Cerca",
+    "text_fill_fileds": "Llenar los campos",
+    "text_admin_commision": "Comisión administrativa",
+    "text_notification_deleted": "Notificación eliminada",
+    "text_transferred_successfully": "Transferido con éxito"
   },
   "iw": {
     "text_enter_social": "או להיכנס למדיה חברתית",
@@ -4201,7 +4312,7 @@ Map<String, dynamic> languages = {
     "text_cancelRideReason": "סיבה לביטול נסיעה",
     "text_nodriver": "לא נמצא נהג",
     "text_tryagain": "נסה שוב",
-    "text_ridelater": "לרכוב אחר כך",
+    "text_ridelater": "סע אחר כך",
     "text_ridenow": "תרכב עכשיו",
     "text_home": "בית",
     "text_work": "עֲבוֹדָה",
@@ -4409,7 +4520,17 @@ Map<String, dynamic> languages = {
     "text_city": "עִיר",
     "text_postal_code": "מיקוד",
     "text_tax_number": "מספר מס",
-    "text_no_fleet_assigned": "אין צי שהוקצה"
+    "text_no_fleet_assigned": "אין צי שהוקצה",
+    "text_ridewithout_destination": "לרכוב ללא יעד",
+    "text_notification": "הוֹדָעָה",
+    "text_delete_notification": "האם אתה בטוח רוצה למחוק את ההודעות",
+    "text_share": "לַחֲלוֹק",
+    "text_share_money": "שתף כסף",
+    "text_close": "סגור",
+    "text_fill_fileds": "מלא את השדות",
+    "text_admin_commision": "ועדת מנהל",
+    "text_notification_deleted": "הודעה נמחקת",
+    "text_transferred_successfully": "הועבר בהצלחה"
   },
   "bn": {
     "text_enter_social": "বা সোশ্যাল মিডিয়া প্রবেশ করুন",
@@ -4778,6 +4899,16 @@ Map<String, dynamic> languages = {
     "text_city": "শহর",
     "text_postal_code": "পোস্ট অফিসের নাম্বার",
     "text_tax_number": "কর নম্বর",
-    "text_no_fleet_assigned": "কোন বহর বরাদ্দ করা হয়নি"
+    "text_no_fleet_assigned": "কোন বহর বরাদ্দ করা হয়নি",
+    "text_ridewithout_destination": "গন্তব্য ছাড়াই চড়ুন",
+    "text_notification": "বিজ্ঞপ্তি",
+    "text_delete_notification": "আপনি কি নিশ্চিততাটি মুছে ফেলতে চান?",
+    "text_share": "শেয়ার",
+    "text_share_money": "টাকা ভাগ করুন",
+    "text_close": "বন্ধ",
+    "text_fill_fileds": "ক্ষেত্রগুলি পূরণ করুন",
+    "text_admin_commision": "প্রশাসক কমিশন",
+    "text_notification_deleted": "বিজ্ঞপ্তি মুছে ফেলা হয়েছে",
+    "text_transferred_successfully": "সফলভাবে স্থানান্তরিত"
   }
 };

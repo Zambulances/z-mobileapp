@@ -84,6 +84,7 @@ class _MapsState extends State<Maps>
   dynamic pinLocationIcon;
   dynamic userLocationIcon;
   bool makeOnline = false;
+  bool contactus = false;
 
   dynamic onrideicon;
   dynamic offlineicon;
@@ -278,7 +279,7 @@ class _MapsState extends State<Maps>
             await perm.Permission.location.request();
             await perm.Permission.locationAlways.request();
           } else {
-            [perm.Permission.location, perm.Permission.locationAlways]
+            await [perm.Permission.location, perm.Permission.locationAlways]
                 .request();
           }
         }
@@ -429,7 +430,7 @@ class _MapsState extends State<Maps>
     addDropMarker() async {
       var testIcon = await capturePng(iconDropKey);
 
-      if (testIcon != null) {
+      if (testIcon != null && driverReq['drop_address'] != null) {
         setState(() {
           myMarkers.add(Marker(
               markerId: const MarkerId('3'),
@@ -441,9 +442,8 @@ class _MapsState extends State<Maps>
             .isEmpty) {
           getPolylines();
         }
+        getLatLngBounds();
       }
-
-      getLatLngBounds();
     }
 
     addMarker() async {
@@ -1584,7 +1584,8 @@ class _MapsState extends State<Maps>
                                                             },
                                                             text: languages[
                                                                     choosenLanguage]
-                                                                ['text_continue']))
+                                                                [
+                                                                'text_continue']))
                                                   ],
                                                 ),
                                               )
@@ -2644,7 +2645,7 @@ class _MapsState extends State<Maps>
                                                                                           SizedBox(
                                                                                             height: media.width * 0.04,
                                                                                           ),
-                                                                                          (driverReq['is_rental'] != true)
+                                                                                          (driverReq['is_rental'] != true && driverReq['drop_address'] != null)
                                                                                               ? Row(
                                                                                                   children: [
                                                                                                     Icon(
@@ -2665,9 +2666,7 @@ class _MapsState extends State<Maps>
                                                                                                           height: media.width * 0.1,
                                                                                                           child: Text(
                                                                                                             driverReq['drop_address'],
-                                                                                                            style: GoogleFonts.roboto(
-                                                                                                              fontSize: media.width * twelve,
-                                                                                                            ),
+                                                                                                            style: GoogleFonts.roboto(fontSize: media.width * twelve, fontWeight: FontWeight.w600),
                                                                                                             maxLines: 2,
                                                                                                             overflow: TextOverflow.ellipsis,
                                                                                                           ),
@@ -2955,7 +2954,7 @@ class _MapsState extends State<Maps>
                                                                                             ),
                                                                                           ),
                                                                                           SizedBox(height: media.width * 0.05),
-                                                                                          (driverReq['is_rental'] != true)
+                                                                                          (driverReq['is_rental'] != true && driverReq['drop_address'] != null)
                                                                                               ? Container(
                                                                                                   padding: EdgeInsets.all(media.width * 0.05),
                                                                                                   decoration: BoxDecoration(boxShadow: [
@@ -3120,7 +3119,7 @@ class _MapsState extends State<Maps>
                                                                                 ),
                                                                               ],
                                                                             )
-                                                                          : (_bottom == 0 && driverReq['is_trip_start'] == 1 && driverReq['is_rental'] != true)
+                                                                          : (_bottom == 0 && driverReq['is_trip_start'] == 1 && driverReq['is_rental'] != true && driverReq['drop_address'] != null)
                                                                               ? Row(
                                                                                   children: [
                                                                                     Icon(Icons.location_on_outlined, color: Colors.red, size: media.width * 0.075),
@@ -3188,6 +3187,154 @@ class _MapsState extends State<Maps>
                                                                   ),
                                                                 ),
                                                               ))
+                                                          : Container(),
+                                                      Positioned(
+                                                        right: 10,
+                                                        top: 150,
+                                                        child: InkWell(
+                                                          onTap: () async {
+                                                            if (contactus ==
+                                                                false) {
+                                                              setState(() {
+                                                                contactus =
+                                                                    true;
+                                                              });
+                                                            } else {
+                                                              setState(() {
+                                                                contactus =
+                                                                    false;
+                                                              });
+                                                            }
+                                                          },
+                                                          child: Container(
+                                                            height:
+                                                                media.width *
+                                                                    0.1,
+                                                            width: media.width *
+                                                                0.1,
+                                                            decoration: BoxDecoration(
+                                                                boxShadow: [
+                                                                  BoxShadow(
+                                                                      blurRadius:
+                                                                          2,
+                                                                      color: Colors
+                                                                          .black
+                                                                          .withOpacity(
+                                                                              0.2),
+                                                                      spreadRadius:
+                                                                          2)
+                                                                ],
+                                                                color: page,
+                                                                borderRadius: BorderRadius
+                                                                    .circular(media
+                                                                            .width *
+                                                                        0.02)),
+                                                            alignment: Alignment
+                                                                .center,
+                                                            child: Image.asset(
+                                                              'assets/images/customercare.png',
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                              width:
+                                                                  media.width *
+                                                                      0.06,
+                                                            ),
+                                                            // Icon(
+                                                            //     Icons
+                                                            //         .my_location_sharp,
+                                                            //     size: media
+                                                            //             .width *
+                                                            //         0.06),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      (contactus == true)
+                                                          ? Positioned(
+                                                              right: 10,
+                                                              top: 190,
+                                                              child: InkWell(
+                                                                onTap:
+                                                                    () async {},
+                                                                child:
+                                                                    Container(
+                                                                        padding:
+                                                                            EdgeInsets.all(
+                                                                                10),
+                                                                        height: media.width *
+                                                                            0.3,
+                                                                        width: media.width *
+                                                                            0.45,
+                                                                        decoration: BoxDecoration(
+                                                                            boxShadow: [
+                                                                              BoxShadow(blurRadius: 2, color: Colors.black.withOpacity(0.2), spreadRadius: 2)
+                                                                            ],
+                                                                            color:
+                                                                                page,
+                                                                            borderRadius: BorderRadius.circular(media.width *
+                                                                                0.02)),
+                                                                        alignment:
+                                                                            Alignment
+                                                                                .center,
+                                                                        child:
+                                                                            Column(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.spaceEvenly,
+                                                                          children: [
+                                                                            InkWell(
+                                                                              onTap: () {
+                                                                                makingPhoneCall(userDetails['contact_us_mobile1']);
+                                                                              },
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  const Expanded(flex: 20, child: Icon(Icons.call)),
+                                                                                  Expanded(
+                                                                                      flex: 80,
+                                                                                      child: Text(
+                                                                                        userDetails['contact_us_mobile1'],
+                                                                                        style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
+                                                                                      ))
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            InkWell(
+                                                                              onTap: () {
+                                                                                makingPhoneCall(userDetails['contact_us_mobile1']);
+                                                                              },
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  const Expanded(flex: 20, child: Icon(Icons.call)),
+                                                                                  Expanded(
+                                                                                      flex: 80,
+                                                                                      child: Text(
+                                                                                        userDetails['contact_us_mobile2'],
+                                                                                        style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
+                                                                                      ))
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            InkWell(
+                                                                              onTap: () {
+                                                                                openBrowser(userDetails['contact_us_link'].toString());
+                                                                              },
+                                                                              child: Row(
+                                                                                children: [
+                                                                                  const Expanded(flex: 20, child: Icon(Icons.vpn_lock_rounded)),
+                                                                                  Expanded(
+                                                                                      flex: 80,
+                                                                                      child: Text(
+                                                                                        'Goto URL',
+                                                                                        maxLines: 1,
+                                                                                        // overflow:
+                                                                                        //     TextOverflow.ellipsis,
+                                                                                        style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
+                                                                                      ))
+                                                                                ],
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        )),
+                                                              ),
+                                                            )
                                                           : Container(),
                                                       //user cancelled request popup
                                                       (_reqCancelled == true)
