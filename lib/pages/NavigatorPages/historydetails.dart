@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'dart:ui' as ui;
+
+import '../onTripPage/map_page.dart';
 
 class HistoryDetails extends StatefulWidget {
   const HistoryDetails({Key? key}) : super(key: key);
@@ -15,6 +20,235 @@ class HistoryDetails extends StatefulWidget {
 }
 
 class _HistoryDetailsState extends State<HistoryDetails> {
+  dynamic mapPadding = 0.0;
+  List myMarker = [];
+  LatLng center = const LatLng(41.4219057, -102.0840772);
+
+  dynamic pickicon;
+  dynamic dropicon;
+
+  // GlobalKey iconKey = GlobalKey();
+  // GlobalKey iconDropKey = GlobalKey();
+
+  getLocs() async {
+    final Uint8List pickicon1 =
+        await getBytesFromAsset('assets/images/userloc.png', 40);
+    final Uint8List dropicon1 =
+        await getBytesFromAsset('assets/images/droploc.png', 40);
+
+    // if (mounted) {
+    setState(() {
+      pickicon = BitmapDescriptor.fromBytes(pickicon1);
+      dropicon = BitmapDescriptor.fromBytes(dropicon1);
+    });
+    // }
+    addPickDropMarker();
+  }
+
+  addDropMarker() async {
+    // CameraUpdate.newCameraPosition(CameraPosition(target: target))
+  }
+
+  addMarker() async {}
+
+  addPickDropMarker() async {
+    print('11111111111111111111');
+
+    // addMarker();
+    // var testIcon1 = await _capturePng(offlineicon);
+    // if (testIcon1 != null) {
+    setState(() {
+      myMarker.add(Marker(
+          markerId: const MarkerId('pointpick'),
+          icon: pickicon,
+          position: LatLng(myHistory[selectedHistory]['pick_lat'],
+              myHistory[selectedHistory]['pick_lng'])));
+    });
+    // }
+    print('22222222222222');
+
+    // var testIcon = await _capturePng(onlineicon);
+    // if (testIcon != null) {
+    setState(() {
+      myMarker.add(Marker(
+          markerId: const MarkerId('pointdrop'),
+          icon: dropicon,
+          position: LatLng(myHistory[selectedHistory]['drop_lat'],
+              myHistory[selectedHistory]['drop_lng'])));
+    });
+    // }
+    print('333333333333333333333');
+
+    LatLngBounds bound;
+    if (myHistory.isNotEmpty) {
+      if (myHistory[selectedHistory]['pick_lat'] >
+              myHistory[selectedHistory]['drop_lat'] &&
+          myHistory[selectedHistory]['pick_lng'] >
+              myHistory[selectedHistory]['drop_lng']) {
+        bound = LatLngBounds(
+            southwest: LatLng(myHistory[selectedHistory]['drop_lat'],
+                myHistory[selectedHistory]['drop_lng']),
+            northeast: LatLng(myHistory[selectedHistory]['pick_lat'],
+                myHistory[selectedHistory]['pick_lng']));
+      } else if (myHistory[selectedHistory]['pick_lng'] >
+          myHistory[selectedHistory]['drop_lng']) {
+        bound = LatLngBounds(
+            southwest: LatLng(myHistory[selectedHistory]['pick_lat'],
+                myHistory[selectedHistory]['drop_lng']),
+            northeast: LatLng(myHistory[selectedHistory]['drop_lat'],
+                myHistory[selectedHistory]['pick_lng']));
+      } else if (myHistory[selectedHistory]['pick_lat'] >
+          myHistory[selectedHistory]['drop_lat']) {
+        bound = LatLngBounds(
+            southwest: LatLng(myHistory[selectedHistory]['drop_lat'],
+                myHistory[selectedHistory]['pick_lng']),
+            northeast: LatLng(myHistory[selectedHistory]['pick_lat'],
+                myHistory[selectedHistory]['drop_lng']));
+      } else {
+        bound = LatLngBounds(
+            southwest: LatLng(myHistory[selectedHistory]['pick_lat'],
+                myHistory[selectedHistory]['pick_lng']),
+            northeast: LatLng(myHistory[selectedHistory]['drop_lat'],
+                myHistory[selectedHistory]['drop_lng']));
+      }
+    } else {
+      if (myHistory
+                  .firstWhere((element) => element.id == 'pickup')
+                  .LatLng(myHistory[selectedHistory]['pick_lat'],
+                      myHistory[selectedHistory]['pick_lng'])
+                  .myHistory[selectedHistory]['pick_lat'] >
+              myHistory
+                  .firstWhere((element) => element.id == 'drop')
+                  .LatLng(myHistory[selectedHistory]['drop_lat'],
+                      myHistory[selectedHistory]['drop_lng'])
+                  .myHistory[selectedHistory]['drop_lat'] &&
+          myHistory
+                  .firstWhere((element) => element.id == 'pickup')
+                  .LatLng(myHistory[selectedHistory]['pick_lat'],
+                      myHistory[selectedHistory]['pick_lng'])
+                  .myHistory[selectedHistory]['pick_lng'] >
+              myHistory
+                  .firstWhere((element) => element.id == 'drop')
+                  .LatLng(myHistory[selectedHistory]['drop_lat'],
+                      myHistory[selectedHistory]['drop_lng'])
+                  .myHistory[selectedHistory]['drop_lng']) {
+        bound = LatLngBounds(
+            southwest: myHistory
+                .firstWhere((element) => element.id == 'drop')
+                .LatLng(myHistory[selectedHistory]['drop_lat'],
+                    myHistory[selectedHistory]['drop_lng']),
+            northeast: myHistory
+                .firstWhere((element) => element.id == 'pickup')
+                .LatLng(myHistory[selectedHistory]['pick_lat'],
+                    myHistory[selectedHistory]['pick_lng']));
+      } else if (myHistory
+              .firstWhere((element) => element.id == 'pickup')
+              .LatLng(myHistory[selectedHistory]['pick_lat'],
+                  myHistory[selectedHistory]['pick_lng'])
+              .myHistory[selectedHistory]['pick_lng'] >
+          myHistory
+              .firstWhere((element) => element.id == 'drop')
+              .LatLng(myHistory[selectedHistory]['drop_lat'],
+                  myHistory[selectedHistory]['drop_lng'])
+              .myHistory[selectedHistory]['drop_lng']) {
+        bound = LatLngBounds(
+            southwest: LatLng(
+                myHistory
+                    .firstWhere((element) => element.id == 'pickup')
+                    .LatLng(myHistory[selectedHistory]['pick_lat'],
+                        myHistory[selectedHistory]['pick_lng'])
+                    .myHistory[selectedHistory]['pick_lat'],
+                myHistory
+                    .firstWhere((element) => element.id == 'drop')
+                    .LatLng(myHistory[selectedHistory]['drop_lat'],
+                        myHistory[selectedHistory]['drop_lng'])
+                    .myHistory[selectedHistory]['drop_lng']),
+            northeast: LatLng(
+                myHistory
+                    .firstWhere((element) => element.id == 'drop')
+                    .LatLng(myHistory[selectedHistory]['drop_lat'],
+                        myHistory[selectedHistory]['drop_lng'])
+                    .myHistory[selectedHistory]['drop_lat'],
+                myHistory
+                    .firstWhere((element) => element.id == 'pickup')
+                    .LatLng(myHistory[selectedHistory]['pick_lat'],
+                        myHistory[selectedHistory]['pick_lng'])
+                    .myHistory[selectedHistory]['pick_lng']));
+      } else if (myHistory
+              .firstWhere((element) => element.id == 'pickup')
+              .LatLng(myHistory[selectedHistory]['pick_lat'],
+                  myHistory[selectedHistory]['pick_lng'])
+              .myHistory[selectedHistory]['pick_lat'] >
+          myHistory
+              .firstWhere((element) => element.id == 'drop')
+              .LatLng(myHistory[selectedHistory]['drop_lat'],
+                  myHistory[selectedHistory]['drop_lng'])
+              .myHistory[selectedHistory]['drop_lat']) {
+        bound = LatLngBounds(
+            southwest: LatLng(
+                myHistory
+                    .firstWhere((element) => element.id == 'drop')
+                    .LatLng(myHistory[selectedHistory]['drop_lat'],
+                        myHistory[selectedHistory]['drop_lng'])
+                    .myHistory[selectedHistory]['drop_lat'],
+                myHistory
+                    .firstWhere((element) => element.id == 'pickup')
+                    .LatLng(myHistory[selectedHistory]['pick_lat'],
+                        myHistory[selectedHistory]['pick_lng'])
+                    .myHistory[selectedHistory]['pick_lng']),
+            northeast: LatLng(
+                myHistory
+                    .firstWhere((element) => element.id == 'pickup')
+                    .LatLng(myHistory[selectedHistory]['pick_lat'],
+                        myHistory[selectedHistory]['pick_lng'])
+                    .myHistory[selectedHistory]['pick_lat'],
+                myHistory
+                    .firstWhere((element) => element.id == 'drop')
+                    .LatLng(myHistory[selectedHistory]['drop_lat'],
+                        myHistory[selectedHistory]['drop_lng'])
+                    .myHistory[selectedHistory]['drop_lng']));
+      } else {
+        bound = LatLngBounds(
+            southwest: myHistory
+                .firstWhere((element) => element.id == 'pickup')
+                .LatLng(myHistory[selectedHistory]['pick_lat'],
+                    myHistory[selectedHistory]['pick_lng']),
+            northeast: myHistory
+                .firstWhere((element) => element.id == 'drop')
+                .LatLng(myHistory[selectedHistory]['drop_lat'],
+                    myHistory[selectedHistory]['drop_lng']));
+      }
+    }
+    CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
+    _controller!.moveCamera(cameraUpdate);
+    await getPolylineshistory(
+        pickLat: myHistory[selectedHistory]['pick_lat'],
+        pickLng: myHistory[selectedHistory]['pick_lng'],
+        dropLat: myHistory[selectedHistory]['drop_lat'],
+        dropLng: myHistory[selectedHistory]['drop_lng']);
+    setState(() {});
+  }
+
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  dynamic _controller;
+
+  void onMapCreated(GoogleMapController controller) async {
+    setState(() {
+      _controller = controller;
+      _controller?.setMapStyle(mapStyle);
+    });
+    getLocs();
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -75,6 +309,32 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                               fontSize: media.width * sixteen,
                               color: textColor,
                               fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      SizedBox(
+                        height: media.height * 0.02,
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(media.width * 0.034),
+                        height: media.width * 0.5,
+                        width: media.width * 0.9,
+                        // color: Colors.black,
+                        child: GoogleMap(
+                          padding: const EdgeInsets.all(5),
+                          onMapCreated: onMapCreated,
+                          compassEnabled: false,
+                          initialCameraPosition: CameraPosition(
+                            target: center,
+                            // zoom: 0.0,
+                          ),
+                          markers: Set<Marker>.from(myMarker),
+                          scrollGesturesEnabled: false,
+                          zoomGesturesEnabled: false,
+                          polylines: polyline,
+                          // minMaxZoomPreference: const MinMaxZoomPreference(0.0, 20.0),
+                          myLocationButtonEnabled: false,
+                          buildingsEnabled: false,
+                          zoomControlsEnabled: false,
                         ),
                       ),
                       SizedBox(

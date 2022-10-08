@@ -72,7 +72,7 @@ class _MapsState extends State<Maps>
   dynamic userLocationIcon;
   bool favAddressAdd = false;
   bool _showToast = false;
-
+  bool contactus = false;
   final _mapMarkerSC = StreamController<List<Marker>>();
   StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
   Stream<List<Marker>> get carMarkerStream => _mapMarkerSC.stream;
@@ -1039,6 +1039,178 @@ class _MapsState extends State<Maps>
                                                         ],
                                                       ),
                                                     )),
+                                                Positioned(
+                                                  right: 10,
+                                                  top: 150,
+                                                  child: InkWell(
+                                                    onTap: () async {
+                                                      if (contactus == false) {
+                                                        setState(() {
+                                                          contactus = true;
+                                                        });
+                                                      } else {
+                                                        setState(() {
+                                                          contactus = false;
+                                                        });
+                                                      }
+                                                    },
+                                                    child: Container(
+                                                      height: media.width * 0.1,
+                                                      width: media.width * 0.1,
+                                                      decoration: BoxDecoration(
+                                                          boxShadow: [
+                                                            BoxShadow(
+                                                                blurRadius: 2,
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.2),
+                                                                spreadRadius: 2)
+                                                          ],
+                                                          color: page,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(media
+                                                                          .width *
+                                                                      0.02)),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Image.asset(
+                                                        'assets/images/customercare.png',
+                                                        fit: BoxFit.contain,
+                                                        width:
+                                                            media.width * 0.06,
+                                                      ),
+                                                      // Icon(
+                                                      //     Icons
+                                                      //         .my_location_sharp,
+                                                      //     size: media
+                                                      //             .width *
+                                                      //         0.06),
+                                                    ),
+                                                  ),
+                                                ),
+                                                (contactus == true)
+                                                    ? Positioned(
+                                                        right: 10,
+                                                        top: 190,
+                                                        child: InkWell(
+                                                          onTap: () async {},
+                                                          child: Container(
+                                                              padding:
+                                                                  EdgeInsets.all(
+                                                                      10),
+                                                              height:
+                                                                  media.width *
+                                                                      0.3,
+                                                              width:
+                                                                  media.width *
+                                                                      0.45,
+                                                              decoration: BoxDecoration(
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                        blurRadius:
+                                                                            2,
+                                                                        color: Colors
+                                                                            .black
+                                                                            .withOpacity(
+                                                                                0.2),
+                                                                        spreadRadius:
+                                                                            2)
+                                                                  ],
+                                                                  color: page,
+                                                                  borderRadius:
+                                                                      BorderRadius.circular(
+                                                                          media.width *
+                                                                              0.02)),
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceEvenly,
+                                                                children: [
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      makingPhoneCall(
+                                                                          userDetails[
+                                                                              'contact_us_mobile1']);
+                                                                    },
+                                                                    child: Row(
+                                                                      children: [
+                                                                        const Expanded(
+                                                                            flex:
+                                                                                20,
+                                                                            child:
+                                                                                Icon(Icons.call)),
+                                                                        Expanded(
+                                                                            flex:
+                                                                                80,
+                                                                            child:
+                                                                                Text(
+                                                                              userDetails['contact_us_mobile1'],
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
+                                                                            ))
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      makingPhoneCall(
+                                                                          userDetails[
+                                                                              'contact_us_mobile1']);
+                                                                    },
+                                                                    child: Row(
+                                                                      children: [
+                                                                        const Expanded(
+                                                                            flex:
+                                                                                20,
+                                                                            child:
+                                                                                Icon(Icons.call)),
+                                                                        Expanded(
+                                                                            flex:
+                                                                                80,
+                                                                            child:
+                                                                                Text(
+                                                                              userDetails['contact_us_mobile2'],
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
+                                                                            ))
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                  InkWell(
+                                                                    onTap: () {
+                                                                      openBrowser(
+                                                                          userDetails['contact_us_link']
+                                                                              .toString());
+                                                                    },
+                                                                    child: Row(
+                                                                      children: [
+                                                                        const Expanded(
+                                                                            flex:
+                                                                                20,
+                                                                            child:
+                                                                                Icon(Icons.vpn_lock_rounded)),
+                                                                        Expanded(
+                                                                            flex:
+                                                                                80,
+                                                                            child:
+                                                                                Text(
+                                                                              'Goto URL',
+                                                                              maxLines: 1,
+                                                                              // overflow:
+                                                                              //     TextOverflow.ellipsis,
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
+                                                                            ))
+                                                                      ],
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              )),
+                                                        ),
+                                                      )
+                                                    : Container(),
                                                 (_bottom == 0)
                                                     ? Positioned(
                                                         top: MediaQuery.of(
@@ -1087,7 +1259,6 @@ class _MapsState extends State<Maps>
                                                                           () {
                                                                         Scaffold.of(context)
                                                                             .openDrawer();
-                                                                            print(userDetails['country_code']);
                                                                       },
                                                                       child: const Icon(
                                                                           Icons
@@ -1477,7 +1648,7 @@ class _MapsState extends State<Maps>
                                                                             SizedBox(
                                                                               height: media.width * 0.05,
                                                                             ),
-                                                                            (favAddress.isNotEmpty)
+                                                                            (favAddress.isNotEmpty && _bottom == 1)
                                                                                 ? Column(
                                                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                                                     children: [
@@ -1628,7 +1799,38 @@ class _MapsState extends State<Maps>
                                                                                       ],
                                                                                     ),
                                                                                   )
-                                                                                : Container()
+                                                                                : Container(),
+                                                                            SizedBox(
+                                                                              height: media.width * 0.05,
+                                                                            ),
+                                                                            Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                InkWell(
+                                                                                  onTap: () {
+                                                                                    // if (_dropaddress == true) {
+                                                                                    Navigator.push(
+                                                                                        context,
+                                                                                        MaterialPageRoute(
+                                                                                            builder: (context) => BookingConfirmation(
+                                                                                                  type: 2,
+                                                                                                )));
+                                                                                    // }
+                                                                                  },
+                                                                                  child: Text(
+                                                                                      // (_dropaddress == true)
+                                                                                      //     ?
+                                                                                      // 'Ride without Destination'
+                                                                                      languages[choosenLanguage]['text_ridewithout_destination']
+                                                                                      // : '',
+                                                                                      ,
+                                                                                      style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600, color: buttonColor)),
+                                                                                )
+                                                                                //        Button(onTap: (){
+                                                                                //   Navigator.push(context, MaterialPageRoute(builder: (context)=>BookingConfirmation()));
+                                                                                // }, text: ((_dropaddress == true) ? 'Later' : ''))
+                                                                              ],
+                                                                            )
                                                                           ],
                                                                         ))),
                                                           ],

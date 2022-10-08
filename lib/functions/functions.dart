@@ -24,7 +24,7 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //languages code
 dynamic phcode;
@@ -327,9 +327,9 @@ registerUser() async {
     final response =
         http.MultipartRequest('POST', Uri.parse('${url}api/v1/user/register'));
     response.headers.addAll({'Content-Type': 'application/json'});
-    if(proImageFile1 != null){
-    response.files.add(
-        await http.MultipartFile.fromPath('profile_picture', proImageFile1));
+    if (proImageFile1 != null) {
+      response.files.add(
+          await http.MultipartFile.fromPath('profile_picture', proImageFile1));
     }
     response.fields.addAll({
       "name": name,
@@ -421,6 +421,99 @@ otpCall() async {
   return result;
 }
 
+//request notification
+List notificationHistory = [];
+Map<String, dynamic> notificationHistoryPage = {};
+
+getnotificationHistory() async {
+  dynamic result;
+
+  try {
+    var response = await http.get(
+        Uri.parse('${url}api/v1/notifications/get-notification'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+    if (response.statusCode == 200) {
+      notificationHistory = jsonDecode(response.body)['data'];
+      notificationHistoryPage = jsonDecode(response.body)['meta'];
+      result = 'success';
+      print(notificationHistory.toString());
+      printWrapped(notificationHistoryPage.toString());
+      valueNotifierHome.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+      valueNotifierHome.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+
+      internet = false;
+      valueNotifierHome.incrementNotifier();
+    }
+  }
+  return result;
+}
+
+//delete notification
+deleteNotification(id) async {
+  dynamic result;
+
+  try {
+    var response = await http.get(
+        Uri.parse('${url}api/v1/notifications/delete-notification/$id'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+    if (response.statusCode == 200) {
+      // notificationHistory = jsonDecode(response.body)['data'];
+      // notificationHistoryPage = jsonDecode(response.body)['meta'];
+      result = 'success';
+      valueNotifierHome.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+      valueNotifierHome.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+
+      internet = false;
+      valueNotifierHome.incrementNotifier();
+    }
+  }
+  return result;
+}
+
+sharewalletfun({mobile, role, amount}) async {
+  dynamic result;
+  try {
+    var response = await http.post(
+        Uri.parse('${url}api/v1/payment/wallet/transfer-money-from-wallet'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${bearerToken[0].token}',
+        },
+        body: jsonEncode({'mobile': mobile, 'role': role, 'amount': amount}));
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success'] == true) {
+        result = 'success';
+      } else {
+        debugPrint(response.body);
+        result = 'failed';
+      }
+    } else {
+      debugPrint(response.body);
+      result = jsonDecode(response.body)['message'];
+      print(result.toString());
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
 // verify user already exist
 
 verifyUser(String number) async {
@@ -784,7 +877,6 @@ class AddressList {
 //get polylines
 
 List<LatLng> polyList = [];
-
 getPolylines() async {
   polyList.clear();
   String pickLat = '';
@@ -818,6 +910,27 @@ getPolylines() async {
     dropLat = userRequestData['drop_lat'].toString();
     dropLng = userRequestData['drop_lng'].toString();
   }
+
+  try {
+    var response = await http.get(Uri.parse(
+        'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
+    if (response.statusCode == 200) {
+      var steps =
+          jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
+      decodeEncodedPolyline(steps);
+    } else {
+      debugPrint(response.body);
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+  return polyList;
+}
+
+getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
+  polyList.clear();
 
   try {
     var response = await http.get(Uri.parse(
@@ -920,24 +1033,49 @@ etaRequest() async {
           'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          'pick_lat': (userRequestData.isNotEmpty)
-              ? userRequestData['pick_lat']
-              : addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
-          'pick_lng': (userRequestData.isNotEmpty)
-              ? userRequestData['pick_lng']
-              : addressList
-                  .firstWhere((e) => e.id == 'pickup')
-                  .latlng
-                  .longitude,
-          'drop_lat': (userRequestData.isNotEmpty)
-              ? userRequestData['drop_lat']
-              : addressList.firstWhere((e) => e.id == 'drop').latlng.latitude,
-          'drop_lng': (userRequestData.isNotEmpty)
-              ? userRequestData['drop_lng']
-              : addressList.firstWhere((e) => e.id == 'drop').latlng.longitude,
-          'ride_type': 1
-        }));
+        body: (addressList.where((element) => element.id == 'drop').isNotEmpty)
+            ? jsonEncode({
+                'pick_lat': (userRequestData.isNotEmpty)
+                    ? userRequestData['pick_lat']
+                    : addressList
+                        .firstWhere((e) => e.id == 'pickup')
+                        .latlng
+                        .latitude,
+                'pick_lng': (userRequestData.isNotEmpty)
+                    ? userRequestData['pick_lng']
+                    : addressList
+                        .firstWhere((e) => e.id == 'pickup')
+                        .latlng
+                        .longitude,
+                'drop_lat': (userRequestData.isNotEmpty)
+                    ? userRequestData['drop_lat']
+                    : addressList
+                        .firstWhere((e) => e.id == 'drop')
+                        .latlng
+                        .latitude,
+                'drop_lng': (userRequestData.isNotEmpty)
+                    ? userRequestData['drop_lng']
+                    : addressList
+                        .firstWhere((e) => e.id == 'drop')
+                        .latlng
+                        .longitude,
+                'ride_type': 1
+              })
+            : jsonEncode({
+                'pick_lat': (userRequestData.isNotEmpty)
+                    ? userRequestData['pick_lat']
+                    : addressList
+                        .firstWhere((e) => e.id == 'pickup')
+                        .latlng
+                        .latitude,
+                'pick_lng': (userRequestData.isNotEmpty)
+                    ? userRequestData['pick_lng']
+                    : addressList
+                        .firstWhere((e) => e.id == 'pickup')
+                        .latlng
+                        .longitude,
+                'ride_type': 1
+              }));
 
     if (response.statusCode == 200) {
       etaDetails = jsonDecode(response.body)['data'];
@@ -1109,35 +1247,75 @@ createRequest() async {
           'Authorization': 'Bearer ${bearerToken[0].token}',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          'pick_lat':
-              addressList.firstWhere((e) => e.id == 'pickup').latlng.latitude,
-          'pick_lng':
-              addressList.firstWhere((e) => e.id == 'pickup').latlng.longitude,
-          'drop_lat':
-              addressList.firstWhere((e) => e.id == 'drop').latlng.latitude,
-          'drop_lng':
-              addressList.firstWhere((e) => e.id == 'drop').latlng.longitude,
-          'vehicle_type': etaDetails[choosenVehicle]['zone_type_id'],
-          'ride_type': 1,
-          'payment_opt': (etaDetails[choosenVehicle]['payment_type']
-                      .toString()
-                      .split(',')
-                      .toList()[payingVia] ==
-                  'card')
-              ? 0
-              : (etaDetails[choosenVehicle]['payment_type']
-                          .toString()
-                          .split(',')
-                          .toList()[payingVia] ==
-                      'cash')
-                  ? 1
-                  : 2,
-          'pick_address':
-              addressList.firstWhere((e) => e.id == 'pickup').address,
-          'drop_address': addressList.firstWhere((e) => e.id == 'drop').address,
-          'request_eta_amount': etaDetails[choosenVehicle]['total']
-        }));
+        body: (addressList.where((element) => element.id == 'drop').isNotEmpty)
+            ? jsonEncode({
+                'pick_lat': addressList
+                    .firstWhere((e) => e.id == 'pickup')
+                    .latlng
+                    .latitude,
+                'pick_lng': addressList
+                    .firstWhere((e) => e.id == 'pickup')
+                    .latlng
+                    .longitude,
+                'drop_lat': addressList
+                    .firstWhere((e) => e.id == 'drop')
+                    .latlng
+                    .latitude,
+                'drop_lng': addressList
+                    .firstWhere((e) => e.id == 'drop')
+                    .latlng
+                    .longitude,
+                'vehicle_type': etaDetails[choosenVehicle]['zone_type_id'],
+                'ride_type': 1,
+                'payment_opt': (etaDetails[choosenVehicle]['payment_type']
+                            .toString()
+                            .split(',')
+                            .toList()[payingVia] ==
+                        'card')
+                    ? 0
+                    : (etaDetails[choosenVehicle]['payment_type']
+                                .toString()
+                                .split(',')
+                                .toList()[payingVia] ==
+                            'cash')
+                        ? 1
+                        : 2,
+                'pick_address':
+                    addressList.firstWhere((e) => e.id == 'pickup').address,
+                'drop_address':
+                    addressList.firstWhere((e) => e.id == 'drop').address,
+                'request_eta_amount': etaDetails[choosenVehicle]['total']
+              })
+            : jsonEncode({
+                'pick_lat': addressList
+                    .firstWhere((e) => e.id == 'pickup')
+                    .latlng
+                    .latitude,
+                'pick_lng': addressList
+                    .firstWhere((e) => e.id == 'pickup')
+                    .latlng
+                    .longitude,
+
+                'vehicle_type': etaDetails[choosenVehicle]['zone_type_id'],
+                'ride_type': 1,
+                'payment_opt': (etaDetails[choosenVehicle]['payment_type']
+                            .toString()
+                            .split(',')
+                            .toList()[payingVia] ==
+                        'card')
+                    ? 0
+                    : (etaDetails[choosenVehicle]['payment_type']
+                                .toString()
+                                .split(',')
+                                .toList()[payingVia] ==
+                            'cash')
+                        ? 1
+                        : 2,
+                'pick_address':
+                    addressList.firstWhere((e) => e.id == 'pickup').address,
+                // 'drop_address': addressList.firstWhere((e) => e.id == 'drop').address,
+                'request_eta_amount': etaDetails[choosenVehicle]['total']
+              }));
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
       streamRequest();
@@ -1753,8 +1931,8 @@ cancelRequestWithReason(reason) async {
 
 makingPhoneCall(phnumber) async {
   var mobileCall = 'tel:$phnumber';
-  if (await canLaunchUrlString(mobileCall)) {
-    await launchUrlString(mobileCall);
+  if (await canLaunch(mobileCall)) {
+    await launch(mobileCall);
   } else {
     throw 'Could not launch $mobileCall';
   }
@@ -2078,8 +2256,8 @@ deleteSos(id) async {
 //open url in browser
 
 openBrowser(browseUrl) async {
-  if (await canLaunchUrlString(browseUrl)) {
-    await launchUrlString(browseUrl);
+  if (await canLaunch(browseUrl)) {
+    await launch(browseUrl);
   } else {
     throw 'Could not launch $browseUrl';
   }

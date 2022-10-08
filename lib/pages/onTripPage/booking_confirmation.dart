@@ -348,10 +348,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 //add drop marker
   addPickDropMarker() async {
     addMarker();
-    if (widget.type != 1) {
+    if (widget.type == null || (userRequestData.isNotEmpty)
+        ? userRequestData['is_rental'] != true
+        : 11 == 5) {
       addDropMarker();
       getPolylines();
-    } else {
+    } else if (widget.type == 1 || widget.type == 2) {
       if (userRequestData.isNotEmpty) {
         CameraUpdate cameraUpdate = CameraUpdate.newLatLng(
             LatLng(userRequestData['pick_lat'], userRequestData['pick_lng']));
@@ -409,7 +411,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     } else if (permission == PermissionStatus.granted ||
         permission == PermissionStatus.grantedLimited) {
       // var loc = await location.getLocation();
-locationAllowed = true;
+      locationAllowed = true;
       if (timerLocation == null && locationAllowed == true) {
         getCurrentLocation();
       }
@@ -580,133 +582,123 @@ locationAllowed = true;
                               if (snapshots != null) {
                                 driversData = [];
                                 // ignore: avoid_function_literals_in_foreach_calls
-                                snapshots.children.forEach((element) { 
+                                snapshots.children.forEach((element) {
                                   driversData.add(element.value);
                                 });
-                                  // ignore: avoid_function_literals_in_foreach_calls
-                                  driversData.forEach((e) {
-                                    if (e['is_active'] == 1 &&
-                                        e['is_available'] ==
-                                            true) {
-                                      DateTime dt =
-                                          DateTime.fromMillisecondsSinceEpoch(
-                                              e['updated_at']);
-                                      if (DateTime.now()
-                                              .difference(dt)
-                                              .inMinutes <=
-                                          2) {
-                                        if (myMarker
-                                            .where((element) => element.markerId
-                                                .toString()
-                                                .contains(
-                                                    'car${e['id']}'))
-                                            .isEmpty) {
-                                          myMarker.add(Marker(
-                                            markerId: MarkerId(
-                                                'car${e['id']}'),
-                                            rotation: (myBearings[e
-                                                            ['id']
-                                                        .toString()] !=
-                                                    null)
-                                                ? myBearings[e
-                                                        ['id']
-                                                    .toString()]
-                                                : 0.0,
-                                            position: LatLng(
-                                                e['l'][0],
-                                                e['l'][1]),
-                                            icon: pinLocationIcon,
-                                          ));
-                                        } else if (_controller != null) {
-                                          var dist = calculateDistance(
-                                              myMarker
-                                                  .lastWhere((element) => element
-                                                      .markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${e['id']}'))
-                                                  .position
-                                                  .latitude,
-                                              myMarker
-                                                  .lastWhere((element) => element
-                                                      .markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${e['id']}'))
-                                                  .position
-                                                  .longitude,
-                                              e['l'][0],
-                                              e['l'][1]);
-                                          if (dist > 100) {
-                                            if (myMarker
-                                                        .lastWhere((element) =>
-                                                            element.markerId
-                                                                .toString()
-                                                                .contains(
-                                                                    'car${e['id']}'))
-                                                        .position
-                                                        .latitude !=
-                                                    e['l'][0] ||
-                                                myMarker
-                                                        .lastWhere((element) =>
-                                                            element.markerId
-                                                                .toString()
-                                                                .contains(
-                                                                    'car${e['id']}'))
-                                                        .position
-                                                        .longitude !=
-                                                    e['l'][1]) {
-                                              animationController =
-                                                  AnimationController(
-                                                duration: const Duration(
-                                                    milliseconds:
-                                                        1500), //Animation duration of marker
-
-                                                vsync: this, //From the widget
-                                              );
-                                              animateCar(
-                                                  myMarker
-                                                      .lastWhere((element) =>
-                                                          element.markerId
-                                                              .toString()
-                                                              .contains(
-                                                                  'car${e['id']}'))
-                                                      .position
-                                                      .latitude,
-                                                  myMarker
-                                                      .lastWhere((element) =>
-                                                          element.markerId
-                                                              .toString()
-                                                              .contains(
-                                                                  'car${e['id']}'))
-                                                      .position
-                                                      .longitude,
-                                                  e['l'][0],
-                                                  e['l'][1],
-                                                  _mapMarkerSink,
-                                                  this,
-                                                  _controller,
-                                                  'car${e['id']}',
-                                                  e['id']);
-                                            }
-                                          }
-                                        }
-                                      }
-                                    } else {
+                                // ignore: avoid_function_literals_in_foreach_calls
+                                driversData.forEach((e) {
+                                  if (e['is_active'] == 1 &&
+                                      e['is_available'] == true) {
+                                    DateTime dt =
+                                        DateTime.fromMillisecondsSinceEpoch(
+                                            e['updated_at']);
+                                    if (DateTime.now()
+                                            .difference(dt)
+                                            .inMinutes <=
+                                        2) {
                                       if (myMarker
                                           .where((element) => element.markerId
                                               .toString()
-                                              .contains(
-                                                  'car${e['id']}'))
-                                          .isNotEmpty) {
-                                        myMarker.removeWhere((element) =>
-                                            element.markerId.toString().contains(
-                                                'car${e['id']}'));
+                                              .contains('car${e['id']}'))
+                                          .isEmpty) {
+                                        myMarker.add(Marker(
+                                          markerId: MarkerId('car${e['id']}'),
+                                          rotation: (myBearings[
+                                                      e['id'].toString()] !=
+                                                  null)
+                                              ? myBearings[e['id'].toString()]
+                                              : 0.0,
+                                          position:
+                                              LatLng(e['l'][0], e['l'][1]),
+                                          icon: pinLocationIcon,
+                                        ));
+                                      } else if (_controller != null) {
+                                        var dist = calculateDistance(
+                                            myMarker
+                                                .lastWhere((element) => element
+                                                    .markerId
+                                                    .toString()
+                                                    .contains('car${e['id']}'))
+                                                .position
+                                                .latitude,
+                                            myMarker
+                                                .lastWhere((element) => element
+                                                    .markerId
+                                                    .toString()
+                                                    .contains('car${e['id']}'))
+                                                .position
+                                                .longitude,
+                                            e['l'][0],
+                                            e['l'][1]);
+                                        if (dist > 100) {
+                                          if (myMarker
+                                                      .lastWhere((element) =>
+                                                          element.markerId
+                                                              .toString()
+                                                              .contains(
+                                                                  'car${e['id']}'))
+                                                      .position
+                                                      .latitude !=
+                                                  e['l'][0] ||
+                                              myMarker
+                                                      .lastWhere((element) =>
+                                                          element.markerId
+                                                              .toString()
+                                                              .contains(
+                                                                  'car${e['id']}'))
+                                                      .position
+                                                      .longitude !=
+                                                  e['l'][1]) {
+                                            animationController =
+                                                AnimationController(
+                                              duration: const Duration(
+                                                  milliseconds:
+                                                      1500), //Animation duration of marker
+
+                                              vsync: this, //From the widget
+                                            );
+                                            animateCar(
+                                                myMarker
+                                                    .lastWhere((element) =>
+                                                        element.markerId
+                                                            .toString()
+                                                            .contains(
+                                                                'car${e['id']}'))
+                                                    .position
+                                                    .latitude,
+                                                myMarker
+                                                    .lastWhere((element) =>
+                                                        element.markerId
+                                                            .toString()
+                                                            .contains(
+                                                                'car${e['id']}'))
+                                                    .position
+                                                    .longitude,
+                                                e['l'][0],
+                                                e['l'][1],
+                                                _mapMarkerSink,
+                                                this,
+                                                _controller,
+                                                'car${e['id']}',
+                                                e['id']);
+                                          }
+                                        }
                                       }
                                     }
-                                  });
-                                }
-                              
+                                  } else {
+                                    if (myMarker
+                                        .where((element) => element.markerId
+                                            .toString()
+                                            .contains('car${e['id']}'))
+                                        .isNotEmpty) {
+                                      myMarker.removeWhere((element) => element
+                                          .markerId
+                                          .toString()
+                                          .contains('car${e['id']}'));
+                                    }
+                                  }
+                                });
+                              }
                             }
                           }
                         }
@@ -1000,15 +992,17 @@ locationAllowed = true;
                                                   onTap: () async {
                                                     if (locationAllowed ==
                                                         true) {
-                                                      if(currentLocation != null){
-                                                            center = currentLocation;
-                                                          
-                                                      _controller?.animateCamera(
-                                                          CameraUpdate
-                                                              .newLatLngZoom(
-                                                                  center,
-                                                                  18.0));
-                                                          }
+                                                      if (currentLocation !=
+                                                          null) {
+                                                        center =
+                                                            currentLocation;
+
+                                                        _controller?.animateCamera(
+                                                            CameraUpdate
+                                                                .newLatLngZoom(
+                                                                    center,
+                                                                    18.0));
+                                                      }
                                                     } else {
                                                       if (serviceEnabled ==
                                                           true) {
@@ -3598,12 +3592,14 @@ locationAllowed = true;
                                           child: GestureDetector(
                                             onPanUpdate: (val) {
                                               // print(val.delta.dy);
-                                              if (val.delta.dy > 0 && _ontripBottom == true) {
+                                              if (val.delta.dy > 0 &&
+                                                  _ontripBottom == true) {
                                                 setState(() {
                                                   _ontripBottom = false;
                                                 });
                                               }
-                                              if (val.delta.dy < 0 && _ontripBottom == false) {
+                                              if (val.delta.dy < 0 &&
+                                                  _ontripBottom == false) {
                                                 setState(() {
                                                   _ontripBottom = true;
                                                 });
@@ -3967,8 +3963,11 @@ locationAllowed = true;
                                                         child: Column(
                                                           children: [
                                                             (userRequestData[
-                                                                        'is_rental'] !=
-                                                                    true)
+                                                                            'is_rental'] !=
+                                                                        true &&
+                                                                    userRequestData[
+                                                                            'drop_address'] !=
+                                                                        null)
                                                                 ? Container(
                                                                     padding: EdgeInsets.all(
                                                                         media.width *
@@ -5606,7 +5605,10 @@ locationAllowed = true;
                                                                             .bold),
                                                               ),
                                                               (userRequestData
-                                                                      .isNotEmpty)
+                                                                          .isNotEmpty &&
+                                                                      userRequestData[
+                                                                              'drop_address'] !=
+                                                                          null)
                                                                   ? Text(
                                                                       userRequestData[
                                                                           'drop_address'],
@@ -5618,6 +5620,8 @@ locationAllowed = true;
                                                                       softWrap:
                                                                           false,
                                                                       style: GoogleFonts.roboto(
+                                                                          fontWeight: FontWeight
+                                                                              .w600,
                                                                           fontSize:
                                                                               media.width * twelve),
                                                                     )
@@ -5636,8 +5640,9 @@ locationAllowed = true;
                                                                               TextOverflow.fade,
                                                                           softWrap:
                                                                               false,
-                                                                          style:
-                                                                              GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                          style: GoogleFonts.roboto(
+                                                                              fontWeight: FontWeight.w600,
+                                                                              fontSize: media.width * twelve),
                                                                         )
                                                                       : Container(),
                                                             ],
