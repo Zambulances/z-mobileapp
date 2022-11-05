@@ -72,6 +72,7 @@ class _LoadingPageState extends State<LoadingPage> {
         // friendly dialog box before call the request method.
         // This is very important to not harm the user experience
         await AwesomeNotifications().requestPermissionToSendNotifications();
+        AwesomeNotifications().setGlobalBadgeCounter(0);
       }
     });
     _package = await PackageInfo.fromPlatform();

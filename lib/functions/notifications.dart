@@ -55,6 +55,9 @@ void initMessaging() {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = message.notification?.android;
+    if (notification != null && driverReq.isEmpty) {
+      getUserDetails();
+    }
     if (notification != null && android != null) {
       AwesomeNotifications().createNotification(
           content: NotificationContent(

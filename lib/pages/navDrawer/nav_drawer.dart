@@ -131,471 +131,417 @@ class _NavDrawerState extends State<NavDrawer> {
                       ],
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(top: media.width * 0.02),
-                    width: media.width * 0.7,
-                    child: Column(
-                      children: [
-                        //notification
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const NotificationPage()));
-                            setState(() {
-                              userDetails['notifications_count'] = 0;
-                            });
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  ValueListenableBuilder(
+                      valueListenable: valueNotifierNotification.value,
+                      builder: (context, value, child) {
+                        return Container(
+                          padding: EdgeInsets.only(top: media.width * 0.02),
+                          width: media.width * 0.7,
+                          child: Column(
                             children: [
-                              Container(
-                                padding: EdgeInsets.all(media.width * 0.025),
+                              //notification
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const NotificationPage()));
+                                  setState(() {
+                                    userDetails['notifications_count'] = 0;
+                                  });
+                                },
                                 child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Image.asset(
-                                      'assets/images/notification.png',
-                                      fit: BoxFit.contain,
-                                      width: media.width * 0.075,
-                                    ),
-                                    SizedBox(
-                                      width: media.width * 0.025,
-                                    ),
-                                    SizedBox(
-                                      width: media.width * 0.49,
-                                      child: Text(
-                                        languages[choosenLanguage]
-                                                ['text_notification']
-                                            .toString(),
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * sixteen,
-                                            color: textColor),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.all(media.width * 0.025),
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                            'assets/images/notification.png',
+                                            fit: BoxFit.contain,
+                                            width: media.width * 0.075,
+                                          ),
+                                          SizedBox(
+                                            width: media.width * 0.025,
+                                          ),
+                                          SizedBox(
+                                            width: media.width * 0.49,
+                                            child: Text(
+                                              languages[choosenLanguage]
+                                                      ['text_notification']
+                                                  .toString(),
+                                              overflow: TextOverflow.ellipsis,
+                                              style: GoogleFonts.roboto(
+                                                  fontSize:
+                                                      media.width * sixteen,
+                                                  color: textColor),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                    )
+                                    ),
+                                    (userDetails['notifications_count'] == 0)
+                                        ? Container()
+                                        : Container(
+                                            height: 20,
+                                            width: 20,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: buttonColor,
+                                            ),
+                                            child: Text(
+                                              userDetails['notifications_count']
+                                                  .toString(),
+                                              style: GoogleFonts.roboto(
+                                                  fontSize:
+                                                      media.width * fourteen,
+                                                  color: buttonText),
+                                            ),
+                                          )
                                   ],
                                 ),
                               ),
-                              (userDetails['notifications_count'] == 0)
-                                  ? Container()
-                                  : Container(
-                                      height: 20,
-                                      width: 20,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: buttonColor,
+                              //history
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const History()));
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(media.width * 0.025),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/history.png',
+                                        fit: BoxFit.contain,
+                                        width: media.width * 0.075,
                                       ),
-                                      child: Text(
-                                        userDetails['notifications_count']
-                                            .toString(),
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * fourteen,
-                                            color: buttonText),
+                                      SizedBox(
+                                        width: media.width * 0.025,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.55,
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_enable_history'],
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              //wallet
+                              userDetails['owner_id'] == null
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const WalletPage()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/walletImage.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_enable_wallet'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     )
-                            ],
-                          ),
-                        ),
-                        //history
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const History()));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/history.png',
-                                  fit: BoxFit.contain,
-                                  width: media.width * 0.075,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.025,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.55,
-                                  child: Text(
-                                    languages[choosenLanguage]
-                                        ['text_enable_history'],
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                                  : Container(),
 
-                        //wallet
-                        userDetails['owner_id'] == null
-                            ? InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const WalletPage()));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/walletImage.png',
-                                        fit: BoxFit.contain,
-                                        width: media.width * 0.075,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.025,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.55,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_enable_wallet'],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
+                              //referral
+                              userDetails['owner_id'] == null &&
+                                      userDetails['role'] == 'driver'
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ReferralPage()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/referral.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_enable_referal'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
+                                      ),
+                                    )
+                                  : Container(),
 
-                        //referral
-                        userDetails['owner_id'] == null &&
-                                userDetails['role'] == 'driver'
-                            ? InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ReferralPage()));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/referral.png',
-                                        fit: BoxFit.contain,
-                                        width: media.width * 0.075,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.025,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.55,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_enable_referal'],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
+                              //manage vehicle
+
+                              userDetails['role'] == 'owner'
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const ManageVehicles()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/updateVehicleInfo.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_manage_vehicle'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
-
-                        //manage vehicle
-
-                        userDetails['role'] == 'owner'
-                            ? InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const ManageVehicles()));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/updateVehicleInfo.png',
-                                        fit: BoxFit.contain,
-                                        width: media.width * 0.075,
                                       ),
-                                      SizedBox(
-                                        width: media.width * 0.025,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.55,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_manage_vehicle'],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
+                                    )
+                                  : Container(),
+
+                              //manage Driver
+
+                              userDetails['role'] == 'owner'
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const DriverList()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/managedriver.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_manage_drivers'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
-
-                        //manage Driver
-
-                        userDetails['role'] == 'owner'
-                            ? InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const DriverList()));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/managedriver.png',
-                                        fit: BoxFit.contain,
-                                        width: media.width * 0.075,
                                       ),
-                                      SizedBox(
-                                        width: media.width * 0.025,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.55,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_manage_drivers'],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
+                                    )
+                                  : Container(),
+                              //update vehicles
+
+                              userDetails['owner_id'] == null &&
+                                      userDetails['role'] == 'driver'
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const UpdateVehicle()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/updateVehicleInfo.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_updateVehicle'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
-                        //update vehicles
-
-                        userDetails['owner_id'] == null &&
-                                userDetails['role'] == 'driver'
-                            ? InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const UpdateVehicle()));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/updateVehicleInfo.png',
-                                        fit: BoxFit.contain,
-                                        width: media.width * 0.075,
                                       ),
-                                      SizedBox(
-                                        width: media.width * 0.025,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.55,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_updateVehicle'],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
+                                    )
+                                  : Container(),
 //fleet details
-                        userDetails['owner_id'] != null &&
-                                userDetails['role'] == 'driver'
-                            ? InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const FleetDetails()));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/updateVehicleInfo.png',
-                                        fit: BoxFit.contain,
-                                        width: media.width * 0.075,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.025,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.55,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_fleet_details'],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
+                              userDetails['owner_id'] != null &&
+                                      userDetails['role'] == 'driver'
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const FleetDetails()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/updateVehicleInfo.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_fleet_details'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
-                        //earnings
-                        userDetails['owner_id'] == null
-                            ? InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const DriverEarnings()));
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.all(media.width * 0.025),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/Earnings.png',
-                                        fit: BoxFit.contain,
-                                        width: media.width * 0.075,
                                       ),
-                                      SizedBox(
-                                        width: media.width * 0.025,
-                                      ),
-                                      SizedBox(
-                                        width: media.width * 0.55,
-                                        child: Text(
-                                          languages[choosenLanguage]
-                                              ['text_earnings'],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.roboto(
-                                              fontSize: media.width * sixteen,
-                                              color: textColor),
+                                    )
+                                  : Container(),
+                              //earnings
+                              userDetails['owner_id'] == null
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const DriverEarnings()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/Earnings.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_earnings'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : Container(),
+                                      ),
+                                    )
+                                  : Container(),
 
-                        //documents
-                        InkWell(
-                          onTap: () async {
-                            var nav = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Docs(
-                                          fromPage: '2',
-                                        )));
-                            if (nav) {
-                              setState(() {});
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/manageDocuments.png',
-                                  fit: BoxFit.contain,
-                                  width: media.width * 0.075,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.025,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.55,
-                                  child: Text(
-                                    languages[choosenLanguage]
-                                        ['text_manage_docs'],
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        //faq
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const Faq()));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/faq.png',
-                                  fit: BoxFit.contain,
-                                  width: media.width * 0.075,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.025,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.55,
-                                  child: Text(
-                                    languages[choosenLanguage]['text_faq'],
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        //sos
-                        userDetails['role'] != 'owner'
-                            ? InkWell(
+                              //documents
+                              InkWell(
                                 onTap: () async {
                                   var nav = await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => const Sos()));
-
+                                          builder: (context) => Docs(
+                                                fromPage: '2',
+                                              )));
                                   if (nav) {
                                     setState(() {});
                                   }
@@ -605,7 +551,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                   child: Row(
                                     children: [
                                       Image.asset(
-                                        'assets/images/sos.png',
+                                        'assets/images/manageDocuments.png',
                                         fit: BoxFit.contain,
                                         width: media.width * 0.075,
                                       ),
@@ -616,7 +562,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                         width: media.width * 0.55,
                                         child: Text(
                                           languages[choosenLanguage]
-                                              ['text_sos'],
+                                              ['text_manage_docs'],
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
@@ -626,64 +572,219 @@ class _NavDrawerState extends State<NavDrawer> {
                                     ],
                                   ),
                                 ),
-                              )
-                            : Container(),
+                              ),
 
-                        //language
-                        InkWell(
-                          onTap: () async {
-                            var nav = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const SelectLanguage()));
-                            if (nav) {
-                              setState(() {});
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/changeLanguage.png',
-                                  fit: BoxFit.contain,
-                                  width: media.width * 0.075,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.025,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.55,
-                                  child: Text(
-                                    languages[choosenLanguage]
-                                        ['text_change_language'],
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        //bank details
-                        userDetails['owner_id'] == null
-                            ? InkWell(
+                              //faq
+                              InkWell(
                                 onTap: () {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              const BankDetails()));
+                                          builder: (context) => const Faq()));
                                 },
                                 child: Container(
                                   padding: EdgeInsets.all(media.width * 0.025),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.account_balance,
+                                      Image.asset(
+                                        'assets/images/faq.png',
+                                        fit: BoxFit.contain,
+                                        width: media.width * 0.075,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.025,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.55,
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_faq'],
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              //sos
+                              userDetails['role'] != 'owner'
+                                  ? InkWell(
+                                      onTap: () async {
+                                        var nav = await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Sos()));
+
+                                        if (nav) {
+                                          setState(() {});
+                                        }
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/images/sos.png',
+                                              fit: BoxFit.contain,
+                                              width: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_sos'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+
+                              //language
+                              InkWell(
+                                onTap: () async {
+                                  var nav = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SelectLanguage()));
+                                  if (nav) {
+                                    setState(() {});
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(media.width * 0.025),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/changeLanguage.png',
+                                        fit: BoxFit.contain,
+                                        width: media.width * 0.075,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.025,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.55,
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_change_language'],
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              //bank details
+                              userDetails['owner_id'] == null
+                                  ? InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const BankDetails()));
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.account_balance,
+                                                size: media.width * 0.075),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_updateBank'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+                              //make complaints
+                              InkWell(
+                                onTap: () async {
+                                  var nav = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => MakeComplaint(
+                                                fromPage: 0,
+                                              )));
+                                  if (nav) {
+                                    setState(() {});
+                                  }
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(media.width * 0.025),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        'assets/images/makecomplaint.png',
+                                        fit: BoxFit.contain,
+                                        width: media.width * 0.075,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.025,
+                                      ),
+                                      SizedBox(
+                                        width: media.width * 0.55,
+                                        child: Text(
+                                          languages[choosenLanguage]
+                                              ['text_make_complaints'],
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              //about
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => const About()));
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(media.width * 0.025),
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.info_outline,
                                           size: media.width * 0.075),
                                       SizedBox(
                                         width: media.width * 0.025,
@@ -692,7 +793,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                         width: media.width * 0.55,
                                         child: Text(
                                           languages[choosenLanguage]
-                                              ['text_updateBank'],
+                                              ['text_about'],
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
@@ -702,86 +803,53 @@ class _NavDrawerState extends State<NavDrawer> {
                                     ],
                                   ),
                                 ),
-                              )
-                            : Container(),
-                        //make complaints
-                        InkWell(
-                          onTap: () async {
-                            var nav = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MakeComplaint(
-                                          fromPage: 0,
-                                        )));
-                            if (nav) {
-                              setState(() {});
-                            }
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/makecomplaint.png',
-                                  fit: BoxFit.contain,
-                                  width: media.width * 0.075,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.025,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.55,
-                                  child: Text(
-                                    languages[choosenLanguage]
-                                        ['text_make_complaints'],
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        //about
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const About()));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            child: Row(
-                              children: [
-                                Icon(Icons.info_outline,
-                                    size: media.width * 0.075),
-                                SizedBox(
-                                  width: media.width * 0.025,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.55,
-                                  child: Text(
-                                    languages[choosenLanguage]['text_about'],
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                              ),
 
-                        //delete account
-                        userDetails['owner_id'] == null
-                            ? InkWell(
+                              //delete account
+                              userDetails['owner_id'] == null
+                                  ? InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          deleteAccount = true;
+                                        });
+                                        valueNotifierHome.incrementNotifier();
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.delete_forever,
+                                              size: media.width * 0.075,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.025,
+                                            ),
+                                            SizedBox(
+                                              width: media.width * 0.55,
+                                              child: Text(
+                                                languages[choosenLanguage]
+                                                    ['text_delete_account'],
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * sixteen,
+                                                    color: textColor),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  : Container(),
+
+                              //logout
+                              InkWell(
                                 onTap: () {
                                   setState(() {
-                                    deleteAccount = true;
+                                    logout = true;
                                   });
                                   valueNotifierHome.incrementNotifier();
                                   Navigator.pop(context);
@@ -790,9 +858,10 @@ class _NavDrawerState extends State<NavDrawer> {
                                   padding: EdgeInsets.all(media.width * 0.025),
                                   child: Row(
                                     children: [
-                                      Icon(
-                                        Icons.delete_forever,
-                                        size: media.width * 0.075,
+                                      Image.asset(
+                                        'assets/images/logout.png',
+                                        fit: BoxFit.contain,
+                                        width: media.width * 0.075,
                                       ),
                                       SizedBox(
                                         width: media.width * 0.025,
@@ -801,7 +870,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                         width: media.width * 0.55,
                                         child: Text(
                                           languages[choosenLanguage]
-                                              ['text_delete_account'],
+                                              ['text_logout'],
                                           overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
@@ -812,46 +881,10 @@ class _NavDrawerState extends State<NavDrawer> {
                                   ),
                                 ),
                               )
-                            : Container(),
-
-                        //logout
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              logout = true;
-                            });
-                            valueNotifierHome.incrementNotifier();
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(media.width * 0.025),
-                            child: Row(
-                              children: [
-                                Image.asset(
-                                  'assets/images/logout.png',
-                                  fit: BoxFit.contain,
-                                  width: media.width * 0.075,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.025,
-                                ),
-                                SizedBox(
-                                  width: media.width * 0.55,
-                                  child: Text(
-                                    languages[choosenLanguage]['text_logout'],
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.roboto(
-                                        fontSize: media.width * sixteen,
-                                        color: textColor),
-                                  ),
-                                )
-                              ],
-                            ),
+                            ],
                           ),
-                        )
-                      ],
-                    ),
-                  )
+                        );
+                      })
                 ]),
           ),
         )),

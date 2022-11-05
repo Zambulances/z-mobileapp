@@ -3258,7 +3258,7 @@ class _MapsState extends State<Maps>
                                                                 child:
                                                                     Container(
                                                                         padding:
-                                                                            EdgeInsets.all(
+                                                                            const EdgeInsets.all(
                                                                                 10),
                                                                         height: media.width *
                                                                             0.3,

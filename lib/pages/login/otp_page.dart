@@ -74,7 +74,7 @@ class _OtpState extends State<Otp> {
             MaterialPageRoute(builder: (context) => const Maps()),
             (route) => false);
       }
-    } else if(verify == false) {
+    } else if (verify == false) {
       if (ischeckownerordriver == 'driver') {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const GetStarted()));
@@ -82,7 +82,7 @@ class _OtpState extends State<Otp> {
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => const OwnersRegister()));
       }
-    }else{
+    } else {
       _error = verify.toString();
       setState(() {
         _loading = false;

@@ -22,7 +22,6 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void initState() {
     getdata();
-    // TODO: implement initState
     super.initState();
   }
 
@@ -152,7 +151,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                                         0.05)),
                                                             alignment: Alignment
                                                                 .center,
-                                                            child: Icon(Icons
+                                                            child: const Icon(Icons
                                                                 .notifications)),
                                                         SizedBox(
                                                           width: media.width *
@@ -433,7 +432,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                 borderRadius: BorderRadius.circular(10),
                                 color: Colors.transparent.withOpacity(0.6)),
                             child: Text(
-                              'Notification deleted',
+                              languages[choosenLanguage]
+                                  ['text_notification_deleted'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * twelve,
                                   color: Colors.white),

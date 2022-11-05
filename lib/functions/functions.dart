@@ -124,16 +124,13 @@ validateEmail(email) async {
 getlangid() async {
   dynamic result;
   try {
-    print('started');
     var response = await http
         .post(Uri.parse('${url}api/v1/user/update-my-lang'), headers: {
       'Authorization': 'Bearer ${bearerToken[0].token}',
     }, body: {
       'lang': choosenLanguage,
     });
-    print('completed');
     if (response.statusCode == 200) {
-      print(response.body);
       if (jsonDecode(response.body)['success'] == true) {
         result = 'success';
       } else {
@@ -560,7 +557,7 @@ registerDriver() async {
       "mobile": phnumber,
       "email": email,
       "device_token": fcm,
-      "country": countries[phcode]['dial_code'],
+      "country": countries[phcode]['code'],
       "service_location_id": myServiceId.toString(),
       "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
       "vehicle_type": myVehicleId.toString(),
@@ -658,8 +655,6 @@ getnotificationHistory() async {
       notificationHistory = jsonDecode(response.body)['data'];
       notificationHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
-      print(notificationHistory.toString());
-      printWrapped(notificationHistoryPage.toString());
       valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -726,7 +721,6 @@ sharewalletfun({mobile, role, amount}) async {
     } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
-      print(result.toString());
     }
   } catch (e) {
     if (e is SocketException) {
@@ -760,7 +754,7 @@ registerOwner() async {
       "tax_number": taxNumber,
       "company_name": companyName,
       "device_token": fcm,
-      "country": countries[phcode]['dial_code'],
+      "country": countries[phcode]['code'],
       "service_location_id": ownerServiceLocation,
       "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
       'lang': choosenLanguage,
@@ -1118,8 +1112,11 @@ getUserDetails() async {
       },
     );
     if (response.statusCode == 200) {
-      printWrapped(response.body);
       userDetails = jsonDecode(response.body)['data'];
+      if (userDetails['notifications_count'] != 0 &&
+          userDetails['notifications_count'] != null) {
+        valueNotifierNotification.incrementNotifier();
+      }
       if (userDetails['role'] != 'owner') {
         if (userDetails['sos']['data'] != null) {
           sosData = userDetails['sos']['data'];
@@ -1254,8 +1251,18 @@ class ValueNotifyingHome {
   }
 }
 
+class ValueNotifyingNotification {
+  ValueNotifier value = ValueNotifier(0);
+
+  void incrementNotifier() {
+    value.value++;
+  }
+}
+
 ValueNotifying valueNotifierHome = ValueNotifying();
 ValueNotifying valueNotifiercheck = ValueNotifying();
+ValueNotifyingNotification valueNotifierNotification =
+    ValueNotifyingNotification();
 
 //driver online offline status
 driverStatus() async {
@@ -2531,10 +2538,10 @@ Map<String, dynamic> walletBalance = {};
 List walletHistory = [];
 Map<String, dynamic> walletPages = {};
 
-void printWrapped(String text) {
-  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-  pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
-}
+// void printWrapped(String text) {
+//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+// }
 
 getWalletHistory() async {
   walletBalance.clear();
@@ -2757,7 +2764,6 @@ getPaystackPayment(money) async {
       if (jsonDecode(response.body)['status'] == false) {
         results = jsonDecode(response.body)['message'];
       } else {
-        printWrapped(response.body);
         results = 'success';
         paystackCode = jsonDecode(response.body)['data'];
       }

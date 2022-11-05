@@ -54,7 +54,8 @@ class _ButtonState extends State<Button> {
             widget.text,
             style: GoogleFonts.roboto(
                 fontSize: media.width * sixteen,
-                color: (widget.textcolor != null) ? widget.textcolor : buttonText,
+                color:
+                    (widget.textcolor != null) ? widget.textcolor : buttonText,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1),
           ),

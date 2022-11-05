@@ -62,7 +62,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               myHistory[selectedHistory]['drop_lng'])));
     });
     // }
-    print('333333333333333333333');
 
     LatLngBounds bound;
     if (myHistory.isNotEmpty) {
