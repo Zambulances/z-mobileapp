@@ -52,7 +52,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
   addMarker() async {}
 
   addPickDropMarker() async {
-    print('11111111111111111111');
 
     // addMarker();
     // var testIcon1 = await _capturePng(offlineicon);
@@ -65,7 +64,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               myHistory[selectedHistory]['pick_lng'])));
     });
     // }
-    print('22222222222222');
 
     // var testIcon = await _capturePng(onlineicon);
     // if (testIcon != null) {
@@ -77,7 +75,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               myHistory[selectedHistory]['drop_lng'])));
     });
     // }
-    print('333333333333333333333');
 
     LatLngBounds bound;
     if (myHistory.isNotEmpty) {

@@ -56,10 +56,10 @@ checkInternetConnection() {
   });
 }
 
-void printWrapped(String text) {
-  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-  pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
-}
+// void printWrapped(String text) {
+//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+// }
 
 getDetailsOfDevice() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
@@ -336,7 +336,7 @@ registerUser() async {
       "mobile": phnumber,
       "email": email,
       "device_token": fcm,
-      "country": countries[phcode]['dial_code'],
+      "country": countries[phcode]['code'],
       "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
       'lang': choosenLanguage,
     });
@@ -436,8 +436,6 @@ getnotificationHistory() async {
       notificationHistory = jsonDecode(response.body)['data'];
       notificationHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
-      print(notificationHistory.toString());
-      printWrapped(notificationHistoryPage.toString());
       valueNotifierHome.incrementNotifier();
     } else {
       debugPrint(response.body);
@@ -504,7 +502,6 @@ sharewalletfun({mobile, role, amount}) async {
     } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
-      print(result.toString());
     }
   } catch (e) {
     if (e is SocketException) {
@@ -605,9 +602,11 @@ getUserDetails() async {
       },
     );
     if (response.statusCode == 200) {
-      printWrapped(response.body);
       userDetails =
           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
+          if(userDetails['notifications_count'] != 0 && userDetails['notifications_count'] != null){
+        valueNotifierNotification.incrementNotifier();
+      }
       favAddress = userDetails['favouriteLocations']['data'];
       sosData = userDetails['sos']['data'];
       if (userDetails['onTripRequest'] != null) {
@@ -733,7 +732,16 @@ class ValueNotifyingHome {
   }
 }
 
+class ValueNotifyingNotification {
+  ValueNotifier value = ValueNotifier(0);
+
+  void incrementNotifier() {
+    value.value++;
+  }
+}
+
 ValueNotifyingHome valueNotifierHome = ValueNotifyingHome();
+ValueNotifyingNotification valueNotifierNotification = ValueNotifyingNotification();
 
 class ValueNotifyingBook {
   ValueNotifier value = ValueNotifier(0);
@@ -822,13 +830,13 @@ getAutoAddress(input, sessionToken, lat, lng) async {
   dynamic response;
   var countryCode = userDetails['country_code'];
   try {
-    if (userDetails['country_code'] == null) {
-      response = await http.get(Uri.parse(
-          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&library=places&key=$mapkey&sessiontoken=$sessionToken'));
-    } else {
+    if(userDetails['enable_country_restrict_on_map'] == '1' && userDetails['country_code'] != null ) {
       response = await http.get(Uri.parse(
           'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&library=places&location=$lat%2C$lng&radius=2000&components=country:$countryCode&key=$mapkey&sessiontoken=$sessionToken'));
-    }
+    }else {
+      response = await http.get(Uri.parse(
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&library=places&key=$mapkey&sessiontoken=$sessionToken'));
+    } 
     if (response.statusCode == 200) {
       addAutoFill = jsonDecode(response.body)['predictions'];
       valueNotifierHome.incrementNotifier();
@@ -2599,7 +2607,6 @@ getPaystackPayment(money) async {
       if (jsonDecode(response.body)['status'] == false) {
         results = jsonDecode(response.body)['message'];
       } else {
-        printWrapped(response.body);
         results = 'success';
         paystackCode = jsonDecode(response.body)['data'];
       }

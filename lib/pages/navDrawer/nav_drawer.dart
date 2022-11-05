@@ -121,72 +121,77 @@ class _NavDrawerState extends State<NavDrawer> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: media.width * 0.1),
+                    padding: EdgeInsets.only(top: media.width * 0.05),
                     width: media.width * 0.7,
                     child: Column(
                       children: [
                         //notification
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const NotificationPage()));
-                            setState(() {
-                              userDetails['notifications_count'] = 0;
-                            });
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(media.width * 0.025),
-                                child: Row(
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/notification.png',
-                                      fit: BoxFit.contain,
-                                      width: media.width * 0.075,
+                        ValueListenableBuilder(
+                          valueListenable: valueNotifierNotification.value,
+                          builder: (context, value, child) {
+                            return InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const NotificationPage()));
+                                setState(() {
+                                  userDetails['notifications_count'] = 0;
+                                });
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(media.width * 0.025),
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          'assets/images/notification.png',
+                                          fit: BoxFit.contain,
+                                          width: media.width * 0.075,
+                                        ),
+                                        SizedBox(
+                                          width: media.width * 0.025,
+                                        ),
+                                        SizedBox(
+                                          width: media.width * 0.49,
+                                          child: Text(
+                                            languages[choosenLanguage]
+                                                    ['text_notification']
+                                                .toString(),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                color: textColor),
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    SizedBox(
-                                      width: media.width * 0.025,
-                                    ),
-                                    SizedBox(
-                                      width: media.width * 0.49,
-                                      child: Text(
-                                        languages[choosenLanguage]
-                                                ['text_notification']
-                                            .toString(),
-                                        overflow: TextOverflow.ellipsis,
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * sixteen,
-                                            color: textColor),
-                                      ),
-                                    )
-                                  ],
-                                ),
+                                  ),
+                                  (userDetails['notifications_count'] == 0)
+                                      ? Container()
+                                      : Container(
+                                          height: 20,
+                                          width: 20,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: buttonColor,
+                                          ),
+                                          child: Text(
+                                            userDetails['notifications_count']
+                                                .toString(),
+                                            style: GoogleFonts.roboto(
+                                                fontSize: media.width * fourteen,
+                                                color: buttonText),
+                                          ),
+                                        )
+                                ],
                               ),
-                              (userDetails['notifications_count'] == 0)
-                                  ? Container()
-                                  : Container(
-                                      height: 20,
-                                      width: 20,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: buttonColor,
-                                      ),
-                                      child: Text(
-                                        userDetails['notifications_count']
-                                            .toString(),
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * fourteen,
-                                            color: buttonText),
-                                      ),
-                                    )
-                            ],
-                          ),
+                            );
+                          }
                         ),
                         //history
                         InkWell(

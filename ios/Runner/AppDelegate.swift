@@ -21,5 +21,6 @@ var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
     }
     override func applicationDidBecomeActive(_ application: UIApplication) {
         application.endBackgroundTask(bgTask);
+        application.applicationIconBadgeNumber = 0;
     }
 }

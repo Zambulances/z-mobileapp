@@ -26,8 +26,12 @@ void initMessaging() {
         defaultPrivacy: NotificationPrivacy.Public),
   ]);
 
+
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
+    if(notification != null && userRequestData.isEmpty){
+      getUserDetails();
+    }
     if (notification != null) {
       if (requestStreamEnd == null &&
           requestStreamStart == null &&

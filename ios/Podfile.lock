@@ -164,7 +164,7 @@ PODS:
   - StripeUICore (22.5.1):
     - StripeCore (= 22.5.1)
   - Toast (4.0.0)
-  - url_launcher_ios (0.0.1):
+  - url_launcher (0.0.1):
     - Flutter
   - webview_flutter_wkwebview (0.0.1):
     - Flutter
@@ -194,7 +194,7 @@ DEPENDENCIES:
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
   - stripe_ios (from `.symlinks/plugins/stripe_ios/ios`)
-  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+  - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 SPEC REPOS:
@@ -273,8 +273,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_ios/ios"
   stripe_ios:
     :path: ".symlinks/plugins/stripe_ios/ios"
-  url_launcher_ios:
-    :path: ".symlinks/plugins/url_launcher_ios/ios"
+  url_launcher:
+    :path: ".symlinks/plugins/url_launcher/ios"
   webview_flutter_wkwebview:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
@@ -327,7 +327,7 @@ SPEC CHECKSUMS:
   StripeFinancialConnections: 982115b82af429968d8aa78d329a42ed7ba3feab
   StripeUICore: 08c1efbd7e3c54ee7fa74334a37a1d4c08ba944d
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
-  url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
+  url_launcher: 6fef411d543ceb26efce54b05a0a40bfd74cbbef
   webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
 
 PODFILE CHECKSUM: 902396c7b6c17227f0214bd70e32d93df61fab51

@@ -1098,7 +1098,7 @@ class _MapsState extends State<Maps>
                                                           onTap: () async {},
                                                           child: Container(
                                                               padding:
-                                                                  EdgeInsets.all(
+                                                                 const EdgeInsets.all(
                                                                       10),
                                                               height:
                                                                   media.width *
