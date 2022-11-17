@@ -20,7 +20,7 @@ void initMessaging() {
         ledColor: Colors.blueGrey,
         enableLights: true,
         importance: NotificationImportance.Max,
-        channelShowBadge: true,
+        channelShowBadge: false,
         locked: false,
         playSound: true,
         defaultPrivacy: NotificationPrivacy.Public),
@@ -29,10 +29,11 @@ void initMessaging() {
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     RemoteNotification? notification = message.notification;
+    AndroidNotification? android = message.notification?.android;
     if(notification != null && userRequestData.isEmpty){
       getUserDetails();
     }
-    if (notification != null) {
+    if (notification != null  && android != null) {
       if (requestStreamEnd == null &&
           requestStreamStart == null &&
           rideStreamStart == null &&

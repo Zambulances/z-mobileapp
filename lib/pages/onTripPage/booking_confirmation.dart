@@ -69,6 +69,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   bool _isLoading = false;
   LatLng _center = const LatLng(41.4219057, -102.0840772);
   dynamic pinLocationIcon;
+  dynamic pinLocationIcon2;
   dynamic animationController;
   bool _ontripBottom = false;
   bool _cancelling = false;
@@ -391,6 +392,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     final Uint8List markerIcon =
         await getBytesFromAsset('assets/images/top-taxi.png', 40);
     pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
+    final Uint8List markerIcon2 =
+        await getBytesFromAsset('assets/images/bike.png', 40);
+    pinLocationIcon2 = BitmapDescriptor.fromBytes(markerIcon2);
 
     choosenVehicle = null;
     _dist = null;
@@ -610,7 +614,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                               : 0.0,
                                           position:
                                               LatLng(e['l'][0], e['l'][1]),
-                                          icon: pinLocationIcon,
+                                          icon: (e['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
                                         ));
                                       } else if (_controller != null) {
                                         var dist = calculateDistance(
@@ -680,7 +684,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                 this,
                                                 _controller,
                                                 'car${e['id']}',
-                                                e['id']);
+                                                e['id'],
+                                                (e['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
+                                                );
                                           }
                                         }
                                       }
@@ -759,7 +765,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                 : 0.0,
                                             position: LatLng(driverData['l'][0],
                                                 driverData['l'][1]),
-                                            icon: pinLocationIcon,
+                                            icon: (driverData['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
                                           ));
                                         } else if (_controller != null) {
                                           var dist = calculateDistance(
@@ -832,7 +838,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   this,
                                                   _controller,
                                                   'car${driverData['id']}',
-                                                  driverData['id']);
+                                                  driverData['id'],
+                                                  (driverData['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
+                                                  );
                                             }
                                           }
                                         }
@@ -5718,7 +5726,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
       GoogleMapController controller, //Google map controller of our widget
 
       markerid,
-      markerBearing) async {
+      markerBearing,
+      icon
+      ) async {
     final double bearing =
         getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
 
@@ -5727,7 +5737,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     var carMarker = Marker(
         markerId: MarkerId(markerid),
         position: LatLng(fromLat, fromLong),
-        icon: pinLocationIcon,
+        icon: icon,
         anchor: const Offset(0.5, 0.5),
         flat: true,
         draggable: false);
@@ -5756,7 +5766,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
         carMarker = Marker(
             markerId: MarkerId(markerid),
             position: newPos,
-            icon: pinLocationIcon,
+            icon: icon,
             anchor: const Offset(0.5, 0.5),
             flat: true,
             rotation: bearing,

@@ -69,6 +69,7 @@ class _MapsState extends State<Maps>
   Map myBearings = {};
 
   late BitmapDescriptor pinLocationIcon;
+  dynamic pinLocationIcon2;
   dynamic userLocationIcon;
   bool favAddressAdd = false;
   bool _showToast = false;
@@ -147,7 +148,10 @@ class _MapsState extends State<Maps>
     polyline.clear();
     final Uint8List markerIcon =
         await getBytesFromAsset('assets/images/top-taxi.png', 40);
+    final Uint8List bikeIcons =
+        await getBytesFromAsset('assets/images/bike.png', 40);
     pinLocationIcon = BitmapDescriptor.fromBytes(markerIcon);
+    pinLocationIcon2 = BitmapDescriptor.fromBytes(bikeIcons);
 
     permission = await location.hasPermission();
 
@@ -596,7 +600,7 @@ class _MapsState extends State<Maps>
                                                                               [
                                                                               1]),
                                                                       icon:
-                                                                          pinLocationIcon,
+                                                                         (element['vehicle_type_icon'] == 'taxi') ? pinLocationIcon : pinLocationIcon2,
                                                                     ));
                                                                   } else if (_controller !=
                                                                       null) {
@@ -642,7 +646,9 @@ class _MapsState extends State<Maps>
                                                                             this,
                                                                             _controller,
                                                                             'car${element['id']}',
-                                                                            element['id']);
+                                                                            element['id'],
+                                                                            (element['vehicle_type_icon'] == 'taxi') ? pinLocationIcon : pinLocationIcon2
+                                                                            );
                                                                       }
                                                                     }
                                                                   }
@@ -1271,7 +1277,7 @@ class _MapsState extends State<Maps>
                                                     : Container(),
                                                 Positioned(
                                                     bottom:
-                                                        20 + media.width * 0.5,
+                                                        20 + media.width * 0.4,
                                                     child: SizedBox(
                                                       width: media.width * 0.9,
                                                       child: Row(
@@ -1399,7 +1405,7 @@ class _MapsState extends State<Maps>
                                                                 milliseconds:
                                                                     200),
                                                         height: (_bottom == 0)
-                                                            ? media.width * 0.5
+                                                            ? media.width * 0.4
                                                             : media.height * 1 -
                                                                 (MediaQuery.of(
                                                                             context)
@@ -1645,6 +1651,7 @@ class _MapsState extends State<Maps>
                                                                                         .toList(),
                                                                                   )
                                                                                 : Container(),
+                                                                                if(_bottom == 1)
                                                                             SizedBox(
                                                                               height: media.width * 0.05,
                                                                             ),
@@ -1759,6 +1766,7 @@ class _MapsState extends State<Maps>
                                                                                     ],
                                                                                   )
                                                                                 : Container(),
+                                                                                if(_bottom == 1)
                                                                             SizedBox(
                                                                               height: media.width * 0.05,
                                                                             ),
@@ -1803,34 +1811,42 @@ class _MapsState extends State<Maps>
                                                                             SizedBox(
                                                                               height: media.width * 0.05,
                                                                             ),
-                                                                            Row(
-                                                                              mainAxisAlignment: MainAxisAlignment.center,
-                                                                              children: [
-                                                                                InkWell(
-                                                                                  onTap: () {
-                                                                                    // if (_dropaddress == true) {
-                                                                                    Navigator.push(
+                                                                            Button(onTap: (){
+                                                                              Navigator.push(
                                                                                         context,
                                                                                         MaterialPageRoute(
                                                                                             builder: (context) => BookingConfirmation(
                                                                                                   type: 2,
                                                                                                 )));
-                                                                                    // }
-                                                                                  },
-                                                                                  child: Text(
-                                                                                      // (_dropaddress == true)
-                                                                                      //     ?
-                                                                                      // 'Ride without Destination'
-                                                                                      languages[choosenLanguage]['text_ridewithout_destination']
-                                                                                      // : '',
-                                                                                      ,
-                                                                                      style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600, color: buttonColor)),
-                                                                                )
-                                                                                //        Button(onTap: (){
-                                                                                //   Navigator.push(context, MaterialPageRoute(builder: (context)=>BookingConfirmation()));
-                                                                                // }, text: ((_dropaddress == true) ? 'Later' : ''))
-                                                                              ],
-                                                                            )
+                                                                            }, text: languages[choosenLanguage]['text_ridewithout_destination']),
+                                                                            // Row(
+                                                                            //   mainAxisAlignment: MainAxisAlignment.center,
+                                                                            //   children: [
+                                                                            //     InkWell(
+                                                                            //       onTap: () {
+                                                                            //         // if (_dropaddress == true) {
+                                                                            //         Navigator.push(
+                                                                            //             context,
+                                                                            //             MaterialPageRoute(
+                                                                            //                 builder: (context) => BookingConfirmation(
+                                                                            //                       type: 2,
+                                                                            //                     )));
+                                                                            //         // }
+                                                                            //       },
+                                                                            //       child: Text(
+                                                                            //           // (_dropaddress == true)
+                                                                            //           //     ?
+                                                                            //           // 'Ride without Destination'
+                                                                            //           languages[choosenLanguage]['text_ridewithout_destination']
+                                                                            //           // : '',
+                                                                            //           ,
+                                                                            //           style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600, color: buttonColor)),
+                                                                            //     )
+                                                                            //     //        Button(onTap: (){
+                                                                            //     //   Navigator.push(context, MaterialPageRoute(builder: (context)=>BookingConfirmation()));
+                                                                            //     // }, text: ((_dropaddress == true) ? 'Later' : ''))
+                                                                            //   ],
+                                                                            // )
                                                                           ],
                                                                         ))),
                                                           ],
@@ -2669,7 +2685,9 @@ class _MapsState extends State<Maps>
       GoogleMapController controller, //Google map controller of our widget
 
       markerid,
-      markerBearing) async {
+      markerBearing,
+      icon
+      ) async {
     final double bearing =
         getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
 
@@ -2678,7 +2696,7 @@ class _MapsState extends State<Maps>
     var carMarker = Marker(
         markerId: MarkerId(markerid),
         position: LatLng(fromLat, fromLong),
-        icon: pinLocationIcon,
+        icon: icon,
         anchor: const Offset(0.5, 0.5),
         flat: true,
         draggable: false);
@@ -2707,7 +2725,7 @@ class _MapsState extends State<Maps>
         carMarker = Marker(
             markerId: MarkerId(markerid),
             position: newPos,
-            icon: pinLocationIcon,
+            icon: icon,
             anchor: const Offset(0.5, 0.5),
             flat: true,
             rotation: bearing,
