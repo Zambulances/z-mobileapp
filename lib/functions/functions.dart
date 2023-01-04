@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/editprofile.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
@@ -56,10 +55,10 @@ checkInternetConnection() {
   });
 }
 
-// void printWrapped(String text) {
-//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
-// }
+void printWrapped(String text) {
+  final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
+  pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
+}
 
 getDetailsOfDevice() async {
   var connectivityResult = await (Connectivity().checkConnectivity());
@@ -269,6 +268,7 @@ phoneAuth(String phone) async {
 }
 
 //get local bearer token
+String lastNotification = '';
 
 getLocalData() async {
   dynamic result;
@@ -280,6 +280,9 @@ getLocalData() async {
     internet = true;
   }
   try {
+    if (pref.containsKey('lastNotification')) {
+      lastNotification = pref.getString('lastNotification');
+    }
     if (pref.containsKey('choosenLanguage')) {
       choosenLanguage = pref.getString('choosenLanguage');
       languageDirection = pref.getString('languageDirection');
@@ -453,6 +456,38 @@ getnotificationHistory() async {
   return result;
 }
 
+getNotificationPages(id) async {
+  dynamic result;
+
+  try {
+    var response = await http.get(
+        Uri.parse('${url}api/v1/notifications/get-notification?$id'),
+        headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
+    if (response.statusCode == 200) {
+      List list = jsonDecode(response.body)['data'];
+      // ignore: avoid_function_literals_in_foreach_calls
+      list.forEach((element) {
+        notificationHistory.add(element);
+      });
+      notificationHistoryPage = jsonDecode(response.body)['meta'];
+      result = 'success';
+      valueNotifierHome.incrementNotifier();
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+      valueNotifierHome.incrementNotifier();
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+
+      internet = false;
+      valueNotifierHome.incrementNotifier();
+    }
+  }
+  return result;
+}
+
 //delete notification
 deleteNotification(id) async {
   dynamic result;
@@ -462,8 +497,6 @@ deleteNotification(id) async {
         Uri.parse('${url}api/v1/notifications/delete-notification/$id'),
         headers: {'Authorization': 'Bearer ${bearerToken[0].token}'});
     if (response.statusCode == 200) {
-      // notificationHistory = jsonDecode(response.body)['data'];
-      // notificationHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
     } else {
@@ -604,7 +637,8 @@ getUserDetails() async {
     if (response.statusCode == 200) {
       userDetails =
           Map<String, dynamic>.from(jsonDecode(response.body)['data']);
-          if(userDetails['notifications_count'] != 0 && userDetails['notifications_count'] != null){
+      if (userDetails['notifications_count'] != 0 &&
+          userDetails['notifications_count'] != null) {
         valueNotifierNotification.incrementNotifier();
       }
       favAddress = userDetails['favouriteLocations']['data'];
@@ -666,9 +700,6 @@ getUserDetails() async {
         valueNotifierHome.incrementNotifier();
         valueNotifierBook.incrementNotifier();
       } else {
-        if (userRequestData.isNotEmpty) {
-          audioPlayer.play(audio);
-        }
         chatList.clear();
         userRequestData = {};
         requestStreamStart?.cancel();
@@ -741,7 +772,8 @@ class ValueNotifyingNotification {
 }
 
 ValueNotifyingHome valueNotifierHome = ValueNotifyingHome();
-ValueNotifyingNotification valueNotifierNotification = ValueNotifyingNotification();
+ValueNotifyingNotification valueNotifierNotification =
+    ValueNotifyingNotification();
 
 class ValueNotifyingBook {
   ValueNotifier value = ValueNotifier(0);
@@ -830,13 +862,14 @@ getAutoAddress(input, sessionToken, lat, lng) async {
   dynamic response;
   var countryCode = userDetails['country_code'];
   try {
-    if(userDetails['enable_country_restrict_on_map'] == '1' && userDetails['country_code'] != null ) {
+    if (userDetails['enable_country_restrict_on_map'] == '1' &&
+        userDetails['country_code'] != null) {
       response = await http.get(Uri.parse(
           'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&library=places&location=$lat%2C$lng&radius=2000&components=country:$countryCode&key=$mapkey&sessiontoken=$sessionToken'));
-    }else {
+    } else {
       response = await http.get(Uri.parse(
           'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$input&library=places&key=$mapkey&sessiontoken=$sessionToken'));
-    } 
+    }
     if (response.statusCode == 200) {
       addAutoFill = jsonDecode(response.body)['predictions'];
       valueNotifierHome.incrementNotifier();
@@ -925,6 +958,7 @@ getPolylines() async {
     if (response.statusCode == 200) {
       var steps =
           jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
+
       decodeEncodedPolyline(steps);
     } else {
       debugPrint(response.body);
@@ -946,7 +980,7 @@ getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
     if (response.statusCode == 200) {
       var steps =
           jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
-      decodeEncodedPolyline(steps);
+      decodeEncodedPolylineHistory(steps);
     } else {
       debugPrint(response.body);
     }
@@ -959,6 +993,49 @@ getPolylineshistory({pickLat, pickLng, dropLat, dropLng}) async {
 }
 
 //polyline decode
+
+Set<Polyline> polylineHistory = {};
+
+List<PointLatLng> decodeEncodedPolylineHistory(String encoded) {
+  List<PointLatLng> poly = [];
+  int index = 0, len = encoded.length;
+  int lat = 0, lng = 0;
+  polylineHistory.clear();
+
+  while (index < len) {
+    int b, shift = 0, result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lat += dlat;
+
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.codeUnitAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+    lng += dlng;
+    LatLng p = LatLng((lat / 1E5).toDouble(), (lng / 1E5).toDouble());
+    polyList.add(p);
+  }
+
+  polylineHistory.add(
+    Polyline(
+        polylineId: const PolylineId('1'),
+        color: const Color(0xffFD9898),
+        visible: true,
+        width: 4,
+        points: polyList),
+  );
+  valueNotifierBook.incrementNotifier();
+  return poly;
+}
 
 Set<Polyline> polyline = {};
 
@@ -1303,7 +1380,6 @@ createRequest() async {
                     .firstWhere((e) => e.id == 'pickup')
                     .latlng
                     .longitude,
-
                 'vehicle_type': etaDetails[choosenVehicle]['zone_type_id'],
                 'ride_type': 1,
                 'payment_opt': (etaDetails[choosenVehicle]['payment_type']
@@ -1321,7 +1397,6 @@ createRequest() async {
                         : 2,
                 'pick_address':
                     addressList.firstWhere((e) => e.id == 'pickup').address,
-                // 'drop_address': addressList.firstWhere((e) => e.id == 'drop').address,
                 'request_eta_amount': etaDetails[choosenVehicle]['total']
               }));
     if (response.statusCode == 200) {
@@ -2589,10 +2664,38 @@ addMoneyStripe(amount, nonce) async {
   return result;
 }
 
+//stripe pay money
+
+payMoneyStripe(nonce) async {
+  dynamic result;
+  try {
+    var response = await http.post(
+        Uri.parse('${url}api/v1/payment/stripe/make-payment-for-ride'),
+        headers: {
+          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode(
+            {'request_id': userRequestData['id'], 'payment_id': nonce}));
+    if (response.statusCode == 200) {
+      result = 'success';
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }
+  }
+  return result;
+}
+
 //paystack payment
 Map<String, dynamic> paystackCode = {};
 
-getPaystackPayment(money) async {
+getPaystackPayment(body) async {
   dynamic results;
   paystackCode.clear();
   try {
@@ -2602,7 +2705,7 @@ getPaystackPayment(money) async {
               'Authorization': 'Bearer ${bearerToken[0].token}',
               'Content-Type': 'application/json'
             },
-            body: jsonEncode({'amount': money}));
+            body: body);
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['status'] == false) {
         results = jsonDecode(response.body)['message'];

@@ -15,7 +15,6 @@ class Languages extends StatefulWidget {
 }
 
 class _LanguagesState extends State<Languages> {
-
   bool _isLoading = false;
   @override
   void initState() {
@@ -48,9 +47,11 @@ class _LanguagesState extends State<Languages> {
             child: Column(
               children: [
                 Container(
-                  height: media.width * 0.11 + MediaQuery.of(context).padding.top,
+                  height:
+                      media.width * 0.11 + MediaQuery.of(context).padding.top,
                   width: media.width * 1,
-                  padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+                  padding:
+                      EdgeInsets.only(top: MediaQuery.of(context).padding.top),
                   color: topBar,
                   child: Stack(
                     children: [
@@ -61,7 +62,8 @@ class _LanguagesState extends State<Languages> {
                         child: Text(
                           (choosenLanguage.isEmpty)
                               ? 'Choose Language'
-                              : languages[choosenLanguage]['text_choose_language'],
+                              : languages[choosenLanguage]
+                                  ['text_choose_language'],
                           style: GoogleFonts.roboto(
                               color: textColor,
                               fontSize: media.width * sixteen,
@@ -155,14 +157,15 @@ class _LanguagesState extends State<Languages> {
                     ? Button(
                         onTap: () async {
                           setState(() {
-                              _isLoading = true;
-                            });
+                            _isLoading = true;
+                          });
                           await getlangid();
-                          pref.setString('languageDirection', languageDirection);
+                          pref.setString(
+                              'languageDirection', languageDirection);
                           pref.setString('choosenLanguage', choosenLanguage);
                           setState(() {
-                              _isLoading = false;
-                            });
+                            _isLoading = false;
+                          });
                           navigate();
                         },
                         text: languages[choosenLanguage]['text_confirm'])
@@ -172,9 +175,9 @@ class _LanguagesState extends State<Languages> {
           ),
 
           //loader
-            (_isLoading == true)
-                        ? const Positioned(top: 0, child: Loading())
-                        : Container()
+          (_isLoading == true)
+              ? const Positioned(top: 0, child: Loading())
+              : Container()
         ],
       ),
     ));

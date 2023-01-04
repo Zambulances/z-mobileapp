@@ -9,8 +9,10 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 
+// ignore: must_be_immutable
 class SelectWallet extends StatefulWidget {
-  const SelectWallet({Key? key}) : super(key: key);
+  dynamic from;
+  SelectWallet({this.from, Key? key}) : super(key: key);
 
   @override
   State<SelectWallet> createState() => _SelectWalletState();
@@ -134,8 +136,14 @@ class _SelectWalletState extends State<SelectWallet> {
                                         }
                                         if (val2.status ==
                                             PaymentIntentsStatus.Succeeded) {
-                                          var val3 = await addMoneyStripe(
-                                              addMoney, val2.id);
+                                          dynamic val3;
+                                          if (widget.from == '1') {
+                                            val3 =
+                                                await payMoneyStripe(val2.id);
+                                          } else {
+                                            val3 = await addMoneyStripe(
+                                                addMoney, val2.id);
+                                          }
                                           if (val3 == 'success') {
                                             setState(() {
                                               _success = true;

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
+import 'package:tagyourtaxi_driver/pages/NavigatorPages/flutterwavepage.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/selectwallet.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
-import 'paystackpayment.dart';
-import 'flutterWavePage.dart';
-import 'razorpaypage.dart';
-import 'cashfreepage.dart';
+import 'package:tagyourtaxi_driver/pages/NavigatorPages/paystackpayment.dart';
+import 'package:tagyourtaxi_driver/pages/NavigatorPages/razorpaypage.dart';
+import 'package:tagyourtaxi_driver/pages/NavigatorPages/cashfreepage.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -747,7 +747,7 @@ class _WalletPageState extends State<WalletPage> {
                                                               MaterialPageRoute(
                                                                   builder:
                                                                       (context) =>
-                                                                          const SelectWallet()));
+                                                                          SelectWallet()));
                                                           if (val) {
                                                             setState(() {
                                                               _choosePayment =
@@ -790,7 +790,7 @@ class _WalletPageState extends State<WalletPage> {
                                                               MaterialPageRoute(
                                                                   builder:
                                                                       (context) =>
-                                                                          const PayStackPage()));
+                                                                          PayStackPage()));
                                                           if (val) {
                                                             setState(() {
                                                               _choosePayment =
@@ -800,7 +800,9 @@ class _WalletPageState extends State<WalletPage> {
                                                               addMoney = null;
                                                               addMoneyController
                                                                   .clear();
+                                                              _isLoading = true;
                                                             });
+                                                            getWallet();
                                                           }
                                                         },
                                                         child: Container(
@@ -833,7 +835,7 @@ class _WalletPageState extends State<WalletPage> {
                                                               MaterialPageRoute(
                                                                   builder:
                                                                       (context) =>
-                                                                          const FlutterWavePage()));
+                                                                          FlutterWavePage()));
                                                           if (val) {
                                                             setState(() {
                                                               _choosePayment =
@@ -876,7 +878,7 @@ class _WalletPageState extends State<WalletPage> {
                                                               MaterialPageRoute(
                                                                   builder:
                                                                       (context) =>
-                                                                          const RazorPayPage()));
+                                                                          RazorPayPage()));
                                                           if (val) {
                                                             setState(() {
                                                               _choosePayment =
@@ -919,7 +921,7 @@ class _WalletPageState extends State<WalletPage> {
                                                               MaterialPageRoute(
                                                                   builder:
                                                                       (context) =>
-                                                                          const CashFreePage()));
+                                                                          CashFreePage()));
                                                           if (val) {
                                                             setState(() {
                                                               _choosePayment =

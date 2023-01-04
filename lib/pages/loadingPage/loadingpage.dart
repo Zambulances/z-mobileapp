@@ -1,7 +1,5 @@
 // import 'dart:async';
 import 'dart:convert';
-
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,10 +23,12 @@ class LoadingPage extends StatefulWidget {
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
+dynamic package;
+
 class _LoadingPageState extends State<LoadingPage> {
   String dot = '.';
   bool updateAvailable = false;
-  dynamic _package;
+
   dynamic _version;
   bool _isLoading = false;
 
@@ -75,16 +75,7 @@ class _LoadingPageState extends State<LoadingPage> {
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-    AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
-      if (!isAllowed) {
-        // This is just a basic example. For real apps, you must show some
-        // friendly dialog box before call the request method.
-        // This is very important to not harm the user experience
-        await AwesomeNotifications().requestPermissionToSendNotifications();
-        AwesomeNotifications().setGlobalBadgeCounter(0);
-      }
-    });
-    _package = await PackageInfo.fromPlatform();
+    package = await PackageInfo.fromPlatform();
 
     if (platform == TargetPlatform.android) {
       _version = await FirebaseDatabase.instance
@@ -97,27 +88,27 @@ class _LoadingPageState extends State<LoadingPage> {
     }
     if (_version.value != null) {
       var version = _version.value.toString().split('.');
-      var package = _package.version.toString().split('.');
+      var packages = package.version.toString().split('.');
 
-      for (var i = 0; i < version.length || i < package.length; i++) {
-        if (i < version.length && i < package.length) {
-          if (int.parse(package[i]) < int.parse(version[i])) {
+      for (var i = 0; i < version.length || i < packages.length; i++) {
+        if (i < version.length && i < packages.length) {
+          if (int.parse(packages[i]) < int.parse(version[i])) {
             setState(() {
               updateAvailable = true;
             });
             break;
-          } else if (int.parse(package[i]) > int.parse(version[i])) {
+          } else if (int.parse(packages[i]) > int.parse(version[i])) {
             setState(() {
               updateAvailable = false;
             });
             break;
           }
-        } else if (i >= version.length && i < package.length) {
+        } else if (i >= version.length && i < packages.length) {
           setState(() {
             updateAvailable = false;
           });
           break;
-        } else if (i < version.length && i >= package.length) {
+        } else if (i < version.length && i >= packages.length) {
           setState(() {
             updateAvailable = true;
           });
@@ -219,19 +210,17 @@ class _LoadingPageState extends State<LoadingPage> {
                                         if (platform ==
                                             TargetPlatform.android) {
                                           openBrowser(
-                                              'https://play.google.com/store/apps/details?id=${_package.packageName}');
+                                              'https://play.google.com/store/apps/details?id=${package.packageName}');
                                         } else {
                                           setState(() {
                                             _isLoading = true;
                                           });
                                           var response = await http.get(Uri.parse(
-                                              'http://itunes.apple.com/lookup?bundleId=${_package.packageName}'));
+                                              'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
                                           if (response.statusCode == 200) {
                                             openBrowser(jsonDecode(
                                                     response.body)['results'][0]
                                                 ['trackViewUrl']);
-
-                                            // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
                                           }
 
                                           setState(() {

@@ -1,13 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/loadingPage/loadingpage.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 
 class ReferralPage extends StatefulWidget {
   const ReferralPage({Key? key}) : super(key: key);
@@ -29,9 +33,23 @@ class _ReferralPageState extends State<ReferralPage> {
 //get referral code
   _getReferral() async {
     await getReferral();
+    await getUrls();
     setState(() {
       _isLoading = false;
     });
+  }
+
+  var android = '';
+  var ios = '';
+
+  getUrls() async {
+    android =
+        'https://play.google.com/store/apps/details?id=${package.packageName}';
+    var response = await http.get(Uri.parse(
+        'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
+    if (response.statusCode == 200) {
+      ios = jsonDecode(response.body)['results'][0]['trackViewUrl'];
+    }
   }
 
 //show toast for copied
@@ -167,14 +185,57 @@ class _ReferralPageState extends State<ReferralPage> {
                                     bottom: media.width * 0.05),
                                 child: Button(
                                     onTap: () async {
-                                      await Share.share(
-                                          languages[choosenLanguage]
-                                                  ['text_invitation_1'] +
-                                              ' ' +
-                                              myReferralCode['refferal_code'] +
-                                              ' ' +
-                                              languages[choosenLanguage]
-                                                  ['text_invitation_2']);
+                                      if (android != '' && ios != '') {
+                                        await Share.share(
+                                            // ignore: prefer_interpolation_to_compose_strings
+                                            languages[choosenLanguage]
+                                                        ['text_invitation_1']
+                                                    .toString()
+                                                    .replaceAll(
+                                                        '55', package.appName) +
+                                                ' ' +
+                                                myReferralCode[
+                                                    'refferal_code'] +
+                                                ' ' +
+                                                languages[choosenLanguage]
+                                                    ['text_invitation_2'] +
+                                                ' \n\nandroid\n\n' +
+                                                android +
+                                                '\n\niOS\n\n' +
+                                                ios);
+                                      } else if (android != '') {
+                                        await Share.share(
+                                            // ignore: prefer_interpolation_to_compose_strings
+                                            languages[choosenLanguage]
+                                                        ['text_invitation_1']
+                                                    .toString()
+                                                    .replaceAll(
+                                                        '55', package.appName) +
+                                                ' ' +
+                                                myReferralCode[
+                                                    'refferal_code'] +
+                                                ' ' +
+                                                languages[choosenLanguage]
+                                                    ['text_invitation_2'] +
+                                                ' \n\nandroid\n\n' +
+                                                android);
+                                      } else if (ios != '') {
+                                        await Share.share(
+                                            // ignore: prefer_interpolation_to_compose_strings
+                                            languages[choosenLanguage]
+                                                        ['text_invitation_1']
+                                                    .toString()
+                                                    .replaceAll(
+                                                        '55', package.appName) +
+                                                ' ' +
+                                                myReferralCode[
+                                                    'refferal_code'] +
+                                                ' ' +
+                                                languages[choosenLanguage]
+                                                    ['text_invitation_2'] +
+                                                '\n\niOS\n\n' +
+                                                ios);
+                                      }
                                     },
                                     text: languages[choosenLanguage]
                                         ['text_invite']),

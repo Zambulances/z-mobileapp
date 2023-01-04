@@ -184,7 +184,7 @@ Map<String, dynamic> languages = {
     "text_noDataFound": "No Data Found",
     "text_removeFav": "Are you sure to remove this address from your favorites",
     "text_invite": "Invite",
-    "text_invitation_1": "Join me on Tagxi! using my invite code",
+    "text_invitation_1": "Join me on 55! using my invite code",
     "text_invitation_2": "To make easy your ride",
     "text_upcoming": "Upcoming",
     "text_completed": "Completed",
@@ -373,8 +373,9 @@ Map<String, dynamic> languages = {
     "text_close": "Close",
     "text_fill_fileds": "Fill The Fields",
     "text_admin_commision": "Admin Commission",
-    "text_notification_deleted": "Notification  Deleted",
-    "text_transferred_successfully": "Transferred Successfully"
+    "text_notification_deleted": "Notification Deleted",
+    "text_transferred_successfully": "Transferred Successfully",
+    "text_waitingforpayment": "Waiting For Payment"
   },
   "hi": {
     "text_enter_social": "या सोशल मीडिया में प्रवेश करें",
@@ -564,7 +565,7 @@ Map<String, dynamic> languages = {
         "क्या आप इस पते को अपने पसंदीदा से हटाना सुनिश्चित करते हैं",
     "text_invite": "आमंत्रित करना",
     "text_invitation_1":
-        "मुझे Tagxi ​​पर शामिल करें! मेरे आमंत्रित कोड का उपयोग करना",
+        "55 पर मेरे साथ जुड़ें! मेरे आमंत्रित कोड का उपयोग करना",
     "text_invitation_2": "अपनी सवारी को आसान बनाने के लिए",
     "text_upcoming": "आगामी",
     "text_completed": "पूरा हुआ",
@@ -756,7 +757,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "फील्ड भरें",
     "text_admin_commision": "व्यवस्थापक आयोग",
     "text_notification_deleted": "अधिसूचना हटा दी गई",
-    "text_transferred_successfully": "सफलतापूर्वक स्थानांतरित किया गया"
+    "text_transferred_successfully": "सफलतापूर्वक स्थानांतरित किया गया",
+    "text_waitingforpayment": "भुगतान की प्रतीक्षा करना"
   },
   "ar": {
     "text_enter_social": "أو أدخل وسائل التواصل الاجتماعي",
@@ -940,7 +942,7 @@ Map<String, dynamic> languages = {
     "text_noDataFound": "لاتوجد بيانات",
     "text_removeFav": "هل أنت متأكد من إزالة هذا العنوان من مفضلاتك",
     "text_invite": "يدعو",
-    "text_invitation_1": "انضم إلي على Tagxi! باستخدام رمز الدعوة الخاص بي",
+    "text_invitation_1": "انضم إلي في 55! باستخدام رمز الدعوة الخاص بي",
     "text_invitation_2": "لتسهيل رحلتك",
     "text_upcoming": "القادمة",
     "text_completed": "مكتمل",
@@ -1131,7 +1133,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "ملء الحقول",
     "text_admin_commision": "اللجنة الإدارية",
     "text_notification_deleted": "تم حذف الإخطار",
-    "text_transferred_successfully": "نقل بنجاح"
+    "text_transferred_successfully": "نقل بنجاح",
+    "text_waitingforpayment": "في انتظار الدفع"
   },
   "fr": {
     "text_enter_social": "ou entrez les médias sociaux",
@@ -1325,7 +1328,7 @@ Map<String, dynamic> languages = {
     "text_removeFav": "Êtes-vous sûr de supprimer cette adresse de vos favoris",
     "text_invite": "Inviter",
     "text_invitation_1":
-        "Rejoignez-moi sur Tagxi! en utilisant mon code d'invitation",
+        "Rejoignez-moi sur 55! en utilisant mon code d'invitation",
     "text_invitation_2": "Pour faciliter votre balade",
     "text_upcoming": "A venir",
     "text_completed": "Complété",
@@ -1519,7 +1522,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "Remplissez les champs",
     "text_admin_commision": "Commission administrative",
     "text_notification_deleted": "Notification supprimée",
-    "text_transferred_successfully": "Transféré avec succès"
+    "text_transferred_successfully": "Transféré avec succès",
+    "text_waitingforpayment": "En attente de paiement"
   },
   "tr": {
     "text_enter_social": "veya sosyal medyaya girin",
@@ -1705,7 +1709,7 @@ Map<String, dynamic> languages = {
     "text_removeFav":
         "Bu adresi favorilerinizden kaldıracağınızdan emin misiniz",
     "text_invite": "Davet etmek",
-    "text_invitation_1": "Tagxi'de bana katılın! davet kodumu kullanarak",
+    "text_invitation_1": "55'te bana katılın! davet kodumu kullanarak",
     "text_invitation_2": "Sürüşünüzü kolaylaştırmak için",
     "text_upcoming": "Yaklaşan",
     "text_completed": "Tamamlanmış",
@@ -1897,7 +1901,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "Tarlaları doldurun",
     "text_admin_commision": "Yönetici komisyonu",
     "text_notification_deleted": "Bildirim silindi",
-    "text_transferred_successfully": "Başarıyla aktarıldı"
+    "text_transferred_successfully": "Başarıyla aktarıldı",
+    "text_waitingforpayment": "Ödeme için bekleniyor"
   },
   "ru": {
     "text_enter_social": "или войти в социальные сети",
@@ -2089,7 +2094,7 @@ Map<String, dynamic> languages = {
     "text_removeFav": "Вы обязательно удалите этот адрес из своих любимых",
     "text_invite": "Приглашать",
     "text_invitation_1":
-        "Присоединяйтесь ко мне на Tagxi! Используя мой код приглашения",
+        "Присоединяйтесь ко мне на 55! Используя мой код приглашения",
     "text_invitation_2": "Чтобы упростить поездку",
     "text_upcoming": "Предстоящий",
     "text_completed": "Завершенный",
@@ -2282,7 +2287,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "Заполните поля",
     "text_admin_commision": "Административная комиссия",
     "text_notification_deleted": "Уведомление удалено",
-    "text_transferred_successfully": "Переведен успешно"
+    "text_transferred_successfully": "Переведен успешно",
+    "text_waitingforpayment": "Ожидается платеж"
   },
   "it": {
     "text_enter_social": "o inserisci i social media",
@@ -2471,8 +2477,7 @@ Map<String, dynamic> languages = {
     "text_removeFav":
         "Sei sicuro di rimuovere questo indirizzo dai tuoi preferiti",
     "text_invite": "Invitare",
-    "text_invitation_1":
-        "Unisciti a me su Tagxi! Usando il mio codice di invito",
+    "text_invitation_1": "Unisciti a me al 55! Usando il mio codice di invito",
     "text_invitation_2": "Per rendere facile la tua corsa",
     "text_upcoming": "Imminente",
     "text_completed": "Completato",
@@ -2664,7 +2669,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "Riempire i campi",
     "text_admin_commision": "Commissione amministrativa",
     "text_notification_deleted": "Notifica eliminata",
-    "text_transferred_successfully": "Trasferito con successo"
+    "text_transferred_successfully": "Trasferito con successo",
+    "text_waitingforpayment": "In attesa del pagamento"
   },
   "de": {
     "text_enter_social": "Oder betreten Sie soziale Medien",
@@ -2793,7 +2799,7 @@ Map<String, dynamic> languages = {
     "text_cancelrequest": "Anfrage abbrechen",
     "text_entercancelreason": "Geben Sie den Abbrechen der Vernunft ein",
     "text_pickdroplocation": "Wählen Sie Drop -Standort",
-    "text_choosepicklocation": "Wählen Sie auswählen Standort",
+    "text_choosepicklocation": "Wählen Sie auswählen",
     "text_fav_address": "Lieblingsadresse",
     "text_pick_suggestion": "Pickup -Vorschlag",
     "text_drop_suggestion": "Vorschläge fallen",
@@ -2858,7 +2864,7 @@ Map<String, dynamic> languages = {
     "text_removeFav": "Entfernen Sie diese Adresse sicher von Ihren Favoriten?",
     "text_invite": "Einladen",
     "text_invitation_1":
-        "Begleiten Sie mich auf Tagxi! Verwenden Sie meinen Einladungscode",
+        "Begleiten Sie mich auf 55! Verwenden Sie meinen Einladungscode",
     "text_invitation_2": "Um Ihre Fahrt einfach zu erleichtern",
     "text_upcoming": "Bevorstehende",
     "text_completed": "Abgeschlossen",
@@ -3053,7 +3059,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "Füllen Sie die Felder",
     "text_admin_commision": "Administratorkommission",
     "text_notification_deleted": "Benachrichtigung gelöscht",
-    "text_transferred_successfully": "Erfolgreich übertragen"
+    "text_transferred_successfully": "Erfolgreich übertragen",
+    "text_waitingforpayment": "Warten auf Zahlung"
   },
   "ko": {
     "text_enter_social": "또는 소셜 미디어를 입력하십시오",
@@ -3105,7 +3112,7 @@ Map<String, dynamic> languages = {
     "text_not_uploaded": "업로드되지 않았습니다",
     "text_uploaded": "업로드",
     "text_upload": "업로드",
-    "text_approval_waiting": "검증 보류",
+    "text_approval_waiting": "확인중인 확인",
     "text_send_approval":
         "귀하의 문서는 여전히 확인을 위해 보류 중입니다. 모든 것이 확인되면 타기를 시작합니다. 꽉 앉으세요",
     "text_upload_docs": "문서를 업로드하십시오",
@@ -3232,7 +3239,7 @@ Map<String, dynamic> languages = {
     "text_noDataFound": "데이터가 없습니다",
     "text_removeFav": "즐겨 찾기 에서이 주소를 제거 하시겠습니까?",
     "text_invite": "초대",
-    "text_invitation_1": "Tagxi에 나와 함께! 내 초대 코드를 사용합니다",
+    "text_invitation_1": "55에 나와 함께! 내 초대 코드를 사용합니다",
     "text_invitation_2": "타는 것을 쉽게 만들기 위해",
     "text_upcoming": "다가오는",
     "text_completed": "완전한",
@@ -3416,7 +3423,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "필드를 채우십시오",
     "text_admin_commision": "관리자위원회",
     "text_notification_deleted": "알림이 삭제되었습니다",
-    "text_transferred_successfully": "성공적으로 전송되었습니다"
+    "text_transferred_successfully": "성공적으로 전송되었습니다",
+    "text_waitingforpayment": "지불을 기다리고 있습니다"
   },
   "zh": {
     "text_enter_social": "或进入社交媒体",
@@ -3592,7 +3600,7 @@ Map<String, dynamic> languages = {
     "text_noDataFound": "没有找到数据",
     "text_removeFav": "您一定会从您的收藏夹中删除此地址",
     "text_invite": "邀请",
-    "text_invitation_1": "加入我的tagxi！使用我的邀请代码",
+    "text_invitation_1": "加入我的55！使用我的邀请代码",
     "text_invitation_2": "轻松骑行",
     "text_upcoming": "即将到来",
     "text_completed": "完全的",
@@ -3774,7 +3782,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "填写字段",
     "text_admin_commision": "管理委员会",
     "text_notification_deleted": "已删除通知",
-    "text_transferred_successfully": "成功转移"
+    "text_transferred_successfully": "成功转移",
+    "text_waitingforpayment": "等待付款"
   },
   "es": {
     "text_enter_social": "o entrar en las redes sociales",
@@ -3924,7 +3933,7 @@ Map<String, dynamic> languages = {
     "text_finddriverdesc":
         "Estamos buscando conductores cercanos para aceptar su viaje. ¡Una vez aceptado, puedes viajar con nosotros! ¡Nosotros apreciamos su paciencia!",
     "text_pickup_instruction": "Cualquier instrucción para recoger",
-    "text_shareride": "Compartir viaje",
+    "text_shareride": "Compartir un paseo",
     "text_ridecancel": "¿Estás seguro de cancelar el paseo?",
     "text_ridecancel_desc":
         "Su viaje será cancelado y devuelto al menú principal. Esto conducirá a una tarifa de cancelación",
@@ -3964,7 +3973,7 @@ Map<String, dynamic> languages = {
     "text_removeFav":
         "¿Está seguro de eliminar esta dirección de sus favoritos?",
     "text_invite": "Invitar",
-    "text_invitation_1": "¡Únete a mí en Tagxi! Usando mi código de invitación",
+    "text_invitation_1": "¡Únete a mí en 55! Usando mi código de invitación",
     "text_invitation_2": "Para facilitar tu viaje",
     "text_upcoming": "Próximo",
     "text_completed": "Terminado",
@@ -4158,7 +4167,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "Llenar los campos",
     "text_admin_commision": "Comisión administrativa",
     "text_notification_deleted": "Notificación eliminada",
-    "text_transferred_successfully": "Transferido con éxito"
+    "text_transferred_successfully": "Transferido con éxito",
+    "text_waitingforpayment": "A la espera del pago"
   },
   "iw": {
     "text_enter_social": "או להיכנס למדיה חברתית",
@@ -4312,7 +4322,7 @@ Map<String, dynamic> languages = {
     "text_cancelRideReason": "סיבה לביטול נסיעה",
     "text_nodriver": "לא נמצא נהג",
     "text_tryagain": "נסה שוב",
-    "text_ridelater": "סע אחר כך",
+    "text_ridelater": "לרכוב אחר כך",
     "text_ridenow": "תרכב עכשיו",
     "text_home": "בית",
     "text_work": "עֲבוֹדָה",
@@ -4342,7 +4352,7 @@ Map<String, dynamic> languages = {
     "text_noDataFound": "לא נמצאו נתונים",
     "text_removeFav": "האם אתה בטוח תסיר כתובת זו מהמועדפים שלך",
     "text_invite": "להזמין",
-    "text_invitation_1": "הצטרף אלי ל- Tagxi! באמצעות קוד ההזמנה שלי",
+    "text_invitation_1": "הצטרף אליי ב 55! באמצעות קוד ההזמנה שלי",
     "text_invitation_2": "כדי להקל על הרכיבה שלך",
     "text_upcoming": "צפוי",
     "text_completed": "הושלם",
@@ -4530,7 +4540,8 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "מלא את השדות",
     "text_admin_commision": "ועדת מנהל",
     "text_notification_deleted": "הודעה נמחקת",
-    "text_transferred_successfully": "הועבר בהצלחה"
+    "text_transferred_successfully": "הועבר בהצלחה",
+    "text_waitingforpayment": "מחכה לתשלום"
   },
   "bn": {
     "text_enter_social": "বা সোশ্যাল মিডিয়া প্রবেশ করুন",
@@ -4718,7 +4729,7 @@ Map<String, dynamic> languages = {
         "আপনি কি আপনার পছন্দসই থেকে এই ঠিকানাটি সরিয়ে ফেলতে ভুলবেন না?",
     "text_invite": "আমন্ত্রণ",
     "text_invitation_1":
-        "আমার সাথে ট্যাগ্সিতে যোগ দিন! আমার আমন্ত্রণ কোড ব্যবহার করে",
+        "55 এ আমার সাথে যোগ দিন! আমার আমন্ত্রণ কোড ব্যবহার করে",
     "text_invitation_2": "আপনার যাত্রা সহজ করতে",
     "text_upcoming": "আসন্ন",
     "text_completed": "সম্পূর্ণ",
@@ -4909,6 +4920,7 @@ Map<String, dynamic> languages = {
     "text_fill_fileds": "ক্ষেত্রগুলি পূরণ করুন",
     "text_admin_commision": "প্রশাসক কমিশন",
     "text_notification_deleted": "বিজ্ঞপ্তি মুছে ফেলা হয়েছে",
-    "text_transferred_successfully": "সফলভাবে স্থানান্তরিত"
+    "text_transferred_successfully": "সফলভাবে স্থানান্তরিত",
+    "text_waitingforpayment": "টাকা প্রদানের জন্য অপেক্ষা করছি"
   }
 };

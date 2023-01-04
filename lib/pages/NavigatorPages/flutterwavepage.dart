@@ -9,8 +9,10 @@ import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:flutterwave_standard/flutterwave.dart';
 
+// ignore: must_be_immutable
 class FlutterWavePage extends StatefulWidget {
-  const FlutterWavePage({Key? key}) : super(key: key);
+  dynamic from;
+  FlutterWavePage({this.from, Key? key}) : super(key: key);
 
   @override
   State<FlutterWavePage> createState() => _FlutterWavePageState();
@@ -156,8 +158,14 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
                                     setState(() {
                                       _isLoading = true;
                                     });
-                                    var val = await addMoneyFlutterwave(
-                                        addMoney, response.transactionId);
+                                    dynamic val;
+                                    if (widget.from == '1') {
+                                      val = await payMoneyStripe(
+                                          response.transactionId);
+                                    } else {
+                                      val = await addMoneyFlutterwave(
+                                          addMoney, response.transactionId);
+                                    }
                                     if (val == 'success') {
                                       setState(() {
                                         _success = true;

@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:tagyourtaxi_driver/functions/notifications.dart';
+import 'package:tagyourtaxi_driver/pages/NavigatorPages/notification.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/drop_loc_select.dart';
 import 'package:tagyourtaxi_driver/pages/login/login.dart';
@@ -194,14 +196,6 @@ class _MapsState extends State<Maps>
       }
       _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
 
-      // BitmapDescriptor.fromAssetImage(
-      //         const ImageConfiguration(devicePixelRatio: 5),
-      //         'assets/images/userloc.png')
-      //     .then((value) {
-      //   setState(() {
-      //     userLocationIcon = value;
-      //   });
-      // });
       //remove in original
 
       var val =
@@ -244,29 +238,11 @@ class _MapsState extends State<Maps>
       if (permission != geolocs.LocationPermission.deniedForever) {
         await perm.Permission.location.request();
       }
-
-      // await [
-      //   perm.Permission
-      //       .location,
-      //   perm.Permission
-      //       .locationAlways
-      // ].request();
-      //  geolocator.GeolocatorPlatform.instance.requestPermission();
     }
     setState(() {
       _loading = true;
     });
     getLocs();
-    // else if(permission == geolocator.LocationPermission.deniedForever){
-    //   print('denied forver');
-    //   setState(() {
-    //     _locationDenied = true;
-    //   });
-    // }
-    // setState(() {
-    //   _isLoading = true;
-    // });
-    // getLocs();
   }
 
   int _bottom = 0;
@@ -300,12 +276,26 @@ class _MapsState extends State<Maps>
           });
           return false;
         }
-        return false;
+        return true;
       },
       child: Material(
         child: ValueListenableBuilder(
             valueListenable: valueNotifierHome.value,
             builder: (context, value, child) {
+              if (isGeneral == true) {
+                isGeneral = false;
+                if (lastNotification != latestNotification) {
+                  lastNotification = latestNotification;
+                  pref.setString('lastNotification', latestNotification);
+                  latestNotification = '';
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const NotificationPage()));
+                  });
+                }
+              }
               if (userRequestData.isNotEmpty &&
                   userRequestData['is_later'] == 1 &&
                   userRequestData['is_completed'] != 1 &&
@@ -599,8 +589,10 @@ class _MapsState extends State<Maps>
                                                                           element['l']
                                                                               [
                                                                               1]),
-                                                                      icon:
-                                                                         (element['vehicle_type_icon'] == 'taxi') ? pinLocationIcon : pinLocationIcon2,
+                                                                      icon: (element['vehicle_type_icon'] ==
+                                                                              'taxi')
+                                                                          ? pinLocationIcon
+                                                                          : pinLocationIcon2,
                                                                     ));
                                                                   } else if (_controller !=
                                                                       null) {
@@ -647,8 +639,7 @@ class _MapsState extends State<Maps>
                                                                             _controller,
                                                                             'car${element['id']}',
                                                                             element['id'],
-                                                                            (element['vehicle_type_icon'] == 'taxi') ? pinLocationIcon : pinLocationIcon2
-                                                                            );
+                                                                            (element['vehicle_type_icon'] == 'taxi') ? pinLocationIcon : pinLocationIcon2);
                                                                       }
                                                                     }
                                                                   }
@@ -680,6 +671,8 @@ class _MapsState extends State<Maps>
                                                                   onMapCreated:
                                                                       _onMapCreated,
                                                                   compassEnabled:
+                                                                      false,
+                                                                  mapToolbarEnabled:
                                                                       false,
                                                                   initialCameraPosition:
                                                                       CameraPosition(
@@ -1104,14 +1097,13 @@ class _MapsState extends State<Maps>
                                                           onTap: () async {},
                                                           child: Container(
                                                               padding:
-                                                                 const EdgeInsets.all(
-                                                                      10),
-                                                              height:
-                                                                  media.width *
-                                                                      0.3,
-                                                              width:
-                                                                  media.width *
-                                                                      0.45,
+                                                                  const EdgeInsets
+                                                                      .all(10),
+                                                              height: media.width *
+                                                                  0.3,
+                                                              width: media
+                                                                      .width *
+                                                                  0.45,
                                                               decoration: BoxDecoration(
                                                                   boxShadow: [
                                                                     BoxShadow(
@@ -1126,8 +1118,8 @@ class _MapsState extends State<Maps>
                                                                   ],
                                                                   color: page,
                                                                   borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          media.width *
+                                                                      BorderRadius
+                                                                          .circular(media.width *
                                                                               0.02)),
                                                               alignment:
                                                                   Alignment
@@ -1265,6 +1257,7 @@ class _MapsState extends State<Maps>
                                                                           () {
                                                                         Scaffold.of(context)
                                                                             .openDrawer();
+                                                                            printWrapped(userDetails.toString());
                                                                       },
                                                                       child: const Icon(
                                                                           Icons
@@ -1277,7 +1270,7 @@ class _MapsState extends State<Maps>
                                                     : Container(),
                                                 Positioned(
                                                     bottom:
-                                                        20 + media.width * 0.4,
+                                                      (userDetails['show_ride_without_destination'].toString() == '1') ?  20 + media.width * 0.4 : 20 + media.width*0.25,
                                                     child: SizedBox(
                                                       width: media.width * 0.9,
                                                       child: Row(
@@ -1405,7 +1398,7 @@ class _MapsState extends State<Maps>
                                                                 milliseconds:
                                                                     200),
                                                         height: (_bottom == 0)
-                                                            ? media.width * 0.4
+                                                            ? (userDetails['show_ride_without_destination'].toString() == '1') ? media.width * 0.4 : media.width*0.25
                                                             : media.height * 1 -
                                                                 (MediaQuery.of(
                                                                             context)
@@ -1651,10 +1644,11 @@ class _MapsState extends State<Maps>
                                                                                         .toList(),
                                                                                   )
                                                                                 : Container(),
-                                                                                if(_bottom == 1)
-                                                                            SizedBox(
-                                                                              height: media.width * 0.05,
-                                                                            ),
+                                                                            if (_bottom ==
+                                                                                1)
+                                                                              SizedBox(
+                                                                                height: media.width * 0.05,
+                                                                              ),
                                                                             (favAddress.isNotEmpty && _bottom == 1)
                                                                                 ? Column(
                                                                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1766,10 +1760,11 @@ class _MapsState extends State<Maps>
                                                                                     ],
                                                                                   )
                                                                                 : Container(),
-                                                                                if(_bottom == 1)
-                                                                            SizedBox(
-                                                                              height: media.width * 0.05,
-                                                                            ),
+                                                                            if (_bottom ==
+                                                                                1)
+                                                                              SizedBox(
+                                                                                height: media.width * 0.05,
+                                                                              ),
                                                                             (_bottom == 1)
                                                                                 ? InkWell(
                                                                                     onTap: () async {
@@ -1780,10 +1775,12 @@ class _MapsState extends State<Maps>
                                                                                       });
                                                                                       if (_dropaddress == true && addressList.where((element) => element.id == 'pickup').isNotEmpty) {
                                                                                         var navigate = await Navigator.push(context, MaterialPageRoute(builder: (context) => const DropLocation()));
-                                                                                        if (navigate) {
-                                                                                          setState(() {
-                                                                                            addressList.removeWhere((element) => element.id == 'drop');
-                                                                                          });
+                                                                                        if (navigate != null) {
+                                                                                          if (navigate) {
+                                                                                            setState(() {
+                                                                                              addressList.removeWhere((element) => element.id == 'drop');
+                                                                                            });
+                                                                                          }
                                                                                         }
                                                                                       }
                                                                                     },
@@ -1811,42 +1808,17 @@ class _MapsState extends State<Maps>
                                                                             SizedBox(
                                                                               height: media.width * 0.05,
                                                                             ),
-                                                                            Button(onTap: (){
-                                                                              Navigator.push(
-                                                                                        context,
-                                                                                        MaterialPageRoute(
-                                                                                            builder: (context) => BookingConfirmation(
-                                                                                                  type: 2,
-                                                                                                )));
-                                                                            }, text: languages[choosenLanguage]['text_ridewithout_destination']),
-                                                                            // Row(
-                                                                            //   mainAxisAlignment: MainAxisAlignment.center,
-                                                                            //   children: [
-                                                                            //     InkWell(
-                                                                            //       onTap: () {
-                                                                            //         // if (_dropaddress == true) {
-                                                                            //         Navigator.push(
-                                                                            //             context,
-                                                                            //             MaterialPageRoute(
-                                                                            //                 builder: (context) => BookingConfirmation(
-                                                                            //                       type: 2,
-                                                                            //                     )));
-                                                                            //         // }
-                                                                            //       },
-                                                                            //       child: Text(
-                                                                            //           // (_dropaddress == true)
-                                                                            //           //     ?
-                                                                            //           // 'Ride without Destination'
-                                                                            //           languages[choosenLanguage]['text_ridewithout_destination']
-                                                                            //           // : '',
-                                                                            //           ,
-                                                                            //           style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600, color: buttonColor)),
-                                                                            //     )
-                                                                            //     //        Button(onTap: (){
-                                                                            //     //   Navigator.push(context, MaterialPageRoute(builder: (context)=>BookingConfirmation()));
-                                                                            //     // }, text: ((_dropaddress == true) ? 'Later' : ''))
-                                                                            //   ],
-                                                                            // )
+                                                                            if(userDetails['show_ride_without_destination'].toString() == '1')
+                                                                            Button(
+                                                                                onTap: () {
+                                                                                  Navigator.push(
+                                                                                      context,
+                                                                                      MaterialPageRoute(
+                                                                                          builder: (context) => BookingConfirmation(
+                                                                                                type: 2,
+                                                                                              )));
+                                                                                },
+                                                                                text: languages[choosenLanguage]['text_ridewithout_destination']),
                                                                           ],
                                                                         ))),
                                                           ],
@@ -2686,8 +2658,7 @@ class _MapsState extends State<Maps>
 
       markerid,
       markerBearing,
-      icon
-      ) async {
+      icon) async {
     final double bearing =
         getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
 

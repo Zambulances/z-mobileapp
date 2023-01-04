@@ -40,8 +40,8 @@ class _SelectLanguageState extends State<SelectLanguage> {
               Container(
                 height: media.height * 1,
                 width: media.width * 1,
-                padding: EdgeInsets.fromLTRB(media.width * 0.05, media.width * 0.05,
-                    media.width * 0.05, media.width * 0.05),
+                padding: EdgeInsets.fromLTRB(media.width * 0.05,
+                    media.width * 0.05, media.width * 0.05, media.width * 0.05),
                 color: page,
                 child: Column(
                   children: [
@@ -98,8 +98,8 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                           });
                                         },
                                         child: Container(
-                                          padding:
-                                              EdgeInsets.all(media.width * 0.025),
+                                          padding: EdgeInsets.all(
+                                              media.width * 0.025),
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -110,7 +110,8 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                         e['code'] == i)['name']
                                                     .toString(),
                                                 style: GoogleFonts.roboto(
-                                                    fontSize: media.width * sixteen,
+                                                    fontSize:
+                                                        media.width * sixteen,
                                                     color: textColor),
                                               ),
                                               Container(
@@ -119,18 +120,20 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     border: Border.all(
-                                                        color:
-                                                            const Color(0xff222222),
+                                                        color: const Color(
+                                                            0xff222222),
                                                         width: 1.2)),
                                                 alignment: Alignment.center,
                                                 child: (_choosenLanguage == i)
                                                     ? Container(
-                                                        height: media.width * 0.03,
-                                                        width: media.width * 0.03,
+                                                        height:
+                                                            media.width * 0.03,
+                                                        width:
+                                                            media.width * 0.03,
                                                         decoration:
                                                             const BoxDecoration(
-                                                                shape:
-                                                                    BoxShape.circle,
+                                                                shape: BoxShape
+                                                                    .circle,
                                                                 color: Color(
                                                                     0xff222222)),
                                                       )
@@ -158,15 +161,16 @@ class _SelectLanguageState extends State<SelectLanguage> {
                             languageDirection = 'ltr';
                           }
                           setState(() {
-                              _isLoading = true;
-                            });
+                            _isLoading = true;
+                          });
                           await getlangid();
-                          pref.setString('languageDirection', languageDirection);
+                          pref.setString(
+                              'languageDirection', languageDirection);
                           pref.setString('choosenLanguage', _choosenLanguage);
                           valueNotifierHome.incrementNotifier();
                           setState(() {
-                              _isLoading = false;
-                            });
+                            _isLoading = false;
+                          });
                           pop();
                         },
                         text: languages[choosenLanguage]['text_confirm'])
@@ -174,9 +178,9 @@ class _SelectLanguageState extends State<SelectLanguage> {
                 ),
               ),
               //loader
-            (_isLoading == true)
-                        ? const Positioned(top: 0, child: Loading())
-                        : Container()
+              (_isLoading == true)
+                  ? const Positioned(top: 0, child: Loading())
+                  : Container()
             ],
           ),
         ),

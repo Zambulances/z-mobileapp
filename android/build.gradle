@@ -14,14 +14,6 @@ buildscript {
 
 allprojects {
     repositories {
-          all { ArtifactRepository repo ->
-              println repo.url.toString()
-              if (repo.url.toString().startsWith("https://jcenter.bintray.com/")) {
-                  project.logger.warn "Repository ${repo.url} removed."
-                  remove repo
-                  maven { url "https://maven.aliyun.com/repository/jcenter" }
-              }
-          }
           google()
           mavenCentral()
       }

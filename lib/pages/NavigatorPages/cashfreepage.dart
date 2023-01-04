@@ -11,8 +11,10 @@ import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:cashfree_pg/cashfree_pg.dart';
 
+// ignore: must_be_immutable
 class CashFreePage extends StatefulWidget {
-  const CashFreePage({Key? key}) : super(key: key);
+  dynamic from;
+  CashFreePage({this.from, Key? key}) : super(key: key);
 
   @override
   State<CashFreePage> createState() => _CashFreePageState();
@@ -55,7 +57,12 @@ class _CashFreePageState extends State<CashFreePage> {
       }).then((value) async {
         cfSuccessList = jsonDecode(jsonEncode(value));
         if (cfSuccessList['txStatus'] == 'SUCCESS') {
-          var verify = await cashFreePaymentSuccess();
+          dynamic verify;
+          if (widget.from == '1') {
+            verify = await payMoneyStripe(cfSuccessList['orderId']);
+          } else {
+            verify = await cashFreePaymentSuccess();
+          }
           if (verify == 'success') {
             setState(() {
               _success = true;

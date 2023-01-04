@@ -9,8 +9,10 @@ import 'package:tagyourtaxi_driver/translations/translation.dart';
 import 'package:tagyourtaxi_driver/widgets/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
+// ignore: must_be_immutable
 class RazorPayPage extends StatefulWidget {
-  const RazorPayPage({Key? key}) : super(key: key);
+  dynamic from;
+  RazorPayPage({this.from, Key? key}) : super(key: key);
 
   @override
   State<RazorPayPage> createState() => _RazorPayPageState();
@@ -33,7 +35,12 @@ class _RazorPayPageState extends State<RazorPayPage> {
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    var val = await addMoneyRazorpay(addMoney, response.paymentId);
+    dynamic val;
+    if (widget.from == '1') {
+      val = await payMoneyStripe(response.paymentId);
+    } else {
+      val = await addMoneyRazorpay(addMoney, response.paymentId);
+    }
     if (val == 'success') {
       setState(() {
         _success = true;

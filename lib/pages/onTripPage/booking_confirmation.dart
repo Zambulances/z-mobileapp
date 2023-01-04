@@ -614,7 +614,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                               : 0.0,
                                           position:
                                               LatLng(e['l'][0], e['l'][1]),
-                                          icon: (e['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
+                                          icon: (e['vehicle_type_icon'] ==
+                                                  'motor_bike')
+                                              ? pinLocationIcon2
+                                              : pinLocationIcon,
                                         ));
                                       } else if (_controller != null) {
                                         var dist = calculateDistance(
@@ -662,31 +665,34 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                               vsync: this, //From the widget
                                             );
                                             animateCar(
-                                                myMarker
-                                                    .lastWhere((element) =>
-                                                        element.markerId
-                                                            .toString()
-                                                            .contains(
-                                                                'car${e['id']}'))
-                                                    .position
-                                                    .latitude,
-                                                myMarker
-                                                    .lastWhere((element) =>
-                                                        element.markerId
-                                                            .toString()
-                                                            .contains(
-                                                                'car${e['id']}'))
-                                                    .position
-                                                    .longitude,
-                                                e['l'][0],
-                                                e['l'][1],
-                                                _mapMarkerSink,
-                                                this,
-                                                _controller,
-                                                'car${e['id']}',
-                                                e['id'],
-                                                (e['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
-                                                );
+                                              myMarker
+                                                  .lastWhere((element) =>
+                                                      element.markerId
+                                                          .toString()
+                                                          .contains(
+                                                              'car${e['id']}'))
+                                                  .position
+                                                  .latitude,
+                                              myMarker
+                                                  .lastWhere((element) =>
+                                                      element.markerId
+                                                          .toString()
+                                                          .contains(
+                                                              'car${e['id']}'))
+                                                  .position
+                                                  .longitude,
+                                              e['l'][0],
+                                              e['l'][1],
+                                              _mapMarkerSink,
+                                              this,
+                                              _controller,
+                                              'car${e['id']}',
+                                              e['id'],
+                                              (e['vehicle_type_icon'] ==
+                                                      'motor_bike')
+                                                  ? pinLocationIcon2
+                                                  : pinLocationIcon,
+                                            );
                                           }
                                         }
                                       }
@@ -765,7 +771,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                 : 0.0,
                                             position: LatLng(driverData['l'][0],
                                                 driverData['l'][1]),
-                                            icon: (driverData['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
+                                            icon: (driverData[
+                                                        'vehicle_type_icon'] ==
+                                                    'motor_bike')
+                                                ? pinLocationIcon2
+                                                : pinLocationIcon,
                                           ));
                                         } else if (_controller != null) {
                                           var dist = calculateDistance(
@@ -816,31 +826,34 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                               );
 
                                               animateCar(
-                                                  myMarker
-                                                      .lastWhere((element) =>
-                                                          element.markerId
-                                                              .toString()
-                                                              .contains(
-                                                                  'car${driverData['id']}'))
-                                                      .position
-                                                      .latitude,
-                                                  myMarker
-                                                      .firstWhere((element) =>
-                                                          element.markerId
-                                                              .toString()
-                                                              .contains(
-                                                                  'car${driverData['id']}'))
-                                                      .position
-                                                      .longitude,
-                                                  driverData['l'][0],
-                                                  driverData['l'][1],
-                                                  _mapMarkerSink,
-                                                  this,
-                                                  _controller,
-                                                  'car${driverData['id']}',
-                                                  driverData['id'],
-                                                  (driverData['vehicle_type_icon'] == 'motor_bike') ? pinLocationIcon2 : pinLocationIcon,
-                                                  );
+                                                myMarker
+                                                    .lastWhere((element) => element
+                                                        .markerId
+                                                        .toString()
+                                                        .contains(
+                                                            'car${driverData['id']}'))
+                                                    .position
+                                                    .latitude,
+                                                myMarker
+                                                    .firstWhere((element) => element
+                                                        .markerId
+                                                        .toString()
+                                                        .contains(
+                                                            'car${driverData['id']}'))
+                                                    .position
+                                                    .longitude,
+                                                driverData['l'][0],
+                                                driverData['l'][1],
+                                                _mapMarkerSink,
+                                                this,
+                                                _controller,
+                                                'car${driverData['id']}',
+                                                driverData['id'],
+                                                (driverData['vehicle_type_icon'] ==
+                                                        'motor_bike')
+                                                    ? pinLocationIcon2
+                                                    : pinLocationIcon,
+                                              );
                                             }
                                           }
                                         }
@@ -5727,8 +5740,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
       markerid,
       markerBearing,
-      icon
-      ) async {
+      icon) async {
     final double bearing =
         getBearing(LatLng(fromLat, fromLong), LatLng(toLat, toLong));
 

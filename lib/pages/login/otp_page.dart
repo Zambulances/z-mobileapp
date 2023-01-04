@@ -84,7 +84,7 @@ class _OtpState extends State<Otp> {
             MaterialPageRoute(builder: (context) => const Maps()),
             (route) => false);
       }
-    }  else if(verify == false) {
+    } else if (verify == false) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const GetStarted()));
     } else {

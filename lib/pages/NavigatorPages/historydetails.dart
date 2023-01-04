@@ -45,17 +45,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     addPickDropMarker();
   }
 
-  addDropMarker() async {
-    // CameraUpdate.newCameraPosition(CameraPosition(target: target))
-  }
-
-  addMarker() async {}
-
   addPickDropMarker() async {
-
-    // addMarker();
-    // var testIcon1 = await _capturePng(offlineicon);
-    // if (testIcon1 != null) {
     setState(() {
       myMarker.add(Marker(
           markerId: const MarkerId('pointpick'),
@@ -63,10 +53,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
           position: LatLng(myHistory[selectedHistory]['pick_lat'],
               myHistory[selectedHistory]['pick_lng'])));
     });
-    // }
 
-    // var testIcon = await _capturePng(onlineicon);
-    // if (testIcon != null) {
     setState(() {
       myMarker.add(Marker(
           markerId: const MarkerId('pointdrop'),
@@ -74,7 +61,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
           position: LatLng(myHistory[selectedHistory]['drop_lat'],
               myHistory[selectedHistory]['drop_lng'])));
     });
-    // }
 
     LatLngBounds bound;
     if (myHistory.isNotEmpty) {
@@ -327,8 +313,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           markers: Set<Marker>.from(myMarker),
                           scrollGesturesEnabled: false,
                           zoomGesturesEnabled: false,
-                          polylines: polyline,
-                          // minMaxZoomPreference: const MinMaxZoomPreference(0.0, 20.0),
+                          polylines: polylineHistory,
                           myLocationButtonEnabled: false,
                           buildingsEnabled: false,
                           zoomControlsEnabled: false,
