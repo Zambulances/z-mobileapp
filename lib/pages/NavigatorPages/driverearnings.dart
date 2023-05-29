@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
 
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class DriverEarnings extends StatefulWidget {
   const DriverEarnings({Key? key}) : super(key: key);
@@ -29,13 +30,22 @@ class _DriverEarningsState extends State<DriverEarnings> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //getting earnings data
   getEarnings() async {
     driverTodayEarnings.clear();
-    await driverTodayEarning();
+    var val = await driverTodayEarning();
+    if(mounted){
+      if(val == 'logout'){
+        navigateLogout();
+      }
     setState(() {
       _isLoading = false;
     });
+    }
   }
 
   _datePicker() async {
@@ -124,7 +134,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               _isLoading = true;
                             });
 
-                            await driverTodayEarning();
+                            var val = await driverTodayEarning();
+                            if(val == 'logout'){
+                              navigateLogout();
+                            }
                             setState(() {
                               _isLoading = false;
                             });
@@ -155,7 +168,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               _isLoading = true;
                             });
 
-                            await driverWeeklyEarning();
+                            var val = await driverWeeklyEarning();
+                            if(val == 'logout'){
+                              navigateLogout();
+                            }
                             setState(() {
                               _isLoading = false;
                             });
@@ -934,8 +950,11 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               driverReportEarnings.clear();
                                               _isLoading = true;
                                             });
-                                            await driverEarningReport(
+                                            var val =await driverEarningReport(
                                                 _fromDate, _toDate);
+                                            if(val == 'logout'){
+                                              navigateLogout();
+                                            }
                                             setState(() {
                                               _isLoading = false;
                                             });

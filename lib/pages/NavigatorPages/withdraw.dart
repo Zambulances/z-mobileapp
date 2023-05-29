@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/bankdetails.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/bankdetails.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class Withdraw extends StatefulWidget {
   const Withdraw({Key? key}) : super(key: key);
@@ -32,13 +33,23 @@ class _WithdrawState extends State<Withdraw> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
+
 //get withdrawed money list
   getWithdrawel() async {
-    await getWithdrawList();
+    var val = await getWithdrawList();
+    if(mounted){
+      if(val == 'logout'){
+        navigateLogout();
+      }
     setState(() {
       _isLoading = false;
       addBank = false;
     });
+    }
   }
 
   _errorClear() async {
@@ -269,11 +280,14 @@ class _WithdrawState extends State<Withdraw> {
                                                   _isLoading = true;
                                                 });
 
-                                                await getWithdrawListPages(
+                                                var val = await getWithdrawListPages(
                                                     (withDrawHistoryPages[
                                                                 'current_page'] +
                                                             1)
                                                         .toString());
+                                                if(val == 'logout'){
+                                                  navigateLogout();
+                                                }
 
                                                 setState(() {
                                                   _isLoading = false;
@@ -575,7 +589,10 @@ class _WithdrawState extends State<Withdraw> {
                                         setState(() {
                                           _isLoading = true;
                                         });
-                                        await getBankInfo();
+                                        var val = await getBankInfo();
+                                        if(val == 'logout'){
+                                          navigateLogout();
+                                        }
                                         if (bankData.isNotEmpty) {
                                           setState(() {
                                             _addPayment = false;
@@ -583,7 +600,10 @@ class _WithdrawState extends State<Withdraw> {
                                           //withdraw request
                                           var val = await requestWithdraw(
                                               withDrawMoney);
-                                          if (val != 'success' &&
+                                          if(val == 'logout'){
+                                            navigateLogout();
+                                          }
+                                          else if (val != 'success' &&
                                               val != 'no internet') {
                                             setState(() {
                                               _error = val;

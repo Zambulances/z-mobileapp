@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/history.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/makecomplaint.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'dart:ui' as ui;
 
 class HistoryDetails extends StatefulWidget {
@@ -205,11 +205,12 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     }
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
     _controller!.moveCamera(cameraUpdate);
-    getPolylineshistory(
-        pickLat: myHistory[selectedHistory]['pick_lat'],
-        pickLng: myHistory[selectedHistory]['pick_lng'],
-        dropLat: myHistory[selectedHistory]['drop_lat'],
-        dropLng: myHistory[selectedHistory]['drop_lng']);
+    // await getPolylineshistory(
+    //     pickLat: myHistory[selectedHistory]['pick_lat'],
+    //     pickLng: myHistory[selectedHistory]['pick_lng'],
+    //     dropLat: myHistory[selectedHistory]['drop_lat'],
+    //     dropLng: myHistory[selectedHistory]['drop_lng']);
+    setState(() {});
   }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
@@ -312,7 +313,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           markers: Set<Marker>.from(myMarker),
                           scrollGesturesEnabled: false,
                           zoomGesturesEnabled: false,
-                          polylines: polyline,
+                          polylines: polylineHistory,
                           // minMaxZoomPreference: const MinMaxZoomPreference(0.0, 20.0),
                           myLocationButtonEnabled: false,
                           buildingsEnabled: false,

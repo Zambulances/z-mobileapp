@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_number.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/pages/vehicleInformations/vehicle_number.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class VehicleYear extends StatefulWidget {
   const VehicleYear({Key? key}) : super(key: key);
@@ -20,6 +21,10 @@ class _VehicleYearState extends State<VehicleYear> {
   String dateError = '';
 
   TextEditingController controller = TextEditingController();
+
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,9 +150,12 @@ class _VehicleYearState extends State<VehicleYear> {
                       top: 0,
                       child: NoInternet(
                         onTap: () {
-                          setState(() {
+                          setState(() async {
                             internetTrue();
-                            getUserDetails();
+                            var val = await getUserDetails();
+                            if(val == 'logout'){
+                              navigateLogout();
+                            }
                           });
                         },
                       ))

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/vehicle_make.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/pages/vehicleInformations/vehicle_make.dart';
+import 'package:tagxi_driver/styles/styles.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class VehicleType extends StatefulWidget {
   const VehicleType({Key? key}) : super(key: key);
@@ -17,6 +17,7 @@ class VehicleType extends StatefulWidget {
 
 dynamic myVehicalType;
 dynamic myVehicleId;
+dynamic myVehicleIconFor;
 
 class _VehicleTypeState extends State<VehicleType> {
   bool _loaded = false;
@@ -31,10 +32,13 @@ class _VehicleTypeState extends State<VehicleType> {
   getvehicle() async {
     myVehicalType = '';
     myVehicleId = '';
+    myVehicleIconFor = '';
     await getvehicleType();
+    if(mounted){
     setState(() {
       _loaded = true;
     });
+    }
   }
 
   @override
@@ -100,6 +104,8 @@ class _VehicleTypeState extends State<VehicleType> {
                                         onTap: () {
                                           setState(() {
                                             myVehicleId = vehicleType[i]['id'];
+                                            myVehicleIconFor = vehicleType[i]
+                                                ['icon_types_for'];
                                           });
                                         },
                                         child: Row(

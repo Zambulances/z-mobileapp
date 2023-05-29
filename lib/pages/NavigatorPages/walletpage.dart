@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/cashfreepage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/flutterwavepayment.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/paystackpayment.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/razorpaypage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/selectwallet.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/withdraw.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/cashfreepage.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/flutterwavepayment.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/paystackpayment.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/razorpaypage.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/selectwallet.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/withdraw.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -39,6 +40,10 @@ class _WalletPageState extends State<WalletPage> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //get wallet details
   getWallet() async {
     var val = await getWalletHistory();
@@ -48,6 +53,8 @@ class _WalletPageState extends State<WalletPage> {
       _isLoading = false;
       _completed = true;
       valueNotifierHome.incrementNotifier();
+    }else if (val == 'logout'){
+      navigateLogout();
     }
   }
 
@@ -380,10 +387,13 @@ class _WalletPageState extends State<WalletPage> {
                                                 _isLoading = true;
                                               });
 
-                                              await getWalletHistoryPage(
+                                             var val =  await getWalletHistoryPage(
                                                   (walletPages['current_page'] +
                                                           1)
                                                       .toString());
+                                            if(val == 'logout'){
+                                              navigateLogout();
+                                            }
 
                                               setState(() {
                                                 _isLoading = false;
@@ -1233,6 +1243,8 @@ class _WalletPageState extends State<WalletPage> {
                                                           getWallet();
                                                           showToast();
                                                         });
+                                                      }else if(result == 'logout'){
+                                                        navigateLogout();
                                                       } else {
                                                         setState(() {
                                                           error = true;

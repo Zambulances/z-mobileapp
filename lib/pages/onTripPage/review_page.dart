@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class Review extends StatefulWidget {
   const Review({Key? key}) : super(key: key);
@@ -33,6 +34,10 @@ class _ReviewState extends State<Review> {
         context,
         MaterialPageRoute(builder: (context) => const Maps()),
         (route) => false);
+  }
+
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
   }
 
   @override
@@ -200,6 +205,8 @@ class _ReviewState extends State<Review> {
                                 if (result == true) {
                                   _loading = false;
                                   navigate();
+                                }else if(result == 'logout'){
+                                  navigateLogout();
                                 } else {
                                   setState(() {
                                     _loading = false;

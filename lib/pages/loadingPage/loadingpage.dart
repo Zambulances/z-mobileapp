@@ -1,23 +1,25 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:tagyourtaxi_driver/pages/language/languages.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/docs_onprocess.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/upload_docs.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/pages/language/languages.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/pages/vehicleInformations/docs_onprocess.dart';
+import 'package:tagxi_driver/pages/vehicleInformations/upload_docs.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import '../../styles/styles.dart';
 import '../../functions/functions.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:geolocator/geolocator.dart' as geolocator;
 import '../login/signupmethod.dart';
+import 'package:permission_handler/permission_handler.dart' as perm;
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -26,12 +28,17 @@ class LoadingPage extends StatefulWidget {
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
+dynamic package;
+
 class _LoadingPageState extends State<LoadingPage> {
   String dot = '.';
   bool updateAvailable = false;
-  dynamic _package;
+  late geolocator.LocationPermission permission;
+  String state = '';
+  int gettingPerm = 0;
   dynamic _version;
   bool _isLoading = false;
+  bool _error = false;
 
   var demopage = TextEditingController();
 
@@ -64,18 +71,51 @@ class _LoadingPageState extends State<LoadingPage> {
     super.initState();
   }
 
+  getData()async{
+    for (var i = 0; _error == true; i++){
+      await getLanguageDone();
+    }
+  }
+
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-    AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
-      if (!isAllowed) {
-        // This is just a basic example. For real apps, you must show some
-        // friendly dialog box before call the request method.
-        // This is very important to not harm the user experience
-        await AwesomeNotifications().requestPermissionToSendNotifications();
-        AwesomeNotifications().setGlobalBadgeCounter(0);
+    permission = await geolocator.GeolocatorPlatform.instance.checkPermission();
+    serviceEnabled =
+        await geolocator.GeolocatorPlatform.instance.isLocationServiceEnabled();
+
+    if ((permission == geolocator.LocationPermission.denied ||
+        permission == geolocator.LocationPermission.deniedForever ||
+        serviceEnabled == false) && gettingPerm == 0) {
+      gettingPerm++;
+await Future.delayed(const Duration(seconds: 5),(){});
+      if (gettingPerm > 1) {
+        locationAllowed = false;
+        state = '3';
+      } else {
+        state = '2';
       }
-    });
-    _package = await PackageInfo.fromPlatform();
+      
+      setState(() {
+        _isLoading = false;
+      });
+    } else  {
+      if(permission == geolocator.LocationPermission.whileInUse ||
+        permission == geolocator.LocationPermission.always){
+          if (center == null) {
+          var locs = await geolocator.Geolocator.getLastKnownPosition();
+          if (locs != null) {
+            center = LatLng(locs.latitude, locs.longitude);
+          } else {
+           var loc = await geolocator.Geolocator.getCurrentPosition(
+                desiredAccuracy: geolocator.LocationAccuracy.low);
+            center = LatLng(double.parse(loc.latitude.toString()),
+                double.parse(loc.longitude.toString()));
+          }
+        }
+        positionStreamData();
+      }
+    package = await PackageInfo.fromPlatform();
+    try{
     if (platform == TargetPlatform.android) {
       _version = await FirebaseDatabase.instance
           .ref()
@@ -87,29 +127,30 @@ class _LoadingPageState extends State<LoadingPage> {
           .child('driver_ios_version')
           .get();
     }
+    _error = false;
     if (_version.value != null) {
       var version = _version.value.toString().split('.');
-      var package = _package.version.toString().split('.');
+      var packages = package.version.toString().split('.');
 
-      for (var i = 0; i < version.length || i < package.length; i++) {
-        if (i < version.length && i < package.length) {
-          if (int.parse(package[i]) < int.parse(version[i])) {
+      for (var i = 0; i < version.length || i < packages.length; i++) {
+        if (i < version.length && i < packages.length) {
+          if (int.parse(packages[i]) < int.parse(version[i])) {
             setState(() {
               updateAvailable = true;
             });
             break;
-          } else if (int.parse(package[i]) > int.parse(version[i])) {
+          } else if (int.parse(packages[i]) > int.parse(version[i])) {
             setState(() {
               updateAvailable = false;
             });
             break;
           }
-        } else if (i >= version.length && i < package.length) {
+        } else if (i >= version.length && i < packages.length) {
           setState(() {
             updateAvailable = false;
           });
           break;
-        } else if (i < version.length && i >= package.length) {
+        } else if (i < version.length && i >= packages.length) {
           setState(() {
             updateAvailable = true;
           });
@@ -143,7 +184,50 @@ class _LoadingPageState extends State<LoadingPage> {
       } else {
         setState(() {});
       }
+    }else{
+setState(() {
+            _isLoading = false;
+          });
+    }}catch(e){
+  if(_error == false){
+  setState(() {
+    _error = true;
+  });
+  getData();
+  }
+  
+  
+
     }
+    }
+  }
+
+  getLocationPermission() async {
+    if (serviceEnabled == false) {
+      // await location.requestService();
+      await geolocator.Geolocator.getCurrentPosition(
+                desiredAccuracy: geolocator.LocationAccuracy.low);
+    }
+    if (await geolocator.GeolocatorPlatform.instance
+        .isLocationServiceEnabled()) {
+      if (permission == geolocator.LocationPermission.denied ||
+          permission == geolocator.LocationPermission.deniedForever) {
+        if (permission != geolocator.LocationPermission.deniedForever &&
+            await geolocator.GeolocatorPlatform.instance
+                .isLocationServiceEnabled()) {
+          if (platform == TargetPlatform.android) {
+            await perm.Permission.location.request();
+            await perm.Permission.locationAlways.request();
+          } else {
+            await [perm.Permission.location].request();
+          }
+        }
+      }
+    }
+    setState(() {
+      _isLoading = true;
+    });
+   getLanguageDone();
   }
 
   @override
@@ -154,7 +238,189 @@ class _LoadingPageState extends State<LoadingPage> {
       child: Scaffold(
         body: Stack(
           children: [
-            Container(
+           (state == '2')
+                                              ? Container(
+                                                  height: media.height * 1,
+                                                  width: media.width * 1,
+                                                  alignment: Alignment.center,
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      SizedBox(
+                                                        height:
+                                                            media.height * 0.31,
+                                                        child: Image.asset(
+                                                          'assets/images/allow_location_permission.png',
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height:
+                                                            media.width * 0.05,
+                                                      ),
+                                                      Text(
+                                                       (choosenLanguage != '') ?   languages[
+                                                                choosenLanguage]
+                                                            [
+                                                            'text_trustedtaxi'] : 'Most Trusted Taxi Booking App',
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                                fontSize: media
+                                                                        .width *
+                                                                    eighteen,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600),
+                                                      ),
+                                                      SizedBox(
+                                                        height:
+                                                            media.width * 0.025,
+                                                      ),
+                                                      Text(
+                                                       (choosenLanguage != '') ?   languages[
+                                                                choosenLanguage]
+                                                            [
+                                                            'text_allowpermission1'] : 'To enjoy your ride experience',
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                          fontSize:
+                                                              media.width *
+                                                                  fourteen,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                       (choosenLanguage != '') ?   languages[
+                                                                choosenLanguage]
+                                                            [
+                                                            'text_allowpermission2'] : 'Please allow us the following permissions',
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                          fontSize:
+                                                              media.width *
+                                                                  fourteen,
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height:
+                                                            media.width * 0.05,
+                                                      ),
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.fromLTRB(
+                                                                media.width *
+                                                                    0.05,
+                                                                0,
+                                                                media.width *
+                                                                    0.05,
+                                                                0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            SizedBox(
+                                                                width: media
+                                                                        .width *
+                                                                    0.075,
+                                                                child: const Icon(
+                                                                    Icons
+                                                                        .location_on_outlined)),
+                                                            SizedBox(
+                                                              width:
+                                                                  media.width *
+                                                                      0.025,
+                                                            ),
+                                                            SizedBox(
+                                                              width:
+                                                                  media.width *
+                                                                      0.8,
+                                                              child: Text(
+                                                               (choosenLanguage != '') ?   languages[
+                                                                        choosenLanguage]
+                                                                    [
+                                                                    'text_loc_permission'] : 'Allow Location all the time - To book a taxi',
+                                                                style: GoogleFonts.roboto(
+                                                                    fontSize: media
+                                                                            .width *
+                                                                        fourteen,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height:
+                                                            media.width * 0.02,
+                                                      ),
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.fromLTRB(
+                                                                media.width *
+                                                                    0.05,
+                                                                0,
+                                                                media.width *
+                                                                    0.05,
+                                                                0),
+                                                        child: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            SizedBox(
+                                                                width: media
+                                                                        .width *
+                                                                    0.075,
+                                                                child: const Icon(
+                                                                    Icons
+                                                                        .location_on_outlined)),
+                                                            SizedBox(
+                                                              width:
+                                                                  media.width *
+                                                                      0.025,
+                                                            ),
+                                                            SizedBox(
+                                                              width:
+                                                                  media.width *
+                                                                      0.8,
+                                                              child: Text(
+                                                              (choosenLanguage != '') ?    languages[
+                                                                        choosenLanguage]
+                                                                    [
+                                                                    'text_background_permission'] : 'Enable Background Location - collects location data to enable users to identify nearby drivers even when the app is closed or not in use',
+                                                                style: GoogleFonts.roboto(
+                                                                    fontSize: media
+                                                                            .width *
+                                                                        fourteen,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  media.width *
+                                                                      0.05),
+                                                          child: Button(
+                                                              onTap: () async {
+                                                                getLocationPermission();
+                                                              },
+                                                              text: (choosenLanguage != '') ?  languages[
+                                                                      choosenLanguage]
+                                                                  [
+                                                                  'text_continue'] : 'Continue'))
+                                                    ],
+                                                  ),
+                                                )
+                                              :  Container(
               height: media.height * 1,
               width: media.width * 1,
               decoration: BoxDecoration(
@@ -213,13 +479,13 @@ class _LoadingPageState extends State<LoadingPage> {
                                         if (platform ==
                                             TargetPlatform.android) {
                                           openBrowser(
-                                              'https://play.google.com/store/apps/details?id=${_package.packageName}');
+                                              'https://play.google.com/store/apps/details?id=${package.packageName}');
                                         } else {
                                           setState(() {
                                             _isLoading = true;
                                           });
                                           var response = await http.get(Uri.parse(
-                                              'http://itunes.apple.com/lookup?bundleId=${_package.packageName}'));
+                                              'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
                                           if (response.statusCode == 200) {
                                             openBrowser(jsonDecode(
                                                     response.body)['results'][0]

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class RazorPayPage extends StatefulWidget {
@@ -17,7 +18,7 @@ class RazorPayPage extends StatefulWidget {
 }
 
 class _RazorPayPageState extends State<RazorPayPage> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _success = false;
   bool _failed = false;
   dynamic _razorpay;
@@ -32,6 +33,10 @@ class _RazorPayPageState extends State<RazorPayPage> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
     var val = await addMoneyRazorpay(addMoney, response.paymentId);
     if (val == 'success') {
@@ -39,6 +44,8 @@ class _RazorPayPageState extends State<RazorPayPage> {
         _success = true;
         _isLoading = false;
       });
+    }else if(val == 'logout'){
+      navigateLogout();
     } else {
       setState(() {
         _failed = true;
@@ -58,9 +65,7 @@ class _RazorPayPageState extends State<RazorPayPage> {
 
 //payment gateway code
   payMoney() async {
-    setState(() {
-      _isLoading = true;
-    });
+    
     var options = {
       'key': (walletBalance['razor_pay_environment'] == 'test')
           ? walletBalance['razorpay_test_api_key']

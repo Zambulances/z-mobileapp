@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
 // import 'package:flutter_paystack/flutter_paystack.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class PayStackPage extends StatefulWidget {
@@ -18,7 +19,7 @@ class PayStackPage extends StatefulWidget {
 }
 
 class _PayStackPageState extends State<PayStackPage> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _success = false;
   String _error = '';
   // final plugin = PaystackPlugin();
@@ -28,21 +29,26 @@ class _PayStackPageState extends State<PayStackPage> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 // //payment gateway code
   payMoney() async {
-    setState(() {
-      _isLoading = true;
-      _error = '';
-    });
+    
     var val = await getPaystackPayment(addMoney * 100);
 //
-    if (val != 'success') {
+    if(val == 'logout'){
+      navigateLogout();
+    }
+    else if (val != 'success') {
       _error = val.toString();
     }
-
+  if(mounted){
     setState(() {
       _isLoading = false;
     });
+  }
   }
 
   @override

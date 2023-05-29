@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
 
 import '../../functions/functions.dart';
 import '../../styles/styles.dart';
@@ -25,23 +26,35 @@ class _AssignDriverState extends State<AssignDriver> {
 
   @override
   void initState() {
-    setState(() {
+    
       getdriverdata();
       isassigndriver = '';
-    });
+  
     super.initState();
   }
 
-  getdriverdata() async {
-    await fleetDriverDetails(fleetid: widget.fleetid, isassigndriver: true);
-    await getVehicleInfo();
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
 
+  getdriverdata() async {
+    var val = await fleetDriverDetails(fleetid: widget.fleetid, isassigndriver: true);
+    if(val == 'logout'){
+      navigateLogout();
+    }else{
+    var val = await getVehicleInfo();
+    if(val == 'logout'){
+      navigateLogout();
+    }
+    }
+if(mounted){
     setState(() {
       // if (_isLoadingassigndriver == true) {
       //   showToast();
       // }
       _isLoadingassigndriver = false;
     });
+}
   }
 
   showToast() {
@@ -635,9 +648,14 @@ class _AssignDriverState extends State<AssignDriver> {
                               // await fleetDriverDetails(
                               //     fleetid: widget.fleetid,
                               //     isassigndriver: true);
-                              await getVehicleInfo();
+                             var val = await getVehicleInfo();
+                             if(val == 'logout'){
+                               navigateLogout();
+                             }
 
                               pop();
+                            }else if(result == 'logout'){
+                              navigateLogout();
                             } else {
                               setState(() {
                                 _isLoadingassigndriver = false;

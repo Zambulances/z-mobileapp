@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/historydetails.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/historydetails.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
 
 class History extends StatefulWidget {
   const History({Key? key}) : super(key: key);
@@ -28,17 +29,25 @@ class _HistoryState extends State<History> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //get history
   _getHistory() async {
     setState(() {
       myHistoryPage.clear();
       myHistory.clear();
     });
-    await getHistory('is_later=1');
-
+    var val = await getHistory('is_later=1');
+  if(mounted){
+    if(val == 'logout'){
+      navigateLogout();
+    }
     setState(() {
       _isLoading = false;
     });
+  }
   }
 
   @override
@@ -107,7 +116,10 @@ class _HistoryState extends State<History> {
                             _isLoading = true;
                           });
 
-                          await getHistory('is_later=1');
+                          var val = await getHistory('is_later=1');
+                          if(val == 'logout'){
+                            navigateLogout();
+                          }
                           setState(() {
                             _isLoading = false;
                           });
@@ -140,7 +152,10 @@ class _HistoryState extends State<History> {
                             _isLoading = true;
                           });
 
-                          await getHistory('is_completed=1');
+                          var val = await getHistory('is_completed=1');
+                          if(val == 'logout'){
+                            navigateLogout();
+                          }
                           setState(() {
                             _isLoading = false;
                           });
@@ -173,7 +188,10 @@ class _HistoryState extends State<History> {
                             _isLoading = true;
                           });
 
-                          await getHistory('is_cancelled=1');
+                          var val = await getHistory('is_cancelled=1');
+                          if(val == 'logout'){
+                            navigateLogout();
+                          }
                           setState(() {
                             _isLoading = false;
                           });
@@ -1192,18 +1210,22 @@ class _HistoryState extends State<History> {
                                   myHistoryPage['pagination']['total_pages'])
                               ? InkWell(
                                   onTap: () async {
+                                    dynamic val;
                                     setState(() {
                                       _isLoading = true;
                                     });
                                     if (_showHistory == 0) {
-                                      await getHistoryPages(
+                                      val = await getHistoryPages(
                                           'is_later=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                     } else if (_showHistory == 1) {
-                                      await getHistoryPages(
+                                      val = await getHistoryPages(
                                           'is_completed=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                     } else if (_showHistory == 2) {
-                                      await getHistoryPages(
+                                      val = await getHistoryPages(
                                           'is_cancelled=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
+                                    }
+                                    if(val == 'logout'){
+                                      navigateLogout();
                                     }
                                     setState(() {
                                       _isLoading = false;

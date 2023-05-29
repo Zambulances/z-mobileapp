@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/withdraw.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/withdraw.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class BankDetails extends StatefulWidget {
   const BankDetails({Key? key}) : super(key: key);
@@ -32,11 +33,20 @@ class _BankDetailsState extends State<BankDetails> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
   getBankDetails() async {
-    await getBankInfo();
+    var val = await getBankInfo();
+    if(mounted){
+    if(val == 'logout'){
+      navigateLogout();
+    }
     setState(() {
       _isLoading = false;
     });
+    }
   }
 
 //showing error
@@ -299,6 +309,8 @@ class _BankDetailsState extends State<BankDetails> {
                                         if (addBank == true) {
                                           pop();
                                         }
+                                      }else if(val == 'logout'){
+                                        navigateLogout();
                                       } else {
                                         setState(() {
                                           _showError = val.toString();

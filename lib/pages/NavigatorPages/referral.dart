@@ -1,13 +1,19 @@
+import 'dart:convert';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/loadingPage/loadingpage.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:http/http.dart' as http;
 
 class ReferralPage extends StatefulWidget {
   const ReferralPage({Key? key}) : super(key: key);
@@ -28,10 +34,47 @@ class _ReferralPageState extends State<ReferralPage> {
 
 //get referral code
   _getReferral() async {
-    await getReferral();
+    var val = await getReferral();
+    if(val == 'logout'){
+      navigateLogout();
+    }
+    await getUrls();
     setState(() {
       _isLoading = false;
     });
+  }
+
+  String androidPackage = '';
+  String iOSBundle = '';
+  var android = '';
+  var ios = '';
+
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
+  getUrls() async {
+    var packageName = await FirebaseDatabase.instance
+        .ref()
+        .child('driver_package_name')
+        .get();
+    if (packageName.value != null) {
+      androidPackage = packageName.value.toString();
+      android = 'https://play.google.com/store/apps/details?id=$androidPackage';
+    }
+    var bundleId =
+        await FirebaseDatabase.instance.ref().child('driver_bundle_id').get();
+    if (bundleId.value != null) {
+      iOSBundle = bundleId.value.toString();
+      var response = await http
+          .get(Uri.parse('http://itunes.apple.com/lookup?bundleId=$iOSBundle'));
+      if (response.statusCode == 200) {
+        if (jsonDecode(response.body)['results'].isNotEmpty) {
+          ios = jsonDecode(response.body)['results'][0]['trackViewUrl'];
+        }
+        // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
+      }
+    }
   }
 
 //show toast for copy
@@ -169,14 +212,57 @@ class _ReferralPageState extends State<ReferralPage> {
                                     bottom: media.width * 0.05),
                                 child: Button(
                                     onTap: () async {
-                                      await Share.share(
-                                          languages[choosenLanguage]
-                                                  ['text_invitation_1'] +
-                                              ' ' +
-                                              myReferralCode['refferal_code'] +
-                                              ' ' +
-                                              languages[choosenLanguage]
-                                                  ['text_invitation_2']);
+                                      if (android != '' && ios != '') {
+                                        await Share.share(
+                                            // ignore: prefer_interpolation_to_compose_strings
+                                            languages[choosenLanguage]
+                                                        ['text_invitation_1']
+                                                    .toString()
+                                                    .replaceAll(
+                                                        '55', package.appName) +
+                                                ' ' +
+                                                myReferralCode[
+                                                    'refferal_code'] +
+                                                ' ' +
+                                                languages[choosenLanguage]
+                                                    ['text_invitation_2'] +
+                                                ' \n\nandroid\n\n' +
+                                                android +
+                                                '\n\niOS\n\n' +
+                                                ios);
+                                      } else if (android != '') {
+                                        await Share.share(
+                                            // ignore: prefer_interpolation_to_compose_strings
+                                            languages[choosenLanguage]
+                                                        ['text_invitation_1']
+                                                    .toString()
+                                                    .replaceAll(
+                                                        '55', package.appName) +
+                                                ' ' +
+                                                myReferralCode[
+                                                    'refferal_code'] +
+                                                ' ' +
+                                                languages[choosenLanguage]
+                                                    ['text_invitation_2'] +
+                                                ' \n\nandroid\n\n' +
+                                                android);
+                                      } else if (ios != '') {
+                                        await Share.share(
+                                            // ignore: prefer_interpolation_to_compose_strings
+                                            languages[choosenLanguage]
+                                                        ['text_invitation_1']
+                                                    .toString()
+                                                    .replaceAll(
+                                                        '55', package.appName) +
+                                                ' ' +
+                                                myReferralCode[
+                                                    'refferal_code'] +
+                                                ' ' +
+                                                languages[choosenLanguage]
+                                                    ['text_invitation_2'] +
+                                                '\n\niOS\n\n' +
+                                                ios);
+                                      }
                                     },
                                     text: languages[choosenLanguage]
                                         ['text_invite']),
@@ -189,12 +275,19 @@ class _ReferralPageState extends State<ReferralPage> {
                       ? Positioned(
                           top: 0,
                           child: NoInternet(
-                            onTap: () {
+                            onTap: () async{
                               setState(() {
                                 internetTrue();
                                 _isLoading = true;
-                                getReferral();
                               });
+                                var val = await getReferral();
+                                if(val == 'logout'){
+                                  navigateLogout();
+                                }
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              
                             },
                           ))
                       : Container(),

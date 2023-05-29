@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/managevehicles.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/referral_code.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/managevehicles.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/pages/vehicleInformations/referral_code.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class VehicleColor extends StatefulWidget {
   const VehicleColor({Key? key}) : super(key: key);
@@ -31,6 +32,10 @@ class _VehicleColorState extends State<VehicleColor> {
         context,
         MaterialPageRoute(builder: (context) => const Referral()),
         (route) => false);
+  }
+
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
   }
 
   navigateMap() {
@@ -183,6 +188,8 @@ class _VehicleColorState extends State<VehicleColor> {
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
+                                  }else if(reg == 'logout'){
+                                    navigateLogout();
                                   } else {
                                     setState(() {
                                       uploadError = reg.toString();
@@ -196,6 +203,8 @@ class _VehicleColorState extends State<VehicleColor> {
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
+                                  }else if(update == 'logout'){
+                                    navigateLogout();
                                   }
                                   setState(() {
                                     _isLoading = false;

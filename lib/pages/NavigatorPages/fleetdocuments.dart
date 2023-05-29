@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -30,12 +31,20 @@ class _FleetDocumentsState extends State<FleetDocuments> {
     getdata();
     super.initState();
   }
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
 
   getdata() async {
-    await getFleetDocumentsNeeded(widget.fleetid);
+    var val = await getFleetDocumentsNeeded(widget.fleetid);
+    if(mounted){
+      if(val == 'logout'){
+        navigateLogout();
+      }
     setState(() {
       _loaded = true;
     });
+    }
   }
 
   @override
@@ -443,6 +452,10 @@ class _UploadDocsState extends State<UploadDocs> {
     Navigator.pop(context);
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //get camera permission
   getCameraPermission() async {
     var status = await Permission.camera.status;
@@ -628,10 +641,12 @@ class _UploadDocsState extends State<UploadDocs> {
                                             .toString()] !=
                                     null)
                                 ? languages[choosenLanguage][
-                                    fleetdocumentsNeeded[fleetdocsId]
+                                    fleetdocumentsNeeded[fleetchoosenDocs]
                                             ['identify_number_locale_key']
                                         .toString()]
-                                : 'Identification Number',
+                                : fleetdocumentsNeeded[fleetchoosenDocs]
+                                        ['identify_number_locale_key']
+                                    .toString(),
                             textController: idNumber,
                             onTap: (val) {
                               setState(() {
@@ -674,8 +689,13 @@ class _UploadDocsState extends State<UploadDocs> {
                             });
                             var result = await uploadFleetDocs(widget.fleetid);
                             if (result == 'success') {
-                              await getFleetDocumentsNeeded(widget.fleetid);
+                              var val = await getFleetDocumentsNeeded(widget.fleetid);
+                              if(val == 'logout'){
+                                navigateLogout();
+                              }
                               pop();
+                            }else if(result == 'logout'){
+                              navigateLogout();
                             } else {
                               setState(() {
                                 _error = languages[choosenLanguage]

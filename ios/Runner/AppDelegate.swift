@@ -10,14 +10,20 @@ import Firebase
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     FirebaseApp.configure()
-    GMSServices.provideAPIKey("AIzaSyB4KttZBNVcz6Q52gaIgKK8-3h2Qk8RA3Y")
+    GMSServices.provideAPIKey("AIzaSyD9g7Gv0okelx6Ntjh2mV7fK0QRSI0gRSI")
     GeneratedPluginRegistrant.register(with: self)
+    if #available(iOS 10.0, *) { 
+     UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+    }
+    application.registerForRemoteNotifications()
    UIApplication.shared.beginReceivingRemoteControlEvents()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
 }
+
+    
+    
 var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0);
     override func applicationDidEnterBackground(_ application: UIApplication) {
-        
                 bgTask = application.beginBackgroundTask()
     }
     override func applicationDidBecomeActive(_ application: UIApplication) {

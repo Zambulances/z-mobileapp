@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/functions/notifications.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/functions/notifications.dart';
 import 'pages/loadingPage/loadingpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -10,6 +10,14 @@ void main() async {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   await Firebase.initializeApp();
+  //   FlutterError.onError = (errorDetails) {
+  //     FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  //   };
+  //   //Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  //   PlatformDispatcher.instance.onError = (error, stack) {
+  //     FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+  //     return true;
+  //   };
   checkInternetConnection();
   initMessaging();
   currentPositionUpdate();

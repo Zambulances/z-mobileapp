@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/otp_page.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/otp_page.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/translation/translation.dart';
 import '../../styles/styles.dart';
 import '../../functions/functions.dart';
 import '../../widgets/widgets.dart';
@@ -39,12 +39,8 @@ class _LoginState extends State<Login> {
   }
 
   countryCode() async {
-    var result = await getCountryCode();
-    if (result == 'success') {
-      setState(() {
-        _isLoading = false;
-      });
-    } else {
+    await getCountryCode();
+    if(mounted){
       setState(() {
         _isLoading = false;
       });

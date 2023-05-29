@@ -55,7 +55,7 @@ class _ButtonState extends State<Button> {
             style: GoogleFonts.roboto(
                 fontSize: media.width * sixteen,
                 color:
-                    (widget.textcolor != null) ? widget.textcolor : buttonText,
+                    (widget.textcolor != null) ? widget.textcolor : page,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1),
           ),
@@ -105,7 +105,7 @@ class _InputFieldState extends State<InputField> {
           counterText: '',
           focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-            color: inputfocusedUnderline,
+            color:(widget.color == null) ?  inputfocusedUnderline : widget.color,
             width: 1.2,
             style: BorderStyle.solid,
           )),
@@ -125,7 +125,7 @@ class _InputFieldState extends State<InputField> {
           hintText: widget.text,
           hintStyle: GoogleFonts.roboto(
             fontSize: media.width * sixteen,
-            color: hintColor,
+            color: textColor.withOpacity(0.6),
           )),
       onChanged: widget.onTap,
     );

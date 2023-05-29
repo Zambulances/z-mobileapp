@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
 
 class Faq extends StatefulWidget {
   const Faq({Key? key}) : super(key: key);
@@ -24,15 +25,23 @@ class _FaqState extends State<Faq> {
     faqDatas();
     super.initState();
   }
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
 
 //get faq datas
 
   faqDatas() async {
-    await getFaqData(center.latitude, center.longitude);
+    var val = await getFaqData(center.latitude, center.longitude);
+    if(mounted){
+      if(val == 'logout'){
+        navigateLogout();
+      }
     setState(() {
       _isLoading = false;
       _faqCompleted = true;
     });
+    }
   }
 
   @override

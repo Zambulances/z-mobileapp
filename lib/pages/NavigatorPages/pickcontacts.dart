@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class PickContact extends StatefulWidget {
   const PickContact({Key? key}) : super(key: key);
@@ -30,6 +31,11 @@ class _PickContactState extends State<PickContact> {
     super.initState();
   }
 
+  navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
+
 //get contact permission
   getContactPermission() async {
     var status = await Permission.contacts.status;
@@ -44,9 +50,11 @@ class _PickContactState extends State<PickContact> {
     if (contacts.isEmpty) {
       var permission = await getContactPermission();
       if (permission == PermissionStatus.granted) {
+        if(mounted){
         setState(() {
           _isLoading = true;
         });
+        }
 
         Iterable<Contact> contactsList = await ContactsService.getContacts();
         setState(() {
@@ -62,9 +70,11 @@ class _PickContactState extends State<PickContact> {
           _isLoading = false;
         });
       } else {
+        if(mounted){
         setState(() {
           _contactDenied = true;
         });
+        }
       }
     }
   }
@@ -263,6 +273,8 @@ class _PickContactState extends State<PickContact> {
                                     await addSos(pickedName, pickedNumber);
                                 if (val == 'success') {
                                   pop();
+                                }else if(val == 'logout'){
+                                  navigateLogout();
                                 }
                                 setState(() {
                                   _isLoading = false;

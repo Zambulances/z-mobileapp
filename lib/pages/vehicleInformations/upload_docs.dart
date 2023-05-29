@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/pages/vehicleInformations/docs_onprocess.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/pages/vehicleInformations/docs_onprocess.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -35,12 +36,21 @@ class _DocsState extends State<Docs> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //get needed docs
   getDocs() async {
-    await getDocumentsNeeded();
+    var val = await getDocumentsNeeded();
+    if(mounted){
+      if(val == 'logout'){
+        navigateLogout();
+      }
     setState(() {
       _loaded = true;
     });
+    }
   }
 
   //navigate
@@ -365,7 +375,10 @@ class _DocsState extends State<Docs> {
                                       _loaded = false;
                                     });
 
-                                    await getUserDetails();
+                                    var val = await getUserDetails();
+                                    if(val == 'logout'){
+                                      navigateLogout();
+                                    }
                                     pop();
                                   } else {
                                     Navigator.pushAndRemoveUntil(
@@ -429,6 +442,10 @@ class _UploadDocsState extends State<UploadDocs> {
   bool _loading = false;
   String _error = '';
   String _permission = '';
+
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
 
 //date picker
   _datePicker() async {
@@ -637,10 +654,11 @@ class _UploadDocsState extends State<UploadDocs> {
                                         .toString()] !=
                                     null)
                                 ? languages[choosenLanguage][
-                                    documentsNeeded[docsId]
+                                    documentsNeeded[choosenDocs]
                                             ['identify_number_locale_key']
                                         .toString()]
-                                : 'Identification Number',
+                                : documentsNeeded[choosenDocs]
+                                    ['identify_number_locale_key'],
                             textController: idNumber,
                             onTap: (val) {
                               setState(() {
@@ -686,9 +704,13 @@ class _UploadDocsState extends State<UploadDocs> {
                             var result = await uploadDocs();
 
                             if (result == 'success') {
-                              await getDocumentsNeeded();
-
+                              var val =await getDocumentsNeeded();
+                              if(val == 'logout'){
+                                navigateLogout();
+                              }
                               pop();
+                            }else if(result == 'logout'){
+                              navigateLogout();
                             } else {
                               setState(() {
                                 _error = result.toString();

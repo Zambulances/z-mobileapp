@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
 import '../../functions/functions.dart';
 import '../../styles/styles.dart';
 import '../../translation/translation.dart';
@@ -33,15 +34,15 @@ class _AddDriverState extends State<AddDriver> {
     Navigator.pop(context);
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
   countryCode() async {
-    var result = await getCountryCode();
-    if (result == 'success') {
+    await getCountryCode();
+    if (mounted) {
       setState(() {
         _loading = false;
-      });
-    } else {
-      setState(() {
-        _loading = true;
       });
     }
   }
@@ -50,8 +51,10 @@ class _AddDriverState extends State<AddDriver> {
     setState(() {
       _showToast = true;
     });
-    await fleetDriverDetails();
-
+    var val = await fleetDriverDetails();
+    if(val == 'logout'){
+      navigateLogout();
+    }
     Future.delayed(const Duration(seconds: 1), () async {
       setState(() {
         _showToast = false;
@@ -107,7 +110,10 @@ class _AddDriverState extends State<AddDriver> {
                               Positioned(
                                   child: InkWell(
                                       onTap: () async {
-                                        await fleetDriverDetails();
+                                       var val = await fleetDriverDetails();
+                                       if(val == 'logout'){
+                                         navigateLogout();
+                                       }
 
                                         pop();
                                       },
@@ -482,7 +488,9 @@ class _AddDriverState extends State<AddDriver> {
                                             if (val == 'true') {
                                               showToast();
                                               serviceLocations.clear();
-                                            } else {
+                                            } else if(val == 'logout'){
+                                              navigateLogout();
+                                            }else {
                                               error = val.toString();
                                             }
                                           } else {

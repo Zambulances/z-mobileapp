@@ -2,13 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'package:cashfree_pg/cashfree_pg.dart';
 
 class CashFreePage extends StatefulWidget {
@@ -19,7 +20,7 @@ class CashFreePage extends StatefulWidget {
 }
 
 class _CashFreePageState extends State<CashFreePage> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _success = false;
   bool _failed = false;
 
@@ -29,11 +30,13 @@ class _CashFreePageState extends State<CashFreePage> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //payment gateway code
   payMoney() async {
-    setState(() {
-      _isLoading = true;
-    });
+    
     var getToken =
         await getCfToken(addMoney.toString(), walletBalance['currency_code']);
     if (getToken == 'success') {
@@ -57,10 +60,14 @@ class _CashFreePageState extends State<CashFreePage> {
         if (cfSuccessList['txStatus'] == 'SUCCESS') {
           var verify = await cashFreePaymentSuccess();
           if (verify == 'success') {
+            if(mounted){
             setState(() {
               _success = true;
               _isLoading = false;
             });
+            }
+          }else if(verify == 'logout'){
+            navigateLogout();
           } else {
             setState(() {
               _failed = true;
@@ -73,15 +80,18 @@ class _CashFreePageState extends State<CashFreePage> {
           });
         }
       });
+    }else if(getToken == 'logout'){
+      navigateLogout();
     } else {
       setState(() {
         _failed = true;
       });
     }
-
+  if(mounted){
     setState(() {
       _isLoading = false;
     });
+  }
   }
 
   @override

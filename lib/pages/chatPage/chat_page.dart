@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -21,8 +22,19 @@ class _ChatPageState extends State<ChatPage> {
   bool _sendingMessage = false;
   @override
   void initState() {
-    getCurrentMessages();
+    getMessage();
     super.initState();
+  }
+
+  navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
+  getMessage()async{
+    var val = await getCurrentMessages();
+    if(val == 'logout'){
+      navigateLogout();
+    }
   }
 
   @override
@@ -217,7 +229,10 @@ class _ChatPageState extends State<ChatPage> {
                                       });
 
                                       //api call for send message
-                                      await sendMessage(chatText.text);
+                                      var val = await sendMessage(chatText.text);
+                                      if(val == 'logout'){
+                                        navigateLogout();
+                                      }
                                       chatText.clear();
                                       setState(() {
                                         _sendingMessage = false;

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 import 'package:flutterwave_standard/flutterwave.dart';
 
 class FlutterWavePage extends StatefulWidget {
@@ -17,7 +18,7 @@ class FlutterWavePage extends StatefulWidget {
 }
 
 class _FlutterWavePageState extends State<FlutterWavePage> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _success = false;
   bool _failed = false;
   dynamic flutterwave;
@@ -32,11 +33,13 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
     Navigator.pop(context, true);
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //payment gateway code
   payMoney() async {
-    setState(() {
-      _isLoading = true;
-    });
+    
 
     final style = FlutterwaveStyle(
       appBarText: "Flutterwave Checkout",
@@ -78,10 +81,11 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
         isTestMode: (walletBalance['flutterwave_environment'] == 'test')
             ? true
             : false);
-
+if(mounted){
     setState(() {
       _isLoading = false;
     });
+}
   }
 
   @override
@@ -163,6 +167,8 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
                                         _success = true;
                                         _isLoading = false;
                                       });
+                                    }else if(val == 'logout'){
+                                      navigateLogout();
                                     }
                                   } else {
                                     setState(() {

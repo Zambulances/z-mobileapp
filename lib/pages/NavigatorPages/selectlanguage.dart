@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class SelectLanguage extends StatefulWidget {
   const SelectLanguage({Key? key}) : super(key: key);
@@ -20,6 +21,10 @@ class _SelectLanguageState extends State<SelectLanguage> {
   //navigate pop
   pop() {
     Navigator.pop(context, true);
+  }
+
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
   }
 
   @override
@@ -164,7 +169,10 @@ class _SelectLanguageState extends State<SelectLanguage> {
                           setState(() {
                             _isLoading = true;
                           });
-                          await getlangid();
+                          var val = await getlangid();
+                          if(val == 'logout'){
+                            navigateLogout();
+                          }
                           pref.setString(
                               'languageDirection', languageDirection);
                           pref.setString('choosenLanguage', _choosenLanguage);

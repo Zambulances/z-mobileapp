@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/pickcontacts.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/pickcontacts.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class Sos extends StatefulWidget {
   const Sos({Key? key}) : super(key: key);
@@ -19,6 +20,10 @@ class _SosState extends State<Sos> {
   bool _isDeleting = false;
   bool _isLoading = false;
   String _deleteId = '';
+
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -308,6 +313,8 @@ class _SosState extends State<Sos> {
                                                 setState(() {
                                                   _isDeleting = false;
                                                 });
+                                              }else if(val == 'logout'){
+                                                navigateLogout();
                                               }
                                               setState(() {
                                                 _isLoading = false;

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/adddriver.dart';
+import 'package:tagxi_driver/pages/NavigatorPages/adddriver.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
 
 import '../../functions/functions.dart';
 import '../../styles/styles.dart';
@@ -21,17 +22,24 @@ class _DriverListState extends State<DriverList> {
 
   @override
   void initState() {
-    setState(() {
       getdriverdata();
-    });
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
   getdriverdata() async {
-    await fleetDriverDetails();
+    var val = await fleetDriverDetails();
+    if(val == 'logout'){
+      navigateLogout();
+    }
+    if(mounted){
     setState(() {
       _isLoading = false;
     });
+    }
   }
 
   driverdeletepopup(media, driverid) {
@@ -67,7 +75,10 @@ class _DriverListState extends State<DriverList> {
                     setState(() {
                       _isLoading = true;
                     });
-                    await deletefleetdriver(driverid);
+                    var val = await deletefleetdriver(driverid);
+                    if(val == 'logout'){
+                      navigateLogout();
+                    }
 
                     getdriverdata();
                   },

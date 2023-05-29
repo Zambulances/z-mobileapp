@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxi_driver/functions/functions.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/pages/login/signupmethod.dart';
+import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/widgets/widgets.dart';
 
 class MakeComplaint extends StatefulWidget {
   final int fromPage;
@@ -31,24 +32,36 @@ class _MakeComplaintState extends State<MakeComplaint> {
     super.initState();
   }
 
+    navigateLogout(){
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  }
+
 //get complaint data
   getData() async {
+    dynamic val;
+    if(mounted){
     setState(() {
       complaintType = 0;
       complaintDesc = '';
       generalComplaintList = [];
     });
-    if (widget.fromPage == 1) {
-      await getGeneralComplaint("request");
-    } else {
-      await getGeneralComplaint("general");
     }
+    if (widget.fromPage == 1) {
+      val =await getGeneralComplaint("request");
+    } else {
+     val = await getGeneralComplaint("general");
+    }
+    if(mounted){
+      if(val == 'logout'){
+        navigateLogout();
+      }
     setState(() {
       _isLoading = false;
       if (generalComplaintList.isNotEmpty) {
         complaintType = 0;
       }
     });
+    }
   }
 
   @override
@@ -193,10 +206,12 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                     } else {
                                       result = await makeGeneralComplaint();
                                     }
+                                    if(result == 'logout'){
+                                      navigateLogout();
+                                    }else if(result == 'success'){
+                                      _success = true;
+                                    }
                                     setState(() {
-                                      if (result == 'success') {
-                                        _success = true;
-                                      }
 
                                       _isLoading = false;
                                     });

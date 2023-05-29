@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translation/translation.dart';
+import 'package:tagxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxi_driver/translation/translation.dart';
 import '../../functions/functions.dart';
 import '../../widgets/widgets.dart';
 import '../login/signupmethod.dart';
@@ -166,7 +166,7 @@ class _LanguagesState extends State<Languages> {
                             setState(() {
                               _isLoading = true;
                             });
-                            await getlangid();
+                            // await getlangid();
                             //saving language settings in local
                             pref.setString(
                                 'languageDirection', languageDirection);
