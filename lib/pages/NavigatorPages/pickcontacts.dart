@@ -31,10 +31,12 @@ class _PickContactState extends State<PickContact> {
     super.initState();
   }
 
-  navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
-
 
 //get contact permission
   getContactPermission() async {
@@ -50,10 +52,10 @@ class _PickContactState extends State<PickContact> {
     if (contacts.isEmpty) {
       var permission = await getContactPermission();
       if (permission == PermissionStatus.granted) {
-        if(mounted){
-        setState(() {
-          _isLoading = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = true;
+          });
         }
 
         Iterable<Contact> contactsList = await ContactsService.getContacts();
@@ -70,10 +72,10 @@ class _PickContactState extends State<PickContact> {
           _isLoading = false;
         });
       } else {
-        if(mounted){
-        setState(() {
-          _contactDenied = true;
-        });
+        if (mounted) {
+          setState(() {
+            _contactDenied = true;
+          });
         }
       }
     }
@@ -132,7 +134,10 @@ class _PickContactState extends State<PickContact> {
                               onTap: () {
                                 Navigator.pop(context, true);
                               },
-                              child: const Icon(Icons.arrow_back)),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: textColor,
+                              )),
                           InkWell(
                               onTap: () {
                                 setState(() {
@@ -140,7 +145,8 @@ class _PickContactState extends State<PickContact> {
                                 });
                                 getContact();
                               },
-                              child: const Icon(Icons.replay_outlined)),
+                              child: Icon(Icons.replay_outlined,
+                                  color: textColor)),
                         ],
                       ))
                     ],
@@ -229,8 +235,11 @@ class _PickContactState extends State<PickContact> {
                                                   decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
-                                                          color: const Color(
-                                                              0xff222222),
+                                                          color: (isDarkTheme ==
+                                                                  true)
+                                                              ? textColor
+                                                              : const Color(
+                                                                  0xff222222),
                                                           width: 1.2)),
                                                   alignment: Alignment.center,
                                                   child: (pickedName ==
@@ -240,11 +249,13 @@ class _PickContactState extends State<PickContact> {
                                                               0.03,
                                                           width: media.width *
                                                               0.03,
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                  color: Color(
+                                                          decoration: BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: (isDarkTheme ==
+                                                                      true)
+                                                                  ? textColor
+                                                                  : const Color(
                                                                       0xff222222)),
                                                         )
                                                       : Container(),
@@ -273,7 +284,7 @@ class _PickContactState extends State<PickContact> {
                                     await addSos(pickedName, pickedNumber);
                                 if (val == 'success') {
                                   pop();
-                                }else if(val == 'logout'){
+                                } else if (val == 'logout') {
                                   navigateLogout();
                                 }
                                 setState(() {
@@ -292,7 +303,9 @@ class _PickContactState extends State<PickContact> {
                       child: Container(
                       height: media.height * 1,
                       width: media.width * 1,
-                      color: Colors.transparent.withOpacity(0.6),
+                      color: (isDarkTheme == true)
+                          ? textColor.withOpacity(0.2)
+                          : Colors.transparent.withOpacity(0.6),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -313,7 +326,8 @@ class _PickContactState extends State<PickContact> {
                                     width: media.width * 0.1,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle, color: page),
-                                    child: const Icon(Icons.cancel_outlined),
+                                    child: Icon(Icons.cancel_outlined,
+                                        color: textColor),
                                   ),
                                 ),
                               ],

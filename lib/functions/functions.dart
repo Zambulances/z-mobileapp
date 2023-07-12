@@ -7,16 +7,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:location/location.dart';
-// import 'package:location/location.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tagxi_driver/pages/NavigatorPages/editprofile.dart';
 import 'package:tagxi_driver/pages/NavigatorPages/history.dart';
 import 'package:tagxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagxi_driver/pages/loadingPage/loadingpage.dart';
 import 'package:tagxi_driver/pages/login/get_started.dart';
 import 'package:tagxi_driver/pages/login/login.dart';
+import 'package:tagxi_driver/pages/login/otp_page.dart';
 import 'package:tagxi_driver/pages/onTripPage/droplocation.dart';
 import 'package:tagxi_driver/pages/onTripPage/invoice.dart';
-// import 'package:tagxi_driver/pages/login/ownerregister.dart';
 import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagxi_driver/pages/onTripPage/review_page.dart';
 import 'package:tagxi_driver/pages/vehicleInformations/referral_code.dart';
@@ -32,6 +31,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:tagxi_driver/pages/vehicleInformations/vehicle_year.dart';
+import 'package:tagxi_driver/styles/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../pages/NavigatorPages/fleetdocuments.dart';
 import '../pages/login/ownerregister.dart';
@@ -67,15 +67,48 @@ getDetailsOfDevice() async {
     internet = true;
   }
   try {
-    rootBundle.loadString('assets/map_style.json').then((value) {
-      mapStyle = value;
-    });
-    
     pref = await SharedPreferences.getInstance();
+    if (pref.containsKey('isDarkTheme')) {
+      isDarkTheme = pref.getBool('isDarkTheme');
+    }
+    await darktheme();
   } catch (e) {
     if (e is SocketException) {
       internet = false;
     }
+  }
+}
+
+darktheme() async {
+  if (isDarkTheme == true) {
+    page = Colors.black;
+    textColor = Colors.white;
+    buttonColor = Colors.white;
+    loaderColor = Colors.white;
+  } else {
+    page = Colors.white;
+    textColor = Colors.black;
+    buttonColor = const Color(0xffFCB13D);
+    loaderColor = const Color(0xffFCB13D);
+  }
+  if (isDarkTheme == true) {
+    rootBundle.loadString('assets/dark.json').then((value) {
+      mapStyle = value;
+    });
+  } else {
+    rootBundle.loadString('assets/map_style.json').then((value) {
+      mapStyle = value;
+    });
+  }
+
+  if (isDarkTheme == true) {
+    await rootBundle.loadString('assets/dark.json').then((value) {
+      mapStyle = value;
+    });
+  } else {
+    await rootBundle.loadString('assets/map_style.json').then((value) {
+      mapStyle = value;
+    });
   }
 }
 
@@ -119,7 +152,6 @@ validateEmail(email) async {
   return result;
 }
 
-
 //lang
 getlangid() async {
   dynamic result;
@@ -137,7 +169,7 @@ getlangid() async {
         debugPrint(response.body);
         result = 'failed';
       }
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -257,7 +289,7 @@ uploadDocs() async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(respon.statusCode == 401){
+    } else if (respon.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(respon.body);
@@ -309,7 +341,7 @@ uploadFleetDocs(fleetid) async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(request.statusCode == 401){
+    } else if (request.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(respon.body);
@@ -388,6 +420,51 @@ phoneAuth(String phone) async {
   }
 }
 
+//Email
+sendOTPtoEmail(String email) async {
+  dynamic result;
+  try {
+    var response = await http
+        .post(Uri.parse('${url}api/v1/send-mail-otp'), body: {'email': email});
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success'] == true) {
+        result = 'success';
+      } else {
+        debugPrint(response.body);
+        result = 'failed';
+      }
+    }
+    return result;
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+}
+
+dynamic otpval;
+
+emailVerify(String email, otpNumber) async {
+  try {
+    var response = await http.post(Uri.parse('${url}api/v1/validate-email-otp'),
+        body: {"email": email, "otp": otpNumber});
+    if (response.statusCode == 200) {
+      if (jsonDecode(response.body)['success'] == true) {
+        // print(otpval);
+        otpval = 'success';
+      } else {
+        debugPrint(response.body);
+        otpval = 'failed';
+      }
+    }
+    return otpval;
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+}
+
 //get local bearer token
 String lastNotification = '';
 
@@ -404,7 +481,7 @@ getLocalData() async {
     if (pref.containsKey('lastNotification')) {
       lastNotification = pref.getString('lastNotification');
     }
-    if(pref.containsKey('autoAddress')){
+    if (pref.containsKey('autoAddress')) {
       var val = pref.getString('autoAddress');
       storedAutoAddress = jsonDecode(val);
     }
@@ -420,7 +497,8 @@ getLocalData() async {
 
             var responce = await getUserDetails();
             if (responce == true) {
-              if (userDetails['role'] != 'owner' && platform == TargetPlatform.android) {
+              if (userDetails['role'] != 'owner' &&
+                  platform == TargetPlatform.android) {
                 platforms.invokeMethod('login');
               }
               result = '3';
@@ -556,6 +634,7 @@ getVehicleModel() async {
 //register driver
 
 List<BearerClass> bearerToken = <BearerClass>[];
+List<String> vehicletypelist = [];
 
 registerDriver() async {
   bearerToken.clear();
@@ -579,6 +658,7 @@ registerDriver() async {
       "country": countries[phcode]['code'],
       "service_location_id": myServiceId.toString(),
       "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
+      "vehicle_types": jsonEncode(vehicletypelist),
       "vehicle_type": myVehicleId.toString(),
       "car_make": vehicleMakeId.toString(),
       "car_model": vehicleModelId.toString(),
@@ -586,13 +666,16 @@ registerDriver() async {
       "car_number": vehicleNumber,
       "vehicle_year": modelYear,
       'lang': choosenLanguage,
+      'email_confirmed': (value == 0) ? 'true' : 'false'
     });
+
     var request = await response.send();
     var respon = await http.Response.fromStream(request);
 
     if (request.statusCode == 200) {
       var jsonVal = jsonDecode(respon.body);
-      if (ischeckownerordriver == 'driver' && platform == TargetPlatform.android) {
+      if (ischeckownerordriver == 'driver' &&
+          platform == TargetPlatform.android) {
         platforms.invokeMethod('login');
       }
       bearerToken.add(BearerClass(
@@ -640,7 +723,7 @@ addDriver() async {
           'Authorization': 'Bearer ${bearerToken[0].token}',
         },
         body: jsonEncode({
-          "vehicle_type": myVehicleId,
+          "vehicle_type": vehicletypelist[0].toString(),
           "car_make": vehicleMakeId,
           "car_model": vehicleModelId,
           "car_color": vehicleColor,
@@ -657,7 +740,7 @@ addDriver() async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -688,7 +771,7 @@ getnotificationHistory() async {
       notificationHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -722,7 +805,7 @@ getNotificationPages(id) async {
       notificationHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -751,7 +834,7 @@ deleteNotification(id) async {
     if (response.statusCode == 200) {
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -786,9 +869,9 @@ sharewalletfun({mobile, role, amount}) async {
         debugPrint(response.body);
         result = 'failed';
       }
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
@@ -819,7 +902,7 @@ registerOwner() async {
     response.fields.addAll({
       "name": ownerName,
       "mobile": phnumber,
-      "email": ownerEmail,
+      "email": email,
       "address": companyAddress,
       "postal_code": postalCode,
       "city": city,
@@ -830,7 +913,9 @@ registerOwner() async {
       "service_location_id": ownerServiceLocation,
       "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
       'lang': choosenLanguage,
+      'email_confirmed': (value == 0) ? 'false' : 'true'
     });
+
     var request = await response.send();
     var respon = await http.Response.fromStream(request);
 
@@ -891,7 +976,7 @@ fleetDriverDetails({fleetid, bool? isassigndriver}) async {
     if (response.statusCode == 200) {
       fleetdriverList = jsonDecode(response.body)['data'];
       result = true;
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -933,9 +1018,9 @@ assignDriver(driverid, fleet) async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
@@ -975,9 +1060,9 @@ fleetDriver(Map<String, dynamic> map) async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
@@ -1009,9 +1094,9 @@ updateReferral() async {
         debugPrint(response.body);
         result = 'false';
       }
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = 'false';
     }
@@ -1042,7 +1127,7 @@ getDocumentsNeeded() async {
       enableDocumentSubmit = jsonDecode(response.body)['enable_submit_button'];
 
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -1075,7 +1160,7 @@ getFleetDocumentsNeeded(fleetid) async {
       enablefleetDocumentSubmit =
           jsonDecode(response.body)['enable_submit_button'];
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -1113,7 +1198,9 @@ verifyUser(String number) async {
   try {
     var response = await http.post(
         Uri.parse('${url}api/v1/driver/validate-mobile-for-login'),
-        body: {"mobile": number, "role": ischeckownerordriver});
+        body: (value == 0)
+            ? {"mobile": number, "role": ischeckownerordriver}
+            : {"email": email, "role": ischeckownerordriver});
 
     if (response.statusCode == 200) {
       val = jsonDecode(response.body)['success'];
@@ -1152,15 +1239,26 @@ driverLogin() async {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          "mobile": phnumber,
-          'device_token': fcm,
-          "login_by": (platform == TargetPlatform.android) ? 'android' : 'ios',
-          "role": ischeckownerordriver,
-        }));
+        body: (value == 0)
+            ? jsonEncode({
+                "mobile": phnumber,
+                'device_token': fcm,
+                "login_by":
+                    (platform == TargetPlatform.android) ? 'android' : 'ios',
+                "role": ischeckownerordriver,
+              })
+            : jsonEncode({
+                "email": email,
+                "otp": otpNumber,
+                'device_token': fcm,
+                "login_by":
+                    (platform == TargetPlatform.android) ? 'android' : 'ios',
+                "role": ischeckownerordriver,
+              }));
     if (response.statusCode == 200) {
       var jsonVal = jsonDecode(response.body);
-      if (ischeckownerordriver == 'driver' && platform == TargetPlatform.android) {
+      if (ischeckownerordriver == 'driver' &&
+          platform == TargetPlatform.android) {
         platforms.invokeMethod('login');
       }
       bearerToken.add(BearerClass(
@@ -1201,6 +1299,56 @@ driverLogin() async {
 Map<String, dynamic> userDetails = {};
 bool isBackground = false;
 bool screenOn = false;
+dynamic _version;
+bool updateAvailable = false;
+dynamic package;
+
+checkVersion() async {
+  package = await PackageInfo.fromPlatform();
+  try {
+    if (platform == TargetPlatform.android) {
+      _version = await FirebaseDatabase.instance
+          .ref()
+          .child('driver_android_version')
+          .get();
+    } else {
+      _version = await FirebaseDatabase.instance
+          .ref()
+          .child('driver_ios_version')
+          .get();
+    }
+    if (_version.value != null) {
+      var version = _version.value.toString().split('.');
+      var packages = package.version.toString().split('.');
+
+      for (var i = 0; i < version.length || i < packages.length; i++) {
+        if (i < version.length && i < packages.length) {
+          if (int.parse(packages[i]) < int.parse(version[i])) {
+            updateAvailable = true;
+            valueNotifierHome.incrementNotifier();
+
+            break;
+          } else if (int.parse(packages[i]) > int.parse(version[i])) {
+            updateAvailable = false;
+
+            break;
+          }
+        } else if (i >= version.length && i < packages.length) {
+          updateAvailable = false;
+
+          break;
+        } else if (i < version.length && i >= packages.length) {
+          updateAvailable = true;
+          valueNotifierHome.incrementNotifier();
+
+          break;
+        }
+      }
+    }
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+}
 
 //user current state
 getUserDetails() async {
@@ -1280,19 +1428,19 @@ getUserDetails() async {
         if (userDetails['active'] == false) {
           isActive = 'false';
         } else {
-          if(screenOn == false){ 
-            if(platform == TargetPlatform.android){
-          platforms.invokeMethod('keepon');
+          if (screenOn == false) {
+            if (platform == TargetPlatform.android) {
+              platforms.invokeMethod('keepon');
             }
-          screenOn = true;
+            screenOn = true;
           }
           isActive = 'true';
         }
       }
       result = true;
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = false;
     }
@@ -1362,26 +1510,26 @@ driverStatus() async {
       userDetails = jsonDecode(response.body)['data'];
       result = true;
       if (userDetails['active'] == false) {
-        if(screenOn == true){
-          if(platform == TargetPlatform.android){
-          platforms.invokeMethod('keepoff');
-          screenOn = false;
+        if (screenOn == true) {
+          if (platform == TargetPlatform.android) {
+            platforms.invokeMethod('keepoff');
+            screenOn = false;
           }
         }
         userInactive();
       } else {
-        if(screenOn == false){
-          if(platform == TargetPlatform.android){
-          platforms.invokeMethod('keepon');
-          screenOn = true;
+        if (screenOn == false) {
+          if (platform == TargetPlatform.android) {
+            platforms.invokeMethod('keepon');
+            screenOn = true;
           }
         }
         userActive();
       }
       valueNotifierHome.incrementNotifier();
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = false;
     }
@@ -1451,6 +1599,7 @@ currentPositionUpdate() async {
             'vehicle_type_name': userDetails['car_make_name'],
             'vehicle_type_icon': userDetails['vehicle_type_icon_for'],
             'vehicle_type': userDetails['vehicle_type_id'],
+            'vehicle_types': userDetails['vehicle_types'],
             'ownerid': userDetails['owner_id'],
             'service_location_id': userDetails['service_location_id']
           });
@@ -1480,7 +1629,7 @@ currentPositionUpdate() async {
       } else if (serviceEnabled == false && userDetails['active'] == true) {
         await driverStatus();
         await geolocs.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocs.LocationAccuracy.low);
+            desiredAccuracy: geolocs.LocationAccuracy.low);
         // await location.requestService();
       }
       if (userDetails['role'] == 'driver') {
@@ -1706,7 +1855,7 @@ etaRequest() async {
       etaDetails = jsonDecode(response.body)['data'];
       result = true;
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -1780,7 +1929,7 @@ createRequest(name, phone) async {
       await getUserDetails();
       result = 'success';
       // valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -1817,11 +1966,14 @@ getAutoAddress(input, sessionToken, lat, lng) async {
       addAutoFill = jsonDecode(response.body)['predictions'];
       // ignore: avoid_function_literals_in_foreach_calls
       addAutoFill.forEach((element) {
-        
-        if(storedAutoAddress.where((e) => e['description'].toString().toLowerCase() == element['description'].toString().toLowerCase()).isEmpty){
-        storedAutoAddress.add(element);
+        if (storedAutoAddress
+            .where((e) =>
+                e['description'].toString().toLowerCase() ==
+                element['description'].toString().toLowerCase())
+            .isEmpty) {
+          storedAutoAddress.add(element);
         }
-       });
+      });
       pref.setString('autoAddress', jsonEncode(storedAutoAddress).toString());
       valueNotifierHome.incrementNotifier();
     } else {
@@ -1878,10 +2030,9 @@ requestAccept() async {
         FirebaseDatabase.instance
             .ref('request-meta/${driverReq['id']}')
             .remove();
-        
       }
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       result = 'failed';
@@ -1912,10 +2063,13 @@ requestReject() async {
 
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['message'] == 'success') {
-        if (audioPlayers.state != PlayerState.STOPPED && audioPlayers.state != PlayerState.COMPLETED && audioPlayers.state != PlayerState.PAUSED && audioPlayers.playerId.isNotEmpty) {
-        audioPlayers.stop();
-        audioPlayers.dispose();
-         }
+        if (audioPlayers.state != PlayerState.STOPPED &&
+            audioPlayers.state != PlayerState.COMPLETED &&
+            audioPlayers.state != PlayerState.PAUSED &&
+            audioPlayers.playerId.isNotEmpty) {
+          audioPlayers.stop();
+          audioPlayers.dispose();
+        }
         driverReject = true;
         await getUserDetails();
         duration = 0;
@@ -1923,7 +2077,7 @@ requestReject() async {
         valueNotifierHome.incrementNotifier();
       }
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       result = 'failed';
@@ -1961,7 +2115,10 @@ sound() async {
         driverReq['accepted_at'] == null &&
         duration <= 0.0) {
       timer.cancel();
-      if (audioPlayers.state != PlayerState.STOPPED && audioPlayers.state != PlayerState.COMPLETED && audioPlayers.state != PlayerState.PAUSED && audioPlayers.playerId.isNotEmpty) {
+      if (audioPlayers.state != PlayerState.STOPPED &&
+          audioPlayers.state != PlayerState.COMPLETED &&
+          audioPlayers.state != PlayerState.PAUSED &&
+          audioPlayers.playerId.isNotEmpty) {
         audioPlayers.stop();
         audioPlayers.dispose();
       }
@@ -1970,7 +2127,10 @@ sound() async {
       });
       duration = 0;
     } else {
-      if (audioPlayers.state != PlayerState.STOPPED && audioPlayers.state != PlayerState.COMPLETED && audioPlayers.state != PlayerState.PAUSED && audioPlayers.playerId.isNotEmpty) {
+      if (audioPlayers.state != PlayerState.STOPPED &&
+          audioPlayers.state != PlayerState.COMPLETED &&
+          audioPlayers.state != PlayerState.PAUSED &&
+          audioPlayers.playerId.isNotEmpty) {
         audioPlayers.stop();
         audioPlayers.dispose();
       }
@@ -2003,7 +2163,7 @@ driverArrived() async {
         valueNotifierHome.incrementNotifier();
       }
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       result = 'failed';
@@ -2025,7 +2185,9 @@ openMap(lat, lng) async {
     String googleUrl =
         'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
 
+    // ignore: deprecated_member_use
     if (await canLaunch(googleUrl)) {
+      // ignore: deprecated_member_use
       await launch(googleUrl);
     }
   } catch (e) {
@@ -2059,7 +2221,7 @@ tripStart() async {
           .child(driverReq['id'])
           .update({'trip_start': '1'});
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2097,7 +2259,7 @@ tripStartDispatcher() async {
           .child(driverReq['id'])
           .update({'trip_start': '1'});
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2208,7 +2370,7 @@ endTrip() async {
       waitingTime = null;
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       result = 'failed';
@@ -2243,7 +2405,6 @@ getPolylines() async {
     var response = await http.get(Uri.parse(
         'https://maps.googleapis.com/maps/api/directions/json?origin=$pickLat%2C$pickLng&destination=$dropLat%2C$dropLng&avoid=ferries|indoor&transit_mode=bus&mode=driving&key=$mapkey'));
     if (response.statusCode == 200) {
-      // printWrapped(response.body);
       steps =
           jsonDecode(response.body)['routes'][0]['overview_polyline']['points'];
       dropDistance =
@@ -2418,7 +2579,7 @@ userRating() async {
           .update({'is_available': true});
       await getUserDetails();
       result = true;
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2437,7 +2598,9 @@ userRating() async {
 
 makingPhoneCall(phnumber) async {
   var mobileCall = 'tel:$phnumber';
+  // ignore: deprecated_member_use
   if (await canLaunch(mobileCall)) {
+    // ignore: deprecated_member_use
     await launch(mobileCall);
   } else {
     throw 'Could not launch $mobileCall';
@@ -2471,7 +2634,7 @@ cancelRequestDriver(reason) async {
       } else {
         result = false;
       }
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2504,7 +2667,7 @@ getSosData(lat, lng) async {
       sosData = jsonDecode(response.body)['data'];
       valueNotifierHome.incrementNotifier();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       result = 'failed';
@@ -2544,7 +2707,7 @@ getCurrentMessages() async {
         valueNotifierHome.incrementNotifier();
       }
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       result = 'failed';
@@ -2574,8 +2737,8 @@ sendMessage(chat) async {
       FirebaseDatabase.instance
           .ref('requests/${driverReq['id']}')
           .update({'message_by_driver': chatList.length});
-     result = 'success';
-    }else if(response.statusCode == 401){
+      result = 'success';
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       result = 'failed';
@@ -2621,7 +2784,7 @@ cancelReason(reason) async {
     if (response.statusCode == 200) {
       cancelReasonsList = jsonDecode(response.body)['data'];
       result = true;
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2639,7 +2802,9 @@ cancelReason(reason) async {
 //open url in browser
 
 openBrowser(browseUrl) async {
+  // ignore: deprecated_member_use
   if (await canLaunch(browseUrl)) {
+    // ignore: deprecated_member_use
     await launch(browseUrl);
   } else {
     throw 'Could not launch $browseUrl';
@@ -2663,7 +2828,7 @@ getVehicleInfo() async {
     if (response.statusCode == 200) {
       result = 'success';
       vehicledata = jsonDecode(response.body)['data'];
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(vehicledata.toString());
@@ -2694,7 +2859,7 @@ deletefleetdriver(driverid) async {
           .child('drivers/$driverid')
           .update({'is_deleted': 1});
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(vehicledata.toString());
@@ -2724,6 +2889,7 @@ updateVehicle() async {
               "service_location_id": myServiceId,
               "is_company_driver": false,
               "vehicle_type": myVehicleId,
+              "vehicle_types": jsonEncode(vehicletypelist),
               "car_make": vehicleMakeId,
               "car_model": vehicleModelId,
               "car_color": vehicleColor,
@@ -2734,9 +2900,9 @@ updateVehicle() async {
     if (response.statusCode == 200) {
       await getUserDetails();
       result = 'success';
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = 'failure';
     }
@@ -2781,7 +2947,7 @@ updateProfile(name, email) async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(request.statusCode == 401){
+    } else if (request.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(val);
@@ -2822,7 +2988,7 @@ updateProfileWithoutImage(name, email) async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(request.statusCode == 401){
+    } else if (request.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(respon.body);
@@ -2851,7 +3017,7 @@ getFaqData(lat, lng) async {
       faqData = jsonDecode(response.body)['data'];
       valueNotifierHome.incrementNotifier();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2881,9 +3047,9 @@ getHistory(id) async {
       myHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = 'failure';
       valueNotifierHome.incrementNotifier();
@@ -2914,7 +3080,7 @@ getHistoryPages(id) async {
       myHistoryPage = jsonDecode(response.body)['meta'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2958,7 +3124,7 @@ getWalletHistory() async {
       walletPages = walletBalance['wallet_history']['meta']['pagination'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -2991,7 +3157,7 @@ getWalletHistoryPage(page) async {
       walletPages = walletBalance['wallet_history']['meta']['pagination'];
       result = 'success';
       valueNotifierHome.incrementNotifier();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3023,7 +3189,7 @@ addSos(name, number) async {
     if (response.statusCode == 200) {
       await getUserDetails();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3051,7 +3217,7 @@ deleteSos(id) async {
     if (response.statusCode == 200) {
       await getUserDetails();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3081,9 +3247,9 @@ getReferral() async {
       result = 'success';
       myReferralCode = jsonDecode(response.body)['data'];
       valueNotifierHome.incrementNotifier();
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = 'failure';
     }
@@ -3113,9 +3279,9 @@ getStripePayment(money) async {
     if (response.statusCode == 200) {
       results = 'success';
       stripeToken = jsonDecode(response.body)['data'];
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       results = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       results = 'failure';
     }
@@ -3145,9 +3311,9 @@ addMoneyStripe(amount, nonce) async {
       await getWalletHistory();
       await getUserDetails();
       result = 'success';
-    } else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
-    }else {
+    } else {
       debugPrint(response.body);
       result = 'failure';
     }
@@ -3181,7 +3347,7 @@ getPaystackPayment(money) async {
         results = 'success';
         paystackCode = jsonDecode(response.body)['data'];
       }
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       results = 'logout';
     } else {
       debugPrint(response.body);
@@ -3212,7 +3378,7 @@ addMoneyPaystack(amount, nonce) async {
       await getUserDetails();
       paystackCode.clear();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3244,7 +3410,7 @@ addMoneyFlutterwave(amount, nonce) async {
       await getWalletHistory();
       await getUserDetails();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3276,7 +3442,7 @@ addMoneyRazorpay(amount, nonce) async {
       await getWalletHistory();
       await getUserDetails();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3290,8 +3456,6 @@ addMoneyRazorpay(amount, nonce) async {
   }
   return result;
 }
-
-
 
 //cashfree
 
@@ -3317,7 +3481,7 @@ getCfToken(money, currency) async {
         debugPrint(response.body);
         result = 'failure';
       }
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3362,7 +3526,7 @@ cashFreePaymentSuccess() async {
         debugPrint(response.body);
         result = 'failure';
       }
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3389,8 +3553,8 @@ userLogout() async {
       'Content-Type': 'application/json'
     });
     if (response.statusCode == 200) {
-      if(platform == TargetPlatform.android){
-      platforms.invokeMethod('logout');
+      if (platform == TargetPlatform.android) {
+        platforms.invokeMethod('logout');
       }
       // print(id);
       if (role != 'owner') {
@@ -3409,7 +3573,7 @@ userLogout() async {
       requestStreamEnd = null;
       pref.remove('Bearer');
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       pref.remove('Bearer');
       result = 'success';
     } else {
@@ -3468,7 +3632,7 @@ driverTodayEarning() async {
     if (response.statusCode == 200) {
       result = 'success';
       driverTodayEarnings = jsonDecode(response.body)['data'];
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3497,7 +3661,7 @@ driverWeeklyEarning() async {
       result = 'success';
       driverWeeklyEarnings = jsonDecode(response.body)['data'];
       weekDays = jsonDecode(response.body)['data']['week_days'];
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3525,7 +3689,7 @@ driverEarningReport(fromdate, todate) async {
     if (response.statusCode == 200) {
       driverReportEarnings = jsonDecode(response.body)['data'];
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3555,7 +3719,7 @@ requestWithdraw(amount) async {
     if (response.statusCode == 200) {
       await getWithdrawList();
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3592,7 +3756,7 @@ getWithdrawList() async {
       withDrawHistoryPages =
           jsonDecode(response.body)['withdrawal_history']['meta']['pagination'];
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3627,7 +3791,7 @@ getWithdrawListPages(page) async {
       withDrawHistoryPages =
           jsonDecode(response.body)['withdrawal_history']['meta']['pagination'];
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3659,7 +3823,7 @@ getBankInfo() async {
     if (response.statusCode == 200) {
       result = 'success';
       bankData = jsonDecode(response.body)['data'];
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3701,7 +3865,7 @@ addBankData(accName, accNo, bankCode, bankName) async {
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3752,7 +3916,7 @@ getGeneralComplaint(type) async {
     if (response.statusCode == 200) {
       generalComplaintList = jsonDecode(response.body)['data'];
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3782,7 +3946,7 @@ makeGeneralComplaint() async {
             }));
     if (response.statusCode == 200) {
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3813,7 +3977,7 @@ makeRequestComplaint() async {
             }));
     if (response.statusCode == 200) {
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -3983,7 +4147,7 @@ streamEnd(id) {
       .handleError((onError) {
     requestStreamEnd?.cancel();
   }).listen((event) {
-    if (driverReject != true && driverReq['accepted_at'] == null) {
+    if (driverReq['accepted_at'] == null) {
       // userReject = true;
       driverReq.clear();
       getUserDetails();
@@ -4087,7 +4251,7 @@ userDelete() async {
       pref.remove('Bearer');
 
       result = 'success';
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
@@ -4102,22 +4266,21 @@ userDelete() async {
   return result;
 }
 
-
-addHomeAddress(lat,lng,add)async{
+addHomeAddress(lat, lng, add) async {
   dynamic result;
-  try{
-    var response = await http
-        .post(Uri.parse('${url}api/v1/driver/add-my-route-address'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
-      'Content-Type': 'application/json'
-    },
-    body: jsonEncode({
-      'my_route_lat':lat,
-      'my_route_lng':lng,
-      'my_route_address':add
-    })
-    );
-    if(response.statusCode == 200){
+  try {
+    var response = await http.post(
+        Uri.parse('${url}api/v1/driver/add-my-route-address'),
+        headers: {
+          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode({
+          'my_route_lat': lat,
+          'my_route_lng': lng,
+          'my_route_address': add
+        }));
+    if (response.statusCode == 200) {
       await getUserDetails();
       result = 'success';
     } else if (response.statusCode == 422) {
@@ -4128,13 +4291,13 @@ addHomeAddress(lat,lng,add)async{
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
-  }catch(e){
+  } catch (e) {
     if (e is SocketException) {
       result = 'no internet';
       internet = false;
@@ -4143,22 +4306,21 @@ addHomeAddress(lat,lng,add)async{
   return result;
 }
 
-
-enableMyRouteBookings(lat,lng)async{
+enableMyRouteBookings(lat, lng) async {
   dynamic result;
-  try{
-    var response = await http
-        .post(Uri.parse('${url}api/v1/driver/enable-my-route-booking'), headers: {
-      'Authorization': 'Bearer ${bearerToken[0].token}',
-      'Content-Type': 'application/json'
-    },
-    body: jsonEncode({
-      'is_enable':(userDetails['enable_my_route_booking'] == 1) ? 0 : 1,
-      'current_lat':lat,
-      'current_lng':lng
-    })
-    );
-    if(response.statusCode == 200){
+  try {
+    var response = await http.post(
+        Uri.parse('${url}api/v1/driver/enable-my-route-booking'),
+        headers: {
+          'Authorization': 'Bearer ${bearerToken[0].token}',
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode({
+          'is_enable': (userDetails['enable_my_route_booking'] == 1) ? 0 : 1,
+          'current_lat': lat,
+          'current_lng': lng
+        }));
+    if (response.statusCode == 200) {
       await getUserDetails();
       result = 'success';
     } else if (response.statusCode == 422) {
@@ -4169,13 +4331,13 @@ enableMyRouteBookings(lat,lng)async{
           .replaceAll('[', '')
           .replaceAll(']', '')
           .toString();
-    }else if(response.statusCode == 401){
+    } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
       debugPrint(response.body);
       result = jsonDecode(response.body)['message'];
     }
-  }catch(e){
+  } catch (e) {
     if (e is SocketException) {
       result = 'no internet';
       internet = false;

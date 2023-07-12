@@ -34,10 +34,10 @@ class _VehicleTypeState extends State<VehicleType> {
     myVehicleId = '';
     myVehicleIconFor = '';
     await getvehicleType();
-    if(mounted){
-    setState(() {
-      _loaded = true;
-    });
+    if (mounted) {
+      setState(() {
+        _loaded = true;
+      });
     }
   }
 
@@ -63,7 +63,7 @@ class _VehicleTypeState extends State<VehicleType> {
                 children: [
                   Container(
                       width: media.width * 1,
-                      color: topBar,
+                      color: page,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -71,7 +71,7 @@ class _VehicleTypeState extends State<VehicleType> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              child: const Icon(Icons.arrow_back)),
+                              child: Icon(Icons.arrow_back, color: textColor)),
                         ],
                       )),
                   SizedBox(
@@ -103,9 +103,22 @@ class _VehicleTypeState extends State<VehicleType> {
                                       child: InkWell(
                                         onTap: () {
                                           setState(() {
-                                            myVehicleId = vehicleType[i]['id'];
-                                            myVehicleIconFor = vehicleType[i]
-                                                ['icon_types_for'];
+                                            if (vehicletypelist.contains(
+                                                vehicleType[i]['id']
+                                                    .toString())) {
+                                              vehicletypelist.remove(
+                                                  vehicleType[i]['id']
+                                                      .toString());
+                                            } else if (userDetails['role'] !=
+                                                'owner') {
+                                              vehicletypelist.add(vehicleType[i]
+                                                      ['id']
+                                                  .toString());
+                                            } else {
+                                              vehicletypelist = [
+                                                vehicleType[i]['id'].toString()
+                                              ];
+                                            }
                                           });
                                         },
                                         child: Row(
@@ -142,8 +155,8 @@ class _VehicleTypeState extends State<VehicleType> {
                                                 ),
                                               ],
                                             ),
-                                            (myVehicleId ==
-                                                    vehicleType[i]['id'])
+                                            (vehicletypelist.contains(
+                                                    vehicleType[i]['id']))
                                                 ? Icon(
                                                     Icons.done,
                                                     color: buttonColor,
@@ -158,11 +171,15 @@ class _VehicleTypeState extends State<VehicleType> {
                           ),
                         ))
                       : Container(),
-                  (myVehicleId != '')
+                  (vehicletypelist.isNotEmpty)
                       ? Container(
                           padding: const EdgeInsets.only(top: 10, bottom: 10),
                           child: Button(
                               onTap: () {
+                                myVehicleIconFor = vehicleType.firstWhere(
+                                    (element) =>
+                                        element['id'] ==
+                                        vehicletypelist[0])['icon_types_for'];
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(

@@ -36,10 +36,8 @@ class _NoInternetState extends State<NoInternet> {
               children: [
                 SizedBox(
                   width: media.width * 0.6,
-                  child: Image.asset(
-                    'assets/images/noInternet.png',
-                    fit: BoxFit.contain,
-                  ),
+                  child: Image.asset('assets/images/noInternet.png',
+                      fit: BoxFit.contain, color: textColor),
                 ),
                 SizedBox(
                   height: media.width * 0.05,
@@ -59,9 +57,12 @@ class _NoInternetState extends State<NoInternet> {
                 Text(
                   (languages.isNotEmpty && choosenLanguage != '')
                       ? languages[choosenLanguage]['text_nointernetdesc']
-                      : 'Please check your Internet connection, try enabling wifi or tey again later',
+                      : 'Please check your Internet connection, try enabling wifi or try again later',
                   style: GoogleFonts.roboto(
-                      fontSize: media.width * fourteen, color: hintColor),
+                      fontSize: media.width * fourteen,
+                      color: (isDarkTheme == true)
+                          ? textColor.withOpacity(0.4)
+                          : hintColor),
                 ),
                 SizedBox(
                   height: media.width * 0.05,

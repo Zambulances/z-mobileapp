@@ -170,7 +170,7 @@ class _ReviewState extends State<Review> {
                           height: media.height * 0.05,
                         ),
 
-                        //feedbact textfield
+                        //feedback textfield
                         Container(
                           padding: EdgeInsets.all(media.width * 0.05),
                           width: media.width * 0.9,
@@ -188,7 +188,10 @@ class _ReviewState extends State<Review> {
                             decoration: InputDecoration(
                                 hintText: languages[choosenLanguage]
                                     ['text_feedback'],
+                                hintStyle: GoogleFonts.roboto(
+                                    color: textColor.withOpacity(0.6)),    
                                 border: InputBorder.none),
+                            style: GoogleFonts.roboto(color: textColor),    
                           ),
                         ),
                         SizedBox(

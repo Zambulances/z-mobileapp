@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagxi_driver/functions/functions.dart';
 import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/loadingPage/loadingpage.dart';
 import 'package:tagxi_driver/pages/login/signupmethod.dart';
 import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagxi_driver/styles/styles.dart';
@@ -139,8 +138,8 @@ class _ReferralPageState extends State<ReferralPage> {
                                                   // print(myReferralCode);
                                                   Navigator.pop(context);
                                                 },
-                                                child: const Icon(
-                                                    Icons.arrow_back)))
+                                                child: Icon(
+                                                    Icons.arrow_back, color: textColor,)))
                                       ],
                                     ),
                                     SizedBox(
@@ -200,7 +199,7 @@ class _ReferralPageState extends State<ReferralPage> {
                                                   //show toast for copy
                                                   showToast();
                                                 },
-                                                child: const Icon(Icons.copy))
+                                                child: Icon(Icons.copy, color: textColor))
                                           ],
                                         ))
                                   ],
@@ -305,7 +304,9 @@ class _ReferralPageState extends State<ReferralPage> {
                             padding: EdgeInsets.all(media.width * 0.025),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.transparent.withOpacity(0.6)),
+                                color: (isDarkTheme == true)
+                                    ? textColor.withOpacity(0.4)
+                                    :  Colors.transparent.withOpacity(0.6)),
                             child: Text(
                               languages[choosenLanguage]['text_code_copied'],
                               style: GoogleFonts.roboto(

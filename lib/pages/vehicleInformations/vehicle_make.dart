@@ -63,7 +63,7 @@ class _VehicleMakeState extends State<VehicleMake> {
                   Container(
                       alignment: Alignment.bottomLeft,
                       width: media.width * 1,
-                      color: topBar,
+                      color: page,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -71,7 +71,7 @@ class _VehicleMakeState extends State<VehicleMake> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              child: const Icon(Icons.arrow_back)),
+                              child: Icon(Icons.arrow_back, color: textColor)),
                         ],
                       )),
                   SizedBox(

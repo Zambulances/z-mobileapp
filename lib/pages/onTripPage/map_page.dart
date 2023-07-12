@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:http/http.dart' as http;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:location/location.dart';
+// import 'package:location/location.dart';
 import 'package:tagxi_driver/functions/functions.dart';
 import 'package:tagxi_driver/functions/geohash.dart';
 import 'package:tagxi_driver/functions/notifications.dart';
@@ -65,7 +67,7 @@ class _MapsState extends State<Maps>
   bool _dropMarkerDone = false;
 
   late geolocator.LocationPermission permission;
-  Location location = Location();
+  // Location location = Location();
   String state = '';
   dynamic _controller;
   Animation<double>? _animation;
@@ -92,9 +94,8 @@ class _MapsState extends State<Maps>
   dynamic userLocationIcon;
   bool makeOnline = false;
   bool contactus = false;
-      GlobalKey iconKey = GlobalKey();
-    GlobalKey iconDropKey = GlobalKey();
-
+  GlobalKey iconKey = GlobalKey();
+  GlobalKey iconDropKey = GlobalKey();
 
   dynamic onrideicon;
   dynamic offlineicon;
@@ -102,6 +103,7 @@ class _MapsState extends State<Maps>
   dynamic onridebikeicon;
   dynamic offlinebikeicon;
   dynamic onlinebikeicon;
+  bool _isDarkTheme = false;
 
   final _mapMarkerSC = StreamController<List<Marker>>();
   StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
@@ -114,8 +116,13 @@ class _MapsState extends State<Maps>
     addressList.clear();
     show = true;
     filtericon = 0;
+    _isDarkTheme = isDarkTheme;
     getLocs();
     getonlineoffline();
+    // setState(() {
+    // vehicletypelist = userDetails['vehicle_types'];
+
+    // });
     super.initState();
   }
 
@@ -124,6 +131,11 @@ class _MapsState extends State<Maps>
       _controller = controller;
       _controller?.setMapStyle(mapStyle);
     });
+    if (driverReq.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 100), () {
+        addPickDropMarker();
+      });
+    }
     // if(driverReq.isNotEmpty){
     //   mapPadding = media.width*1;
     //   Future.delayed(Duration(seconds: 2),(){
@@ -136,8 +148,11 @@ class _MapsState extends State<Maps>
     // }
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getonlineoffline() async {
@@ -145,10 +160,10 @@ class _MapsState extends State<Maps>
         userDetails['owner_id'] != null &&
         userDetails['vehicle_type_id'] == null &&
         userDetails['active'] == true) {
-     var val = await driverStatus();
-     if(val == 'logout'){
-       navigateLogout();
-     }
+      var val = await driverStatus();
+      if (val == 'logout') {
+        navigateLogout();
+      }
     }
   }
 
@@ -208,6 +223,124 @@ class _MapsState extends State<Maps>
         .asUint8List();
   }
 
+  capturePng(GlobalKey iconKeys) async {
+    dynamic bitmap;
+
+    try {
+      RenderRepaintBoundary boundary =
+          iconKeys.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 2.0);
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      var pngBytes = byteData!.buffer.asUint8List();
+      bitmap = BitmapDescriptor.fromBytes(pngBytes);
+      // return pngBytes;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return bitmap;
+  }
+
+  // Future<BitmapDescriptor> getCustomIcon(GlobalKey iconKeys) async {
+
+  //   var imageData = await _capturePng(iconKeys);
+
+  //   return BitmapDescriptor.fromBytes(imageData);
+  // }
+
+  addDropMarker() async {
+    if (driverReq.isNotEmpty) {
+      var testIcon = await capturePng(iconDropKey);
+
+      if (testIcon != null && driverReq['drop_address'] != null) {
+        setState(() {
+          myMarkers.add(Marker(
+              markerId: const MarkerId('3'),
+              icon: testIcon,
+              position: LatLng(driverReq['drop_lat'], driverReq['drop_lng'])));
+        });
+        getLatLngBounds();
+        // valueNotifierHome.incrementNotifier();
+      }
+    }
+  }
+
+  addMarker() async {
+    polyline.clear();
+    if (driverReq.isNotEmpty) {
+      var testIcon = await capturePng(iconKey);
+      if (testIcon != null) {
+        setState(() {
+          myMarkers.add(Marker(
+              markerId: const MarkerId('2'),
+              icon: testIcon,
+              position: LatLng(driverReq['pick_lat'], driverReq['pick_lng'])));
+        });
+      }
+
+      // setState(() {
+
+      // });
+      //  }else{
+      //    print('it is not null');
+      //  }
+    }
+  }
+
+  //show toast for demo
+  addToast() {
+    setState(() {
+      _showToast = true;
+    });
+    Future.delayed(const Duration(seconds: 5), () {
+      setState(() {
+        _showToast = false;
+      });
+    });
+  }
+
+  addPickDropMarker() async {
+    addMarker();
+    if (driverReq['drop_address'] != null) {
+      //  await getPolylines();
+      addToast();
+      if (driverReq.isNotEmpty) {
+        if (addressList.isNotEmpty) {
+          polyline.add(
+            Polyline(
+                polylineId: const PolylineId('1'),
+                color: buttonColor,
+                points: [
+                  addressList
+                      .firstWhere((element) => element.id == 'pickup')
+                      .latlng,
+                  addressList
+                      .firstWhere((element) => element.id == 'pickup')
+                      .latlng
+                ],
+                geodesic: false,
+                width: 5),
+          );
+        } else {
+          polyline.add(Polyline(
+              polylineId: const PolylineId('1'),
+              color: buttonColor,
+              points: [
+                LatLng(driverReq['pick_lat'], driverReq['pick_lng']),
+                LatLng(driverReq['pick_lat'], driverReq['pick_lng'])
+              ],
+              geodesic: false,
+              width: 5));
+        }
+      }
+      //  Future.delayed(const Duration(seconds: 1),(){
+      addDropMarker();
+      //  });
+      _controller?.animateCamera(CameraUpdate.newLatLngZoom(
+          LatLng(driverReq['pick_lat'], driverReq['pick_lng']), 11.0));
+    }
+  }
+
 //getting permission and current location
   getLocs() async {
     permission = await geolocator.GeolocatorPlatform.instance.checkPermission();
@@ -222,10 +355,10 @@ class _MapsState extends State<Maps>
       if (gettingPerm > 1) {
         locationAllowed = false;
         if (userDetails['active'] == true) {
-         var val = await driverStatus();
-         if(val == 'logout'){
-           navigateLogout();
-         }
+          var val = await driverStatus();
+          if (val == 'logout') {
+            navigateLogout();
+          }
         }
         state = '3';
       } else {
@@ -304,7 +437,7 @@ class _MapsState extends State<Maps>
 
       if (makeOnline == true && userDetails['active'] == false) {
         var val = await driverStatus();
-        if(val == 'logout'){
+        if (val == 'logout') {
           navigateLogout();
         }
       }
@@ -322,31 +455,25 @@ class _MapsState extends State<Maps>
   getLocationService() async {
     // await location.requestService();
     await geolocator.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocator.LocationAccuracy.low);
+        desiredAccuracy: geolocator.LocationAccuracy.low);
     getLocs();
   }
 
   getLocationPermission() async {
-    if (serviceEnabled == false) {
-      // await location.requestService();
-      await geolocator.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocator.LocationAccuracy.low);
-    }
-    if (await geolocator.GeolocatorPlatform.instance
-        .isLocationServiceEnabled()) {
-      if (permission == geolocator.LocationPermission.denied ||
-          permission == geolocator.LocationPermission.deniedForever) {
-        if (permission != geolocator.LocationPermission.deniedForever &&
-            await geolocator.GeolocatorPlatform.instance
-                .isLocationServiceEnabled()) {
-          if (platform == TargetPlatform.android) {
-            await perm.Permission.location.request();
-            await perm.Permission.locationAlways.request();
-          } else {
-            await [perm.Permission.location].request();
-          }
-        }
+    if (permission == geolocator.LocationPermission.denied ||
+        permission == geolocator.LocationPermission.deniedForever) {
+      if (permission != geolocator.LocationPermission.deniedForever) {
+        await perm.Permission.location.request();
       }
+      if (serviceEnabled == false) {
+        await geolocator.Geolocator.getCurrentPosition(
+            desiredAccuracy: geolocator.LocationAccuracy.low);
+        // await location.requestService();
+      }
+    } else if (serviceEnabled == false) {
+      await geolocator.Geolocator.getCurrentPosition(
+          desiredAccuracy: geolocator.LocationAccuracy.low);
+      // await location.requestService();
     }
     setState(() {
       _isLoading = true;
@@ -386,119 +513,12 @@ class _MapsState extends State<Maps>
 
   @override
   Widget build(BuildContext context) {
-
     var media = MediaQuery.of(context).size;
-
-
-    capturePng(GlobalKey iconKeys) async {
-      dynamic bitmap;
-
-
-      try {
-        RenderRepaintBoundary boundary = iconKeys.currentContext!
-            .findRenderObject() as RenderRepaintBoundary;
-        ui.Image image = await boundary.toImage(pixelRatio: 2.0);
-        ByteData? byteData =
-            await image.toByteData(format: ui.ImageByteFormat.png);
-        var pngBytes = byteData!.buffer.asUint8List();
-        bitmap = BitmapDescriptor.fromBytes(pngBytes);
-        // return pngBytes;
-      } catch (e) {
-        debugPrint(e.toString());
-      }
-      return bitmap;
-    }
-
-    // Future<BitmapDescriptor> getCustomIcon(GlobalKey iconKeys) async {
-
-    //   var imageData = await _capturePng(iconKeys);
-
-    //   return BitmapDescriptor.fromBytes(imageData);
-    // }
-
-    addDropMarker() async {
-      if(driverReq.isNotEmpty){
-        
-       
-      var testIcon = await capturePng(iconDropKey);
-
-      if (testIcon != null && driverReq['drop_address'] != null) {
-        
-        setState(() {
-          myMarkers.add(Marker(
-              markerId: const MarkerId('3'),
-              icon: testIcon,
-              position: LatLng(driverReq['drop_lat'], driverReq['drop_lng'])));
-        });
-        getLatLngBounds();
-        // valueNotifierHome.incrementNotifier();
-      }
-      }
-      
-    }
-
-
-
-    addMarker() async {
-      polyline.clear();
-      if (driverReq.isNotEmpty) {
-        var testIcon = await capturePng(iconKey);
-        if (testIcon != null) {
-          setState(() {
-            myMarkers.add(Marker(
-                markerId: const MarkerId('2'),
-                icon: testIcon,
-                position:
-                    LatLng(driverReq['pick_lat'], driverReq['pick_lng'])));
-          });
-        }
-        
-        // setState(() {
-          
-        // });
-        //  }else{
-        //    print('it is not null');
-        //  }
-      }
-    }
-
-        //show toast for demo
-  addToast() {
-    setState(() {
-      _showToast = true;
-    });
-    Future.delayed(const Duration(seconds: 5), () {
-      setState(() {
-        _showToast = false;
-      });
-    });
-  }
-
-      addPickDropMarker()async{
-      addMarker();
-      if(driverReq['drop_address'] != null){
-        //  await getPolylines();
-        addToast();
-      if(driverReq.isNotEmpty){
-      polyline.add(Polyline(polylineId:const PolylineId('1'),color: buttonColor, points: [addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng , addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng],geodesic: false,width: 5),);
-      }
-         Future.delayed(const Duration(seconds: 1),(){
-        addDropMarker();
-         });
-          _controller?.animateCamera(CameraUpdate.newLatLngZoom(
-                          LatLng(driverReq['pick_lat'], driverReq['pick_lng']),
-                          11.0));
-        }
-    }
 
     return WillPopScope(
       onWillPop: () async {
-        if(platform == TargetPlatform.android){
-        platforms.invokeMethod('pipmode');
+        if (platform == TargetPlatform.android) {
+          platforms.invokeMethod('pipmode');
         }
         return false;
       },
@@ -506,6 +526,10 @@ class _MapsState extends State<Maps>
         child: ValueListenableBuilder(
             valueListenable: valueNotifierHome.value,
             builder: (context, value, child) {
+              if (_isDarkTheme != isDarkTheme && _controller != null) {
+                _controller!.setMapStyle(mapStyle);
+                _isDarkTheme = isDarkTheme;
+              }
               if (isGeneral == true) {
                 isGeneral = false;
                 if (lastNotification != latestNotification) {
@@ -561,7 +585,9 @@ class _MapsState extends State<Maps>
                         .longitude,
                     center.latitude,
                     center.longitude);
-                if (dist > 100 && animationController == null && _controller != null) {
+                if (dist > 100 &&
+                    animationController == null &&
+                    _controller != null) {
                   animationController = AnimationController(
                     duration: const Duration(
                         milliseconds: 1500), //Animation duration of marker
@@ -586,7 +612,8 @@ class _MapsState extends State<Maps>
                       _controller,
                       '1',
                       (userDetails['vehicle_type_icon_for'] == 'motor_bike')
-                          ? pinLocationIcon2 : pinLocationIcon,
+                          ? pinLocationIcon2
+                          : pinLocationIcon,
                       '',
                       '');
                 }
@@ -611,16 +638,14 @@ class _MapsState extends State<Maps>
                   mapPadding = media.width * 1;
                 }
 
-                
-
                 if (driverReq['is_completed'] != 1) {
                   if (myMarkers
-                      .where(
-                          (element) => element.markerId == const MarkerId('2'))
-                      .isEmpty && _pickAnimateDone != true) {
-                        _pickAnimateDone = true;
-                    Future.delayed(const Duration(milliseconds: 2000), () {
-                    
+                          .where((element) =>
+                              element.markerId == const MarkerId('2'))
+                          .isEmpty &&
+                      _pickAnimateDone != true) {
+                    _pickAnimateDone = true;
+                    Future.delayed(const Duration(milliseconds: 100), () {
                       // _pickAnimateDone = true;
                       addPickDropMarker();
                       // addMarker();
@@ -635,8 +660,8 @@ class _MapsState extends State<Maps>
                   //         11.0));
                   //   });
                   // }
-                // } else if (driverReq['is_trip_start'] == 1 &&
-                //     driverReq['is_completed'] == 0) {
+                  // } else if (driverReq['is_trip_start'] == 1 &&
+                  //     driverReq['is_completed'] == 0) {
                   // if (myMarkers
                   //         .where((element) =>
                   //             element.markerId == const MarkerId('3'))
@@ -646,7 +671,7 @@ class _MapsState extends State<Maps>
                   //       Future.delayed(const Duration(seconds: 2), () {
                   //         // addDropMarker();
                   //       });
-                    
+
                   // }
                   // if (myMarkers
                   //     .where(
@@ -654,7 +679,7 @@ class _MapsState extends State<Maps>
                   //     .isEmpty) {
                   //   addMarker();
                   // }
-                }else if (driverReq['is_completed'] == 1 &&
+                } else if (driverReq['is_completed'] == 1 &&
                     driverReq['requestBill'] != null) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     Navigator.pushAndRemoveUntil(
@@ -665,9 +690,10 @@ class _MapsState extends State<Maps>
                   });
                   _pickAnimateDone = false;
                   _dropMarkerDone = false;
-                  myMarkers.removeWhere((element) => element.markerId != const MarkerId('1'));
+                  myMarkers.removeWhere(
+                      (element) => element.markerId != const MarkerId('1'));
                   polyline.clear();
-                  
+
                   // myMarkers.removeWhere(
                   //     (element) => element.markerId == const MarkerId('2'));
                   // myMarkers.removeWhere(
@@ -676,15 +702,18 @@ class _MapsState extends State<Maps>
                   //     (element) => element.polylineId == const PolylineId('1'));
                 }
 
-                if(driverReq['accepted_at'] != null && _dropMarkerDone == false && driverReq['drop_address'] != null){
+                if (driverReq['accepted_at'] != null &&
+                    _dropMarkerDone == false &&
+                    driverReq['drop_address'] != null) {
                   _dropMarkerDone = true;
-                  Future.delayed(const Duration(seconds: 2),(){
-                    if(myMarkers
-                          .where((element) =>
-                              element.markerId == const MarkerId('3'))
-                          .isNotEmpty){
-                            myMarkers.removeWhere((element) => element.markerId == const MarkerId('3'));
-                          }
+                  Future.delayed(const Duration(seconds: 2), () {
+                    if (myMarkers
+                        .where((element) =>
+                            element.markerId == const MarkerId('3'))
+                        .isNotEmpty) {
+                      myMarkers.removeWhere(
+                          (element) => element.markerId == const MarkerId('3'));
+                    }
                     addDropMarker();
                   });
                 }
@@ -693,16 +722,15 @@ class _MapsState extends State<Maps>
                 if (myMarkers
                     .where((element) => element.markerId != const MarkerId('1'))
                     .isNotEmpty) {
-                  myMarkers.removeWhere(
-                      (element) => element.markerId != const MarkerId('1'));
-                      polyline.clear();
+                  myMarkers.removeWhere((element) => element.markerId != const MarkerId('1'));
+                  polyline.clear();
                   if (userReject == true) {
                     reqCancel();
                   }
-
+                    }
                   _pickAnimateDone = false;
                   _dropMarkerDone = false;
-                }
+                
               }
 
               if (userDetails['approve'] == false && driverReq.isEmpty) {
@@ -713,6 +741,9 @@ class _MapsState extends State<Maps>
                           builder: (context) => const DocsProcess()),
                       (route) => false);
                 });
+              }
+              if (package == null) {
+                checkVersion();
               }
               return Directionality(
                 textDirection: (languageDirection == 'rtl')
@@ -1101,7 +1132,8 @@ class _MapsState extends State<Maps>
                                                   .longitude,
                                               element['l'][0],
                                               element['l'][1]);
-                                          if (dist > 100 && _controller != null) {
+                                          if (dist > 100 &&
+                                              _controller != null) {
                                             animationController =
                                                 AnimationController(
                                               duration: const Duration(
@@ -1678,6 +1710,8 @@ class _MapsState extends State<Maps>
                                                             'text_trustedtaxi'],
                                                         style:
                                                             GoogleFonts.roboto(
+                                                                color:
+                                                                    textColor,
                                                                 fontSize: media
                                                                         .width *
                                                                     eighteen,
@@ -1708,6 +1742,7 @@ class _MapsState extends State<Maps>
                                                             'text_allowpermission2'],
                                                         style:
                                                             GoogleFonts.roboto(
+                                                          color: textColor,
                                                           fontSize:
                                                               media.width *
                                                                   fourteen,
@@ -1735,9 +1770,11 @@ class _MapsState extends State<Maps>
                                                                 width: media
                                                                         .width *
                                                                     0.075,
-                                                                child: const Icon(
+                                                                child: Icon(
                                                                     Icons
-                                                                        .location_on_outlined)),
+                                                                        .location_on_outlined,
+                                                                    color:
+                                                                        textColor)),
                                                             SizedBox(
                                                               width:
                                                                   media.width *
@@ -1753,6 +1790,8 @@ class _MapsState extends State<Maps>
                                                                     [
                                                                     'text_loc_permission'],
                                                                 style: GoogleFonts.roboto(
+                                                                    color:
+                                                                        textColor,
                                                                     fontSize: media
                                                                             .width *
                                                                         fourteen,
@@ -1786,9 +1825,11 @@ class _MapsState extends State<Maps>
                                                                 width: media
                                                                         .width *
                                                                     0.075,
-                                                                child: const Icon(
+                                                                child: Icon(
                                                                     Icons
-                                                                        .location_on_outlined)),
+                                                                        .location_on_outlined,
+                                                                    color:
+                                                                        textColor)),
                                                             SizedBox(
                                                               width:
                                                                   media.width *
@@ -1804,6 +1845,8 @@ class _MapsState extends State<Maps>
                                                                     [
                                                                     'text_background_permission'],
                                                                 style: GoogleFonts.roboto(
+                                                                    color:
+                                                                        textColor,
                                                                     fontSize: media
                                                                             .width *
                                                                         fourteen,
@@ -2016,7 +2059,7 @@ class _MapsState extends State<Maps>
                                                                         boxShadow: [
                                                                           BoxShadow(
                                                                               blurRadius: 2,
-                                                                              color: Colors.black.withOpacity(0.2),
+                                                                              color: textColor.withOpacity(0.2),
                                                                               spreadRadius: 2)
                                                                         ],
                                                                         color:
@@ -2030,12 +2073,14 @@ class _MapsState extends State<Maps>
                                                                       return InkWell(
                                                                           onTap:
                                                                               () async {
-
                                                                             Scaffold.of(context).openDrawer();
-                                                                            
                                                                           },
                                                                           child:
-                                                                               Icon(Icons.menu,color: textColor,));
+                                                                              Icon(
+                                                                            Icons.menu,
+                                                                            color:
+                                                                                textColor,
+                                                                          ));
                                                                     }),
                                                                   ),
                                                                 ],
@@ -2291,19 +2336,22 @@ class _MapsState extends State<Maps>
                                                                 (userDetails[
                                                                             'role'] ==
                                                                         'driver' &&
-                                                                    userDetails[
-                                                                            'vehicle_type_id'] !=
-                                                                        null)
+                                                                    (userDetails['vehicle_type_id'] !=
+                                                                            null ||
+                                                                        userDetails['vehicle_types']
+                                                                            .isNotEmpty))
                                                             ? Positioned(
                                                                 bottom: 25,
                                                                 child: InkWell(
                                                                   onTap:
                                                                       () async {
                                                                     // await getUserDetails();
-                                                                    if (userDetails['vehicle_type_id'] !=
-                                                                            null &&
-                                                                        userDetails['role'] ==
-                                                                            'driver') {
+                                                                    if (userDetails['role'] ==
+                                                                            'driver' &&
+                                                                        (userDetails['vehicle_type_id'] !=
+                                                                                null ||
+                                                                            userDetails['vehicle_types'] !=
+                                                                                [])) {
                                                                       if (locationAllowed ==
                                                                               true &&
                                                                           serviceEnabled ==
@@ -2314,10 +2362,12 @@ class _MapsState extends State<Maps>
                                                                               true;
                                                                         });
 
-                                                                       var val = await driverStatus();
-                                                                       if(val == 'logout'){
-                                                                         navigateLogout();
-                                                                       }
+                                                                        var val =
+                                                                            await driverStatus();
+                                                                        if (val ==
+                                                                            'logout') {
+                                                                          navigateLogout();
+                                                                        }
                                                                         setState(
                                                                             () {
                                                                           _isLoading =
@@ -2327,8 +2377,9 @@ class _MapsState extends State<Maps>
                                                                               true &&
                                                                           serviceEnabled ==
                                                                               false) {
-                                                                                await geolocator.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocator.LocationAccuracy.low);
+                                                                        await geolocator.Geolocator.getCurrentPosition(
+                                                                            desiredAccuracy:
+                                                                                geolocator.LocationAccuracy.low);
                                                                         // await location
                                                                         //     .requestService();
                                                                         if (await geolocator
@@ -2343,8 +2394,10 @@ class _MapsState extends State<Maps>
                                                                                 true;
                                                                           });
 
-                                                                          var val = await driverStatus();
-                                                                          if(val == 'logout'){
+                                                                          var val =
+                                                                              await driverStatus();
+                                                                          if (val ==
+                                                                              'logout') {
                                                                             navigateLogout();
                                                                           }
                                                                           setState(
@@ -2365,7 +2418,7 @@ class _MapsState extends State<Maps>
                                                                           });
                                                                         } else {
                                                                           await geolocator.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocator.LocationAccuracy.low);
+                                                                              desiredAccuracy: geolocator.LocationAccuracy.low);
                                                                           // await location
                                                                           //     .requestService();
                                                                           setState(
@@ -2452,7 +2505,10 @@ class _MapsState extends State<Maps>
                                                                         'driver' &&
                                                                     userDetails[
                                                                             'vehicle_type_id'] ==
-                                                                        null)
+                                                                        null &&
+                                                                    userDetails[
+                                                                            'vehicle_types']
+                                                                        .isEmpty)
                                                                 ? Positioned(
                                                                     bottom: 0,
                                                                     child:
@@ -2474,8 +2530,9 @@ class _MapsState extends State<Maps>
                                                                             .roboto(
                                                                           fontSize:
                                                                               media.width * fourteen,
-                                                                          color:
-                                                                              Colors.white,
+                                                                          color: isDarkTheme
+                                                                              ? Colors.black
+                                                                              : Colors.white,
                                                                         ),
                                                                         textAlign:
                                                                             TextAlign.center,
@@ -2507,7 +2564,7 @@ class _MapsState extends State<Maps>
                                                                             style:
                                                                                 GoogleFonts.roboto(
                                                                               fontSize: media.width * fourteen,
-                                                                              color: Colors.white,
+                                                                              color: isDarkTheme ? verifyDeclined : Colors.white,
                                                                             ),
                                                                             textAlign:
                                                                                 TextAlign.center,
@@ -2581,93 +2638,88 @@ class _MapsState extends State<Maps>
                                                                               BoxShadow(blurRadius: 2, color: Colors.black.withOpacity(0.2), spreadRadius: 2)
                                                                             ], color: page, borderRadius: BorderRadius.circular(media.width * 0.02)),
                                                                             alignment: Alignment.center,
-                                                                            child: Image.asset('assets/images/locationFind.png', width: media.width * 0.06, color: Colors.black)),
+                                                                            child: Image.asset('assets/images/locationFind.png', width: media.width * 0.06, color: textColor)),
                                                                       )
                                                                     : Container(),
                                                                 const SizedBox(
                                                                     height: 20),
                                                                 //animate to current location button
                                                                 SizedBox(
-                                                                  width: media.width*0.9,
+                                                                  width: media
+                                                                          .width *
+                                                                      0.9,
                                                                   child: Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
                                                                     children: [
-                                                                      (driverReq.isEmpty && userDetails['role'] != 'owner' && userDetails['active'] == true) ?
-                                                                       Button(
-                                                                            onTap:() async {
-                                                                              addressList.clear();
-                                                                              var val =
-                                                                                  await geoCoding(center.latitude, center.longitude);
-                                                                              setState(() {
-                                                                                if (addressList.where((element) => element.id == 'pickup').isNotEmpty) {
-                                                                                  var add = addressList.firstWhere((element) => element.id == 'pickup');
-                                                                                  add.address = val;
-                                                                                  add.latlng = LatLng(center.latitude, center.longitude);
-                                                                                } else {
-                                                                                  addressList.add(AddressList(id: 'pickup', address: val, latlng: LatLng(center.latitude, center.longitude)));
-                                                                                }
-                                                                              });
-                                                                              // var val =
-                                                                              //     await geoCodingForLatLng('pickup');
-                                                                
-                                                                              // if (_pickaddress ==
-                                                                              //     true) {
-                                                                              //   setState(() {
-                                                                              //     if (addressList.where((element) => element.id == 'pickup').isEmpty) {
-                                                                              //       addressList.add(AddressList(id: 'pickup', address: val, latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
-                                                                              //     } else {
-                                                                              //       addressList.firstWhere((element) => element.id == 'pickup').address = val;
-                                                                              //       addressList.firstWhere((element) => element.id == 'pickup').latlng = LatLng(_centerLocation.latitude, _centerLocation.longitude);
-                                                                              //     }
-                                                                              //   });
-                                                                              // }
-                                                                              if(addressList.isNotEmpty){
-                                                                            // ignore: use_build_context_synchronously
-                                                                            Navigator.push(context,
-                                                                                  MaterialPageRoute(builder: (context) =>const DropLocation()));
+                                                                      (driverReq.isEmpty &&
+                                                                              userDetails['role'] != 'owner' &&
+                                                                              userDetails['active'] == true)
+                                                                          ? Button(
+                                                                              onTap: () async {
+                                                                                addressList.clear();
+                                                                                var val = await geoCoding(center.latitude, center.longitude);
+                                                                                setState(() {
+                                                                                  if (addressList.where((element) => element.id == 'pickup').isNotEmpty) {
+                                                                                    var add = addressList.firstWhere((element) => element.id == 'pickup');
+                                                                                    add.address = val;
+                                                                                    add.latlng = LatLng(center.latitude, center.longitude);
+                                                                                  } else {
+                                                                                    addressList.add(AddressList(id: 'pickup', address: val, latlng: LatLng(center.latitude, center.longitude)));
+                                                                                  }
+                                                                                });
+                                                                                // var val =
+                                                                                //     await geoCodingForLatLng('pickup');
+
+                                                                                // if (_pickaddress ==
+                                                                                //     true) {
+                                                                                //   setState(() {
+                                                                                //     if (addressList.where((element) => element.id == 'pickup').isEmpty) {
+                                                                                //       addressList.add(AddressList(id: 'pickup', address: val, latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
+                                                                                //     } else {
+                                                                                //       addressList.firstWhere((element) => element.id == 'pickup').address = val;
+                                                                                //       addressList.firstWhere((element) => element.id == 'pickup').latlng = LatLng(_centerLocation.latitude, _centerLocation.longitude);
+                                                                                //     }
+                                                                                //   });
+                                                                                // }
+                                                                                if (addressList.isNotEmpty) {
+                                                                                  // ignore: use_build_context_synchronously
+                                                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => const DropLocation()));
                                                                                   // if(nav != null){
                                                                                   //   if(nav){
                                                                                   //     addressList.clear();
                                                                                   //   }
                                                                                   // }
-                                                                              }
-                                                                            },
-                                                                            text:
-                                                                                languages[choosenLanguage]['text_instant_ride']) : Container(),
+                                                                                }
+                                                                              },
+                                                                              text: languages[choosenLanguage]['text_instant_ride'])
+                                                                          : Container(),
                                                                       InkWell(
                                                                         onTap:
                                                                             () async {
                                                                           if (locationAllowed ==
                                                                               true) {
-                                                                            _controller?.animateCamera(CameraUpdate.newLatLngZoom(
-                                                                                center,
+                                                                            _controller?.animateCamera(CameraUpdate.newLatLngZoom(center,
                                                                                 18.0));
                                                                           } else {
                                                                             if (serviceEnabled ==
                                                                                 true) {
-                                                                              setState(
-                                                                                  () {
-                                                                                _locationDenied =
-                                                                                    true;
+                                                                              setState(() {
+                                                                                _locationDenied = true;
                                                                               });
                                                                             } else {
-                                                                              await geolocator.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocator.LocationAccuracy.low);
+                                                                              await geolocator.Geolocator.getCurrentPosition(desiredAccuracy: geolocator.LocationAccuracy.low);
                                                                               // await location
                                                                               //     .requestService();
-                                                                
-                                                                              setState(
-                                                                                  () {
-                                                                                _isLoading =
-                                                                                    true;
+
+                                                                              setState(() {
+                                                                                _isLoading = true;
                                                                               });
                                                                               await getLocs();
-                                                                              if (serviceEnabled ==
-                                                                                  true) {
-                                                                                setState(
-                                                                                    () {
-                                                                                  _locationDenied =
-                                                                                      true;
+                                                                              if (serviceEnabled == true) {
+                                                                                setState(() {
+                                                                                  _locationDenied = true;
                                                                                 });
                                                                               }
                                                                             }
@@ -2676,33 +2728,25 @@ class _MapsState extends State<Maps>
                                                                         child:
                                                                             Container(
                                                                           height:
-                                                                              media.width *
-                                                                                  0.1,
-                                                                          width: media
-                                                                                  .width *
-                                                                              0.1,
+                                                                              media.width * 0.1,
+                                                                          width:
+                                                                              media.width * 0.1,
                                                                           decoration: BoxDecoration(
                                                                               boxShadow: [
-                                                                                BoxShadow(
-                                                                                    blurRadius: 2,
-                                                                                    color: Colors.black.withOpacity(0.2),
-                                                                                    spreadRadius: 2)
+                                                                                BoxShadow(blurRadius: 2, color: textColor.withOpacity(0.2), spreadRadius: 2)
                                                                               ],
-                                                                              color:
-                                                                                  page,
-                                                                              borderRadius:
-                                                                                  BorderRadius.circular(media.width *
-                                                                                      0.02)),
+                                                                              color: page,
+                                                                              borderRadius: BorderRadius.circular(media.width * 0.02)),
                                                                           alignment:
-                                                                              Alignment
-                                                                                  .center,
-                                                                          child: Icon(
-                                                                              Icons
-                                                                                  .my_location_sharp,
-                                                                              size: media.width *
-                                                                                  0.06,
-                                                                                  color: textColor,
-                                                                                  ),
+                                                                              Alignment.center,
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.my_location_sharp,
+                                                                            size:
+                                                                                media.width * 0.06,
+                                                                            color:
+                                                                                textColor,
+                                                                          ),
                                                                         ),
                                                                       ),
                                                                     ],
@@ -2727,7 +2771,7 @@ class _MapsState extends State<Maps>
                                                                                       width: media.width * 0.9,
                                                                                       child: Text(
                                                                                         languages[choosenLanguage]['text_rideLaterTime'] + " " + driverReq['cv_trip_start_time'],
-                                                                                        style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: Colors.white),
+                                                                                        style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: (isDarkTheme == true) ? Colors.black : topBar),
                                                                                       ),
                                                                                     )
                                                                                   : (driverReq['is_rental'] == true && driverReq['is_later'] != 1)
@@ -2739,7 +2783,7 @@ class _MapsState extends State<Maps>
                                                                                           width: media.width * 0.9,
                                                                                           child: Text(
                                                                                             languages[choosenLanguage]['text_rental_ride'] + ' - ' + driverReq['rental_package_name'],
-                                                                                            style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: Colors.white),
+                                                                                            style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: (isDarkTheme == true) ? Colors.black : topBar),
                                                                                           ),
                                                                                         )
                                                                                       : (driverReq['is_rental'] == true && driverReq['is_later'] == 1)
@@ -2753,12 +2797,12 @@ class _MapsState extends State<Maps>
                                                                                                 children: [
                                                                                                   Text(
                                                                                                     languages[choosenLanguage]['text_rideLaterTime'] + " " + driverReq['cv_trip_start_time'],
-                                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: Colors.white),
+                                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: (isDarkTheme == true) ? Colors.black : topBar),
                                                                                                   ),
                                                                                                   SizedBox(height: media.width * 0.02),
                                                                                                   Text(
                                                                                                     languages[choosenLanguage]['text_rental_ride'] + ' - ' + driverReq['rental_package_name'],
-                                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: Colors.white),
+                                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: (isDarkTheme == true) ? Colors.black : topBar),
                                                                                                   ),
                                                                                                 ],
                                                                                               ),
@@ -2827,15 +2871,9 @@ class _MapsState extends State<Maps>
                                                                                                                     fit: BoxFit.contain,
                                                                                                                   )
                                                                                                                 : (driverReq['payment_opt'].toString() == '2')
-                                                                                                                    ? Image.asset(
-                                                                                                                        'assets/images/wallet.png',
-                                                                                                                        fit: BoxFit.contain,
-                                                                                                                      )
+                                                                                                                    ? Image.asset('assets/images/wallet.png', fit: BoxFit.contain, color: textColor)
                                                                                                                     : (driverReq['payment_opt'].toString() == '0')
-                                                                                                                        ? Image.asset(
-                                                                                                                            'assets/images/card.png',
-                                                                                                                            fit: BoxFit.contain,
-                                                                                                                          )
+                                                                                                                        ? Image.asset('assets/images/card.png', fit: BoxFit.contain, color: textColor)
                                                                                                                         : Container(),
                                                                                                           ),
                                                                                                           SizedBox(
@@ -2866,7 +2904,7 @@ class _MapsState extends State<Maps>
                                                                                                   child: FittedBox(
                                                                                                     child: Text(
                                                                                                       (duration != 0) ? duration.toString().split('.')[0] : '',
-                                                                                                      style: GoogleFonts.roboto(fontSize: media.width * twenty, fontWeight: FontWeight.bold),
+                                                                                                      style: GoogleFonts.roboto(fontSize: media.width * twenty, fontWeight: FontWeight.bold, color: textColor),
                                                                                                       textAlign: TextAlign.end,
                                                                                                     ),
                                                                                                   ),
@@ -2895,9 +2933,7 @@ class _MapsState extends State<Maps>
                                                                                                       width: media.width * 0.6,
                                                                                                       child: Text(
                                                                                                         driverReq['pick_address'],
-                                                                                                        style: GoogleFonts.roboto(
-                                                                                                          fontSize: media.width * twelve,
-                                                                                                        ),
+                                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                                         maxLines: 2,
                                                                                                         overflow: TextOverflow.ellipsis,
                                                                                                       ),
@@ -2930,7 +2966,7 @@ class _MapsState extends State<Maps>
                                                                                                             height: media.width * 0.1,
                                                                                                             child: Text(
                                                                                                               driverReq['drop_address'],
-                                                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, fontWeight: FontWeight.w600),
+                                                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                                               maxLines: 2,
                                                                                                               overflow: TextOverflow.ellipsis,
                                                                                                             ),
@@ -2956,8 +2992,8 @@ class _MapsState extends State<Maps>
                                                                                                         _isLoading = true;
                                                                                                       });
                                                                                                       //reject request
-                                                                                                      var val =await requestReject();
-                                                                                                      if(val == 'logout'){
+                                                                                                      var val = await requestReject();
+                                                                                                      if (val == 'logout') {
                                                                                                         navigateLogout();
                                                                                                       }
                                                                                                       setState(() {
@@ -2970,8 +3006,8 @@ class _MapsState extends State<Maps>
                                                                                                     setState(() {
                                                                                                       _isLoading = true;
                                                                                                     });
-                                                                                                    var val =await requestAccept();
-                                                                                                    if(val == 'logout'){
+                                                                                                    var val = await requestAccept();
+                                                                                                    if (val == 'logout') {
                                                                                                       navigateLogout();
                                                                                                     }
                                                                                                     setState(() {
@@ -3147,10 +3183,7 @@ class _MapsState extends State<Maps>
                                                                                                                     _showWaitingInfo = true;
                                                                                                                   });
                                                                                                                 },
-                                                                                                                child: Icon(
-                                                                                                                  Icons.info_outline,
-                                                                                                                  size: media.width * 0.04,
-                                                                                                                ),
+                                                                                                                child: Icon(Icons.info_outline, size: media.width * 0.04, color: textColor),
                                                                                                               )
                                                                                                             ],
                                                                                                           ),
@@ -3208,9 +3241,7 @@ class _MapsState extends State<Maps>
                                                                                                         width: media.width * 0.6,
                                                                                                         child: Text(
                                                                                                           driverReq['pick_address'],
-                                                                                                          style: GoogleFonts.roboto(
-                                                                                                            fontSize: media.width * twelve,
-                                                                                                          ),
+                                                                                                          style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                                           maxLines: 2,
                                                                                                           overflow: TextOverflow.ellipsis,
                                                                                                         ),
@@ -3243,9 +3274,7 @@ class _MapsState extends State<Maps>
                                                                                                               height: media.width * 0.1,
                                                                                                               child: Text(
                                                                                                                 driverReq['drop_address'],
-                                                                                                                style: GoogleFonts.roboto(
-                                                                                                                  fontSize: media.width * twelve,
-                                                                                                                ),
+                                                                                                                style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                                                 maxLines: 2,
                                                                                                                 overflow: TextOverflow.ellipsis,
                                                                                                               ),
@@ -3283,9 +3312,7 @@ class _MapsState extends State<Maps>
                                                                                                   height: media.width * 0.05,
                                                                                                   child: Text(
                                                                                                     driverReq['pick_address'],
-                                                                                                    style: GoogleFonts.roboto(
-                                                                                                      fontSize: media.width * twelve,
-                                                                                                    ),
+                                                                                                    style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                                     maxLines: 1,
                                                                                                     overflow: TextOverflow.ellipsis,
                                                                                                   ),
@@ -3310,11 +3337,13 @@ class _MapsState extends State<Maps>
                                                                                               child: Image.asset(
                                                                                                 'assets/images/Call.png',
                                                                                                 width: media.width * 0.06,
+                                                                                                color: textColor,
                                                                                               )),
                                                                                           Text(
                                                                                             languages[choosenLanguage]['text_call'],
                                                                                             style: GoogleFonts.roboto(
                                                                                               fontSize: media.width * twelve,
+                                                                                              color: textColor,
                                                                                             ),
                                                                                           )
                                                                                         ],
@@ -3332,6 +3361,7 @@ class _MapsState extends State<Maps>
                                                                                                       Image.asset(
                                                                                                         'assets/images/message-square.png',
                                                                                                         width: media.width * 0.06,
+                                                                                                        color: textColor,
                                                                                                       ),
                                                                                                       (chatList.where((element) => element['from_type'] == 1 && element['seen'] == 0).isNotEmpty)
                                                                                                           ? Text(
@@ -3345,6 +3375,7 @@ class _MapsState extends State<Maps>
                                                                                                     languages[choosenLanguage]['text_chat'],
                                                                                                     style: GoogleFonts.roboto(
                                                                                                       fontSize: media.width * twelve,
+                                                                                                      color: textColor,
                                                                                                     ),
                                                                                                   )
                                                                                                 ],
@@ -3364,7 +3395,7 @@ class _MapsState extends State<Maps>
                                                                                                   _cancelReason = '';
                                                                                                   _cancellingError = '';
                                                                                                 });
-                                                                                              }else if(val == 'logout'){
+                                                                                              } else if (val == 'logout') {
                                                                                                 navigateLogout();
                                                                                               }
                                                                                               setState(() {
@@ -3374,12 +3405,14 @@ class _MapsState extends State<Maps>
                                                                                             child: Image.asset(
                                                                                               'assets/images/cancel.png',
                                                                                               width: media.width * 0.06,
+                                                                                              color: textColor,
                                                                                             ),
                                                                                           ),
                                                                                           Text(
                                                                                             languages[choosenLanguage]['text_cancel'],
                                                                                             style: GoogleFonts.roboto(
                                                                                               fontSize: media.width * twelve,
+                                                                                              color: textColor,
                                                                                             ),
                                                                                           )
                                                                                         ],
@@ -3405,9 +3438,7 @@ class _MapsState extends State<Maps>
                                                                                             height: media.width * 0.05,
                                                                                             child: Text(
                                                                                               driverReq['drop_address'],
-                                                                                              style: GoogleFonts.roboto(
-                                                                                                fontSize: media.width * twelve,
-                                                                                              ),
+                                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                               maxLines: 1,
                                                                                               overflow: TextOverflow.ellipsis,
                                                                                             ),
@@ -3428,25 +3459,25 @@ class _MapsState extends State<Maps>
                                                                                 _isLoading = true;
                                                                               });
                                                                               if ((driverReq['is_driver_arrived'] == 0)) {
-                                                                               var val = await driverArrived();
-                                                                               if(val == 'logout'){
-                                                                                 navigateLogout();
-                                                                               }
+                                                                                var val = await driverArrived();
+                                                                                if (val == 'logout') {
+                                                                                  navigateLogout();
+                                                                                }
                                                                               } else if (driverReq['is_driver_arrived'] == 1 && driverReq['is_trip_start'] == 0) {
                                                                                 if (driverReq['show_otp_feature'] == true) {
                                                                                   setState(() {
                                                                                     getStartOtp = true;
                                                                                   });
                                                                                 } else {
-                                                                                 var val = await tripStartDispatcher();
-                                                                                 if(val == 'logout'){
-                                                                                   navigateLogout();
-                                                                                 }
+                                                                                  var val = await tripStartDispatcher();
+                                                                                  if (val == 'logout') {
+                                                                                    navigateLogout();
+                                                                                  }
                                                                                 }
                                                                               } else {
                                                                                 driverOtp = '';
                                                                                 var val = await endTrip();
-                                                                                if(val == 'logout'){
+                                                                                if (val == 'logout') {
                                                                                   navigateLogout();
                                                                                 }
                                                                               }
@@ -3463,81 +3494,85 @@ class _MapsState extends State<Maps>
                                                                   ),
                                                                 ))
                                                             : Container(),
-                                                            if(driverReq.isEmpty)
-                                                        Positioned(
-                                                          right: 10,
-                                                          top: MediaQuery.of(context)
-                                                                            .padding
-                                                                            .top +
-                                                                        12.5 + media.width*0.16,
-                                                          child: InkWell(
-                                                            onTap: () async {
-                                                              if (contactus ==
-                                                                  false) {
-                                                                setState(() {
-                                                                  contactus =
-                                                                      true;
-                                                                });
-                                                              } else {
-                                                                setState(() {
-                                                                  contactus =
-                                                                      false;
-                                                                });
-                                                              }
-                                                            },
-                                                            child: Container(
-                                                              height:
-                                                                  media.width *
-                                                                      0.1,
-                                                              width:
-                                                                  media.width *
-                                                                      0.1,
-                                                              decoration: BoxDecoration(
-                                                                  boxShadow: [
-                                                                    BoxShadow(
-                                                                        blurRadius:
-                                                                            2,
-                                                                        color: Colors
-                                                                            .black
-                                                                            .withOpacity(
-                                                                                0.2),
-                                                                        spreadRadius:
-                                                                            2)
-                                                                  ],
-                                                                  color: page,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          media.width *
-                                                                              0.02)),
-                                                              alignment:
-                                                                  Alignment
-                                                                      .center,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/customercare.png',
-                                                                fit: BoxFit
-                                                                    .contain,
+                                                        if (driverReq.isEmpty)
+                                                          Positioned(
+                                                            right: 10,
+                                                            top: MediaQuery.of(
+                                                                        context)
+                                                                    .padding
+                                                                    .top +
+                                                                12.5 +
+                                                                media.width *
+                                                                    0.16,
+                                                            child: InkWell(
+                                                              onTap: () async {
+                                                                if (contactus ==
+                                                                    false) {
+                                                                  setState(() {
+                                                                    contactus =
+                                                                        true;
+                                                                  });
+                                                                } else {
+                                                                  setState(() {
+                                                                    contactus =
+                                                                        false;
+                                                                  });
+                                                                }
+                                                              },
+                                                              child: Container(
+                                                                height: media
+                                                                        .width *
+                                                                    0.1,
                                                                 width: media
                                                                         .width *
-                                                                    0.06,
-                                                                    color: textColor,
+                                                                    0.1,
+                                                                decoration: BoxDecoration(
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                          blurRadius:
+                                                                              2,
+                                                                          color: textColor.withOpacity(
+                                                                              0.2),
+                                                                          spreadRadius:
+                                                                              2)
+                                                                    ],
+                                                                    color: page,
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(media.width *
+                                                                            0.02)),
+                                                                alignment:
+                                                                    Alignment
+                                                                        .center,
+                                                                child:
+                                                                    Image.asset(
+                                                                  'assets/images/customercare.png',
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                  width: media
+                                                                          .width *
+                                                                      0.06,
+                                                                  color:
+                                                                      textColor,
+                                                                ),
+                                                                // Icon(
+                                                                //     Icons
+                                                                //         .my_location_sharp,
+                                                                //     size: media
+                                                                //             .width *
+                                                                //         0.06),
                                                               ),
-                                                              // Icon(
-                                                              //     Icons
-                                                              //         .my_location_sharp,
-                                                              //     size: media
-                                                              //             .width *
-                                                              //         0.06),
                                                             ),
                                                           ),
-                                                        ),
                                                         (contactus == true)
                                                             ? Positioned(
                                                                 right: 10,
-                                                                top:  MediaQuery.of(context)
-                                                                            .padding
-                                                                            .top +
-                                                                        12.5 + media.width*0.27,
+                                                                top: MediaQuery.of(
+                                                                            context)
+                                                                        .padding
+                                                                        .top +
+                                                                    12.5 +
+                                                                    media.width *
+                                                                        0.27,
                                                                 child: InkWell(
                                                                   onTap:
                                                                       () async {},
@@ -3570,7 +3605,7 @@ class _MapsState extends State<Maps>
                                                                                 },
                                                                                 child: Row(
                                                                                   children: [
-                                                                                    const Expanded(flex: 20, child: Icon(Icons.call)),
+                                                                                    Expanded(flex: 20, child: Icon(Icons.call, color: textColor)),
                                                                                     Expanded(
                                                                                         flex: 80,
                                                                                         child: Text(
@@ -3586,7 +3621,7 @@ class _MapsState extends State<Maps>
                                                                                 },
                                                                                 child: Row(
                                                                                   children: [
-                                                                                    const Expanded(flex: 20, child: Icon(Icons.call)),
+                                                                                    Expanded(flex: 20, child: Icon(Icons.call, color: textColor)),
                                                                                     Expanded(
                                                                                         flex: 80,
                                                                                         child: Text(
@@ -3602,7 +3637,7 @@ class _MapsState extends State<Maps>
                                                                                 },
                                                                                 child: Row(
                                                                                   children: [
-                                                                                    const Expanded(flex: 20, child: Icon(Icons.vpn_lock_rounded)),
+                                                                                    Expanded(flex: 20, child: Icon(Icons.vpn_lock_rounded, color: textColor)),
                                                                                     Expanded(
                                                                                         flex: 80,
                                                                                         child: Text(
@@ -3798,8 +3833,12 @@ class _MapsState extends State<Maps>
                                       child: Container(
                                         height: media.height * 1,
                                         width: media.width * 1,
-                                        color:
-                                            Colors.transparent.withOpacity(0.5),
+                                        // color:
+                                        //     Colors.transparent.withOpacity(0.5),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.2)
+                                            : Colors.transparent
+                                                .withOpacity(0.6),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -3913,16 +3952,27 @@ class _MapsState extends State<Maps>
                                                           maxLength: 1,
                                                           textAlign:
                                                               TextAlign.center,
-                                                          decoration: const InputDecoration(
+                                                          decoration: InputDecoration(
                                                               counterText: '',
-                                                              border: UnderlineInputBorder(
+                                                              border: const UnderlineInputBorder(
                                                                   borderSide: BorderSide(
                                                                       color: Colors
-                                                                          .black,
+                                                                          .white,
                                                                       width:
                                                                           1.5,
                                                                       style: BorderStyle
-                                                                          .solid))),
+                                                                          .solid)),
+                                                              enabledBorder: UnderlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: (isDarkTheme ==
+                                                                              true)
+                                                                          ? Colors
+                                                                              .white
+                                                                          : hintColor))),
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                                  color:
+                                                                      textColor),
                                                         ),
                                                       ),
                                                       Container(
@@ -3960,16 +4010,27 @@ class _MapsState extends State<Maps>
                                                           maxLength: 1,
                                                           textAlign:
                                                               TextAlign.center,
-                                                          decoration: const InputDecoration(
+                                                          decoration: InputDecoration(
                                                               counterText: '',
-                                                              border: UnderlineInputBorder(
+                                                              border: const UnderlineInputBorder(
                                                                   borderSide: BorderSide(
                                                                       color: Colors
                                                                           .black,
                                                                       width:
                                                                           1.5,
                                                                       style: BorderStyle
-                                                                          .solid))),
+                                                                          .solid)),
+                                                              enabledBorder: UnderlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: (isDarkTheme ==
+                                                                              true)
+                                                                          ? Colors
+                                                                              .white
+                                                                          : hintColor))),
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                                  color:
+                                                                      textColor),
                                                         ),
                                                       ),
                                                       Container(
@@ -4007,16 +4068,27 @@ class _MapsState extends State<Maps>
                                                           maxLength: 1,
                                                           textAlign:
                                                               TextAlign.center,
-                                                          decoration: const InputDecoration(
+                                                          decoration: InputDecoration(
                                                               counterText: '',
-                                                              border: UnderlineInputBorder(
+                                                              border: const UnderlineInputBorder(
                                                                   borderSide: BorderSide(
                                                                       color: Colors
                                                                           .black,
                                                                       width:
                                                                           1.5,
                                                                       style: BorderStyle
-                                                                          .solid))),
+                                                                          .solid)),
+                                                              enabledBorder: UnderlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: (isDarkTheme ==
+                                                                              true)
+                                                                          ? Colors
+                                                                              .white
+                                                                          : hintColor))),
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                                  color:
+                                                                      textColor),
                                                         ),
                                                       ),
                                                       Container(
@@ -4054,16 +4126,27 @@ class _MapsState extends State<Maps>
                                                           maxLength: 1,
                                                           textAlign:
                                                               TextAlign.center,
-                                                          decoration: const InputDecoration(
+                                                          decoration: InputDecoration(
                                                               counterText: '',
-                                                              border: UnderlineInputBorder(
+                                                              border: const UnderlineInputBorder(
                                                                   borderSide: BorderSide(
                                                                       color: Colors
                                                                           .black,
                                                                       width:
                                                                           1.5,
                                                                       style: BorderStyle
-                                                                          .solid))),
+                                                                          .solid)),
+                                                              enabledBorder: UnderlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: (isDarkTheme ==
+                                                                              true)
+                                                                          ? Colors
+                                                                              .white
+                                                                          : hintColor))),
+                                                          style: GoogleFonts
+                                                              .roboto(
+                                                                  color:
+                                                                      textColor),
                                                         ),
                                                       ),
                                                     ],
@@ -4101,10 +4184,10 @@ class _MapsState extends State<Maps>
                                                         });
                                                         var val =
                                                             await tripStart();
-                                                            if(val == 'logout'){
-                                                              navigateLogout();
-                                                            }
-                                                        else if (val != 'success') {
+                                                        if (val == 'logout') {
+                                                          navigateLogout();
+                                                        } else if (val !=
+                                                            'success') {
                                                           setState(() {
                                                             _errorOtp = true;
                                                             _isLoading = false;
@@ -4144,8 +4227,11 @@ class _MapsState extends State<Maps>
                                       child: Container(
                                       height: media.height * 1,
                                       width: media.width * 1,
-                                      color:
-                                          Colors.transparent.withOpacity(0.6),
+                                      // color:
+                                      //     Colors.transparent.withOpacity(0.6),
+                                      color: (isDarkTheme == true)
+                                          ? textColor.withOpacity(0.2)
+                                          : Colors.transparent.withOpacity(0.6),
                                       alignment: Alignment.center,
                                       child: Column(
                                         mainAxisAlignment:
@@ -4218,8 +4304,9 @@ class _MapsState extends State<Maps>
                                                                             .circle,
                                                                         border: Border.all(
                                                                             color:
-                                                                                Colors.black,
-                                                                            width: 1.2)),
+                                                                                textColor,
+                                                                            width:
+                                                                                1.2)),
                                                                     alignment:
                                                                         Alignment
                                                                             .center,
@@ -4231,9 +4318,9 @@ class _MapsState extends State<Maps>
                                                                             width:
                                                                                 media.width * 0.03,
                                                                             decoration:
-                                                                                const BoxDecoration(
+                                                                                BoxDecoration(
                                                                               shape: BoxShape.circle,
-                                                                              color: Colors.black,
+                                                                              color: textColor,
                                                                             ),
                                                                           )
                                                                         : Container(),
@@ -4252,6 +4339,9 @@ class _MapsState extends State<Maps>
                                                                               i]
                                                                           [
                                                                           'reason'],
+                                                                      style: TextStyle(
+                                                                          color:
+                                                                              textColor),
                                                                     ),
                                                                   )
                                                                 ],
@@ -4282,8 +4372,8 @@ class _MapsState extends State<Maps>
                                                             shape:
                                                                 BoxShape.circle,
                                                             border: Border.all(
-                                                                color: Colors
-                                                                    .black,
+                                                                color:
+                                                                    textColor,
                                                                 width: 1.2)),
                                                         alignment:
                                                             Alignment.center,
@@ -4297,11 +4387,11 @@ class _MapsState extends State<Maps>
                                                                         .width *
                                                                     0.03,
                                                                 decoration:
-                                                                    const BoxDecoration(
+                                                                    BoxDecoration(
                                                                   shape: BoxShape
                                                                       .circle,
-                                                                  color: Colors
-                                                                      .black,
+                                                                  color:
+                                                                      textColor,
                                                                 ),
                                                               )
                                                             : Container(),
@@ -4310,9 +4400,12 @@ class _MapsState extends State<Maps>
                                                         width:
                                                             media.width * 0.05,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_others'])
+                                                      Text(
+                                                          languages[
+                                                                  choosenLanguage]
+                                                              ['text_others'],
+                                                          style: TextStyle(
+                                                              color: textColor))
                                                     ],
                                                   ),
                                                 ),
@@ -4348,9 +4441,14 @@ class _MapsState extends State<Maps>
                                                                 [
                                                                 'text_cancelRideReason'],
                                                             hintStyle: GoogleFonts.roboto(
+                                                                color: textColor
+                                                                    .withOpacity(
+                                                                        0.4),
                                                                 fontSize: media
                                                                         .width *
                                                                     twelve)),
+                                                        style: TextStyle(
+                                                            color: textColor),
                                                         maxLines: 4,
                                                         minLines: 2,
                                                         onChanged: (val) {
@@ -4403,9 +4501,11 @@ class _MapsState extends State<Maps>
                                                                     .isNotEmpty) {
                                                               _cancellingError =
                                                                   '';
-                                                              var val = await cancelRequestDriver(
-                                                                  cancelReasonText);
-                                                              if(val == 'logout'){
+                                                              var val =
+                                                                  await cancelRequestDriver(
+                                                                      cancelReasonText);
+                                                              if (val ==
+                                                                  'logout') {
                                                                 navigateLogout();
                                                               }
                                                               setState(() {
@@ -4422,9 +4522,11 @@ class _MapsState extends State<Maps>
                                                               });
                                                             }
                                                           } else {
-                                                            var val = await cancelRequestDriver(
-                                                                _cancelReason);
-                                                            if(val == 'logout'){
+                                                            var val =
+                                                                await cancelRequestDriver(
+                                                                    _cancelReason);
+                                                            if (val ==
+                                                                'logout') {
                                                               navigateLogout();
                                                             }
                                                             setState(() {
@@ -4471,8 +4573,12 @@ class _MapsState extends State<Maps>
                                       child: Container(
                                         height: media.height * 1,
                                         width: media.width * 1,
-                                        color:
-                                            Colors.transparent.withOpacity(0.6),
+                                        // color:
+                                        //     Colors.transparent.withOpacity(0.6),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.2)
+                                            : Colors.transparent
+                                                .withOpacity(0.6),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -4498,8 +4604,11 @@ class _MapsState extends State<Maps>
                                                                   false;
                                                             });
                                                           },
-                                                          child: const Icon(Icons
-                                                              .cancel_outlined))),
+                                                          child: Icon(
+                                                              Icons
+                                                                  .cancel_outlined,
+                                                              color:
+                                                                  textColor))),
                                                 ],
                                               ),
                                             ),
@@ -4548,7 +4657,8 @@ class _MapsState extends State<Maps>
                                                                     false);
                                                             userDetails.clear();
                                                           });
-                                                        }else if(result == 'logout'){
+                                                        } else if (result ==
+                                                            'logout') {
                                                           navigateLogout();
                                                         } else {
                                                           setState(() {
@@ -4579,8 +4689,12 @@ class _MapsState extends State<Maps>
                                       child: Container(
                                         height: media.height * 1,
                                         width: media.width * 1,
-                                        color:
-                                            Colors.transparent.withOpacity(0.6),
+                                        // color:
+                                        //     Colors.transparent.withOpacity(0.6),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.2)
+                                            : Colors.transparent
+                                                .withOpacity(0.6),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -4605,8 +4719,11 @@ class _MapsState extends State<Maps>
                                                               logout = false;
                                                             });
                                                           },
-                                                          child: const Icon(Icons
-                                                              .cancel_outlined))),
+                                                          child: Icon(
+                                                              Icons
+                                                                  .cancel_outlined,
+                                                              color:
+                                                                  textColor))),
                                                 ],
                                               ),
                                             ),
@@ -4679,8 +4796,12 @@ class _MapsState extends State<Maps>
                                       child: Container(
                                         height: media.height * 1,
                                         width: media.width * 1,
-                                        color:
-                                            Colors.transparent.withOpacity(0.6),
+                                        // color:
+                                        //     Colors.transparent.withOpacity(0.6),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.2)
+                                            : Colors.transparent
+                                                .withOpacity(0.6),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
@@ -4706,8 +4827,11 @@ class _MapsState extends State<Maps>
                                                                   false;
                                                             });
                                                           },
-                                                          child: const Icon(Icons
-                                                              .cancel_outlined))),
+                                                          child: Icon(
+                                                              Icons
+                                                                  .cancel_outlined,
+                                                              color:
+                                                                  textColor))),
                                                 ],
                                               ),
                                             ),
@@ -4811,7 +4935,7 @@ class _MapsState extends State<Maps>
                                           setState(() async {
                                             internetTrue();
                                             var val = await getUserDetails();
-                                            if(val == 'logout'){
+                                            if (val == 'logout') {
                                               navigateLogout();
                                             }
                                           });
@@ -4826,8 +4950,12 @@ class _MapsState extends State<Maps>
                                       child: Container(
                                         height: media.height * 1,
                                         width: media.width * 1,
-                                        color:
-                                            Colors.transparent.withOpacity(0.6),
+                                        // color:
+                                        //     Colors.transparent.withOpacity(0.6),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.2)
+                                            : Colors.transparent
+                                                .withOpacity(0.6),
                                         child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -4856,8 +4984,10 @@ class _MapsState extends State<Maps>
                                                                 shape: BoxShape
                                                                     .circle,
                                                                 color: page),
-                                                        child: const Icon(Icons
-                                                            .cancel_outlined),
+                                                        child: Icon(
+                                                            Icons
+                                                                .cancel_outlined,
+                                                            color: textColor),
                                                       ),
                                                     ),
                                                   ],
@@ -4944,8 +5074,11 @@ class _MapsState extends State<Maps>
                                                                         : Container()
                                                                   ],
                                                                 ),
-                                                                const Icon(Icons
-                                                                    .notification_add)
+                                                                Icon(
+                                                                    Icons
+                                                                        .notification_add,
+                                                                    color:
+                                                                        textColor)
                                                               ],
                                                             ),
                                                           ),
@@ -4990,7 +5123,7 @@ class _MapsState extends State<Maps>
                                                                                       )
                                                                                     ],
                                                                                   ),
-                                                                                  const Icon(Icons.call)
+                                                                                  Icon(Icons.call, color: textColor)
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -5029,25 +5162,113 @@ class _MapsState extends State<Maps>
                                       ))
                                   : Container(),
 
-                                  (_showToast == true)
-                        ? Positioned(
-                            top: media.height * 0.2,
-                            child: Container(
-                              width: media.width * 0.9,
-                              margin: EdgeInsets.all(media.width * 0.05),
-                              padding: EdgeInsets.all(media.width * 0.025),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: page),
-                              child: Text(
-                                'Route Poly line is not available in demo',
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * twelve,
-                                    color: textColor),
-                                textAlign: TextAlign.center,
-                              ),
-                            ))
-                        : Container(),
+                              (_showToast == true)
+                                  ? Positioned(
+                                      top: media.height * 0.2,
+                                      child: Container(
+                                        width: media.width * 0.9,
+                                        margin:
+                                            EdgeInsets.all(media.width * 0.05),
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.025),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: page),
+                                        child: Text(
+                                          'Route Poly line is not available in demo',
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * twelve,
+                                              color: textColor),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ))
+                                  : Container(),
+
+                              (updateAvailable == true)
+                                  ? Positioned(
+                                      top: 0,
+                                      child: Container(
+                                        height: media.height * 1,
+                                        width: media.width * 1,
+                                        color:
+                                            Colors.transparent.withOpacity(0.6),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                                width: media.width * 0.9,
+                                                padding: EdgeInsets.all(
+                                                    media.width * 0.05),
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color: page,
+                                                ),
+                                                child: Column(
+                                                  children: [
+                                                    SizedBox(
+                                                        width:
+                                                            media.width * 0.8,
+                                                        child: Text(
+                                                          languages[
+                                                                  choosenLanguage]
+                                                              [
+                                                              'text_update_available'],
+                                                          style: GoogleFonts.roboto(
+                                                              fontSize:
+                                                                  media.width *
+                                                                      sixteen,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600),
+                                                        )),
+                                                    SizedBox(
+                                                      height:
+                                                          media.width * 0.05,
+                                                    ),
+                                                    Button(
+                                                        onTap: () async {
+                                                          if (platform ==
+                                                              TargetPlatform
+                                                                  .android) {
+                                                            openBrowser(
+                                                                'https://play.google.com/store/apps/details?id=${package.packageName}');
+                                                          } else {
+                                                            setState(() {
+                                                              _isLoading = true;
+                                                            });
+                                                            var response =
+                                                                await http.get(
+                                                                    Uri.parse(
+                                                                        'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
+                                                            if (response
+                                                                    .statusCode ==
+                                                                200) {
+                                                              openBrowser(jsonDecode(
+                                                                          response
+                                                                              .body)[
+                                                                      'results'][0]
+                                                                  [
+                                                                  'trackViewUrl']);
+
+                                                              // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
+                                                            }
+
+                                                            setState(() {
+                                                              _isLoading =
+                                                                  false;
+                                                            });
+                                                          }
+                                                        },
+                                                        text: 'Update')
+                                                  ],
+                                                ))
+                                          ],
+                                        ),
+                                      ))
+                                  : Container(),
 
                               //loader
                               (_isLoading == true)
@@ -5077,21 +5298,23 @@ class _MapsState extends State<Maps>
                                                     borderRadius: (languageDirection ==
                                                             'ltr')
                                                         ? const BorderRadius.only(
-                                                            topLeft: Radius
-                                                                .circular(10),
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    10),
                                                             bottomLeft:
                                                                 Radius.circular(
                                                                     10))
-                                                        : const BorderRadius
-                                                                .only(
+                                                        : const BorderRadius.only(
                                                             topRight:
                                                                 Radius.circular(
                                                                     10),
                                                             bottomRight:
                                                                 Radius.circular(
                                                                     10)),
-                                                    color:
-                                                        const Color(0xff222222)),
+                                                    color: (isDarkTheme == true)
+                                                        ? textColor
+                                                        : const Color(
+                                                            0xff222222)),
                                                 alignment: Alignment.center,
                                                 child: const Icon(
                                                   Icons.star,
@@ -5114,6 +5337,7 @@ class _MapsState extends State<Maps>
                                                       languages[choosenLanguage]
                                                           ['text_pickpoint'],
                                                       style: GoogleFonts.roboto(
+                                                          color: textColor,
                                                           fontSize:
                                                               media.width *
                                                                   twelve,
@@ -5133,6 +5357,8 @@ class _MapsState extends State<Maps>
                                                                     .fade,
                                                             softWrap: false,
                                                             style: GoogleFonts.roboto(
+                                                                color:
+                                                                    textColor,
                                                                 fontSize: media
                                                                         .width *
                                                                     twelve),
@@ -5166,80 +5392,120 @@ class _MapsState extends State<Maps>
                                 top: media.height * 2.5,
                                 left: 100,
                                 child: RepaintBoundary(
-        key: iconDropKey,
-        child: Column(
-          children: [
-            Container(
-              width: media.width * 0.55,
-              height: media.width * 0.12,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10), color: page),
-              child: Row(
-                children: [
-                  Container(
-                    height: media.width * 0.12,
-                    width: media.width * 0.12,
-                    decoration: BoxDecoration(
-                        borderRadius: (languageDirection == 'ltr')
-                            ? const BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                bottomLeft: Radius.circular(10))
-                            : const BorderRadius.only(
-                                topRight: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
-                        color: const Color(0xff222222)),
-                    alignment: Alignment.center,
-                    child: const Icon(
-                      Icons.star,
-                      color: Color(0xffE60000),
-                    ),
-                  ),
-                  Expanded(
-                      child: Container(
-                    padding: EdgeInsets.only(
-                        left: media.width * 0.02, right: media.width * 0.02),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                        (dropDistance != '' && driverReq['accepted_at'] == null) ?  "${languages[choosenLanguage]['text_droppoint']} ($dropDistance)" : languages[choosenLanguage]['text_droppoint'],
-                          // languages[choosenLanguage]['text_droppoint'] + ' (' + dropDistance + ')',
-                          style: GoogleFonts.roboto(
-                              fontSize: media.width * twelve,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        (driverReq.isNotEmpty &&
-                                driverReq['drop_address'] != null)
-                            ? Text(
-                                driverReq['drop_address'],
-                                maxLines: 1,
-                                overflow: TextOverflow.fade,
-                                softWrap: false,
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * twelve),
-                              )
-                            : Container(),
-                      ],
-                    ),
-                  ))
-                ],
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                      image: AssetImage('assets/images/droploc.png'),
-                      fit: BoxFit.contain)),
-              height: media.width * 0.05,
-              width: media.width * 0.05,
-            )
-          ],
-        )),
+                                    key: iconDropKey,
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          width: media.width * 0.55,
+                                          height: media.width * 0.12,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: page),
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: media.width * 0.12,
+                                                width: media.width * 0.12,
+                                                decoration: BoxDecoration(
+                                                    borderRadius: (languageDirection ==
+                                                            'ltr')
+                                                        ? const BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    10),
+                                                            bottomLeft:
+                                                                Radius.circular(
+                                                                    10))
+                                                        : const BorderRadius.only(
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    10)),
+                                                    color: (isDarkTheme == true)
+                                                        ? textColor
+                                                        : const Color(
+                                                            0xff222222)),
+                                                alignment: Alignment.center,
+                                                child: const Icon(
+                                                  Icons.star,
+                                                  color: Color(0xffE60000),
+                                                ),
+                                              ),
+                                              Expanded(
+                                                  child: Container(
+                                                padding: EdgeInsets.only(
+                                                    left: media.width * 0.02,
+                                                    right: media.width * 0.02),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      (dropDistance != '' &&
+                                                              driverReq[
+                                                                      'accepted_at'] ==
+                                                                  null)
+                                                          ? "${languages[choosenLanguage]['text_droppoint']} ($dropDistance)"
+                                                          : languages[
+                                                                  choosenLanguage]
+                                                              [
+                                                              'text_droppoint'],
+                                                      // languages[choosenLanguage]['text_droppoint'] + ' (' + dropDistance + ')',
+                                                      style: GoogleFonts.roboto(
+                                                          color: textColor,
+                                                          fontSize:
+                                                              media.width *
+                                                                  twelve,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    (driverReq.isNotEmpty &&
+                                                            driverReq[
+                                                                    'drop_address'] !=
+                                                                null)
+                                                        ? Text(
+                                                            driverReq[
+                                                                'drop_address'],
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .fade,
+                                                            softWrap: false,
+                                                            style: GoogleFonts.roboto(
+                                                                color:
+                                                                    textColor,
+                                                                fontSize: media
+                                                                        .width *
+                                                                    twelve),
+                                                          )
+                                                        : Container(),
+                                                  ],
+                                                ),
+                                              ))
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Container(
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      'assets/images/droploc.png'),
+                                                  fit: BoxFit.contain)),
+                                          height: media.width * 0.05,
+                                          width: media.width * 0.05,
+                                        )
+                                      ],
+                                    )),
                               )
                             ],
                           ),
@@ -5438,5 +5704,3 @@ class OwnerCarImagecontainer extends StatelessWidget {
     );
   }
 }
-
-

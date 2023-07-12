@@ -41,10 +41,14 @@ class MyApp extends StatelessWidget {
             FocusManager.instance.primaryFocus?.unfocus();
           }
         },
-        child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'Tagxi Driver',
-            theme: ThemeData(),
-            home: const LoadingPage()));
+        child: ValueListenableBuilder(
+            valueListenable: valueNotifierHome.value,
+            builder: (context, value, child) {
+              return MaterialApp(
+                  debugShowCheckedModeBanner: false,
+                  title: 'Tagxi Driver',
+                  theme: ThemeData(),
+                  home: const LoadingPage());
+            }));
   }
 }

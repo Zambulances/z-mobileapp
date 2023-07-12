@@ -34,8 +34,11 @@ class _VehicleColorState extends State<VehicleColor> {
         (route) => false);
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   navigateMap() {
@@ -72,7 +75,7 @@ class _VehicleColorState extends State<VehicleColor> {
                     children: [
                       Container(
                           width: media.width * 1,
-                          color: topBar,
+                          color: page,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -80,7 +83,8 @@ class _VehicleColorState extends State<VehicleColor> {
                                   onTap: () {
                                     Navigator.pop(context);
                                   },
-                                  child: const Icon(Icons.arrow_back)),
+                                  child:
+                                      Icon(Icons.arrow_back, color: textColor)),
                             ],
                           )),
                       SizedBox(
@@ -155,11 +159,16 @@ class _VehicleColorState extends State<VehicleColor> {
                                     showDialog(
                                         context: context,
                                         barrierDismissible: false,
+                                        barrierColor: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.2)
+                                            : Colors.transparent
+                                                .withOpacity(0.6),
                                         builder: (context) {
                                           return AlertDialog(
+                                            backgroundColor: page,
                                             content: Container(
                                               width: media.width * 0.8,
-                                              color: Colors.white,
+                                              color: page,
                                               child: Text(
                                                 languages[choosenLanguage]
                                                     ['text_vehicle_added'],
@@ -188,7 +197,7 @@ class _VehicleColorState extends State<VehicleColor> {
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
-                                  }else if(reg == 'logout'){
+                                  } else if (reg == 'logout') {
                                     navigateLogout();
                                   } else {
                                     setState(() {
@@ -203,7 +212,7 @@ class _VehicleColorState extends State<VehicleColor> {
                                     vehicleMake.clear();
                                     vehicleModel.clear();
                                     vehicleType.clear();
-                                  }else if(update == 'logout'){
+                                  } else if (update == 'logout') {
                                     navigateLogout();
                                   }
                                   setState(() {

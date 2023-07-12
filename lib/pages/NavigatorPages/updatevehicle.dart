@@ -54,7 +54,7 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: const Icon(Icons.arrow_back)))
+                          child: Icon(Icons.arrow_back, color: textColor)))
                 ],
               ),
               SizedBox(
@@ -71,7 +71,9 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                             boxShadow: [
                               BoxShadow(
                                   blurRadius: 2,
-                                  color: Colors.black.withOpacity(0.2),
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.3)
+                                      : Colors.black.withOpacity(0.2),
                                   spreadRadius: 2),
                             ],
                             color: page),
@@ -81,18 +83,36 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                               languages[choosenLanguage]['text_type'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
-                                  color: hintColor),
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.5)
+                                      : hintColor),
                             ),
                             SizedBox(
                               height: media.width * 0.025,
                             ),
-                            Text(
-                              userDetails['vehicle_type_name'],
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * sixteen,
-                                  color: textColor,
-                                  fontWeight: FontWeight.w600),
-                            ),
+                            userDetails['vehicle_types'] == []
+                                ? Text(
+                                    userDetails['vehicle_type_name'],
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w600),
+                                  )
+                                : Container(),
+                            if (userDetails['vehicle_types'] != [])
+                              for (var i = 0;
+                                  i <=
+                                      userDetails['driverVehicleType']['data']
+                                              .length -
+                                          1;
+                                  i++)
+                                Text(
+                                  '${userDetails['driverVehicleType']['data'][i]['vehicletype_name']}',
+                                  style: GoogleFonts.roboto(
+                                      fontSize: media.width * sixteen,
+                                      color: textColor,
+                                      fontWeight: FontWeight.w600),
+                                ),
                             SizedBox(
                               height: media.width * 0.05,
                             ),
@@ -100,7 +120,9 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                               languages[choosenLanguage]['text_make'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
-                                  color: hintColor),
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.5)
+                                      : hintColor),
                             ),
                             SizedBox(
                               height: media.width * 0.025,
@@ -119,7 +141,9 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                               languages[choosenLanguage]['text_model'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
-                                  color: hintColor),
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.5)
+                                      : hintColor),
                             ),
                             SizedBox(
                               height: media.width * 0.025,
@@ -138,7 +162,9 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                               languages[choosenLanguage]['text_number'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
-                                  color: hintColor),
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.5)
+                                      : hintColor),
                             ),
                             SizedBox(
                               height: media.width * 0.025,
@@ -157,7 +183,9 @@ class _UpdateVehicleState extends State<UpdateVehicle> {
                               languages[choosenLanguage]['text_color'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * sixteen,
-                                  color: hintColor),
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.5)
+                                      : hintColor),
                             ),
                             SizedBox(
                               height: media.width * 0.025,

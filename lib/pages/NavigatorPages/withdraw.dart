@@ -111,7 +111,7 @@ class _WithdrawState extends State<Withdraw> {
                                 onTap: () {
                                   Navigator.pop(context);
                                 },
-                                child: const Icon(Icons.arrow_back)))
+                                child: Icon(Icons.arrow_back, color: textColor)))
                       ],
                     ),
                     SizedBox(
@@ -133,6 +133,7 @@ class _WithdrawState extends State<Withdraw> {
                               walletBalance['currency_symbol'] +
                                   withDrawList['wallet_balance'].toString(),
                               style: GoogleFonts.roboto(
+                                  color: textColor,
                                   fontSize: media.width * fourty,
                                   fontWeight: FontWeight.w600),
                             ),
@@ -197,7 +198,11 @@ class _WithdrawState extends State<Withdraw> {
                                                                             .width *
                                                                         fourteen,
                                                                     color:
-                                                                        hintColor),
+                                                                        (isDarkTheme ==
+                                                                            true)
+                                                                        ? textColor
+                                                                            .withOpacity(0.5)
+                                                                        : hintColor),
                                                               ),
                                                               SizedBox(
                                                                 height: media
@@ -268,7 +273,11 @@ class _WithdrawState extends State<Withdraw> {
                                       : (_isLoading == false &&
                                               withDrawHistory.isEmpty)
                                           ? Text(languages[choosenLanguage]
-                                              ['text_noDataFound'])
+                                              ['text_noDataFound'],
+                                              style: TextStyle(
+                                                color: textColor
+                                              ),
+                                            )
                                           : Container(),
                                   (withDrawHistoryPages.isNotEmpty)
                                       ? (withDrawHistoryPages['current_page'] <
@@ -394,7 +403,9 @@ class _WithdrawState extends State<Withdraw> {
                                             walletBalance['currency_symbol'],
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * fifteen,
-                                                color: textColor,
+                                                color: (isDarkTheme == true)
+                                                    ? Colors.black
+                                                    : textColor,
                                                 fontWeight: FontWeight.w600),
                                           )),
                                       SizedBox(
@@ -431,8 +442,14 @@ class _WithdrawState extends State<Withdraw> {
                                                 ['text_enteramount'],
                                             hintStyle: GoogleFonts.roboto(
                                                 fontSize: media.width * twelve,
-                                                color: hintColor),
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.3)
+                                                    : hintColor),
                                           ),
+                                          style: GoogleFonts.roboto(
+                                              fontSize: media.width * fourteen,
+                                              fontWeight: FontWeight.normal,
+                                              color: textColor),
                                           maxLines: 1,
                                         ),
                                       )

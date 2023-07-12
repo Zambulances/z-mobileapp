@@ -26,13 +26,16 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
   }
 
-  navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
-  getMessage()async{
+  getMessage() async {
     var val = await getCurrentMessages();
-    if(val == 'logout'){
+    if (val == 'logout') {
       navigateLogout();
     }
   }
@@ -104,14 +107,17 @@ class _ChatPageState extends State<ChatPage> {
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.2),
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.3)
+                                                    : Colors.black
+                                                        .withOpacity(0.2),
                                                 spreadRadius: 2,
                                                 blurRadius: 2)
                                           ],
                                           color: page),
                                       alignment: Alignment.center,
-                                      child: const Icon(Icons.arrow_back),
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor),
                                     ),
                                   ),
                                 )
@@ -142,44 +148,60 @@ class _ChatPageState extends State<ChatPage> {
                                                   : CrossAxisAlignment.start,
                                               children: [
                                                 Container(
-                                                  width: media.width * 0.5,
-                                                  padding: EdgeInsets.all(
-                                                      media.width * 0.04),
+                                                  width: media.width * 0.4,
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      media.width * 0.04,
+                                                      media.width * 0.02,
+                                                      media.width * 0.04,
+                                                      media.width * 0.02),
                                                   decoration: BoxDecoration(
-                                                      borderRadius: (chatList[i]['from_type'] == 2)
+                                                      borderRadius: (chatList[i][
+                                                                  'from_type'] ==
+                                                              2)
                                                           ? const BorderRadius.only(
-                                                              topLeft:
-                                                                  Radius.circular(
-                                                                      24),
-                                                              bottomLeft:
-                                                                  Radius.circular(
-                                                                      24),
-                                                              bottomRight:
-                                                                  Radius.circular(
-                                                                      24))
+                                                              topLeft: Radius
+                                                                  .circular(24),
+                                                              bottomLeft: Radius
+                                                                  .circular(24),
+                                                              bottomRight: Radius
+                                                                  .circular(24))
                                                           : const BorderRadius.only(
-                                                              topRight:
-                                                                  Radius.circular(
-                                                                      24),
+                                                              topRight: Radius
+                                                                  .circular(24),
                                                               bottomLeft:
-                                                                  Radius.circular(
-                                                                      24),
-                                                              bottomRight:
-                                                                  Radius.circular(24)),
-                                                      color: (chatList[i]['from_type'] == 2) ? const Color(0xff000000).withOpacity(0.15) : const Color(0xff222222)),
+                                                                  Radius.circular(24),
+                                                              bottomRight: Radius.circular(24)),
+                                                      color: (chatList[i]['from_type'] == 2)
+                                                          ? (isDarkTheme == true)
+                                                              ? textColor
+                                                              : const Color(0xff000000).withOpacity(0.15)
+                                                          : (isDarkTheme == true)
+                                                              ? textColor.withOpacity(0.3)
+                                                              : const Color(0xff222222)),
                                                   child: Text(
                                                     chatList[i]['message'],
                                                     style: GoogleFonts.roboto(
                                                         fontSize: media.width *
                                                             fourteen,
-                                                        color: Colors.white),
+                                                        color: (chatList[i][
+                                                                    'from_type'] ==
+                                                                2)
+                                                            ? (isDarkTheme ==
+                                                                    true)
+                                                                ? Colors.black
+                                                                : Colors.white
+                                                            : Colors.white),
                                                   ),
                                                 ),
                                                 SizedBox(
                                                   height: media.width * 0.015,
                                                 ),
-                                                Text(chatList[i]
-                                                    ['converted_created_at'])
+                                                Text(
+                                                  chatList[i]
+                                                      ['converted_created_at'],
+                                                  style: TextStyle(
+                                                      color: textColor),
+                                                )
                                               ],
                                             ),
                                           ));
@@ -215,7 +237,11 @@ class _ChatPageState extends State<ChatPage> {
                                               ['text_entermessage'],
                                           hintStyle: GoogleFonts.roboto(
                                               fontSize: media.width * twelve,
-                                              color: hintColor)),
+                                              color: (isDarkTheme == true)
+                                                  ? textColor.withOpacity(0.5)
+                                                  : hintColor)),
+                                      style:
+                                          GoogleFonts.roboto(color: textColor),
                                       minLines: 1,
                                       onChanged: (val) {},
                                     ),
@@ -229,8 +255,9 @@ class _ChatPageState extends State<ChatPage> {
                                       });
 
                                       //api call for send message
-                                      var val = await sendMessage(chatText.text);
-                                      if(val == 'logout'){
+                                      var val =
+                                          await sendMessage(chatText.text);
+                                      if (val == 'logout') {
                                         navigateLogout();
                                       }
                                       chatText.clear();
@@ -247,6 +274,7 @@ class _ChatPageState extends State<ChatPage> {
                                           child: Image.asset(
                                             'assets/images/send.png',
                                             fit: BoxFit.contain,
+                                            color: textColor,
                                             width: media.width * 0.075,
                                           )),
                                     ),

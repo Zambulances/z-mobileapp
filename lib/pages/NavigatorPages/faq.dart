@@ -86,7 +86,7 @@ class _FaqState extends State<Faq> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(Icons.arrow_back, color: textColor)))
                           ],
                         ),
                         SizedBox(

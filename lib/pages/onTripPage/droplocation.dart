@@ -11,7 +11,7 @@ import 'package:tagxi_driver/styles/styles.dart';
 import 'package:tagxi_driver/translation/translation.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:permission_handler/permission_handler.dart' as perm;
-import 'package:location/location.dart';
+// import 'package:location/location.dart';
 import 'package:tagxi_driver/widgets/widgets.dart';
 import 'package:uuid/uuid.dart';
 
@@ -28,8 +28,7 @@ bool serviceNotAvailable = false;
 class _DropLocationState extends State<DropLocation>
     with WidgetsBindingObserver {
   GoogleMapController? _controller;
-  late PermissionStatus permission;
-  Location location = Location();
+late geolocs.LocationPermission permission; // Location location = Location();
   String _state = '';
   bool _isLoading = false;
   String sessionToken = const Uuid().v4();
@@ -96,16 +95,16 @@ class _DropLocationState extends State<DropLocation>
 
 //get current location
   getLocs() async {
-    permission = await location.hasPermission();
+    permission = await geolocs.GeolocatorPlatform.instance.checkPermission();
 
-    if (permission == PermissionStatus.denied ||
-        permission == PermissionStatus.deniedForever) {
+    if (permission == geolocs.LocationPermission.denied ||
+        permission == geolocs.LocationPermission.deniedForever) {
       setState(() {
         _state = '3';
         _isLoading = false;
       });
-    } else if (permission == PermissionStatus.granted ||
-        permission == PermissionStatus.grantedLimited) {
+    } else if (permission == geolocs.LocationPermission.whileInUse ||
+        permission == geolocs.LocationPermission.always) {
       var locs = await geolocs.Geolocator.getLastKnownPosition();
       if (locs != null) {
         setState(() {
@@ -238,8 +237,8 @@ class _DropLocationState extends State<DropLocation>
                                               setState(() {
                                                 _state = '';
                                               });
-                                              await location
-                                                  .requestPermission();
+                                              await geolocs.Geolocator.getCurrentPosition(
+                desiredAccuracy: geolocs.LocationAccuracy.low);
                                               getLocs();
                                             },
                                             child: Text(
@@ -324,7 +323,7 @@ class _DropLocationState extends State<DropLocation>
                                       color: page,
                                       borderRadius: BorderRadius.circular(
                                           media.width * 0.02)),
-                                  child: const Icon(Icons.my_location_sharp),
+                                  child: Icon(Icons.my_location_sharp, color: textColor),
                                 ),
                               ),
                             ),
@@ -542,14 +541,14 @@ class _DropLocationState extends State<DropLocation>
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                                color: Colors.black
+                                                color: (isDarkTheme == true) ? textColor.withOpacity(0.3) :Colors.black
                                                     .withOpacity(0.2),
                                                 spreadRadius: 2,
                                                 blurRadius: 2)
                                           ],
                                           color: page),
                                       alignment: Alignment.center,
-                                      child: const Icon(Icons.arrow_back),
+                                      child: Icon(Icons.arrow_back, color: textColor,),
                                     ),
                                   ),
                                   Container(
@@ -563,7 +562,7 @@ class _DropLocationState extends State<DropLocation>
                                     decoration: BoxDecoration(
                                         boxShadow: [
                                           BoxShadow(
-                                              color:
+                                              color: (isDarkTheme == true) ? textColor.withOpacity(0.3) :
                                                   Colors.black.withOpacity(0.2),
                                               spreadRadius: 2,
                                               blurRadius: 2)
@@ -587,7 +586,10 @@ class _DropLocationState extends State<DropLocation>
                                                 ['text_4lettersforautofill'],
                                             hintStyle: GoogleFonts.roboto(
                                                 fontSize: media.width * twelve,
-                                                color: hintColor)),
+                                                color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor)),
+                                        style: GoogleFonts.roboto(
+                                          color: textColor
+                                        ),
                                         maxLines: 1,
                                         onChanged: (val) {
                                           _debouncer.run(() {
@@ -662,13 +664,15 @@ class _DropLocationState extends State<DropLocation>
                                                                       BoxDecoration(
                                                                     shape: BoxShape
                                                                         .circle,
-                                                                    color: Colors
+                                                                    color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : Colors
                                                                             .grey[
                                                                         200],
                                                                   ),
-                                                                  child: const Icon(
+                                                                  child: Icon(
                                                                       Icons
-                                                                          .access_time),
+                                                                          .access_time,
+                                                                      color: textColor    
+                                                                  ),
                                                                 ),
                                                                 InkWell(
                                                                   onTap:
@@ -765,9 +769,17 @@ class _DropLocationState extends State<DropLocation>
                                               width: media.width * 0.02,
                                             ),
                                             Text(
-                                                userDetails['currency_symbol']),
-                                            Text(etaDetails['total']
-                                                .toStringAsFixed(2)),
+                                                userDetails['currency_symbol'], 
+                                                style: TextStyle(
+                                                  color: textColor
+                                                ),
+                                            ),
+                                            Text(
+                                              etaDetails['total']
+                                                .toStringAsFixed(2),
+                                              style:
+                                                  TextStyle(color: textColor),  
+                                            ),
                                           ],
                                         ),
                                         Row(
@@ -923,7 +935,13 @@ class _DropLocationState extends State<DropLocation>
                                                 hintStyle: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * twelve,
-                                                    color: hintColor)),
+                                                    color: (isDarkTheme == true)
+                                                        ? textColor
+                                                            .withOpacity(0.5)
+                                                        : hintColor)),
+                                                style: GoogleFonts.roboto(
+                                                  color: textColor
+                                                ),        
                                           ),
                                         ),
                                         SizedBox(
@@ -968,7 +986,13 @@ class _DropLocationState extends State<DropLocation>
                                                 hintStyle: GoogleFonts.roboto(
                                                     fontSize:
                                                         media.width * twelve,
-                                                    color: hintColor)),
+                                                    color: (isDarkTheme == true)
+                                                        ? textColor
+                                                            .withOpacity(0.5)
+                                                        : hintColor)),
+                                                style: GoogleFonts.roboto(
+                                                  color: textColor
+                                                ),        
                                           ),
                                         ),
                                         SizedBox(

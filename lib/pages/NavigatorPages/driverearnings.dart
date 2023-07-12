@@ -107,7 +107,7 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              child: const Icon(Icons.arrow_back)))
+                              child: Icon(Icons.arrow_back, color: textColor)))
                     ],
                   ),
                   SizedBox(
@@ -123,7 +123,7 @@ class _DriverEarningsState extends State<DriverEarnings> {
                           BoxShadow(
                               blurRadius: 2,
                               spreadRadius: 2,
-                              color: Colors.black.withOpacity(0.2))
+                              color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : Colors.black.withOpacity(0.2))
                         ]),
                     child: Row(
                       children: [
@@ -149,7 +149,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   color: (_showEarning == 0)
-                                      ? const Color(0xff222222)
+                                      ? (isDarkTheme == true)
+                                          ? Colors.white
+                                          : const Color(0xff222222)
                                       : page),
                               child: Text(
                                 languages[choosenLanguage]['text_today'],
@@ -157,7 +159,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                     fontSize: media.width * fifteen,
                                     fontWeight: FontWeight.w600,
                                     color: (_showEarning == 0)
-                                        ? Colors.white
+                                        ? (isDarkTheme == true)
+                                            ? Colors.black
+                                            : Colors.white
                                         : textColor),
                               )),
                         ),
@@ -183,7 +187,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   color: (_showEarning == 1)
-                                      ? const Color(0xff222222)
+                                      ? (isDarkTheme == true)
+                                          ? Colors.white
+                                          : const Color(0xff222222)
                                       : page),
                               child: Text(
                                 languages[choosenLanguage]['text_weekly'],
@@ -191,7 +197,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                     fontSize: media.width * fifteen,
                                     fontWeight: FontWeight.w600,
                                     color: (_showEarning == 1)
-                                        ? Colors.white
+                                        ? (isDarkTheme == true)
+                                            ? Colors.black
+                                            : Colors.white
                                         : textColor),
                               )),
                         ),
@@ -209,7 +217,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   color: (_showEarning == 2)
-                                      ? const Color(0xff222222)
+                                      ? (isDarkTheme == true)
+                                          ? Colors.white
+                                          : const Color(0xff222222)
                                       : page),
                               child: Text(
                                 languages[choosenLanguage]['text_report'],
@@ -217,7 +227,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                     fontSize: media.width * fifteen,
                                     fontWeight: FontWeight.w600,
                                     color: (_showEarning == 2)
-                                        ? Colors.white
+                                        ? (isDarkTheme == true)
+                                            ? Colors.black
+                                            : Colors.white
                                         : textColor),
                               )),
                         )
@@ -238,7 +250,7 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               driverTodayEarnings['current_date'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * fifteen,
-                                  color: hintColor),
+                                  color: (isDarkTheme == true) ? textColor.withOpacity(0.5) : hintColor),
                             ),
                             SizedBox(
                               height: media.width * 0.025,
@@ -285,7 +297,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               ['text_trips'],
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
-                                              color: hintColor),
+                                              color: (isDarkTheme == true)
+                                                  ? textColor.withOpacity(0.5)
+                                                  : hintColor),
                                         ),
                                       ),
                                       SizedBox(
@@ -320,7 +334,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               ['text_enable_wallet'],
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
-                                              color: hintColor),
+                                              color: (isDarkTheme == true)
+                                                  ? textColor.withOpacity(0.5)
+                                                  : hintColor),
                                         ),
                                       ),
                                       SizedBox(
@@ -355,7 +371,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               ['text_cash'],
                                           style: GoogleFonts.roboto(
                                               fontSize: media.width * sixteen,
-                                              color: hintColor),
+                                              color: (isDarkTheme == true)
+                                                  ? textColor.withOpacity(0.5)
+                                                  : hintColor),
                                         ),
                                       ),
                                       SizedBox(
@@ -489,7 +507,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                       driverWeeklyEarnings['end_of_week'],
                                   style: GoogleFonts.roboto(
                                       fontSize: media.width * fifteen,
-                                      color: hintColor),
+                                      color: (isDarkTheme == true)
+                                          ? textColor.withOpacity(0.5)
+                                          : hintColor),
                                 ),
                                 SizedBox(
                                   height: media.width * 0.025,
@@ -539,7 +559,12 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                     style: GoogleFonts.roboto(
                                                         fontSize: media.width *
                                                             twelve,
-                                                        color: hintColor),
+                                                        color: (isDarkTheme ==
+                                                                true)
+                                                            ? textColor
+                                                                .withOpacity(
+                                                                    0.5)
+                                                            : hintColor),
                                                   ),
                                                   SizedBox(
                                                     height: media.width * 0.01,
@@ -563,7 +588,12 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                     style: GoogleFonts.roboto(
                                                         fontSize: media.width *
                                                             twelve,
-                                                        color: hintColor),
+                                                        color: (isDarkTheme ==
+                                                                true)
+                                                            ? textColor
+                                                                .withOpacity(
+                                                                    0.5)
+                                                            : hintColor),
                                                   )
                                                 ],
                                               ));
@@ -597,7 +627,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               style: GoogleFonts.roboto(
                                                   fontSize:
                                                       media.width * sixteen,
-                                                  color: hintColor),
+                                                  color: (isDarkTheme == true)
+                                                      ? textColor
+                                                          .withOpacity(0.5)
+                                                      : hintColor),
                                             ),
                                           ),
                                           SizedBox(
@@ -671,7 +704,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               style: GoogleFonts.roboto(
                                                   fontSize:
                                                       media.width * sixteen,
-                                                  color: hintColor),
+                                                  color: (isDarkTheme == true)
+                                                      ? textColor
+                                                          .withOpacity(0.5)
+                                                      : hintColor),
                                             ),
                                           ),
                                           SizedBox(
@@ -708,7 +744,10 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               style: GoogleFonts.roboto(
                                                   fontSize:
                                                       media.width * sixteen,
-                                                  color: hintColor),
+                                                  color: (isDarkTheme == true)
+                                                      ? textColor
+                                                          .withOpacity(0.5)
+                                                      : hintColor),
                                             ),
                                           ),
                                           SizedBox(
@@ -861,7 +900,11 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                           decoration: BoxDecoration(
                                               border: Border(
                                                   bottom: BorderSide(
-                                                      color: underline,
+                                                      color: (isDarkTheme ==
+                                                              true)
+                                                          ? textColor
+                                                              .withOpacity(0.5)
+                                                          : underline,
                                                       width: 1.5))),
                                           child: Row(
                                             mainAxisAlignment:
@@ -886,8 +929,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                               media.width *
                                                                   sixteen),
                                                     ),
-                                              const Icon(
-                                                  Icons.date_range_outlined)
+                                              Icon(
+                                                  Icons.date_range_outlined, color: textColor)
                                             ],
                                           ),
                                         ),
@@ -910,7 +953,11 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                           decoration: BoxDecoration(
                                               border: Border(
                                                   bottom: BorderSide(
-                                                      color: underline,
+                                                      color: (isDarkTheme ==
+                                                              true)
+                                                          ? textColor
+                                                              .withOpacity(0.5)
+                                                          : underline,
                                                       width: 1.5))),
                                           child: Row(
                                             mainAxisAlignment:
@@ -935,8 +982,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                               media.width *
                                                                   sixteen),
                                                     ),
-                                              const Icon(
-                                                  Icons.date_range_outlined)
+                                              Icon(
+                                                  Icons.date_range_outlined, color: textColor)
                                             ],
                                           ),
                                         ),
@@ -977,7 +1024,11 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                   style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * fifteen,
-                                                      color: hintColor),
+                                                      color: (isDarkTheme ==
+                                                              true)
+                                                          ? textColor
+                                                              .withOpacity(0.5)
+                                                          : hintColor),
                                                 ),
                                                 SizedBox(
                                                   height: media.width * 0.025,
@@ -1042,8 +1093,12 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                                   fontSize: media
                                                                           .width *
                                                                       sixteen,
-                                                                  color:
-                                                                      hintColor),
+                                                                  color: (isDarkTheme ==
+                                                                          true)
+                                                                      ? textColor
+                                                                          .withOpacity(
+                                                                              0.5)
+                                                                      : hintColor),
                                                             ),
                                                           ),
                                                           SizedBox(
@@ -1142,8 +1197,12 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                                   fontSize: media
                                                                           .width *
                                                                       sixteen,
-                                                                  color:
-                                                                      hintColor),
+                                                                  color: (isDarkTheme ==
+                                                                          true)
+                                                                      ? textColor
+                                                                          .withOpacity(
+                                                                              0.5)
+                                                                      : hintColor),
                                                             ),
                                                           ),
                                                           SizedBox(
@@ -1191,8 +1250,12 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                                   fontSize: media
                                                                           .width *
                                                                       sixteen,
-                                                                  color:
-                                                                      hintColor),
+                                                                  color: (isDarkTheme ==
+                                                                          true)
+                                                                      ? textColor
+                                                                          .withOpacity(
+                                                                              0.5)
+                                                                      : hintColor),
                                                             ),
                                                           ),
                                                           SizedBox(

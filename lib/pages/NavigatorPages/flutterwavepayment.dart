@@ -124,6 +124,7 @@ if(mounted){
                                 child: Text(
                                   languages[choosenLanguage]['text_addmoney'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -133,7 +134,7 @@ if(mounted){
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back, color: textColor)))
                             ],
                           ),
                           SizedBox(
@@ -144,6 +145,7 @@ if(mounted){
                                 ' ' +
                                 addMoney.toString(),
                             style: GoogleFonts.roboto(
+                                color: textColor,
                                 fontSize: media.width * twenty,
                                 fontWeight: FontWeight.w600),
                           ),

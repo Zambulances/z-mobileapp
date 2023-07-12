@@ -31,19 +31,23 @@ class _FleetDocumentsState extends State<FleetDocuments> {
     getdata();
     super.initState();
   }
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getdata() async {
     var val = await getFleetDocumentsNeeded(widget.fleetid);
-    if(mounted){
-      if(val == 'logout'){
+    if (mounted) {
+      if (val == 'logout') {
         navigateLogout();
       }
-    setState(() {
-      _loaded = true;
-    });
+      setState(() {
+        _loaded = true;
+      });
     }
   }
 
@@ -75,7 +79,7 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                   children: [
                     Container(
                         width: media.width * 1,
-                        color: topBar,
+                        color: page,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -84,7 +88,10 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                                 onTap: () {
                                   Navigator.pop(context, true);
                                 },
-                                child: const Icon(Icons.arrow_back)),
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: textColor,
+                                )),
                           ],
                         )),
                     SizedBox(
@@ -115,7 +122,11 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                                               padding: const EdgeInsets.all(10),
                                               decoration: BoxDecoration(
                                                   border: Border.all(
-                                                      color: underline,
+                                                      color: (isDarkTheme ==
+                                                              true)
+                                                          ? textColor
+                                                              .withOpacity(0.4)
+                                                          : underline,    
                                                       width: 1),
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -167,13 +178,21 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                                                                               [
                                                                               'name']
                                                                           .toString(),
-                                                                  style: GoogleFonts.roboto(
-                                                                      fontSize:
-                                                                          media.width *
-                                                                              twenty,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold),
+                                                                  style:
+                                                                      GoogleFonts
+                                                                          .roboto(
+                                                                    fontSize: media
+                                                                            .width *
+                                                                        twenty,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: (isDarkTheme ==
+                                                                            true)
+                                                                        ? Colors
+                                                                            .white
+                                                                        : textColor,
+                                                                  ),
                                                                 ),
                                                               ),
                                                               const SizedBox(
@@ -219,6 +238,7 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                                                               width:
                                                                   media.width *
                                                                       0.075,
+                                                              color: textColor,
                                                             ),
                                                           )
                                                         ],
@@ -275,8 +295,11 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                                                                       style: GoogleFonts.roboto(
                                                                           fontSize: media.width *
                                                                               sixteen,
-                                                                          fontWeight:
-                                                                              FontWeight.bold),
+                                                                          fontWeight: FontWeight
+                                                                              .bold,
+                                                                          color: (isDarkTheme == true)
+                                                                              ? Colors.white
+                                                                              : textColor),
                                                                     ),
                                                                   ),
                                                                   const SizedBox(
@@ -342,6 +365,7 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                                                               width:
                                                                   media.width *
                                                                       0.075,
+                                                              color: textColor,
                                                             ),
                                                           )
                                                         ],
@@ -452,8 +476,11 @@ class _UploadDocsState extends State<UploadDocs> {
     Navigator.pop(context);
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
 //get camera permission
@@ -528,7 +555,7 @@ class _UploadDocsState extends State<UploadDocs> {
                 children: [
                   Container(
                       width: media.width * 1,
-                      color: topBar,
+                      color: page,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -536,7 +563,10 @@ class _UploadDocsState extends State<UploadDocs> {
                               onTap: () {
                                 Navigator.pop(context);
                               },
-                              child: const Icon(Icons.arrow_back)),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: textColor,
+                              )),
                         ],
                       )),
                   SizedBox(
@@ -600,7 +630,7 @@ class _UploadDocsState extends State<UploadDocs> {
                               decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                          color: underline, width: 1.5))),
+                                          color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : underline, width: 1.5))),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -613,12 +643,16 @@ class _UploadDocsState extends State<UploadDocs> {
                                               fontSize: media.width * sixteen),
                                         )
                                       : Text(
-                                          'Select Date',
+                                          languages[choosenLanguage]
+                                              ['text_expiry_date'],
                                           style: GoogleFonts.roboto(
                                               color: textColor.withOpacity(0.5),
                                               fontSize: media.width * sixteen),
                                         ),
-                                  const Icon(Icons.date_range_outlined)
+                                  Icon(
+                                    Icons.date_range_outlined,
+                                    color: textColor,
+                                  )
                                 ],
                               ),
                             ),
@@ -671,16 +705,20 @@ class _UploadDocsState extends State<UploadDocs> {
                           )),
                   SizedBox(height: media.height * 0.04),
                   (fleetimageFile != null &&
-                              (fleetdocumentsNeeded[fleetchoosenDocs]
+                              ((fleetdocumentsNeeded[fleetchoosenDocs]
                                       ['has_identify_number'] ==
-                                  true)
-                          ? idNumber.text.isNotEmpty
-                          : 1 + 1 == 2 &&
-                                  (fleetdocumentsNeeded[fleetchoosenDocs]
+                                  true
+                          && idNumber.text.isNotEmpty)
+                          || fleetdocumentsNeeded[fleetchoosenDocs]
+                                      ['has_identify_number'] ==
+                                  false) &&
+                                  ((fleetdocumentsNeeded[fleetchoosenDocs]
                                           ['has_expiry_date'] ==
-                                      true)
-                              ? fleetdate != ''
-                              : 1 + 1 == 2)
+                                      true
+                              && fleetdate != '')
+                              || fleetdocumentsNeeded[fleetchoosenDocs]
+                                          ['has_expiry_date'] ==
+                                      false))
                       ? Button(
                           onTap: () async {
                             FocusManager.instance.primaryFocus?.unfocus();
@@ -689,12 +727,13 @@ class _UploadDocsState extends State<UploadDocs> {
                             });
                             var result = await uploadFleetDocs(widget.fleetid);
                             if (result == 'success') {
-                              var val = await getFleetDocumentsNeeded(widget.fleetid);
-                              if(val == 'logout'){
+                              var val =
+                                  await getFleetDocumentsNeeded(widget.fleetid);
+                              if (val == 'logout') {
                                 navigateLogout();
                               }
                               pop();
-                            }else if(result == 'logout'){
+                            } else if (result == 'logout') {
                               navigateLogout();
                             } else {
                               setState(() {
@@ -778,6 +817,7 @@ class _UploadDocsState extends State<UploadDocs> {
                                                 child: Icon(
                                                   Icons.camera_alt_outlined,
                                                   size: media.width * 0.064,
+                                                  color: textColor,
                                                 )),
                                           ),
                                           SizedBox(
@@ -811,6 +851,7 @@ class _UploadDocsState extends State<UploadDocs> {
                                                 child: Icon(
                                                   Icons.image_outlined,
                                                   size: media.width * 0.064,
+                                                  color: textColor,
                                                 )),
                                           ),
                                           SizedBox(

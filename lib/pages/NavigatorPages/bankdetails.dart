@@ -101,7 +101,7 @@ class _BankDetailsState extends State<BankDetails> {
                                 onTap: () {
                                   Navigator.pop(context);
                                 },
-                                child: const Icon(Icons.arrow_back)))
+                                child: Icon(Icons.arrow_back, color: textColor,)))
                       ],
                     ),
                     SizedBox(
@@ -117,11 +117,33 @@ class _BankDetailsState extends State<BankDetails> {
                                   decoration: InputDecoration(
                                       labelText: languages[choosenLanguage]
                                           ['text_accoutHolderName'],
+                                      labelStyle: TextStyle(
+                                          color: (isDarkTheme == true)
+                                              ? textColor
+                                              : null),  
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : Colors.blue)),           
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : hintColor),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          gapPadding: 1),
                                       isDense: true),
+                                    style: GoogleFonts.roboto(
+                                      color: textColor
+                                    ),   
                                 ),
                                 SizedBox(
                                   height: media.width * 0.05,
@@ -131,11 +153,31 @@ class _BankDetailsState extends State<BankDetails> {
                                   decoration: InputDecoration(
                                       labelText: languages[choosenLanguage]
                                           ['text_accountNumber'],
+                                      labelStyle: TextStyle(
+                                          color: (isDarkTheme == true)
+                                              ? textColor
+                                              : null),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : Colors.blue)),
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : hintColor),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          gapPadding: 1),
                                       isDense: true),
+                                    style: GoogleFonts.roboto(color: textColor),    
                                 ),
                                 SizedBox(
                                   height: media.width * 0.05,
@@ -145,11 +187,31 @@ class _BankDetailsState extends State<BankDetails> {
                                   decoration: InputDecoration(
                                       labelText: languages[choosenLanguage]
                                           ['text_bankName'],
+                                      labelStyle: TextStyle(
+                                          color: (isDarkTheme == true)
+                                              ? textColor
+                                              : null),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : Colors.blue)),
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : hintColor),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          gapPadding: 1),
                                       isDense: true),
+                                    style: GoogleFonts.roboto(color: textColor),    
                                 ),
                                 SizedBox(
                                   height: media.width * 0.05,
@@ -159,11 +221,31 @@ class _BankDetailsState extends State<BankDetails> {
                                   decoration: InputDecoration(
                                       labelText: languages[choosenLanguage]
                                           ['text_bankCode'],
+                                      labelStyle: TextStyle(
+                                          color: (isDarkTheme == true)
+                                              ? textColor
+                                              : null),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : Colors.blue)),
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: (isDarkTheme == true)
+                                                  ? textColor
+                                                  : hintColor),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          gapPadding: 1),
                                       isDense: true),
+                                  style: GoogleFonts.roboto(color: textColor),      
                                 ),
                                 SizedBox(
                                   height: media.width * 0.1,
@@ -181,7 +263,7 @@ class _BankDetailsState extends State<BankDetails> {
                                       boxShadow: [
                                         BoxShadow(
                                             blurRadius: 2,
-                                            color:
+                                            color: (isDarkTheme == true) ? textColor.withOpacity(0.3) :
                                                 Colors.black.withOpacity(0.2),
                                             spreadRadius: 2),
                                       ]),
@@ -192,7 +274,7 @@ class _BankDetailsState extends State<BankDetails> {
                                             ['text_accoutHolderName'],
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
-                                            color: hintColor),
+                                            color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor),
                                       ),
                                       SizedBox(
                                         height: media.width * 0.025,
@@ -211,7 +293,9 @@ class _BankDetailsState extends State<BankDetails> {
                                             ['text_bankName'],
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
-                                            color: hintColor),
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.4)
+                                                : hintColor),
                                       ),
                                       SizedBox(
                                         height: media.width * 0.025,
@@ -230,7 +314,9 @@ class _BankDetailsState extends State<BankDetails> {
                                             ['text_accountNumber'],
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
-                                            color: hintColor),
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.4)
+                                                : hintColor),
                                       ),
                                       SizedBox(
                                         height: media.width * 0.025,
@@ -249,7 +335,9 @@ class _BankDetailsState extends State<BankDetails> {
                                             ['text_bankCode'],
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
-                                            color: hintColor),
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.4)
+                                                : hintColor),
                                       ),
                                       SizedBox(
                                         height: media.width * 0.025,

@@ -58,6 +58,7 @@ class _InvoiceState extends State<Invoice> {
                                     languages[choosenLanguage]
                                         ['text_tripsummary'],
                                     style: GoogleFonts.roboto(
+                                        color: textColor,
                                         fontSize: media.width * sixteen,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -86,6 +87,7 @@ class _InvoiceState extends State<Invoice> {
                                         driverReq['userDetail']['data']['name'],
                                         style: GoogleFonts.roboto(
                                           fontSize: media.width * eighteen,
+                                          color: textColor
                                         ),
                                       )
                                     ],
@@ -229,7 +231,7 @@ class _InvoiceState extends State<Invoice> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.info),
+                                      Icon(Icons.info, color: textColor),
                                       SizedBox(
                                         width: media.width * 0.04,
                                       ),

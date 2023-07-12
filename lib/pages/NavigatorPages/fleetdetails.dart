@@ -52,7 +52,7 @@ class _FleetDetailsState extends State<FleetDetails> {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: const Icon(Icons.arrow_back)))
+                          child: Icon(Icons.arrow_back, color: textColor)))
                 ],
               ),
               SizedBox(
@@ -70,7 +70,9 @@ class _FleetDetailsState extends State<FleetDetails> {
                                   boxShadow: [
                                     BoxShadow(
                                         blurRadius: 2,
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.3)
+                                            : Colors.black.withOpacity(0.2),
                                         spreadRadius: 2),
                                   ],
                                   color: page),
@@ -80,7 +82,9 @@ class _FleetDetailsState extends State<FleetDetails> {
                                     languages[choosenLanguage]['text_type'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: hintColor),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.5)
+                                            : hintColor),
                                   ),
                                   SizedBox(
                                     height: media.width * 0.025,
@@ -101,7 +105,9 @@ class _FleetDetailsState extends State<FleetDetails> {
                                     languages[choosenLanguage]['text_make'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: hintColor),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.5)
+                                            : hintColor),
                                   ),
                                   SizedBox(
                                     height: media.width * 0.025,
@@ -122,7 +128,9 @@ class _FleetDetailsState extends State<FleetDetails> {
                                     languages[choosenLanguage]['text_model'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: hintColor),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.5)
+                                            : hintColor),
                                   ),
                                   SizedBox(
                                     height: media.width * 0.025,
@@ -143,7 +151,9 @@ class _FleetDetailsState extends State<FleetDetails> {
                                     languages[choosenLanguage]['text_number'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: hintColor),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.5)
+                                            : hintColor),
                                   ),
                                   SizedBox(
                                     height: media.width * 0.025,
@@ -164,7 +174,9 @@ class _FleetDetailsState extends State<FleetDetails> {
                                     languages[choosenLanguage]['text_color'],
                                     style: GoogleFonts.roboto(
                                         fontSize: media.width * sixteen,
-                                        color: hintColor),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.5)
+                                            : hintColor),
                                   ),
                                   SizedBox(
                                     height: media.width * 0.025,

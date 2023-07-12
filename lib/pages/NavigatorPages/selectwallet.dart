@@ -34,8 +34,11 @@ class _SelectWalletState extends State<SelectWallet> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   @override
@@ -74,6 +77,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                 child: Text(
                                   languages[choosenLanguage]['text_addmoney'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -83,7 +87,8 @@ class _SelectWalletState extends State<SelectWallet> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor)))
                             ],
                           ),
                           SizedBox(
@@ -98,6 +103,17 @@ class _SelectWalletState extends State<SelectWallet> {
                                   onCardChanged: (card) {
                                     setState(() {});
                                   },
+                                  cursorColor: topBar,
+                                  decoration: InputDecoration(
+                                    hintStyle: TextStyle(
+                                        color: (isDarkTheme == true)
+                                            ? topBar
+                                            : hintColor),
+                                  ),
+                                  style: TextStyle(
+                                      color: isDarkTheme == true
+                                          ? topBar
+                                          : textColor),
                                 ),
                                 SizedBox(
                                   height: media.width * 0.1,
@@ -119,8 +135,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                         try {
                                           val2 = await Stripe.instance
                                               .confirmPayment(
-                                            stripeToken['client_token'],
-                                            PaymentMethodParams.card(
+                                            data: PaymentMethodParams.card(
                                               paymentMethodData:
                                                   PaymentMethodData(
                                                 billingDetails: BillingDetails(
@@ -129,6 +144,8 @@ class _SelectWalletState extends State<SelectWallet> {
                                                         userDetails['mobile']),
                                               ),
                                             ),
+                                            paymentIntentClientSecret:
+                                                stripeToken['client_token'],
                                           );
                                         } catch (e) {
                                           setState(() {
@@ -144,7 +161,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                             setState(() {
                                               _success = true;
                                             });
-                                          } else if(val3 == 'logout'){
+                                          } else if (val3 == 'logout') {
                                             navigateLogout();
                                           } else {
                                             setState(() {
@@ -156,7 +173,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                             _failed = true;
                                           });
                                         }
-                                      }else if(val == 'logout'){
+                                      } else if (val == 'logout') {
                                         navigateLogout();
                                       } else {
                                         setState(() {
@@ -229,7 +246,10 @@ class _SelectWalletState extends State<SelectWallet> {
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              color: Colors.transparent.withOpacity(0.6),
+                              // color: Colors.transparent.withOpacity(0.6),
+                              color: (isDarkTheme == true)
+                                  ? textColor.withOpacity(0.2)
+                                  : Colors.transparent.withOpacity(0.6),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

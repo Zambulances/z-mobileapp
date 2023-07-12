@@ -61,7 +61,7 @@ class _ReferralState extends State<Referral> {
                     alignment: Alignment.bottomLeft,
                     height: media.height * 0.12,
                     width: media.width * 1,
-                    color: topBar,
+                    color: page,
                   ),
                   SizedBox(
                     height: media.height * 0.04,

@@ -137,7 +137,7 @@ class _EditProfileState extends State<EditProfile> {
                                     onTap: () {
                                       Navigator.pop(context, true);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(Icons.arrow_back, color: textColor)))
                           ],
                         ),
                         SizedBox(height: media.width * 0.1),
@@ -188,10 +188,21 @@ class _EditProfileState extends State<EditProfile> {
                             decoration: InputDecoration(
                                 labelText: languages[choosenLanguage]
                                     ['text_name'],
+                                labelStyle: TextStyle(
+                                    color: textColor.withOpacity(0.6)),    
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: textColor.withOpacity(0.4),
+                                        width: 1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    gapPadding: 1),
                                 isDense: true),
+                              style: GoogleFonts.roboto(
+                                color: textColor,
+                              ),  
                           ),
                         ),
                         SizedBox(
@@ -210,10 +221,21 @@ class _EditProfileState extends State<EditProfile> {
                             decoration: InputDecoration(
                                 labelText: languages[choosenLanguage]
                                     ['text_email'],
+                                labelStyle: TextStyle(
+                                    color: textColor.withOpacity(0.6)),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: textColor.withOpacity(0.4),
+                                        width: 1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    gapPadding: 1),
                                 isDense: true),
+                                style: GoogleFonts.roboto(
+                                  color: textColor,
+                                ),
                           ),
                         )
                       ],
@@ -317,6 +339,7 @@ class _EditProfileState extends State<EditProfile> {
                                                             12)),
                                                 child: Icon(
                                                   Icons.camera_alt_outlined,
+                                                  color: textColor,
                                                   size: media.width * 0.064,
                                                 )),
                                           ),
@@ -350,6 +373,7 @@ class _EditProfileState extends State<EditProfile> {
                                                             12)),
                                                 child: Icon(
                                                   Icons.image_outlined,
+                                                  color: textColor,
                                                   size: media.width * 0.064,
                                                 )),
                                           ),

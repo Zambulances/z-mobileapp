@@ -29,8 +29,11 @@ class _HistoryState extends State<History> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
 //get history
@@ -40,14 +43,14 @@ class _HistoryState extends State<History> {
       myHistory.clear();
     });
     var val = await getHistory('is_later=1');
-  if(mounted){
-    if(val == 'logout'){
-      navigateLogout();
+    if (mounted) {
+      if (val == 'logout') {
+        navigateLogout();
+      }
+      setState(() {
+        _isLoading = false;
+      });
     }
-    setState(() {
-      _isLoading = false;
-    });
-  }
   }
 
   @override
@@ -87,7 +90,7 @@ class _HistoryState extends State<History> {
                             onTap: () {
                               Navigator.pop(context);
                             },
-                            child: const Icon(Icons.arrow_back)))
+                            child: Icon(Icons.arrow_back, color: textColor)))
                   ],
                 ),
                 SizedBox(
@@ -103,46 +106,12 @@ class _HistoryState extends State<History> {
                         BoxShadow(
                             blurRadius: 2,
                             spreadRadius: 2,
-                            color: Colors.black.withOpacity(0.2))
+                            color: (isDarkTheme == true)
+                                ? textColor.withOpacity(0.3)
+                                : Colors.black.withOpacity(0.2))
                       ]),
                   child: Row(
                     children: [
-                      InkWell(
-                        onTap: () async {
-                          setState(() {
-                            myHistory.clear();
-                            myHistoryPage.clear();
-                            _showHistory = 0;
-                            _isLoading = true;
-                          });
-
-                          var val = await getHistory('is_later=1');
-                          if(val == 'logout'){
-                            navigateLogout();
-                          }
-                          setState(() {
-                            _isLoading = false;
-                          });
-                        },
-                        child: Container(
-                            height: media.width * 0.13,
-                            alignment: Alignment.center,
-                            width: media.width * 0.3,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: (_showHistory == 0)
-                                    ? const Color(0xff222222)
-                                    : page),
-                            child: Text(
-                              languages[choosenLanguage]['text_upcoming'],
-                              style: GoogleFonts.roboto(
-                                  fontSize: media.width * fifteen,
-                                  fontWeight: FontWeight.w600,
-                                  color: (_showHistory == 0)
-                                      ? Colors.white
-                                      : textColor),
-                            )),
-                      ),
                       InkWell(
                         onTap: () async {
                           setState(() {
@@ -153,7 +122,7 @@ class _HistoryState extends State<History> {
                           });
 
                           var val = await getHistory('is_completed=1');
-                          if(val == 'logout'){
+                          if (val == 'logout') {
                             navigateLogout();
                           }
                           setState(() {
@@ -163,11 +132,13 @@ class _HistoryState extends State<History> {
                         child: Container(
                             height: media.width * 0.13,
                             alignment: Alignment.center,
-                            width: media.width * 0.3,
+                            width: media.width * 0.45,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 color: (_showHistory == 1)
-                                    ? const Color(0xff222222)
+                                    ? (isDarkTheme == true)
+                                        ? Colors.white
+                                        : const Color(0xff222222)
                                     : page),
                             child: Text(
                               languages[choosenLanguage]['text_completed'],
@@ -175,7 +146,9 @@ class _HistoryState extends State<History> {
                                   fontSize: media.width * fifteen,
                                   fontWeight: FontWeight.w600,
                                   color: (_showHistory == 1)
-                                      ? Colors.white
+                                      ? (isDarkTheme == true)
+                                          ? Colors.black
+                                          : Colors.white
                                       : textColor),
                             )),
                       ),
@@ -189,7 +162,7 @@ class _HistoryState extends State<History> {
                           });
 
                           var val = await getHistory('is_cancelled=1');
-                          if(val == 'logout'){
+                          if (val == 'logout') {
                             navigateLogout();
                           }
                           setState(() {
@@ -199,11 +172,13 @@ class _HistoryState extends State<History> {
                         child: Container(
                             height: media.width * 0.13,
                             alignment: Alignment.center,
-                            width: media.width * 0.3,
+                            width: media.width * 0.45,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
                                 color: (_showHistory == 2)
-                                    ? const Color(0xff222222)
+                                    ? (isDarkTheme == true)
+                                        ? Colors.white
+                                        : const Color(0xff222222)
                                     : page),
                             child: Text(
                               languages[choosenLanguage]['text_cancelled'],
@@ -211,7 +186,9 @@ class _HistoryState extends State<History> {
                                   fontSize: media.width * fifteen,
                                   fontWeight: FontWeight.w600,
                                   color: (_showHistory == 2)
-                                      ? Colors.white
+                                      ? (isDarkTheme == true)
+                                          ? Colors.black
+                                          : Colors.white
                                       : textColor),
                             )),
                       )
@@ -288,10 +265,15 @@ class _HistoryState extends State<History> {
                                                             BoxShadow(
                                                                 blurRadius: 2,
                                                                 spreadRadius: 2,
-                                                                color: Colors
-                                                                    .black
-                                                                    .withOpacity(
-                                                                        0.2))
+                                                                color: (isDarkTheme ==
+                                                                        true)
+                                                                    ? textColor
+                                                                        .withOpacity(
+                                                                            0.3)
+                                                                    : Colors
+                                                                        .black
+                                                                        .withOpacity(
+                                                                            0.2))
                                                           ]),
                                                       child: Column(
                                                         crossAxisAlignment:
@@ -302,6 +284,8 @@ class _HistoryState extends State<History> {
                                                             myHistory[i][
                                                                 'request_number'],
                                                             style: GoogleFonts.roboto(
+                                                                color:
+                                                                    textColor,
                                                                 fontSize: media
                                                                         .width *
                                                                     sixteen,
@@ -363,6 +347,8 @@ class _HistoryState extends State<History> {
                                                                               [
                                                                               'name'],
                                                                       style: GoogleFonts.roboto(
+                                                                          color:
+                                                                              textColor,
                                                                           fontSize: media.width *
                                                                               eighteen,
                                                                           fontWeight:
@@ -414,6 +400,8 @@ class _HistoryState extends State<History> {
                                                                                     ? languages[choosenLanguage]['text_card']
                                                                                     : '',
                                                                         style: GoogleFonts.roboto(
+                                                                            color:
+                                                                                textColor,
                                                                             fontSize: media.width *
                                                                                 twelve,
                                                                             fontWeight:
@@ -436,6 +424,7 @@ class _HistoryState extends State<History> {
                                                                               ' ' +
                                                                               myHistory[i]['requestBill']['data']['total_amount'].toString(),
                                                                           style: GoogleFonts.roboto(
+                                                                              color: textColor,
                                                                               fontSize: media.width * sixteen,
                                                                               fontWeight: FontWeight.bold),
                                                                         ),
@@ -447,7 +436,7 @@ class _HistoryState extends State<History> {
                                                                           children: [
                                                                             Text(
                                                                               (myHistory[i]['total_time'] < 50) ? myHistory[i]['total_distance'] + myHistory[i]['unit'] + ' - ' + myHistory[i]['total_time'].toString() + ' mins' : myHistory[i]['total_distance'] + myHistory[i]['unit'] + ' - ' + (myHistory[i]['total_time'] / 60).round().toString() + ' hr',
-                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                             ),
                                                                           ],
                                                                         )
@@ -514,6 +503,8 @@ class _HistoryState extends State<History> {
                                                                         [
                                                                         'pick_address'],
                                                                     style: GoogleFonts.roboto(
+                                                                        color:
+                                                                            textColor,
                                                                         fontSize:
                                                                             media.width *
                                                                                 twelve),
@@ -596,6 +587,8 @@ class _HistoryState extends State<History> {
                                                                         [
                                                                         'drop_address'],
                                                                     style: GoogleFonts.roboto(
+                                                                        color:
+                                                                            textColor,
                                                                         fontSize:
                                                                             media.width *
                                                                                 twelve),
@@ -684,10 +677,15 @@ class _HistoryState extends State<History> {
                                                                   blurRadius: 2,
                                                                   spreadRadius:
                                                                       2,
-                                                                  color: Colors
-                                                                      .black
-                                                                      .withOpacity(
-                                                                          0.2))
+                                                                  color: (isDarkTheme ==
+                                                                          true)
+                                                                      ? textColor
+                                                                          .withOpacity(
+                                                                              0.3)
+                                                                      : Colors
+                                                                          .black
+                                                                          .withOpacity(
+                                                                              0.2))
                                                             ]),
                                                         child: Column(
                                                           crossAxisAlignment:
@@ -698,6 +696,8 @@ class _HistoryState extends State<History> {
                                                               myHistory[i][
                                                                   'request_number'],
                                                               style: GoogleFonts.roboto(
+                                                                  color:
+                                                                      textColor,
                                                                   fontSize: media
                                                                           .width *
                                                                       sixteen,
@@ -745,7 +745,7 @@ class _HistoryState extends State<History> {
                                                                               width: media.width * 0.3,
                                                                               child: Text(
                                                                                 myHistory[i]['userDetail']['data']['name'],
-                                                                                style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
+                                                                                style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600, color: textColor),
                                                                               ),
                                                                             ),
                                                                           ],
@@ -879,6 +879,8 @@ class _HistoryState extends State<History> {
                                                                           [
                                                                           'pick_address'],
                                                                       style: GoogleFonts.roboto(
+                                                                          color:
+                                                                              textColor,
                                                                           fontSize:
                                                                               media.width * twelve),
                                                                     )),
@@ -926,7 +928,7 @@ class _HistoryState extends State<History> {
                                                                             child:
                                                                                 Text(
                                                                               myHistory[i]['drop_address'],
-                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                              style: GoogleFonts.roboto(color: textColor, fontSize: media.width * twelve),
                                                                             )),
                                                                       ],
                                                                     ),
@@ -937,235 +939,7 @@ class _HistoryState extends State<History> {
                                                       ),
                                                     ],
                                                   )
-                                                : (_showHistory == 0)
-                                                    ?
-                                                    //upcoming rides
-                                                    Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            myHistory[i]
-                                                                ['updated_at'],
-                                                            style: GoogleFonts.roboto(
-                                                                fontSize: media
-                                                                        .width *
-                                                                    sixteen,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600,
-                                                                color:
-                                                                    textColor),
-                                                          ),
-                                                          Container(
-                                                            margin: EdgeInsets.only(
-                                                                top: media
-                                                                        .width *
-                                                                    0.025,
-                                                                bottom: media
-                                                                        .width *
-                                                                    0.05,
-                                                                left: media
-                                                                        .width *
-                                                                    0.015,
-                                                                right: media
-                                                                        .width *
-                                                                    0.015),
-                                                            width: media.width *
-                                                                0.85,
-                                                            padding: EdgeInsets
-                                                                .fromLTRB(
-                                                                    media.width *
-                                                                        0.025,
-                                                                    media.width *
-                                                                        0.05,
-                                                                    media.width *
-                                                                        0.025,
-                                                                    media.width *
-                                                                        0.05),
-                                                            decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                                color: page,
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                      blurRadius:
-                                                                          2,
-                                                                      spreadRadius:
-                                                                          2,
-                                                                      color: Colors
-                                                                          .black
-                                                                          .withOpacity(
-                                                                              0.2))
-                                                                ]),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Text(
-                                                                  myHistory[i][
-                                                                      'request_number'],
-                                                                  style: GoogleFonts.roboto(
-                                                                      fontSize:
-                                                                          media.width *
-                                                                              sixteen,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w600),
-                                                                ),
-                                                                SizedBox(
-                                                                  height: media
-                                                                          .width *
-                                                                      0.02,
-                                                                ),
-                                                                (myHistory[i][
-                                                                            'userDetail'] !=
-                                                                        null)
-                                                                    ? Container(
-                                                                        padding:
-                                                                            EdgeInsets.only(bottom: media.width * 0.05),
-                                                                        child:
-                                                                            Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.start,
-                                                                          children: [
-                                                                            Container(
-                                                                              height: media.width * 0.16,
-                                                                              width: media.width * 0.16,
-                                                                              decoration: BoxDecoration(shape: BoxShape.circle, image: DecorationImage(image: NetworkImage(myHistory[i]['userDetail']['data']['profile_picture']), fit: BoxFit.cover)),
-                                                                            ),
-                                                                            SizedBox(
-                                                                              width: media.width * 0.02,
-                                                                            ),
-                                                                            Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                SizedBox(
-                                                                                  width: media.width * 0.3,
-                                                                                  child: Text(
-                                                                                    myHistory[i]['userDetail']['data']['name'],
-                                                                                    style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                            Expanded(
-                                                                              child: Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                                                children: [
-                                                                                  Column(
-                                                                                    children: [
-                                                                                      const Icon(
-                                                                                        Icons.cancel,
-                                                                                        color: Color(0xffFF0000),
-                                                                                      ),
-                                                                                      SizedBox(
-                                                                                        height: media.width * 0.01,
-                                                                                      ),
-                                                                                    ],
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      )
-                                                                    : Container(),
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Container(
-                                                                      height: media
-                                                                              .width *
-                                                                          0.05,
-                                                                      width: media
-                                                                              .width *
-                                                                          0.05,
-                                                                      alignment:
-                                                                          Alignment
-                                                                              .center,
-                                                                      decoration: BoxDecoration(
-                                                                          shape: BoxShape
-                                                                              .circle,
-                                                                          color:
-                                                                              const Color(0xffFF0000).withOpacity(0.3)),
-                                                                      child:
-                                                                          Container(
-                                                                        height: media.width *
-                                                                            0.025,
-                                                                        width: media.width *
-                                                                            0.025,
-                                                                        decoration: const BoxDecoration(
-                                                                            shape:
-                                                                                BoxShape.circle,
-                                                                            color: Color(0xffFF0000)),
-                                                                      ),
-                                                                    ),
-                                                                    SizedBox(
-                                                                      width: media
-                                                                              .width *
-                                                                          0.05,
-                                                                    ),
-                                                                    SizedBox(
-                                                                        width: media.width *
-                                                                            0.7,
-                                                                        child:
-                                                                            Text(
-                                                                          myHistory[i]
-                                                                              [
-                                                                              'pick_address'],
-                                                                          style:
-                                                                              GoogleFonts.roboto(fontSize: media.width * twelve),
-                                                                        )),
-                                                                  ],
-                                                                ),
-                                                                (myHistory[i][
-                                                                            'drop_address'] !=
-                                                                        null)
-                                                                    ? Container(
-                                                                        padding:
-                                                                            EdgeInsets.only(top: media.width * 0.05),
-                                                                        child:
-                                                                            Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.start,
-                                                                          children: [
-                                                                            Container(
-                                                                              height: media.width * 0.05,
-                                                                              width: media.width * 0.05,
-                                                                              alignment: Alignment.center,
-                                                                              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xff319900).withOpacity(0.3)),
-                                                                              child: Container(
-                                                                                height: media.width * 0.025,
-                                                                                width: media.width * 0.025,
-                                                                                decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xff319900)),
-                                                                              ),
-                                                                            ),
-                                                                            SizedBox(
-                                                                              width: media.width * 0.05,
-                                                                            ),
-                                                                            SizedBox(
-                                                                                width: media.width * 0.7,
-                                                                                child: Text(
-                                                                                  myHistory[i]['drop_address'],
-                                                                                  style: GoogleFonts.roboto(fontSize: media.width * twelve),
-                                                                                )),
-                                                                          ],
-                                                                        ),
-                                                                      )
-                                                                    : Container(),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      )
-                                                    : Container());
+                                                : Container());
                                   })
                                   .values
                                   .toList(),
@@ -1224,7 +998,7 @@ class _HistoryState extends State<History> {
                                       val = await getHistoryPages(
                                           'is_cancelled=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                     }
-                                    if(val == 'logout'){
+                                    if (val == 'logout') {
                                       navigateLogout();
                                     }
                                     setState(() {

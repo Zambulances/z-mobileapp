@@ -40,8 +40,11 @@ class _WalletPageState extends State<WalletPage> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
 //get wallet details
@@ -53,16 +56,22 @@ class _WalletPageState extends State<WalletPage> {
       _isLoading = false;
       _completed = true;
       valueNotifierHome.incrementNotifier();
-    }else if (val == 'logout'){
+    } else if (val == 'logout') {
       navigateLogout();
     }
   }
 
   List<DropdownMenuItem<String>> get dropdownItems {
-    List<DropdownMenuItem<String>> menuItems = const [
-      DropdownMenuItem(value: "user", child: Text("User")),
-      DropdownMenuItem(value: "driver", child: Text("Driver")),
-      DropdownMenuItem(value: "owner", child: Text("Owner")),
+    List<DropdownMenuItem<String>> menuItems = [
+      DropdownMenuItem(
+          value: "user",
+          child: Text("User", style: TextStyle(color: textColor))),
+      DropdownMenuItem(
+          value: "driver",
+          child: Text("Driver", style: TextStyle(color: textColor))),
+      DropdownMenuItem(
+          value: "owner",
+          child: Text("Owner", style: TextStyle(color: textColor))),
     ];
     return menuItems;
   }
@@ -130,7 +139,8 @@ class _WalletPageState extends State<WalletPage> {
                                       onTap: () {
                                         Navigator.pop(context);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor)))
                             ],
                           ),
                           SizedBox(
@@ -154,6 +164,7 @@ class _WalletPageState extends State<WalletPage> {
                                           walletBalance['wallet_balance']
                                               .toString(),
                                       style: GoogleFonts.roboto(
+                                          color: textColor,
                                           fontSize: media.width * fourty,
                                           fontWeight: FontWeight.w600),
                                     ),
@@ -231,10 +242,15 @@ class _WalletPageState extends State<WalletPage> {
                                                                   BorderRadius
                                                                       .circular(
                                                                           10),
-                                                              color: const Color(
-                                                                      0xff000000)
-                                                                  .withOpacity(
-                                                                      0.05)),
+                                                              color: (isDarkTheme ==
+                                                                      true)
+                                                                  ? textColor
+                                                                      .withOpacity(
+                                                                          0.3)
+                                                                  : const Color(
+                                                                          0xff000000)
+                                                                      .withOpacity(
+                                                                          0.05)),
                                                           alignment:
                                                               Alignment.center,
                                                           child: Text(
@@ -283,7 +299,7 @@ class _WalletPageState extends State<WalletPage> {
                                                             SizedBox(
                                                               height:
                                                                   media.width *
-                                                                      0.01,
+                                                                      0.02,
                                                             ),
                                                             Text(
                                                               walletHistory[i][
@@ -294,8 +310,12 @@ class _WalletPageState extends State<WalletPage> {
                                                                 fontSize: media
                                                                         .width *
                                                                     ten,
-                                                                color:
-                                                                    hintColor,
+                                                                color: (isDarkTheme ==
+                                                                        true)
+                                                                    ? textColor
+                                                                        .withOpacity(
+                                                                            0.5)
+                                                                    : hintColor,
                                                               ),
                                                             )
                                                           ],
@@ -387,13 +407,13 @@ class _WalletPageState extends State<WalletPage> {
                                                 _isLoading = true;
                                               });
 
-                                             var val =  await getWalletHistoryPage(
+                                              var val = await getWalletHistoryPage(
                                                   (walletPages['current_page'] +
                                                           1)
                                                       .toString());
-                                            if(val == 'logout'){
-                                              navigateLogout();
-                                            }
+                                              if (val == 'logout') {
+                                                navigateLogout();
+                                              }
 
                                               setState(() {
                                                 _isLoading = false;
@@ -537,7 +557,10 @@ class _WalletPageState extends State<WalletPage> {
                                                   style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * fifteen,
-                                                      color: textColor,
+                                                      color:
+                                                          (isDarkTheme == true)
+                                                              ? Colors.black
+                                                              : textColor,
                                                       fontWeight:
                                                           FontWeight.w600),
                                                 )),
@@ -566,8 +589,18 @@ class _WalletPageState extends State<WalletPage> {
                                                   hintStyle: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * twelve,
-                                                      color: hintColor),
+                                                      color: (isDarkTheme ==
+                                                              true)
+                                                          ? textColor
+                                                              .withOpacity(0.4)
+                                                          : hintColor),
                                                 ),
+                                                style: GoogleFonts.roboto(
+                                                    fontSize:
+                                                        media.width * fourteen,
+                                                    fontWeight:
+                                                        FontWeight.normal,
+                                                    color: textColor),
                                                 maxLines: 1,
                                               ),
                                             )
@@ -780,7 +813,7 @@ class _WalletPageState extends State<WalletPage> {
                                       decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(12),
-                                          color: page),
+                                          color: topBar),
                                       child: Column(
                                         children: [
                                           SizedBox(
@@ -1083,7 +1116,10 @@ class _WalletPageState extends State<WalletPage> {
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              color: Colors.transparent.withOpacity(0.6),
+                              // color: Colors.transparent.withOpacity(0.6),
+                              color: (isDarkTheme == true)
+                                  ? textColor.withOpacity(0.2)
+                                  : Colors.transparent.withOpacity(0.6),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 mainAxisSize: MainAxisSize.min,
@@ -1112,16 +1148,49 @@ class _WalletPageState extends State<WalletPage> {
                                                 });
                                               },
                                               items: dropdownItems),
-                                          InputField(
-                                              text: languages[choosenLanguage]
-                                                  ['text_enteramount'],
-                                              textController: amount,
-                                              inputType: TextInputType.number),
+
                                           // InputField(
                                           //     text: languages[choosenLanguage]
                                           //         ['text_phone_number'],
                                           //     textController: phonenumber,
                                           //     inputType: TextInputType.number),
+                                          TextFormField(
+                                            controller: amount,
+                                            style: GoogleFonts.roboto(
+                                              fontSize: media.width * sixteen,
+                                              color: textColor,
+                                            ),
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  languages[choosenLanguage]
+                                                      ['text_enteramount'],
+                                              counterText: '',
+                                              hintStyle: GoogleFonts.roboto(
+                                                fontSize: media.width * sixteen,
+                                                color:
+                                                    textColor.withOpacity(0.5),
+                                              ),
+                                              focusedBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                color: (isDarkTheme == true)
+                                                    ? textColor
+                                                    : inputfocusedUnderline,
+                                                width: 1.2,
+                                                style: BorderStyle.solid,
+                                              )),
+                                              enabledBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.5)
+                                                    : inputUnderline,
+                                                width: 1.2,
+                                                style: BorderStyle.solid,
+                                              )),
+                                            ),
+                                          ),
                                           TextFormField(
                                             controller: phonenumber,
                                             onChanged: (val) {
@@ -1149,18 +1218,22 @@ class _WalletPageState extends State<WalletPage> {
                                                   fontSize:
                                                       media.width * sixteen,
                                                   color: textColor
-                                                      .withOpacity(0.7)),
+                                                      .withOpacity(0.5)),
                                               focusedBorder:
                                                   UnderlineInputBorder(
                                                       borderSide: BorderSide(
-                                                color: inputfocusedUnderline,
+                                                color: (isDarkTheme == true)
+                                                    ? textColor
+                                                    : inputfocusedUnderline,
                                                 width: 1.2,
                                                 style: BorderStyle.solid,
                                               )),
                                               enabledBorder:
                                                   UnderlineInputBorder(
                                                       borderSide: BorderSide(
-                                                color: inputUnderline,
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.5)
+                                                    : inputUnderline,
                                                 width: 1.2,
                                                 style: BorderStyle.solid,
                                               )),
@@ -1243,7 +1316,8 @@ class _WalletPageState extends State<WalletPage> {
                                                           getWallet();
                                                           showToast();
                                                         });
-                                                      }else if(result == 'logout'){
+                                                      } else if (result ==
+                                                          'logout') {
                                                         navigateLogout();
                                                       } else {
                                                         setState(() {

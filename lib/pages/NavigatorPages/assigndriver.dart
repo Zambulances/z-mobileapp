@@ -26,35 +26,38 @@ class _AssignDriverState extends State<AssignDriver> {
 
   @override
   void initState() {
-    
-      getdriverdata();
-      isassigndriver = '';
-  
+    getdriverdata();
+    isassigndriver = '';
+
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getdriverdata() async {
-    var val = await fleetDriverDetails(fleetid: widget.fleetid, isassigndriver: true);
-    if(val == 'logout'){
+    var val =
+        await fleetDriverDetails(fleetid: widget.fleetid, isassigndriver: true);
+    if (val == 'logout') {
       navigateLogout();
-    }else{
-    var val = await getVehicleInfo();
-    if(val == 'logout'){
-      navigateLogout();
+    } else {
+      var val = await getVehicleInfo();
+      if (val == 'logout') {
+        navigateLogout();
+      }
     }
+    if (mounted) {
+      setState(() {
+        // if (_isLoadingassigndriver == true) {
+        //   showToast();
+        // }
+        _isLoadingassigndriver = false;
+      });
     }
-if(mounted){
-    setState(() {
-      // if (_isLoadingassigndriver == true) {
-      //   showToast();
-      // }
-      _isLoadingassigndriver = false;
-    });
-}
   }
 
   showToast() {
@@ -106,6 +109,7 @@ if(mounted){
                             child: Text(
                               languages[choosenLanguage]['text_manage_drivers'],
                               style: GoogleFonts.roboto(
+                                  color: textColor,
                                   fontSize: media.width * sixteen,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -115,7 +119,8 @@ if(mounted){
                                   onTap: () {
                                     Navigator.pop(context, true);
                                   },
-                                  child: const Icon(Icons.arrow_back)))
+                                  child:
+                                      Icon(Icons.arrow_back, color: textColor)))
                         ],
                       ),
                       Expanded(
@@ -141,7 +146,10 @@ if(mounted){
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10.0),
-                                          color: Colors.white,
+                                          // color: Colors.white,
+                                          color: (isDarkTheme == true)
+                                              ? Colors.black
+                                              : topBar,
                                           boxShadow: const [
                                             BoxShadow(
                                               color: Colors.grey,
@@ -158,14 +166,16 @@ if(mounted){
                                                   padding: EdgeInsets.all(
                                                       media.width * 0.01),
                                                   height: media.width * 0.3,
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    color: Colors.white,
+                                                  decoration: BoxDecoration(
+                                                    // color: Colors.white,
+                                                    color: (isDarkTheme == true)
+                                                        ? Colors.black
+                                                        : topBar,
                                                     borderRadius:
-                                                        BorderRadius.all(
+                                                        const BorderRadius.all(
                                                             Radius.circular(
                                                                 10)),
-                                                    boxShadow: [
+                                                    boxShadow: const [
                                                       BoxShadow(
                                                         color: Colors.grey,
                                                         offset: Offset(
@@ -384,7 +394,11 @@ if(mounted){
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(10.0),
-                                                        color: Colors.white,
+                                                        // color: Colors.white,
+                                                        color: (isDarkTheme ==
+                                                                true)
+                                                            ? Colors.black
+                                                            : topBar,
                                                         boxShadow: const [
                                                           BoxShadow(
                                                             color: Colors.grey,
@@ -407,14 +421,19 @@ if(mounted){
                                                                         .width *
                                                                     0.3,
                                                                 decoration:
-                                                                    const BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  borderRadius:
-                                                                      BorderRadius.all(
-                                                                          Radius.circular(
-                                                                              10)),
-                                                                  boxShadow: [
+                                                                    BoxDecoration(
+                                                                  // color: Colors
+                                                                  //     .white,
+                                                                  color: (isDarkTheme ==
+                                                                          true)
+                                                                      ? Colors
+                                                                          .black
+                                                                      : topBar,
+                                                                  borderRadius: const BorderRadius
+                                                                          .all(
+                                                                      Radius.circular(
+                                                                          10)),
+                                                                  boxShadow: const [
                                                                     BoxShadow(
                                                                       color: Colors
                                                                           .grey,
@@ -543,8 +562,11 @@ if(mounted){
                                                                   BoxDecoration(
                                                                 shape: BoxShape
                                                                     .circle,
-                                                                border: Border
-                                                                    .all(),
+                                                                border:
+                                                                    Border.all(
+                                                                  color:
+                                                                      textColor,
+                                                                ),
                                                               ),
                                                               child: Container(
                                                                 height: media
@@ -557,8 +579,12 @@ if(mounted){
                                                                               .toString()
                                                                       ? Colors
                                                                           .green
-                                                                      : Colors
-                                                                          .white,
+                                                                      : (isDarkTheme ==
+                                                                              true)
+                                                                          ? Colors
+                                                                              .black
+                                                                          : Colors
+                                                                              .white,
                                                                   shape: BoxShape
                                                                       .circle,
                                                                 ),
@@ -648,13 +674,13 @@ if(mounted){
                               // await fleetDriverDetails(
                               //     fleetid: widget.fleetid,
                               //     isassigndriver: true);
-                             var val = await getVehicleInfo();
-                             if(val == 'logout'){
-                               navigateLogout();
-                             }
+                              var val = await getVehicleInfo();
+                              if (val == 'logout') {
+                                navigateLogout();
+                              }
 
                               pop();
-                            }else if(result == 'logout'){
+                            } else if (result == 'logout') {
                               navigateLogout();
                             } else {
                               setState(() {
@@ -682,7 +708,9 @@ if(mounted){
                         padding: EdgeInsets.all(media.width * 0.025),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
-                            color: Colors.transparent.withOpacity(0.6)),
+                            color: (isDarkTheme == true)
+                                ? textColor.withOpacity(0.6)
+                                : Colors.transparent.withOpacity(0.6)),
                         child: Text(
                           languages[choosenLanguage]['text_select_driver'],
                           style: GoogleFonts.roboto(

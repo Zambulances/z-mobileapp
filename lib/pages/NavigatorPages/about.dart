@@ -55,7 +55,7 @@ class _AboutState extends State<About> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(Icons.arrow_back, color: textColor)))
                           ],
                         ),
                         SizedBox(

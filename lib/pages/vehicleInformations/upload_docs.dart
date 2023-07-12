@@ -84,22 +84,22 @@ class _DocsState extends State<Docs> {
                 color: page,
                 child: Column(
                   children: [
-                    Container(
-                        width: media.width * 1,
-                        color: topBar,
-                        child: (widget.fromPage != null)
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  InkWell(
-                                      onTap: () {
-                                        Navigator.pop(context, false);
-                                      },
-                                      child: const Icon(Icons.arrow_back)),
-                                ],
-                              )
-                            : Container()),
+                    SizedBox(
+                      width: media.width * 1,
+                      child: (widget.fromPage != null)
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.pop(context, false);
+                                },
+                                child: Icon(Icons.arrow_back, color: textColor)
+                              ),
+                            ],
+                          )
+                          : Container()),
                     SizedBox(
                       height: media.height * 0.04,
                     ),
@@ -128,7 +128,7 @@ class _DocsState extends State<Docs> {
                                               padding: const EdgeInsets.all(10),
                                               decoration: BoxDecoration(
                                                   border: Border.all(
-                                                      color: underline,
+                                                      color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : underline,
                                                       width: 1),
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -177,6 +177,7 @@ class _DocsState extends State<Docs> {
                                                                               'name']
                                                                           .toString(),
                                                                   style: GoogleFonts.roboto(
+                                                                      color: textColor,
                                                                       fontSize:
                                                                           media.width *
                                                                               twenty,
@@ -228,6 +229,7 @@ class _DocsState extends State<Docs> {
                                                               width:
                                                                   media.width *
                                                                       0.075,
+                                                              color: textColor,        
                                                             ),
                                                           )
                                                         ],
@@ -282,6 +284,7 @@ class _DocsState extends State<Docs> {
                                                                           : documentsNeeded[i]['name']
                                                                               .toString(),
                                                                       style: GoogleFonts.roboto(
+                                                                          color: textColor,
                                                                           fontSize: media.width *
                                                                               sixteen,
                                                                           fontWeight:
@@ -351,6 +354,7 @@ class _DocsState extends State<Docs> {
                                                               width:
                                                                   media.width *
                                                                       0.075,
+                                                              color: textColor,        
                                                             ),
                                                           )
                                                         ],
@@ -544,17 +548,16 @@ class _UploadDocsState extends State<UploadDocs> {
               color: page,
               child: Column(
                 children: [
-                  Container(
-                      width: media.width * 1,
-                      color: topBar,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          InkWell(
-                              onTap: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Icon(Icons.arrow_back)),
+                  SizedBox(
+                    width: media.width * 1,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(Icons.arrow_back, color: textColor)),
                         ],
                       )),
                   SizedBox(
@@ -617,7 +620,7 @@ class _UploadDocsState extends State<UploadDocs> {
                               decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                          color: underline, width: 1.5))),
+                                          color: (isDarkTheme == true) ? textColor.withOpacity(0.5) : underline, width: 1.5))),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -630,12 +633,13 @@ class _UploadDocsState extends State<UploadDocs> {
                                               fontSize: media.width * sixteen),
                                         )
                                       : Text(
-                                          'Select Date',
+                                          languages[choosenLanguage]
+                                              ['text_expiry_date'],
                                           style: GoogleFonts.roboto(
                                               color: textColor.withOpacity(0.5),
                                               fontSize: media.width * sixteen),
                                         ),
-                                  const Icon(Icons.date_range_outlined)
+                                  Icon(Icons.date_range_outlined, color: textColor)
                                 ],
                               ),
                             ),
@@ -684,16 +688,20 @@ class _UploadDocsState extends State<UploadDocs> {
                           )),
                   SizedBox(height: media.height * 0.04),
                   (imageFile != null &&
-                              (documentsNeeded[choosenDocs]
+                              ((documentsNeeded[choosenDocs]
                                       ['has_identify_number'] ==
-                                  true)
-                          ? idNumber.text.isNotEmpty
-                          : 1 + 1 == 2 &&
-                                  (documentsNeeded[choosenDocs]
+                                  true
+                          && idNumber.text.isNotEmpty)
+                          || documentsNeeded[choosenDocs]
+                                      ['has_identify_number'] ==
+                                  false) &&
+                                  ((documentsNeeded[choosenDocs]
                                           ['has_expiry_date'] ==
-                                      true)
-                              ? date != ''
-                              : 1 + 1 == 2)
+                                      true
+                              && date != '')
+                              || documentsNeeded[choosenDocs]
+                                          ['has_expiry_date'] ==
+                                      false))
                       ? Button(
                           onTap: () async {
                             FocusManager.instance.primaryFocus?.unfocus();
@@ -792,6 +800,7 @@ class _UploadDocsState extends State<UploadDocs> {
                                                 child: Icon(
                                                   Icons.camera_alt_outlined,
                                                   size: media.width * 0.064,
+                                                  color: textColor,
                                                 )),
                                           ),
                                           SizedBox(
@@ -825,6 +834,7 @@ class _UploadDocsState extends State<UploadDocs> {
                                                 child: Icon(
                                                   Icons.image_outlined,
                                                   size: media.width * 0.064,
+                                                  color: textColor,
                                                 )),
                                           ),
                                           SizedBox(

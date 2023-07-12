@@ -22,23 +22,26 @@ class _DriverListState extends State<DriverList> {
 
   @override
   void initState() {
-      getdriverdata();
+    getdriverdata();
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getdriverdata() async {
     var val = await fleetDriverDetails();
-    if(val == 'logout'){
+    if (val == 'logout') {
       navigateLogout();
     }
-    if(mounted){
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -46,27 +49,34 @@ class _DriverListState extends State<DriverList> {
     showDialog(
         context: context,
         barrierDismissible: false,
+        barrierColor: (isDarkTheme == true)
+            ? textColor.withOpacity(0.2)
+            : Colors.transparent.withOpacity(0.6),
         builder: (context) {
           return AlertDialog(
+            backgroundColor: (isDarkTheme == true) ? Colors.black : topBar,
             content: Container(
               width: media.width * 0.8,
-              color: Colors.white,
+              // color: Colors.white,
+              color: (isDarkTheme == true) ? Colors.black : topBar,
               child: Text(
                 languages[choosenLanguage]['text_delete_confirmation'],
                 style: GoogleFonts.roboto(
                     fontSize: media.width * sixteen,
-                    color: textColor,
+                    // color: textColor,
+                    color: (isDarkTheme == true) ? Colors.white : textColor,
                     fontWeight: FontWeight.bold),
               ),
             ),
             actions: [
               Button(
-                  width: media.width * 0.2,
-                  height: media.width * 0.09,
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  text: languages[choosenLanguage]['text_no']),
+                width: media.width * 0.2,
+                height: media.width * 0.09,
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                text: languages[choosenLanguage]['text_no'],
+              ),
               Button(
                   width: media.width * 0.2,
                   height: media.width * 0.09,
@@ -76,7 +86,7 @@ class _DriverListState extends State<DriverList> {
                       _isLoading = true;
                     });
                     var val = await deletefleetdriver(driverid);
-                    if(val == 'logout'){
+                    if (val == 'logout') {
                       navigateLogout();
                     }
 
@@ -119,6 +129,7 @@ class _DriverListState extends State<DriverList> {
                             child: Text(
                               languages[choosenLanguage]['text_manage_drivers'],
                               style: GoogleFonts.roboto(
+                                  color: textColor,
                                   fontSize: media.width * sixteen,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -128,7 +139,8 @@ class _DriverListState extends State<DriverList> {
                                   onTap: () {
                                     Navigator.pop(context);
                                   },
-                                  child: const Icon(Icons.arrow_back)))
+                                  child:
+                                      Icon(Icons.arrow_back, color: textColor)))
                         ],
                       ),
                       Expanded(
@@ -160,7 +172,10 @@ class _DriverListState extends State<DriverList> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           10.0),
-                                                  color: Colors.white,
+                                                  // color: Colors.white,
+                                                  color: (isDarkTheme == true)
+                                                      ? Colors.black
+                                                      : topBar,
                                                   boxShadow: const [
                                                     BoxShadow(
                                                       color: Colors.grey,
@@ -185,14 +200,19 @@ class _DriverListState extends State<DriverList> {
                                                                         .width *
                                                                     0.01),
                                                         decoration:
-                                                            const BoxDecoration(
-                                                          color: Colors.white,
+                                                            BoxDecoration(
+                                                          // color: Colors.white,
+                                                          color: (isDarkTheme ==
+                                                                  true)
+                                                              ? Colors.black
+                                                              : topBar,
                                                           borderRadius:
-                                                              BorderRadius.all(
+                                                              const BorderRadius
+                                                                      .all(
                                                                   Radius
                                                                       .circular(
                                                                           10)),
-                                                          boxShadow: [
+                                                          boxShadow: const [
                                                             BoxShadow(
                                                               color:
                                                                   Colors.grey,
@@ -343,7 +363,7 @@ class _DriverListState extends State<DriverList> {
                                                                             style:
                                                                                 GoogleFonts.roboto(
                                                                               fontSize: media.width * fourteen,
-                                                                              color: buttonText,
+                                                                              color: (isDarkTheme == true) ? Colors.black : buttonText,
                                                                             ),
                                                                           ),
                                                                         )

@@ -130,6 +130,7 @@ class _CashFreePageState extends State<CashFreePage> {
                                 child: Text(
                                   languages[choosenLanguage]['text_addmoney'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -139,7 +140,7 @@ class _CashFreePageState extends State<CashFreePage> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back, color: textColor,)))
                             ],
                           ),
                           SizedBox(

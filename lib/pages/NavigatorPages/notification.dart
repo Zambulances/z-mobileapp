@@ -26,14 +26,17 @@ class _NotificationPageState extends State<NotificationPage> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getdata() async {
     var val = await getnotificationHistory();
     if (mounted) {
-      if(val == 'logout'){
+      if (val == 'logout') {
         navigateLogout();
       }
       isLoading = false;
@@ -98,7 +101,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(Icons.arrow_back,
+                                        color: textColor)))
                           ],
                         ),
                         Expanded(
@@ -160,15 +164,18 @@ class _NotificationPageState extends State<NotificationPage> {
                                                                         borderRadius:
                                                                             BorderRadius.circular(
                                                                                 10),
-                                                                        color: const Color(0xff000000)
-                                                                            .withOpacity(
+                                                                        color: (isDarkTheme ==
+                                                                                true)
+                                                                            ? textColor.withOpacity(
+                                                                                0.3)
+                                                                            : const Color(0xff000000).withOpacity(
                                                                                 0.05)),
                                                                     alignment:
                                                                         Alignment
                                                                             .center,
-                                                                    child: const Icon(
-                                                                        Icons
-                                                                            .notifications)),
+                                                                    child: Icon(
+                                                                        Icons.notifications,
+                                                                        color: textColor)),
                                                                 SizedBox(
                                                                   width: media
                                                                           .width *
@@ -269,8 +276,9 @@ class _NotificationPageState extends State<NotificationPage> {
                                                                               notificationid = notificationHistory[i]['id'];
                                                                             });
                                                                           },
-                                                                          icon:
-                                                                              const Icon(Icons.delete_forever),
+                                                                          icon: Icon(
+                                                                              Icons.delete_forever,
+                                                                              color: textColor),
                                                                         ))
                                                                   ],
                                                                 ))
@@ -319,9 +327,10 @@ class _NotificationPageState extends State<NotificationPage> {
                                                       setState(() {
                                                         isLoading = true;
                                                       });
-                                                      var val = await getNotificationPages(
-                                                          'page=${notificationHistoryPage['pagination']['current_page'] + 1}');
-                                                      if(val == 'logout'){
+                                                      var val =
+                                                          await getNotificationPages(
+                                                              'page=${notificationHistoryPage['pagination']['current_page'] + 1}');
+                                                      if (val == 'logout') {
                                                         navigateLogout();
                                                       }
                                                       setState(() {
@@ -382,7 +391,10 @@ class _NotificationPageState extends State<NotificationPage> {
                           child: Container(
                             height: media.height * 1,
                             width: media.width * 1,
-                            color: Colors.transparent.withOpacity(0.6),
+                            // color: Colors.transparent.withOpacity(0.6),
+                            color: (isDarkTheme == true)
+                                ? textColor.withOpacity(0.2)
+                                : Colors.transparent.withOpacity(0.6),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -404,8 +416,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                   showinfovalue = null;
                                                 });
                                               },
-                                              child: const Icon(
-                                                  Icons.cancel_outlined))),
+                                              child: Icon(Icons.cancel_outlined,
+                                                  color: textColor))),
                                     ],
                                   ),
                                 ),
@@ -464,7 +476,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           child: Container(
                             height: media.height * 1,
                             width: media.width * 1,
-                            color: Colors.transparent.withOpacity(0.6),
+                            color: (isDarkTheme == true)
+                                ? textColor.withOpacity(0.2)
+                                : Colors.transparent.withOpacity(0.6),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -519,7 +533,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                     isLoading = false;
                                                     showToast();
                                                   });
-                                                }else if(result == 'logout'){
+                                                } else if (result == 'logout') {
                                                   navigateLogout();
                                                 } else {
                                                   // setState(() {

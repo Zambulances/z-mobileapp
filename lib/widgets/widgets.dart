@@ -105,13 +105,15 @@ class _InputFieldState extends State<InputField> {
           counterText: '',
           focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-            color:(widget.color == null) ?  inputfocusedUnderline : widget.color,
+            color:(widget.color == null) ? (isDarkTheme == true) ? textColor.withOpacity(0.5) : inputfocusedUnderline : widget.color,
             width: 1.2,
             style: BorderStyle.solid,
           )),
           enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-            color: (widget.color == null) ? inputUnderline : widget.color,
+            color: (widget.color == null) ? (isDarkTheme == true)
+                    ? textColor.withOpacity(0.3)
+                    : inputUnderline : widget.color,
             width: 1.2,
             style: BorderStyle.solid,
           )),
@@ -127,6 +129,9 @@ class _InputFieldState extends State<InputField> {
             fontSize: media.width * sixteen,
             color: textColor.withOpacity(0.6),
           )),
+          style: GoogleFonts.roboto(
+            color: textColor
+          ),
       onChanged: widget.onTap,
     );
   }

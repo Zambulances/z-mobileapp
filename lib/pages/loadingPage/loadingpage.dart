@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tagxi_driver/pages/language/languages.dart';
 import 'package:tagxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
@@ -28,17 +26,13 @@ class LoadingPage extends StatefulWidget {
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
-dynamic package;
-
 class _LoadingPageState extends State<LoadingPage> {
   String dot = '.';
   bool updateAvailable = false;
   late geolocator.LocationPermission permission;
   String state = '';
   int gettingPerm = 0;
-  dynamic _version;
   bool _isLoading = false;
-  bool _error = false;
 
   var demopage = TextEditingController();
 
@@ -71,42 +65,44 @@ class _LoadingPageState extends State<LoadingPage> {
     super.initState();
   }
 
-  getData()async{
-    for (var i = 0; _error == true; i++){
-      await getLanguageDone();
-    }
-  }
+  // getData() async {
+  //   for (var i = 0; _error == true; i++) {
+  //     await getLanguageDone();
+  //   }
+  // }
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
+    await getDetailsOfDevice();
     permission = await geolocator.GeolocatorPlatform.instance.checkPermission();
     serviceEnabled =
         await geolocator.GeolocatorPlatform.instance.isLocationServiceEnabled();
 
     if ((permission == geolocator.LocationPermission.denied ||
-        permission == geolocator.LocationPermission.deniedForever ||
-        serviceEnabled == false) && gettingPerm == 0) {
+            permission == geolocator.LocationPermission.deniedForever ||
+            serviceEnabled == false) &&
+        gettingPerm == 0) {
       gettingPerm++;
-await Future.delayed(const Duration(seconds: 5),(){});
+      await Future.delayed(const Duration(seconds: 5), () {});
       if (gettingPerm > 1) {
         locationAllowed = false;
         state = '3';
       } else {
         state = '2';
       }
-      
+
       setState(() {
         _isLoading = false;
       });
-    } else  {
-      if(permission == geolocator.LocationPermission.whileInUse ||
-        permission == geolocator.LocationPermission.always){
-          if (center == null) {
+    } else {
+      if (permission == geolocator.LocationPermission.whileInUse ||
+          permission == geolocator.LocationPermission.always) {
+        if (center == null) {
           var locs = await geolocator.Geolocator.getLastKnownPosition();
           if (locs != null) {
             center = LatLng(locs.latitude, locs.longitude);
           } else {
-           var loc = await geolocator.Geolocator.getCurrentPosition(
+            var loc = await geolocator.Geolocator.getCurrentPosition(
                 desiredAccuracy: geolocator.LocationAccuracy.low);
             center = LatLng(double.parse(loc.latitude.toString()),
                 double.parse(loc.longitude.toString()));
@@ -114,56 +110,55 @@ await Future.delayed(const Duration(seconds: 5),(){});
         }
         positionStreamData();
       }
-    package = await PackageInfo.fromPlatform();
-    try{
-    if (platform == TargetPlatform.android) {
-      _version = await FirebaseDatabase.instance
-          .ref()
-          .child('driver_android_version')
-          .get();
-    } else {
-      _version = await FirebaseDatabase.instance
-          .ref()
-          .child('driver_ios_version')
-          .get();
-    }
-    _error = false;
-    if (_version.value != null) {
-      var version = _version.value.toString().split('.');
-      var packages = package.version.toString().split('.');
+      // package = await PackageInfo.fromPlatform();
+      // try{
+      // if (platform == TargetPlatform.android) {
+      //   _version = await FirebaseDatabase.instance
+      //       .ref()
+      //       .child('driver_android_version')
+      //       .get();
+      // } else {
+      //   _version = await FirebaseDatabase.instance
+      //       .ref()
+      //       .child('driver_ios_version')
+      //       .get();
+      // }
+      // _error = false;
+      // if (_version.value != null) {
+      //   var version = _version.value.toString().split('.');
+      //   var packages = package.version.toString().split('.');
 
-      for (var i = 0; i < version.length || i < packages.length; i++) {
-        if (i < version.length && i < packages.length) {
-          if (int.parse(packages[i]) < int.parse(version[i])) {
-            setState(() {
-              updateAvailable = true;
-            });
-            break;
-          } else if (int.parse(packages[i]) > int.parse(version[i])) {
-            setState(() {
-              updateAvailable = false;
-            });
-            break;
-          }
-        } else if (i >= version.length && i < packages.length) {
-          setState(() {
-            updateAvailable = false;
-          });
-          break;
-        } else if (i < version.length && i >= packages.length) {
-          setState(() {
-            updateAvailable = true;
-          });
-          break;
-        }
-      }
-    }
+      //   for (var i = 0; i < version.length || i < packages.length; i++) {
+      //     if (i < version.length && i < packages.length) {
+      //       if (int.parse(packages[i]) < int.parse(version[i])) {
+      //         setState(() {
+      //           updateAvailable = true;
+      //         });
+      //         break;
+      //       } else if (int.parse(packages[i]) > int.parse(version[i])) {
+      //         setState(() {
+      //           updateAvailable = false;
+      //         });
+      //         break;
+      //       }
+      //     } else if (i >= version.length && i < packages.length) {
+      //       setState(() {
+      //         updateAvailable = false;
+      //       });
+      //       break;
+      //     } else if (i < version.length && i >= packages.length) {
+      //       setState(() {
+      //         updateAvailable = true;
+      //       });
+      //       break;
+      //     }
+      //   }
+      // }
 
-    if (updateAvailable == false) {
-      await getDetailsOfDevice();
+      // if (updateAvailable == false) {
+
       if (internet == true) {
         var val = await getLocalData();
-
         //if user is login and check waiting for approval status and send accordingly
         if (val == '3') {
           navigate();
@@ -184,50 +179,51 @@ await Future.delayed(const Duration(seconds: 5),(){});
       } else {
         setState(() {});
       }
-    }else{
-setState(() {
-            _isLoading = false;
-          });
-    }}catch(e){
-  if(_error == false){
-  setState(() {
-    _error = true;
-  });
-  getData();
-  }
-  
-  
+//     }else{
+// setState(() {
+//             _isLoading = false;
+//           });
+//     }}catch(e){
+//   if(_error == false){
+//   setState(() {
+//     _error = true;
+//   });
+//   getData();
+//   }
 
+//     }
     }
-    }
+    // setState(() {});
   }
 
   getLocationPermission() async {
-    if (serviceEnabled == false) {
-      // await location.requestService();
-      await geolocator.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocator.LocationAccuracy.low);
-    }
-    if (await geolocator.GeolocatorPlatform.instance
-        .isLocationServiceEnabled()) {
-      if (permission == geolocator.LocationPermission.denied ||
-          permission == geolocator.LocationPermission.deniedForever) {
-        if (permission != geolocator.LocationPermission.deniedForever &&
-            await geolocator.GeolocatorPlatform.instance
-                .isLocationServiceEnabled()) {
-          if (platform == TargetPlatform.android) {
-            await perm.Permission.location.request();
-            await perm.Permission.locationAlways.request();
-          } else {
-            await [perm.Permission.location].request();
-          }
+    // if (await geolocator.GeolocatorPlatform.instance
+    //     .isLocationServiceEnabled()) {
+    if (permission == geolocator.LocationPermission.denied ||
+        permission == geolocator.LocationPermission.deniedForever) {
+      if (permission != geolocator.LocationPermission.deniedForever) {
+        if (platform == TargetPlatform.android) {
+          await perm.Permission.location.request();
+          await perm.Permission.locationAlways.request();
+        } else {
+          await [perm.Permission.location].request();
+        }
+        if (serviceEnabled == false) {
+          // await location.requestService();
+          await geolocator.Geolocator.getCurrentPosition(
+              desiredAccuracy: geolocator.LocationAccuracy.low);
         }
       }
+    } else if (serviceEnabled == false) {
+      // await location.requestService();
+      await geolocator.Geolocator.getCurrentPosition(
+          desiredAccuracy: geolocator.LocationAccuracy.low);
     }
+    // }
     setState(() {
       _isLoading = true;
     });
-   getLanguageDone();
+    getLanguageDone();
   }
 
   @override
@@ -235,212 +231,171 @@ setState(() {
     var media = MediaQuery.of(context).size;
 
     return Material(
+      color: Colors.black,
       child: Scaffold(
         body: Stack(
           children: [
-           (state == '2')
-                                              ? Container(
-                                                  height: media.height * 1,
-                                                  width: media.width * 1,
-                                                  alignment: Alignment.center,
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      SizedBox(
-                                                        height:
-                                                            media.height * 0.31,
-                                                        child: Image.asset(
-                                                          'assets/images/allow_location_permission.png',
-                                                          fit: BoxFit.contain,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height:
-                                                            media.width * 0.05,
-                                                      ),
-                                                      Text(
-                                                       (choosenLanguage != '') ?   languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_trustedtaxi'] : 'Most Trusted Taxi Booking App',
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                                fontSize: media
-                                                                        .width *
-                                                                    eighteen,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                      ),
-                                                      SizedBox(
-                                                        height:
-                                                            media.width * 0.025,
-                                                      ),
-                                                      Text(
-                                                       (choosenLanguage != '') ?   languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_allowpermission1'] : 'To enjoy your ride experience',
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                          fontSize:
-                                                              media.width *
-                                                                  fourteen,
-                                                        ),
-                                                      ),
-                                                      Text(
-                                                       (choosenLanguage != '') ?   languages[
-                                                                choosenLanguage]
-                                                            [
-                                                            'text_allowpermission2'] : 'Please allow us the following permissions',
-                                                        style:
-                                                            GoogleFonts.roboto(
-                                                          fontSize:
-                                                              media.width *
-                                                                  fourteen,
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height:
-                                                            media.width * 0.05,
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                media.width *
-                                                                    0.05,
-                                                                0,
-                                                                media.width *
-                                                                    0.05,
-                                                                0),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            SizedBox(
-                                                                width: media
-                                                                        .width *
-                                                                    0.075,
-                                                                child: const Icon(
-                                                                    Icons
-                                                                        .location_on_outlined)),
-                                                            SizedBox(
-                                                              width:
-                                                                  media.width *
-                                                                      0.025,
-                                                            ),
-                                                            SizedBox(
-                                                              width:
-                                                                  media.width *
-                                                                      0.8,
-                                                              child: Text(
-                                                               (choosenLanguage != '') ?   languages[
-                                                                        choosenLanguage]
-                                                                    [
-                                                                    'text_loc_permission'] : 'Allow Location all the time - To book a taxi',
-                                                                style: GoogleFonts.roboto(
-                                                                    fontSize: media
-                                                                            .width *
-                                                                        fourteen,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height:
-                                                            media.width * 0.02,
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                media.width *
-                                                                    0.05,
-                                                                0,
-                                                                media.width *
-                                                                    0.05,
-                                                                0),
-                                                        child: Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            SizedBox(
-                                                                width: media
-                                                                        .width *
-                                                                    0.075,
-                                                                child: const Icon(
-                                                                    Icons
-                                                                        .location_on_outlined)),
-                                                            SizedBox(
-                                                              width:
-                                                                  media.width *
-                                                                      0.025,
-                                                            ),
-                                                            SizedBox(
-                                                              width:
-                                                                  media.width *
-                                                                      0.8,
-                                                              child: Text(
-                                                              (choosenLanguage != '') ?    languages[
-                                                                        choosenLanguage]
-                                                                    [
-                                                                    'text_background_permission'] : 'Enable Background Location - collects location data to enable users to identify nearby drivers even when the app is closed or not in use',
-                                                                style: GoogleFonts.roboto(
-                                                                    fontSize: media
-                                                                            .width *
-                                                                        fourteen,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  media.width *
-                                                                      0.05),
-                                                          child: Button(
-                                                              onTap: () async {
-                                                                getLocationPermission();
-                                                              },
-                                                              text: (choosenLanguage != '') ?  languages[
-                                                                      choosenLanguage]
-                                                                  [
-                                                                  'text_continue'] : 'Continue'))
-                                                    ],
-                                                  ),
-                                                )
-                                              :  Container(
-              height: media.height * 1,
-              width: media.width * 1,
-              decoration: BoxDecoration(
-                color: page,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(media.width * 0.01),
-                    width: media.width * 0.429,
-                    height: media.width * 0.429,
-                    decoration: const BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage('assets/images/logo.png'),
-                            fit: BoxFit.contain)),
+            (state == '2')
+                ? ValueListenableBuilder(
+                    valueListenable: valueNotifierHome.value,
+                    builder: (context, value, child) {
+                      return Container(
+                        height: media.height * 1,
+                        width: media.width * 1,
+                        alignment: Alignment.center,
+                        color: page,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              height: media.height * 0.31,
+                              child: Image.asset(
+                                'assets/images/allow_location_permission.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            SizedBox(
+                              height: media.width * 0.05,
+                            ),
+                            Text(
+                              (choosenLanguage != '')
+                                  ? languages[choosenLanguage]
+                                      ['text_trustedtaxi']
+                                  : 'Most Trusted Taxi Booking App',
+                              style: GoogleFonts.roboto(
+                                fontSize: media.width * eighteen,
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                            SizedBox(
+                              height: media.width * 0.025,
+                            ),
+                            Text(
+                              (choosenLanguage != '')
+                                  ? languages[choosenLanguage]
+                                      ['text_allowpermission1']
+                                  : 'To enjoy your ride experience',
+                              style: GoogleFonts.roboto(
+                                fontSize: media.width * fourteen,
+                                color: textColor,
+                              ),
+                            ),
+                            Text(
+                              (choosenLanguage != '')
+                                  ? languages[choosenLanguage]
+                                      ['text_allowpermission2']
+                                  : 'Please allow us the following permissions',
+                              style: GoogleFonts.roboto(
+                                fontSize: media.width * fourteen,
+                                color: textColor,
+                              ),
+                            ),
+                            SizedBox(
+                              height: media.width * 0.05,
+                            ),
+                            Container(
+                              padding: EdgeInsets.fromLTRB(
+                                  media.width * 0.05, 0, media.width * 0.05, 0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                      width: media.width * 0.075,
+                                      child: Icon(
+                                        Icons.location_on_outlined,
+                                        color: textColor,
+                                      )),
+                                  SizedBox(
+                                    width: media.width * 0.025,
+                                  ),
+                                  SizedBox(
+                                    width: media.width * 0.8,
+                                    child: Text(
+                                      (choosenLanguage != '')
+                                          ? languages[choosenLanguage]
+                                              ['text_loc_permission']
+                                          : 'Allow Location all the time - To book a taxi',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        fontWeight: FontWeight.w600,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              height: media.width * 0.02,
+                            ),
+                            Container(
+                              padding: EdgeInsets.fromLTRB(
+                                  media.width * 0.05, 0, media.width * 0.05, 0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                      width: media.width * 0.075,
+                                      child: Icon(
+                                        Icons.location_on_outlined,
+                                        color: textColor,
+                                      )),
+                                  SizedBox(
+                                    width: media.width * 0.025,
+                                  ),
+                                  SizedBox(
+                                    width: media.width * 0.8,
+                                    child: Text(
+                                      (choosenLanguage != '')
+                                          ? languages[choosenLanguage]
+                                              ['text_background_permission']
+                                          : 'Enable Background Location - collects location data to enable users to identify nearby drivers even when the app is closed or not in use',
+                                      style: GoogleFonts.roboto(
+                                        fontSize: media.width * fourteen,
+                                        fontWeight: FontWeight.w600,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                                padding: EdgeInsets.all(media.width * 0.05),
+                                child: Button(
+                                    onTap: () async {
+                                      getLocationPermission();
+                                    },
+                                    text: (choosenLanguage != '')
+                                        ? languages[choosenLanguage]
+                                            ['text_continue']
+                                        : 'Continue'))
+                          ],
+                        ),
+                      );
+                    })
+                : Container(
+                    height: media.height * 1,
+                    width: media.width * 1,
+                    decoration: BoxDecoration(
+                      color: page,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(media.width * 0.01),
+                          width: media.width * 0.429,
+                          height: media.width * 0.429,
+                          decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage('assets/images/logo.png'),
+                                  fit: BoxFit.contain)),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
 
             //update available
 

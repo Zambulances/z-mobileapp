@@ -34,8 +34,11 @@ class _AddDriverState extends State<AddDriver> {
     Navigator.pop(context);
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   countryCode() async {
@@ -52,7 +55,7 @@ class _AddDriverState extends State<AddDriver> {
       _showToast = true;
     });
     var val = await fleetDriverDetails();
-    if(val == 'logout'){
+    if (val == 'logout') {
       navigateLogout();
     }
     Future.delayed(const Duration(seconds: 1), () async {
@@ -103,6 +106,7 @@ class _AddDriverState extends State<AddDriver> {
                                 child: Text(
                                   languages[choosenLanguage]['text_add_driver'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -110,14 +114,15 @@ class _AddDriverState extends State<AddDriver> {
                               Positioned(
                                   child: InkWell(
                                       onTap: () async {
-                                       var val = await fleetDriverDetails();
-                                       if(val == 'logout'){
-                                         navigateLogout();
-                                       }
+                                        var val = await fleetDriverDetails();
+                                        if (val == 'logout') {
+                                          navigateLogout();
+                                        }
 
                                         pop();
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor)))
                             ],
                           ),
                           Expanded(
@@ -157,7 +162,11 @@ class _AddDriverState extends State<AddDriver> {
                                     media.width * 1 - (media.width * 0.08 * 2),
                                 decoration: BoxDecoration(
                                     border: Border(
-                                        bottom: BorderSide(color: underline))),
+                                        bottom: BorderSide(
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.4)
+                                      : underline,
+                                ))),
                                 child: Row(
                                   children: [
                                     InkWell(
@@ -166,9 +175,15 @@ class _AddDriverState extends State<AddDriver> {
                                           //dialod box for select country for dial code
                                           await showDialog(
                                               context: context,
+                                              barrierColor: (isDarkTheme ==
+                                                      true)
+                                                  ? textColor.withOpacity(0.3)
+                                                  : Colors.black
+                                                      .withOpacity(0.5),
                                               builder: (context) {
                                                 var searchVal = '';
                                                 return AlertDialog(
+                                                  backgroundColor: page,
                                                   insetPadding:
                                                       const EdgeInsets.all(10),
                                                   content: StatefulBuilder(
@@ -176,7 +191,7 @@ class _AddDriverState extends State<AddDriver> {
                                                           (context, setState) {
                                                     return Container(
                                                       width: media.width * 0.9,
-                                                      color: Colors.white,
+                                                      color: page,
                                                       child: Directionality(
                                                         textDirection:
                                                             (languageDirection ==
@@ -218,16 +233,19 @@ class _AddDriverState extends State<AddDriver> {
                                                                         : EdgeInsets.only(
                                                                             bottom: media.width *
                                                                                 0.04),
-                                                                    border:
-                                                                        InputBorder
-                                                                            .none,
-                                                                    hintText:
-                                                                        languages[choosenLanguage]
-                                                                            [
-                                                                            'text_search'],
+                                                                    border: InputBorder
+                                                                        .none,
+                                                                    hintText: languages[choosenLanguage][
+                                                                        'text_search'],
                                                                     hintStyle: GoogleFonts.roboto(
+                                                                        color: textColor.withOpacity(
+                                                                            0.4),
                                                                         fontSize:
                                                                             media.width * sixteen)),
+                                                                style: GoogleFonts
+                                                                    .roboto(
+                                                                        color:
+                                                                            textColor),
                                                                 onChanged:
                                                                     (val) {
                                                                   setState(() {
@@ -264,7 +282,7 @@ class _AddDriverState extends State<AddDriver> {
                                                                                           },
                                                                                           child: Container(
                                                                                             padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                                                                            color: Colors.white,
+                                                                                            color: page,
                                                                                             child: Row(
                                                                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                               children: [
@@ -278,13 +296,13 @@ class _AddDriverState extends State<AddDriver> {
                                                                                                         width: media.width * 0.4,
                                                                                                         child: Text(
                                                                                                           countries[i]['name'],
-                                                                                                          style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                                          style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                                         )),
                                                                                                   ],
                                                                                                 ),
                                                                                                 Text(
                                                                                                   countries[i]['dial_code'],
-                                                                                                  style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                                  style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                                 )
                                                                                               ],
                                                                                             ),
@@ -299,7 +317,7 @@ class _AddDriverState extends State<AddDriver> {
                                                                                               },
                                                                                               child: Container(
                                                                                                 padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                                                                                color: Colors.white,
+                                                                                                color: page,
                                                                                                 child: Row(
                                                                                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                                   children: [
@@ -313,13 +331,13 @@ class _AddDriverState extends State<AddDriver> {
                                                                                                             width: media.width * 0.4,
                                                                                                             child: Text(
                                                                                                               countries[i]['name'],
-                                                                                                              style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                                              style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                                             )),
                                                                                                       ],
                                                                                                     ),
                                                                                                     Text(
                                                                                                       countries[i]['dial_code'],
-                                                                                                      style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                                      style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                                     )
                                                                                                   ],
                                                                                                 ),
@@ -367,8 +385,8 @@ class _AddDriverState extends State<AddDriver> {
                                             const SizedBox(
                                               width: 2,
                                             ),
-                                            const Icon(
-                                                Icons.keyboard_arrow_down)
+                                            Icon(Icons.keyboard_arrow_down,
+                                                color: textColor)
                                           ],
                                         ),
                                       ),
@@ -488,9 +506,9 @@ class _AddDriverState extends State<AddDriver> {
                                             if (val == 'true') {
                                               showToast();
                                               serviceLocations.clear();
-                                            } else if(val == 'logout'){
+                                            } else if (val == 'logout') {
                                               navigateLogout();
-                                            }else {
+                                            } else {
                                               error = val.toString();
                                             }
                                           } else {
@@ -537,7 +555,9 @@ class _AddDriverState extends State<AddDriver> {
                           padding: EdgeInsets.all(media.width * 0.025),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: Colors.transparent.withOpacity(0.6)),
+                              color: (isDarkTheme == true)
+                                  ? textColor.withOpacity(0.6)
+                                  : Colors.transparent.withOpacity(0.6)),
                           child: Text(
                             languages[choosenLanguage]['text_driver_added'],
                             style: GoogleFonts.roboto(

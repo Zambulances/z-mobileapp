@@ -70,7 +70,7 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                 onTap: () {
                                   Navigator.pop(context, false);
                                 },
-                                child: const Icon(Icons.arrow_back)))
+                                child: Icon(Icons.arrow_back, color: textColor,)))
                       ],
                     ),
                     SizedBox(
@@ -126,7 +126,7 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     border: Border.all(
-                                                        color: const Color(
+                                                        color: (isDarkTheme == true) ? textColor : const Color(
                                                             0xff222222),
                                                         width: 1.2)),
                                                 alignment: Alignment.center,
@@ -137,10 +137,10 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                         width:
                                                             media.width * 0.03,
                                                         decoration:
-                                                            const BoxDecoration(
+                                                            BoxDecoration(
                                                                 shape: BoxShape
                                                                     .circle,
-                                                                color: Color(
+                                                                color: (isDarkTheme == true) ? textColor :const Color(
                                                                     0xff222222)),
                                                       )
                                                     : Container(),

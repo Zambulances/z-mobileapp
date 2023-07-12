@@ -21,8 +21,11 @@ class _SosState extends State<Sos> {
   bool _isLoading = false;
   String _deleteId = '';
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   @override
@@ -74,7 +77,8 @@ class _SosState extends State<Sos> {
                                       onTap: () {
                                         Navigator.pop(context, false);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor)))
                             ],
                           ),
                           SizedBox(
@@ -192,9 +196,12 @@ class _SosState extends State<Sos> {
                                                                             true;
                                                                       });
                                                                     },
-                                                                    child: const Icon(
-                                                                        Icons
-                                                                            .remove_circle_outline))
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .remove_circle_outline,
+                                                                      color:
+                                                                          textColor,
+                                                                    ))
                                                               ],
                                                             ),
                                                           )
@@ -255,7 +262,10 @@ class _SosState extends State<Sos> {
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              color: Colors.transparent.withOpacity(0.6),
+                              // color: Colors.transparent.withOpacity(0.6),
+                              color: (isDarkTheme == true)
+                                  ? textColor.withOpacity(0.2)
+                                  : Colors.transparent.withOpacity(0.6),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -276,8 +286,9 @@ class _SosState extends State<Sos> {
                                                     _isDeleting = false;
                                                   });
                                                 },
-                                                child: const Icon(
-                                                    Icons.cancel_outlined))),
+                                                child: Icon(
+                                                    Icons.cancel_outlined,
+                                                    color: textColor))),
                                       ],
                                     ),
                                   ),
@@ -313,7 +324,7 @@ class _SosState extends State<Sos> {
                                                 setState(() {
                                                   _isDeleting = false;
                                                 });
-                                              }else if(val == 'logout'){
+                                              } else if (val == 'logout') {
                                                 navigateLogout();
                                               }
                                               setState(() {
