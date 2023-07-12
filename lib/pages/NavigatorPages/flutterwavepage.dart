@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/noInternet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -19,7 +20,7 @@ class FlutterWavePage extends StatefulWidget {
 }
 
 class _FlutterWavePageState extends State<FlutterWavePage> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _success = false;
   bool _failed = false;
   dynamic flutterwave;
@@ -34,12 +35,15 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
     Navigator.pop(context, true);
   }
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
 //payment gateway code
   payMoney() async {
-    setState(() {
-      _isLoading = true;
-    });
-
     final style = FlutterwaveStyle(
       appBarText: "Flutterwave Checkout",
       buttonColor: buttonColor,
@@ -66,24 +70,25 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
         email: userDetails['email']);
 
     flutterwave = Flutterwave(
-        context: context,
-        style: style,
-        publicKey: (walletBalance['flutterwave_environment'] == 'test')
-            ? walletBalance['flutter_wave_test_secret_key']
-            : walletBalance['flutter_wave_live_secret_key'],
-        currency: "NGN", //walletBalance['currency_code'],
-        txRef: '${userDetails['id']}_${DateTime.now()}',
-        amount: addMoney.toString(),
-        customer: customer,
-        paymentOptions: "ussd, card, barter, payattitude, account",
-        customization: Customization(title: "Payment"),
-        isTestMode:
-            (walletBalance['flutterwave_environment'] == 'test') ? true : false,
-        redirectUrl: '');
-
-    setState(() {
-      _isLoading = false;
-    });
+      context: context,
+      style: style,
+      publicKey: (walletBalance['flutterwave_environment'] == 'test')
+          ? walletBalance['flutter_wave_test_secret_key']
+          : walletBalance['flutter_wave_live_secret_key'],
+      currency: walletBalance['currency_code'],
+      txRef: '${userDetails['id']}_${DateTime.now()}',
+      amount: addMoney.toString(),
+      customer: customer,
+      paymentOptions: "ussd, card, barter, payattitude, account",
+      customization: Customization(title: "Payment"),
+      isTestMode:
+          (walletBalance['flutterwave_environment'] == 'test') ? true : false,
+    );
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -122,6 +127,7 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
                                 child: Text(
                                   languages[choosenLanguage]['text_addmoney'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -131,7 +137,7 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back, color: textColor)))
                             ],
                           ),
                           SizedBox(
@@ -142,6 +148,7 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
                                 ' ' +
                                 addMoney.toString(),
                             style: GoogleFonts.roboto(
+                                color: textColor,
                                 fontSize: media.width * twenty,
                                 fontWeight: FontWeight.w600),
                           ),
@@ -162,9 +169,15 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
                                     if (widget.from == '1') {
                                       val = await payMoneyStripe(
                                           response.transactionId);
+                                      if (val == 'logout') {
+                                        navigateLogout();
+                                      }
                                     } else {
                                       val = await addMoneyFlutterwave(
                                           addMoney, response.transactionId);
+                                      if (val == 'logout') {
+                                        navigateLogout();
+                                      }
                                     }
                                     if (val == 'success') {
                                       setState(() {

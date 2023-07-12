@@ -8,6 +8,7 @@ import 'package:tagyourtaxi_driver/pages/NavigatorPages/razorpaypage.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/selectwallet.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/review_page.dart';
@@ -34,6 +35,13 @@ class _InvoiceState extends State<Invoice> {
     timing = 0.0;
     promoStatus = null;
     super.initState();
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
   }
 
   @override
@@ -67,6 +75,7 @@ class _InvoiceState extends State<Invoice> {
                           Text(
                             languages[choosenLanguage]['text_tripsummary'],
                             style: GoogleFonts.roboto(
+                                color: textColor,
                                 fontSize: media.width * sixteen,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -93,6 +102,7 @@ class _InvoiceState extends State<Invoice> {
                               Text(
                                 userRequestData['driverDetail']['data']['name'],
                                 style: GoogleFonts.roboto(
+                                  color: textColor,
                                   fontSize: media.width * eighteen,
                                 ),
                               )
@@ -223,7 +233,7 @@ class _InvoiceState extends State<Invoice> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(Icons.info),
+                              Icon(Icons.info, color: textColor,),
                               SizedBox(
                                 width: media.width * 0.04,
                               ),
@@ -614,7 +624,10 @@ class _InvoiceState extends State<Invoice> {
                           setState(() {
                             _isLoading = true;
                           });
-                          await getWalletHistory();
+                          var val = await getWalletHistory();
+                          if (val == 'logout') {
+                            navigateLogout();
+                          }
                           setState(() {
                             _isLoading = false;
                             _choosePayment = true;
@@ -722,7 +735,11 @@ class _InvoiceState extends State<Invoice> {
                                                         _isLoading = true;
                                                         _choosePayment = false;
                                                       });
-                                                      await getUserDetails();
+                                                      var val =
+                                                          await getUserDetails();
+                                                      if (val == 'logout') {
+                                                        navigateLogout();
+                                                      }
                                                       setState(() {
                                                         _isLoading = false;
                                                       });
@@ -767,7 +784,11 @@ class _InvoiceState extends State<Invoice> {
                                                         _isLoading = true;
                                                         _choosePayment = false;
                                                       });
-                                                      await getUserDetails();
+                                                      var val =
+                                                          await getUserDetails();
+                                                      if (val == 'logout') {
+                                                        navigateLogout();
+                                                      }
                                                       setState(() {
                                                         _isLoading = false;
                                                       });
@@ -812,7 +833,11 @@ class _InvoiceState extends State<Invoice> {
                                                         _isLoading = true;
                                                         _choosePayment = false;
                                                       });
-                                                      await getUserDetails();
+                                                      var val =
+                                                          await getUserDetails();
+                                                      if (val == 'logout') {
+                                                        navigateLogout();
+                                                      }
                                                       setState(() {
                                                         _isLoading = false;
                                                       });
@@ -857,7 +882,11 @@ class _InvoiceState extends State<Invoice> {
                                                         _isLoading = true;
                                                         _choosePayment = false;
                                                       });
-                                                      await getUserDetails();
+                                                      var val =
+                                                          await getUserDetails();
+                                                      if (val == 'logout') {
+                                                        navigateLogout();
+                                                      }
                                                       setState(() {
                                                         _isLoading = false;
                                                       });
@@ -902,7 +931,11 @@ class _InvoiceState extends State<Invoice> {
                                                         _isLoading = true;
                                                         _choosePayment = false;
                                                       });
-                                                      await getUserDetails();
+                                                      var val =
+                                                          await getUserDetails();
+                                                      if (val == 'logout') {
+                                                        navigateLogout();
+                                                      }
                                                       setState(() {
                                                         _isLoading = false;
                                                       });

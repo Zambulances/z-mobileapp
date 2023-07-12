@@ -204,11 +204,11 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     }
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
     _controller!.moveCamera(cameraUpdate);
-    await getPolylineshistory(
-        pickLat: myHistory[selectedHistory]['pick_lat'],
-        pickLng: myHistory[selectedHistory]['pick_lng'],
-        dropLat: myHistory[selectedHistory]['drop_lat'],
-        dropLng: myHistory[selectedHistory]['drop_lng']);
+    // await getPolylineshistory(
+    //     pickLat: myHistory[selectedHistory]['pick_lat'],
+    //     pickLng: myHistory[selectedHistory]['pick_lng'],
+    //     dropLat: myHistory[selectedHistory]['drop_lat'],
+    //     dropLng: myHistory[selectedHistory]['drop_lng']);
     setState(() {});
   }
 
@@ -260,6 +260,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                     child: Text(
                       languages[choosenLanguage]['text_tripsummary'],
                       style: GoogleFonts.roboto(
+                          color: textColor,
                           fontSize: media.width * sixteen,
                           fontWeight: FontWeight.bold),
                     ),
@@ -269,7 +270,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: const Icon(Icons.arrow_back)))
+                          child: Icon(Icons.arrow_back, color: textColor,)))
                 ],
               ),
               Expanded(
@@ -464,7 +465,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
-                                  color: Colors.white,
+                                  color: (isDarkTheme == true) ? Colors.black : Colors.white,
                                 ),
                               ),
                               SizedBox(
@@ -512,7 +513,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
-                                  color: Colors.white,
+                                  color: (isDarkTheme == true) ? Colors.black : Colors.white,
                                 ),
                               ),
                               SizedBox(
@@ -560,7 +561,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
-                                  color: Colors.white,
+                                  color: (isDarkTheme == true) ? Colors.black : Colors.white,
                                 ),
                               ),
                               SizedBox(
@@ -619,6 +620,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 ['name'],
                             style: GoogleFonts.roboto(
                               fontSize: media.width * eighteen,
+                              color: textColor
                             ),
                           ),
                           Expanded(
@@ -629,6 +631,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 myHistory[selectedHistory]['ride_user_rating']
                                     .toString(),
                                 style: GoogleFonts.roboto(
+                                    color: textColor,
                                     fontSize: media.width * eighteen,
                                     fontWeight: FontWeight.w600),
                               ),
@@ -768,7 +771,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.info),
+                          Icon(Icons.info, color: textColor),
                           SizedBox(
                             width: media.width * 0.04,
                           ),

@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
@@ -23,6 +24,7 @@ class DropLocation extends StatefulWidget {
 
 class _DropLocationState extends State<DropLocation>
     with WidgetsBindingObserver {
+  final _debouncer = Debouncer(milliseconds: 1000);
   GoogleMapController? _controller;
   late PermissionStatus permission;
   Location location = Location();
@@ -44,6 +46,13 @@ class _DropLocationState extends State<DropLocation>
     });
   }
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
@@ -57,10 +66,20 @@ class _DropLocationState extends State<DropLocation>
       if (_controller != null) {
         _controller?.setMapStyle(mapStyle);
       }
-      if (timerLocation == null && locationAllowed == true) {
-        getCurrentLocation();
+      if (locationAllowed == true) {
+        if (positionStream == null || positionStream!.isPaused) {
+          positionStreamData();
+        }
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    _controller = null;
+
+    super.dispose();
   }
 
   //show toast for demo
@@ -262,16 +281,27 @@ class _DropLocationState extends State<DropLocation>
                               child: InkWell(
                                 onTap: () async {
                                   if (locationAllowed == true) {
-                                    _controller?.animateCamera(
-                                        CameraUpdate.newLatLngZoom(
-                                            center, 18.0));
+                                    if (currentLocation != null) {
+                                      _controller?.animateCamera(
+                                          CameraUpdate.newLatLngZoom(
+                                              currentLocation, 18.0));
+                                      center = currentLocation;
+                                    } else {
+                                      _controller?.animateCamera(
+                                          CameraUpdate.newLatLngZoom(
+                                              center, 18.0));
+                                    }
                                   } else {
                                     if (serviceEnabled == true) {
                                       setState(() {
                                         _locationDenied = true;
                                       });
                                     } else {
-                                      await location.requestService();
+                                      await geolocs.Geolocator
+                                          .getCurrentPosition(
+                                              desiredAccuracy:
+                                                  geolocs.LocationAccuracy.low);
+                                      // await location.requestService();
                                       if (await geolocs
                                           .GeolocatorPlatform.instance
                                           .isLocationServiceEnabled()) {
@@ -289,14 +319,16 @@ class _DropLocationState extends State<DropLocation>
                                       boxShadow: [
                                         BoxShadow(
                                             blurRadius: 2,
-                                            color:
-                                                Colors.black.withOpacity(0.2),
+                                            color: textColor.withOpacity(0.2),
                                             spreadRadius: 2)
                                       ],
                                       color: page,
                                       borderRadius: BorderRadius.circular(
                                           media.width * 0.02)),
-                                  child: const Icon(Icons.my_location_sharp),
+                                  child: Icon(
+                                    Icons.my_location_sharp,
+                                    color: textColor,
+                                  ),
                                 ),
                               ),
                             ),
@@ -410,8 +442,13 @@ class _DropLocationState extends State<DropLocation>
                                                                             element['pick_address'] ==
                                                                             dropAddressConfirmation)
                                                                         .isEmpty
-                                                                    ? Colors
-                                                                        .black
+                                                                    // ? Colors
+                                                                    //     .black
+                                                                    ? (isDarkTheme ==
+                                                                            true)
+                                                                        ? textColor
+                                                                            .withOpacity(0.4)
+                                                                        : textColor
                                                                     : buttonColor,
                                                               ),
                                                             )
@@ -502,14 +539,17 @@ class _DropLocationState extends State<DropLocation>
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.2),
+                                                color:
+                                                    textColor.withOpacity(0.2),
                                                 spreadRadius: 2,
                                                 blurRadius: 2)
                                           ],
                                           color: page),
                                       alignment: Alignment.center,
-                                      child: const Icon(Icons.arrow_back),
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: textColor,
+                                      ),
                                     ),
                                   ),
                                   Container(
@@ -517,14 +557,13 @@ class _DropLocationState extends State<DropLocation>
                                     width: media.width * 0.75,
                                     padding: EdgeInsets.fromLTRB(
                                         media.width * 0.05,
-                                        media.width * 0.02,
+                                        0,
                                         media.width * 0.05,
-                                        media.width * 0.02),
+                                        0),
                                     decoration: BoxDecoration(
                                         boxShadow: [
                                           BoxShadow(
-                                              color:
-                                                  Colors.black.withOpacity(0.2),
+                                              color: textColor.withOpacity(0.2),
                                               spreadRadius: 2,
                                               blurRadius: 2)
                                         ],
@@ -547,20 +586,56 @@ class _DropLocationState extends State<DropLocation>
                                                 ['text_4lettersforautofill'],
                                             hintStyle: GoogleFonts.roboto(
                                                 fontSize: media.width * twelve,
-                                                color: hintColor)),
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.3)
+                                                    : hintColor)),
+                                        style: GoogleFonts.roboto(
+                                            color: textColor),
                                         maxLines: 1,
                                         onChanged: (val) {
-                                          if (val.length >= 4) {
-                                            getAutoAddress(
-                                                val,
-                                                sessionToken,
-                                                _center.latitude,
-                                                _center.longitude);
-                                          } else if (val.isEmpty) {
-                                            setState(() {
-                                              addAutoFill.clear();
-                                            });
-                                          }
+                                          _debouncer.run(() {
+                                            if (val.length >= 4) {
+                                              if (storedAutoAddress
+                                                  .where((element) =>
+                                                      element['description']
+                                                          .toString()
+                                                          .toLowerCase()
+                                                          .contains(val
+                                                              .toLowerCase()))
+                                                  .isNotEmpty) {
+                                                addAutoFill.removeWhere(
+                                                    (element) =>
+                                                        element['description']
+                                                            .toString()
+                                                            .toLowerCase()
+                                                            .contains(val
+                                                                .toLowerCase()) ==
+                                                        false);
+                                                storedAutoAddress
+                                                    .where((element) =>
+                                                        element['description']
+                                                            .toString()
+                                                            .toLowerCase()
+                                                            .contains(val
+                                                                .toLowerCase()))
+                                                    .forEach((element) {
+                                                  addAutoFill.add(element);
+                                                });
+                                                valueNotifierHome
+                                                    .incrementNotifier();
+                                              } else {
+                                                getAutoAddress(
+                                                    val,
+                                                    sessionToken,
+                                                    _center.latitude,
+                                                    _center.longitude);
+                                              }
+                                            } else if (val.isEmpty) {
+                                              setState(() {
+                                                addAutoFill.clear();
+                                              });
+                                            }
+                                          });
                                         }),
                                   )
                                 ],
@@ -611,13 +686,19 @@ class _DropLocationState extends State<DropLocation>
                                                                       BoxDecoration(
                                                                     shape: BoxShape
                                                                         .circle,
-                                                                    color: Colors
-                                                                            .grey[
-                                                                        200],
+                                                                    color: (isDarkTheme ==
+                                                                            true)
+                                                                        ? textColor.withOpacity(
+                                                                            0.3)
+                                                                        : Colors
+                                                                            .grey[200],
                                                                   ),
-                                                                  child: const Icon(
-                                                                      Icons
-                                                                          .access_time),
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .access_time,
+                                                                    color:
+                                                                        textColor,
+                                                                  ),
                                                                 ),
                                                                 InkWell(
                                                                   onTap:
@@ -689,7 +770,10 @@ class _DropLocationState extends State<DropLocation>
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              color: Colors.transparent.withOpacity(0.6),
+                              // color: Colors.transparent.withOpacity(0.6),
+                              color: (isDarkTheme == true)
+                                  ? textColor.withOpacity(0.2)
+                                  : Colors.transparent.withOpacity(0.6),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -711,8 +795,10 @@ class _DropLocationState extends State<DropLocation>
                                                 favAddressAdd = false;
                                               });
                                             },
-                                            child: const Icon(
-                                                Icons.cancel_outlined),
+                                            child: Icon(
+                                              Icons.cancel_outlined,
+                                              color: textColor,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -775,8 +861,7 @@ class _DropLocationState extends State<DropLocation>
                                                           shape:
                                                               BoxShape.circle,
                                                           border: Border.all(
-                                                              color:
-                                                                  Colors.black,
+                                                              color: textColor,
                                                               width: 1.2)),
                                                       alignment:
                                                           Alignment.center,
@@ -789,11 +874,11 @@ class _DropLocationState extends State<DropLocation>
                                                                   media.width *
                                                                       0.03,
                                                               decoration:
-                                                                  const BoxDecoration(
+                                                                  BoxDecoration(
                                                                 shape: BoxShape
                                                                     .circle,
-                                                                color: Colors
-                                                                    .black,
+                                                                color:
+                                                                    textColor,
                                                               ),
                                                             )
                                                           : Container(),
@@ -801,9 +886,12 @@ class _DropLocationState extends State<DropLocation>
                                                     SizedBox(
                                                       width: media.width * 0.01,
                                                     ),
-                                                    Text(languages[
-                                                            choosenLanguage]
-                                                        ['text_home'])
+                                                    Text(
+                                                      languages[choosenLanguage]
+                                                          ['text_home'],
+                                                      style: TextStyle(
+                                                          color: textColor),
+                                                    )
                                                   ],
                                                 ),
                                               ),
@@ -830,8 +918,7 @@ class _DropLocationState extends State<DropLocation>
                                                           shape:
                                                               BoxShape.circle,
                                                           border: Border.all(
-                                                              color:
-                                                                  Colors.black,
+                                                              color: textColor,
                                                               width: 1.2)),
                                                       alignment:
                                                           Alignment.center,
@@ -843,22 +930,23 @@ class _DropLocationState extends State<DropLocation>
                                                               width:
                                                                   media.width *
                                                                       0.03,
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color:
+                                                                      textColor),
                                                             )
                                                           : Container(),
                                                     ),
                                                     SizedBox(
                                                       width: media.width * 0.01,
                                                     ),
-                                                    Text(languages[
-                                                            choosenLanguage]
-                                                        ['text_work'])
+                                                    Text(
+                                                      languages[choosenLanguage]
+                                                          ['text_work'],
+                                                      style: TextStyle(
+                                                          color: textColor),
+                                                    )
                                                   ],
                                                 ),
                                               ),
@@ -885,8 +973,7 @@ class _DropLocationState extends State<DropLocation>
                                                           shape:
                                                               BoxShape.circle,
                                                           border: Border.all(
-                                                              color:
-                                                                  Colors.black,
+                                                              color: textColor,
                                                               width: 1.2)),
                                                       alignment:
                                                           Alignment.center,
@@ -899,22 +986,23 @@ class _DropLocationState extends State<DropLocation>
                                                               width:
                                                                   media.width *
                                                                       0.03,
-                                                              decoration:
-                                                                  const BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  color:
+                                                                      textColor),
                                                             )
                                                           : Container(),
                                                     ),
                                                     SizedBox(
                                                       width: media.width * 0.01,
                                                     ),
-                                                    Text(languages[
-                                                            choosenLanguage]
-                                                        ['text_others'])
+                                                    Text(
+                                                      languages[choosenLanguage]
+                                                          ['text_others'],
+                                                      style: TextStyle(
+                                                          color: textColor),
+                                                    )
                                                   ],
                                                 ),
                                               ),
@@ -969,6 +1057,9 @@ class _DropLocationState extends State<DropLocation>
                                                     favLng,
                                                     favSelectedAddress,
                                                     favNameText);
+                                                if (val == 'logout') {
+                                                  navigateLogout();
+                                                }
                                                 setState(() {
                                                   _isLoading = false;
                                                   if (val == true) {
@@ -990,6 +1081,9 @@ class _DropLocationState extends State<DropLocation>
                                                     favLng,
                                                     favSelectedAddress,
                                                     favName);
+                                                if (val == 'logout') {
+                                                  navigateLogout();
+                                                }
                                                 setState(() {
                                                   _isLoading = false;
                                                   if (val == true) {
@@ -1013,7 +1107,7 @@ class _DropLocationState extends State<DropLocation>
                             ))
                         : Container(),
 
-                    //display toast
+                        //display toast
                     (_showToast == true)
                         ? Positioned(
                             top: media.height * 0.5,

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "214496791559-3m833j3u2kche5uhuf5bagml32ngp92l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.driver.tagxi",
+            "certificate_hash": "773394247ad0028088b620b2ad46a4827a34fc07"
+          }
+        },
+        {
           "client_id": "214496791559-oo8d7ekgq9mmk3qrumh4aui6lg7jm57p.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
@@ -48,11 +56,10 @@
               "client_type": 3
             },
             {
-              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.tagxi.user",
-                "app_store_id": "1608868419"
+                "bundle_id": "com.driver.tagxi"
               }
             }
           ]
@@ -93,11 +100,10 @@
               "client_type": 3
             },
             {
-              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.tagxi.user",
-                "app_store_id": "1608868419"
+                "bundle_id": "com.driver.tagxi"
               }
             }
           ]
@@ -146,11 +152,10 @@
               "client_type": 3
             },
             {
-              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.tagxi.user",
-                "app_store_id": "1608868419"
+                "bundle_id": "com.driver.tagxi"
               }
             }
           ]
@@ -161,7 +166,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:214496791559:android:9a383c3780116fc3e2eea2",
         "android_client_info": {
-          "package_name": "com.tagxi.user"
+          "package_name": "com.user.tagxi"
         }
       },
       "oauth_client": [
@@ -169,7 +174,7 @@
           "client_id": "214496791559-5u4kc265gvl939lm1a34u67um42qfj2n.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.tagxi.user",
+            "package_name": "com.user.tagxi",
             "certificate_hash": "9c79dfa50c59f9c738a641ac6839861a8dbf45e2"
           }
         },
@@ -177,7 +182,7 @@
           "client_id": "214496791559-is8v3lcclp6o1931jrm8l4rg7d191u0t.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.tagxi.user",
+            "package_name": "com.user.tagxi",
             "certificate_hash": "760f4fe53f3be4d2ba6c7a540a48c89f678abad0"
           }
         },
@@ -199,11 +204,10 @@
               "client_type": 3
             },
             {
-              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.tagxi.user",
-                "app_store_id": "1608868419"
+                "bundle_id": "com.driver.tagxi"
               }
             }
           ]
@@ -218,6 +222,30 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "214496791559-ighss2vhtdbs5qckvo3vqjd9ln96fbkt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.user.tagxi",
+            "certificate_hash": "d3a9d059de8722d9568e3e72e0b9761788b2afa8"
+          }
+        },
+        {
+          "client_id": "214496791559-pggo7lqmaem6dqe1pj0rrg9ttva8r0n0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.user.tagxi",
+            "certificate_hash": "a9c8513a5a3a9b2650d7a36774981c8691df4bf2"
+          }
+        },
+        {
+          "client_id": "214496791559-tlem6fmuq3jisa0m5djppvkk1gpuldnf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.user.tagxi",
+            "certificate_hash": "8b1f5a22712f04b7e0c281f06328d1c10fdbb044"
+          }
+        },
         {
           "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
           "client_type": 3
@@ -236,11 +264,54 @@
               "client_type": 3
             },
             {
-              "client_id": "214496791559-ah9stvpq8elhdrg0c0eq2ognli94vqib.apps.googleusercontent.com",
+              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.tagxi.user",
-                "app_store_id": "1608868419"
+                "bundle_id": "com.driver.tagxi"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:214496791559:android:d58ea7a592c0f651e2eea2",
+        "android_client_info": {
+          "package_name": "test.flutter.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "214496791559-fuuretnqqhnu8od1cov6v0a3gkcqqseg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "test.flutter.app",
+            "certificate_hash": "d3a9d059de8722d9568e3e72e0b9761788b2afa8"
+          }
+        },
+        {
+          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.driver.tagxi"
               }
             }
           ]

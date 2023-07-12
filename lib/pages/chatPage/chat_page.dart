@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 
@@ -19,8 +20,22 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     //get messages
-    getCurrentMessages();
+    getMessages();
     super.initState();
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
+  getMessages() async {
+    var val = await getCurrentMessages();
+    if (val == 'logout') {
+      navigateLogout();
+    }
   }
 
   @override
@@ -89,14 +104,19 @@ class _ChatPageState extends State<ChatPage> {
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.2),
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.3)
+                                                    : Colors.black
+                                                        .withOpacity(0.2),
                                                 spreadRadius: 2,
                                                 blurRadius: 2)
                                           ],
                                           color: page),
                                       alignment: Alignment.center,
-                                      child: const Icon(Icons.arrow_back),
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: textColor,
+                                      ),
                                     ),
                                   ),
                                 )
@@ -134,40 +154,53 @@ class _ChatPageState extends State<ChatPage> {
                                                       media.width * 0.04,
                                                       media.width * 0.02),
                                                   decoration: BoxDecoration(
-                                                      borderRadius: (chatList[i]['from_type'] == 1)
+                                                      borderRadius: (chatList[i][
+                                                                  'from_type'] ==
+                                                              1)
                                                           ? const BorderRadius.only(
-                                                              topLeft:
-                                                                  Radius.circular(
-                                                                      24),
-                                                              bottomLeft:
-                                                                  Radius.circular(
-                                                                      24),
-                                                              bottomRight:
-                                                                  Radius.circular(
-                                                                      24))
+                                                              topLeft: Radius
+                                                                  .circular(24),
+                                                              bottomLeft: Radius
+                                                                  .circular(24),
+                                                              bottomRight: Radius
+                                                                  .circular(24))
                                                           : const BorderRadius.only(
-                                                              topRight:
-                                                                  Radius.circular(
-                                                                      24),
+                                                              topRight: Radius
+                                                                  .circular(24),
                                                               bottomLeft:
-                                                                  Radius.circular(
-                                                                      24),
-                                                              bottomRight:
-                                                                  Radius.circular(24)),
-                                                      color: (chatList[i]['from_type'] == 1) ? const Color(0xff000000).withOpacity(0.15) : const Color(0xff222222)),
+                                                                  Radius.circular(24),
+                                                              bottomRight: Radius.circular(24)),
+                                                      color: (chatList[i]['from_type'] == 1)
+                                                          ? (isDarkTheme == true)
+                                                              ? textColor
+                                                              : const Color(0xff000000).withOpacity(0.15)
+                                                          : (isDarkTheme == true)
+                                                              ? textColor.withOpacity(0.3)
+                                                              : const Color(0xff222222)),
                                                   child: Text(
                                                     chatList[i]['message'],
                                                     style: GoogleFonts.roboto(
                                                         fontSize: media.width *
                                                             fourteen,
-                                                        color: Colors.white),
+                                                        color: (chatList[i][
+                                                                    'from_type'] ==
+                                                                1)
+                                                            ? (isDarkTheme ==
+                                                                    true)
+                                                                ? Colors.black
+                                                                : Colors.white
+                                                            : Colors.white),
                                                   ),
                                                 ),
                                                 SizedBox(
                                                   height: media.width * 0.015,
                                                 ),
-                                                Text(chatList[i]
-                                                    ['converted_created_at'])
+                                                Text(
+                                                  chatList[i]
+                                                      ['converted_created_at'],
+                                                  style: TextStyle(
+                                                      color: textColor),
+                                                )
                                               ],
                                             ),
                                           ));
@@ -205,7 +238,11 @@ class _ChatPageState extends State<ChatPage> {
                                               ['text_entermessage'],
                                           hintStyle: GoogleFonts.roboto(
                                               fontSize: media.width * twelve,
-                                              color: hintColor)),
+                                              color: (isDarkTheme == true)
+                                                  ? textColor.withOpacity(0.5)
+                                                  : hintColor)),
+                                      style:
+                                          GoogleFonts.roboto(color: textColor),
                                       minLines: 1,
                                       maxLines: 4,
                                       onChanged: (val) {},
@@ -218,7 +255,11 @@ class _ChatPageState extends State<ChatPage> {
                                       setState(() {
                                         _sendingMessage = true;
                                       });
-                                      await sendMessage(chatText.text);
+                                      var val =
+                                          await sendMessage(chatText.text);
+                                      if (val == 'logout') {
+                                        navigateLogout();
+                                      }
                                       chatText.clear();
                                       setState(() {
                                         _sendingMessage = false;
@@ -227,6 +268,7 @@ class _ChatPageState extends State<ChatPage> {
                                     child: Image.asset(
                                       'assets/images/send.png',
                                       fit: BoxFit.contain,
+                                      color: textColor,
                                       width: media.width * 0.075,
                                     ),
                                   )

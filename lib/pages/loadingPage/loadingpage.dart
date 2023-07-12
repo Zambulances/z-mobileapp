@@ -1,13 +1,11 @@
 // import 'dart:async';
 import 'dart:convert';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/invoice.dart';
 import 'package:tagyourtaxi_driver/pages/language/languages.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
@@ -23,13 +21,11 @@ class LoadingPage extends StatefulWidget {
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
-dynamic package;
 
 class _LoadingPageState extends State<LoadingPage> {
   String dot = '.';
   bool updateAvailable = false;
 
-  dynamic _version;
   bool _isLoading = false;
 
   @override
@@ -58,6 +54,14 @@ class _LoadingPageState extends State<LoadingPage> {
                       type: 1,
                     )),
             (route) => false);
+      } else if (userRequestData['drop_lat'] == null) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BookingConfirmation(
+                      type: 2,
+                    )),
+            (route) => false);
       } else {
         Navigator.pushAndRemoveUntil(
             context,
@@ -73,75 +77,34 @@ class _LoadingPageState extends State<LoadingPage> {
     }
   }
 
+
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-    package = await PackageInfo.fromPlatform();
+        await getDetailsOfDevice();
+        if (internet == true) {
+          var val = await getLocalData();
 
-    if (platform == TargetPlatform.android) {
-      _version = await FirebaseDatabase.instance
-          .ref()
-          .child('user_android_version')
-          .get();
-    } else {
-      _version =
-          await FirebaseDatabase.instance.ref().child('user_ios_version').get();
-    }
-    if (_version.value != null) {
-      var version = _version.value.toString().split('.');
-      var packages = package.version.toString().split('.');
-
-      for (var i = 0; i < version.length || i < packages.length; i++) {
-        if (i < version.length && i < packages.length) {
-          if (int.parse(packages[i]) < int.parse(version[i])) {
-            setState(() {
-              updateAvailable = true;
+          if (val == '3') {
+            navigate();
+          } else if (val == '2') {
+            Future.delayed(const Duration(seconds: 2), () {
+              //login page
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const Login()));
             });
-            break;
-          } else if (int.parse(packages[i]) > int.parse(version[i])) {
-            setState(() {
-              updateAvailable = false;
+          } else {
+            Future.delayed(const Duration(seconds: 2), () {
+              //choose language page
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const Languages()));
             });
-            break;
           }
-        } else if (i >= version.length && i < packages.length) {
-          setState(() {
-            updateAvailable = false;
-          });
-          break;
-        } else if (i < version.length && i >= packages.length) {
-          setState(() {
-            updateAvailable = true;
-          });
-          break;
-        }
-      }
-    }
-
-    if (updateAvailable == false) {
-      await getDetailsOfDevice();
-      if (internet == true) {
-        var val = await getLocalData();
-
-        if (val == '3') {
-          navigate();
-        } else if (val == '2') {
-          Future.delayed(const Duration(seconds: 2), () {
-            //login page
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const Login()));
-          });
         } else {
-          Future.delayed(const Duration(seconds: 2), () {
-            //choose language page
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const Languages()));
-          });
+          setState(() {});
         }
-      } else {
-        setState(() {});
       }
-    }
-  }
+    
+  
 
   @override
   Widget build(BuildContext context) {
@@ -154,9 +117,7 @@ class _LoadingPageState extends State<LoadingPage> {
             Container(
               height: media.height * 1,
               width: media.width * 1,
-              decoration: BoxDecoration(
-                color: page,
-              ),
+              color: page,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

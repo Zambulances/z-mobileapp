@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -22,24 +23,26 @@ class PayStackPage extends StatefulWidget {
 }
 
 class _PayStackPageState extends State<PayStackPage> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _success = false;
   String _error = '';
   // final plugin = PaystackPlugin();
   @override
   void initState() {
-    if (walletBalance['paystack_environment'] == 'test') {
-      payMoney();
-      super.initState();
-    }
+    payMoney();
+    super.initState();
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
   }
 
 //payment gateway code
 
   payMoney() async {
-    setState(() {
-      _isLoading = true;
-    });
     dynamic val;
     if (widget.from == '1') {
       val = await getPaystackPayment(jsonEncode(
@@ -47,13 +50,16 @@ class _PayStackPageState extends State<PayStackPage> {
     } else {
       val = await getPaystackPayment(jsonEncode({'amount': addMoney * 100}));
     }
-    if (val != 'success') {
+    if (val == 'logout') {
+      navigateLogout();
+    } else if (val != 'success') {
       _error = val.toString();
     }
-
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -92,6 +98,7 @@ class _PayStackPageState extends State<PayStackPage> {
                                 child: Text(
                                   languages[choosenLanguage]['text_addmoney'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -101,7 +108,7 @@ class _PayStackPageState extends State<PayStackPage> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back, color: textColor)))
                             ],
                           ),
                           SizedBox(

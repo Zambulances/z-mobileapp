@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -24,6 +25,13 @@ class _SelectWalletState extends State<SelectWallet> {
   bool _isLoading = false;
   bool _success = false;
   bool _failed = false;
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
 
   @override
   void initState() {
@@ -71,6 +79,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                 child: Text(
                                   languages[choosenLanguage]['text_addmoney'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -80,7 +89,10 @@ class _SelectWalletState extends State<SelectWallet> {
                                       onTap: () {
                                         Navigator.pop(context);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: textColor,
+                                      )))
                             ],
                           ),
                           SizedBox(
@@ -96,6 +108,17 @@ class _SelectWalletState extends State<SelectWallet> {
                                   onCardChanged: (card) {
                                     setState(() {});
                                   },
+                                  cursorColor: topBar,
+                                  decoration: InputDecoration(
+                                    hintStyle: TextStyle(
+                                        color: (isDarkTheme == true)
+                                            ? topBar
+                                            : hintColor),
+                                  ),
+                                  style: TextStyle(
+                                      color: isDarkTheme == true
+                                          ? topBar
+                                          : textColor),
                                 ),
                                 SizedBox(
                                   height: media.width * 0.1,
@@ -117,8 +140,9 @@ class _SelectWalletState extends State<SelectWallet> {
                                         try {
                                           val2 = await Stripe.instance
                                               .confirmPayment(
-                                            stripeToken['client_token'],
-                                            PaymentMethodParams.card(
+                                            paymentIntentClientSecret:
+                                                stripeToken['client_token'],
+                                            data: PaymentMethodParams.card(
                                               paymentMethodData:
                                                   PaymentMethodData(
                                                 billingDetails: BillingDetails(
@@ -140,6 +164,9 @@ class _SelectWalletState extends State<SelectWallet> {
                                           if (widget.from == '1') {
                                             val3 =
                                                 await payMoneyStripe(val2.id);
+                                            if (val3 == 'logout') {
+                                              navigateLogout();
+                                            }
                                           } else {
                                             val3 = await addMoneyStripe(
                                                 addMoney, val2.id);
@@ -148,6 +175,8 @@ class _SelectWalletState extends State<SelectWallet> {
                                             setState(() {
                                               _success = true;
                                             });
+                                          } else if (val3 == 'logout') {
+                                            navigateLogout();
                                           } else {
                                             setState(() {
                                               _failed = true;
@@ -158,6 +187,8 @@ class _SelectWalletState extends State<SelectWallet> {
                                             _failed = true;
                                           });
                                         }
+                                      } else if (val == 'logout') {
+                                        navigateLogout();
                                       } else {
                                         setState(() {
                                           _failed = true;
@@ -229,7 +260,10 @@ class _SelectWalletState extends State<SelectWallet> {
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              color: Colors.transparent.withOpacity(0.6),
+                              // color: Colors.transparent.withOpacity(0.6),
+                              color: (isDarkTheme == true)
+                                  ? textColor.withOpacity(0.2)
+                                  : Colors.transparent.withOpacity(0.6),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -238,6 +272,7 @@ class _SelectWalletState extends State<SelectWallet> {
                                     width: media.width * 0.9,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
+                                        // border: Border.all(color: topBar),
                                         color: page),
                                     child: Column(
                                       children: [

@@ -52,7 +52,7 @@ class _LanguagesState extends State<Languages> {
                   width: media.width * 1,
                   padding:
                       EdgeInsets.only(top: MediaQuery.of(context).padding.top),
-                  color: topBar,
+                  color: page,
                   child: Stack(
                     children: [
                       Container(
@@ -129,16 +129,18 @@ class _LanguagesState extends State<Languages> {
                                         decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                                color: const Color(0xff222222),
+                                                color: (isDarkTheme == true) ? textColor : const Color(0xff222222),
                                                 width: 1.2)),
                                         alignment: Alignment.center,
                                         child: (choosenLanguage == i)
                                             ? Container(
                                                 height: media.width * 0.03,
                                                 width: media.width * 0.03,
-                                                decoration: const BoxDecoration(
+                                                decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
-                                                    color: Color(0xff222222)),
+                                                    color: (isDarkTheme == true)
+                                                        ? textColor
+                                                        : const Color(0xff222222)),
                                               )
                                             : Container(),
                                       )
@@ -159,7 +161,6 @@ class _LanguagesState extends State<Languages> {
                           setState(() {
                             _isLoading = true;
                           });
-                          await getlangid();
                           pref.setString(
                               'languageDirection', languageDirection);
                           pref.setString('choosenLanguage', choosenLanguage);

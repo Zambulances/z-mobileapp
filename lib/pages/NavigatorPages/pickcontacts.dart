@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:contacts_service/contacts_service.dart';
@@ -44,27 +45,33 @@ class _PickContactState extends State<PickContact> {
     if (contacts.isEmpty) {
       var permission = await getContactPermission();
       if (permission == PermissionStatus.granted) {
-        setState(() {
-          _isLoading = true;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = true;
+          });
+        }
         Iterable<Contact> contactsList = await ContactsService.getContacts();
 
-        setState(() {
-          // ignore: avoid_function_literals_in_foreach_calls
-          contactsList.forEach((contact) {
-            contact.phones!.toSet().forEach((phone) {
-              contacts.add({
-                'name': contact.displayName ?? contact.givenName,
-                'phone': phone.value
-              });
+        // ignore: avoid_function_literals_in_foreach_calls
+        contactsList.forEach((contact) {
+          contact.phones!.toSet().forEach((phone) {
+            contacts.add({
+              'name': contact.displayName ?? contact.givenName,
+              'phone': phone.value
             });
           });
-          _isLoading = false;
         });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       } else {
-        setState(() {
-          _contactDenied = true;
-        });
+        if (mounted) {
+          setState(() {
+            _contactDenied = true;
+          });
+        }
       }
     }
   }
@@ -72,6 +79,13 @@ class _PickContactState extends State<PickContact> {
   //navigate pop
   pop() {
     Navigator.pop(context, true);
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
   }
 
   @override
@@ -121,7 +135,7 @@ class _PickContactState extends State<PickContact> {
                               onTap: () {
                                 Navigator.pop(context, false);
                               },
-                              child: const Icon(Icons.arrow_back)),
+                              child: Icon(Icons.arrow_back, color: textColor)),
                           InkWell(
                               onTap: () {
                                 setState(() {
@@ -129,7 +143,7 @@ class _PickContactState extends State<PickContact> {
                                 });
                                 getContact();
                               },
-                              child: const Icon(Icons.replay_outlined)),
+                              child: Icon(Icons.replay_outlined, color: textColor,)),
                         ],
                       ))
                     ],
@@ -218,7 +232,7 @@ class _PickContactState extends State<PickContact> {
                                                   decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
-                                                          color: const Color(
+                                                          color: (isDarkTheme == true) ? textColor : const Color(
                                                               0xff222222),
                                                           width: 1.2)),
                                                   alignment: Alignment.center,
@@ -230,10 +244,10 @@ class _PickContactState extends State<PickContact> {
                                                           width: media.width *
                                                               0.03,
                                                           decoration:
-                                                              const BoxDecoration(
+                                                              BoxDecoration(
                                                                   shape: BoxShape
                                                                       .circle,
-                                                                  color: Color(
+                                                                  color: (isDarkTheme == true) ? textColor : const Color(
                                                                       0xff222222)),
                                                         )
                                                       : Container(),
@@ -262,6 +276,8 @@ class _PickContactState extends State<PickContact> {
                                     await addSos(pickedName, pickedNumber);
                                 if (val == 'success') {
                                   pop();
+                                } else if (val == 'logout') {
+                                  navigateLogout();
                                 }
                                 setState(() {
                                   _isLoading = false;
@@ -300,7 +316,7 @@ class _PickContactState extends State<PickContact> {
                                     width: media.width * 0.1,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle, color: page),
-                                    child: const Icon(Icons.cancel_outlined),
+                                    child: Icon(Icons.cancel_outlined, color: textColor,),
                                   ),
                                 ),
                               ],

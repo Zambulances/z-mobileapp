@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/noInternet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -21,7 +22,7 @@ class CashFreePage extends StatefulWidget {
 }
 
 class _CashFreePageState extends State<CashFreePage> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   bool _success = false;
   bool _failed = false;
 
@@ -31,11 +32,15 @@ class _CashFreePageState extends State<CashFreePage> {
     super.initState();
   }
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
 //payment code
   payMoney() async {
-    setState(() {
-      _isLoading = true;
-    });
     var getToken =
         await getCfToken(addMoney.toString(), walletBalance['currency_code']);
     if (getToken == 'success') {
@@ -60,8 +65,14 @@ class _CashFreePageState extends State<CashFreePage> {
           dynamic verify;
           if (widget.from == '1') {
             verify = await payMoneyStripe(cfSuccessList['orderId']);
+            if (verify == 'logout') {
+              navigateLogout();
+            }
           } else {
             verify = await cashFreePaymentSuccess();
+            if (verify == 'logout') {
+              navigateLogout();
+            }
           }
           if (verify == 'success') {
             setState(() {
@@ -80,15 +91,18 @@ class _CashFreePageState extends State<CashFreePage> {
           });
         }
       });
+    } else if (getToken == 'logout') {
+      navigateLogout();
     } else {
       setState(() {
         _failed = true;
       });
     }
-
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -127,6 +141,7 @@ class _CashFreePageState extends State<CashFreePage> {
                                 child: Text(
                                   languages[choosenLanguage]['text_addmoney'],
                                   style: GoogleFonts.roboto(
+                                      color: textColor,
                                       fontSize: media.width * sixteen,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -136,7 +151,7 @@ class _CashFreePageState extends State<CashFreePage> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back, color: textColor)))
                             ],
                           ),
                           SizedBox(

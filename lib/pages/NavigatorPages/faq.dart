@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:location/location.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
@@ -26,17 +27,27 @@ class _FaqState extends State<Faq> {
     super.initState();
   }
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
 //get faq data
   faqDatas() async {
+    dynamic val;
     if (currentLocation != null) {
-      await getFaqData(currentLocation.latitude, currentLocation.longitude);
-      setState(() {
-        _faqCompleted = true;
-        _isLoading = false;
-      });
+      val =
+          await getFaqData(currentLocation.latitude, currentLocation.longitude);
     } else {
       var loc = await Location.instance.getLocation();
-      await getFaqData(loc.latitude, loc.longitude);
+      val = await getFaqData(loc.latitude, loc.longitude);
+    }
+    if (val == 'logout') {
+      navigateLogout();
+    }
+    if (mounted) {
       setState(() {
         _faqCompleted = true;
         _isLoading = false;
@@ -86,7 +97,7 @@ class _FaqState extends State<Faq> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(Icons.arrow_back, color: textColor,)))
                           ],
                         ),
                         SizedBox(

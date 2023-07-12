@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -18,6 +19,14 @@ class _FavoriteState extends State<Favorite> {
   bool _isLoading = false;
   bool _deletingAddress = false;
   dynamic _deletingId;
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -60,7 +69,10 @@ class _FavoriteState extends State<Favorite> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(
+                                      Icons.arrow_back,
+                                      color: textColor,
+                                    )))
                           ],
                         ),
                         SizedBox(
@@ -118,8 +130,7 @@ class _FavoriteState extends State<Favorite> {
                                                               'Home')
                                                           ? Image.asset(
                                                               'assets/images/home.png',
-                                                              color:
-                                                                  Colors.black,
+                                                              color: textColor,
                                                               width:
                                                                   media.width *
                                                                       0.075,
@@ -129,16 +140,16 @@ class _FavoriteState extends State<Favorite> {
                                                                   'Work')
                                                               ? Image.asset(
                                                                   'assets/images/briefcase.png',
-                                                                  color: Colors
-                                                                      .black,
+                                                                  color:
+                                                                      textColor,
                                                                   width: media
                                                                           .width *
                                                                       0.075,
                                                                 )
                                                               : Image.asset(
                                                                   'assets/images/navigation.png',
-                                                                  color: Colors
-                                                                      .black,
+                                                                  color:
+                                                                      textColor,
                                                                   width: media
                                                                           .width *
                                                                       0.075,
@@ -180,9 +191,12 @@ class _FavoriteState extends State<Favorite> {
                                                                       true;
                                                                 });
                                                               },
-                                                              child: const Icon(
-                                                                  Icons
-                                                                      .remove_circle_outline)),
+                                                              child: Icon(
+                                                                Icons
+                                                                    .remove_circle_outline,
+                                                                color:
+                                                                    textColor,
+                                                              )),
                                                         ],
                                                       ))
                                                     ],
@@ -214,7 +228,10 @@ class _FavoriteState extends State<Favorite> {
                           child: Container(
                           height: media.height * 1,
                           width: media.width * 1,
-                          color: Colors.transparent.withOpacity(0.6),
+                          // color: Colors.transparent.withOpacity(0.6),
+                          color: (isDarkTheme == true)
+                              ? textColor.withOpacity(0.2)
+                              : Colors.transparent.withOpacity(0.6),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -235,8 +252,10 @@ class _FavoriteState extends State<Favorite> {
                                                 _deletingAddress = false;
                                               });
                                             },
-                                            child: const Icon(
-                                                Icons.cancel_outlined))),
+                                            child: Icon(
+                                              Icons.cancel_outlined,
+                                              color: textColor,
+                                            ))),
                                   ],
                                 ),
                               ),
@@ -245,6 +264,7 @@ class _FavoriteState extends State<Favorite> {
                                 width: media.width * 0.9,
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
+                                    // border: Border.all(color: topBar),
                                     color: page),
                                 child: Column(
                                   children: [
@@ -271,6 +291,8 @@ class _FavoriteState extends State<Favorite> {
                                             setState(() {
                                               _deletingAddress = false;
                                             });
+                                          } else if (result == 'logout') {
+                                            navigateLogout();
                                           }
                                           setState(() {
                                             _isLoading = false;

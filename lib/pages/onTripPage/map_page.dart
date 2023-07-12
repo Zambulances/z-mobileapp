@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:tagyourtaxi_driver/functions/notifications.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/notification.dart';
@@ -24,6 +25,7 @@ import '../navDrawer/nav_drawer.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:permission_handler/permission_handler.dart' as perm;
 import 'package:vector_math/vector_math.dart' as vector;
+import 'package:http/http.dart' as http;
 
 class Maps extends StatefulWidget {
   const Maps({Key? key}) : super(key: key);
@@ -53,6 +55,7 @@ bool deleteAccount = false;
 class _MapsState extends State<Maps>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   LatLng _centerLocation = const LatLng(41.4219057, -102.0840772);
+  final _debouncer = Debouncer(milliseconds: 1000);
 
   dynamic animationController;
   dynamic _sessionToken;
@@ -61,8 +64,10 @@ class _MapsState extends State<Maps>
   bool _dropaddress = false;
   bool _dropLocationMap = false;
   bool _locationDenied = false;
+  bool _showToast = false;
   int gettingPerm = 0;
   Animation<double>? _animation;
+  bool _isDarkTheme = false;
 
   late PermissionStatus permission;
   Location location = Location();
@@ -74,7 +79,6 @@ class _MapsState extends State<Maps>
   dynamic pinLocationIcon2;
   dynamic userLocationIcon;
   bool favAddressAdd = false;
-  bool _showToast = false;
   bool contactus = false;
   final _mapMarkerSC = StreamController<List<Marker>>();
   StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
@@ -89,11 +93,14 @@ class _MapsState extends State<Maps>
 
   @override
   void initState() {
+    _isDarkTheme = isDarkTheme;
     WidgetsBinding.instance.addObserver(this);
-
     getLocs();
     super.initState();
   }
+
+  bool timerTest = false;
+  int timerTime = 0;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -101,14 +108,18 @@ class _MapsState extends State<Maps>
       if (_controller != null) {
         _controller?.setMapStyle(mapStyle);
       }
-      if (timerLocation == null && locationAllowed == true) {
-        getCurrentLocation();
+      if (locationAllowed == true) {
+        if (positionStream == null || positionStream!.isPaused) {
+          positionStreamData();
+        }
       }
     }
   }
 
   @override
   void dispose() {
+    _controller?.dispose();
+    _controller = null;
     animationController?.dispose();
 
     super.dispose();
@@ -130,7 +141,14 @@ class _MapsState extends State<Maps>
         MaterialPageRoute(builder: (context) => BookingConfirmation()));
   }
 
-//show toast for demo
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
+  //show toast for demo
   addToast() {
     setState(() {
       _showToast = true;
@@ -221,15 +239,19 @@ class _MapsState extends State<Maps>
         state = '3';
         _loading = false;
       });
-      if (timerLocation == null && locationAllowed == true) {
-        getCurrentLocation();
+      if (locationAllowed == true) {
+        if (positionStream == null || positionStream!.isPaused) {
+          positionStreamData();
+        }
       }
     }
   }
 
   getLocationPermission() async {
     if (serviceEnabled == false) {
-      await location.requestService();
+      // await location.requestService();
+      await geolocs.Geolocator.getCurrentPosition(
+          desiredAccuracy: geolocs.LocationAccuracy.low);
     }
     if (permission == geolocs.LocationPermission.denied ||
         permission == geolocs.LocationPermission.deniedForever) {
@@ -282,6 +304,10 @@ class _MapsState extends State<Maps>
         child: ValueListenableBuilder(
             valueListenable: valueNotifierHome.value,
             builder: (context, value, child) {
+              if (_isDarkTheme != isDarkTheme && _controller != null) {
+                _controller!.setMapStyle(mapStyle);
+                _isDarkTheme = isDarkTheme;
+              }
               if (isGeneral == true) {
                 isGeneral = false;
                 if (lastNotification != latestNotification) {
@@ -309,6 +335,14 @@ class _MapsState extends State<Maps>
                                   type: 1,
                                 )),
                         (route) => false);
+                  } else if (userRequestData['drop_lat'] == null) {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BookingConfirmation(
+                                  type: 2,
+                                )),
+                        (route) => false);
                   } else {
                     Navigator.pushAndRemoveUntil(
                         context,
@@ -317,6 +351,9 @@ class _MapsState extends State<Maps>
                         (route) => false);
                   }
                 });
+              }
+              if(package == null){
+                checkVersion();
               }
               return Directionality(
                 textDirection: (languageDirection == 'rtl')
@@ -420,6 +457,7 @@ class _MapsState extends State<Maps>
                                                 languages[choosenLanguage]
                                                     ['text_trustedtaxi'],
                                                 style: GoogleFonts.roboto(
+                                                    color: textColor,
                                                     fontSize:
                                                         media.width * eighteen,
                                                     fontWeight:
@@ -432,6 +470,7 @@ class _MapsState extends State<Maps>
                                                 languages[choosenLanguage]
                                                     ['text_allowpermission1'],
                                                 style: GoogleFonts.roboto(
+                                                  color: textColor,
                                                   fontSize:
                                                       media.width * fourteen,
                                                 ),
@@ -440,6 +479,7 @@ class _MapsState extends State<Maps>
                                                 languages[choosenLanguage]
                                                     ['text_allowpermission2'],
                                                 style: GoogleFonts.roboto(
+                                                  color: textColor,
                                                   fontSize:
                                                       media.width * fourteen,
                                                 ),
@@ -459,8 +499,10 @@ class _MapsState extends State<Maps>
                                                             media.width * 0.075,
                                                         width:
                                                             media.width * 0.075,
-                                                        child: const Icon(Icons
-                                                            .location_on_outlined)),
+                                                        child: Icon(
+                                                            Icons
+                                                                .location_on_outlined,
+                                                            color: textColor)),
                                                     SizedBox(
                                                       width:
                                                           media.width * 0.025,
@@ -474,6 +516,8 @@ class _MapsState extends State<Maps>
                                                             'text_loc_permission_user'],
                                                         style:
                                                             GoogleFonts.roboto(
+                                                                color:
+                                                                    textColor,
                                                                 fontSize: media
                                                                         .width *
                                                                     fourteen,
@@ -489,11 +533,37 @@ class _MapsState extends State<Maps>
                                                   padding: EdgeInsets.all(
                                                       media.width * 0.05),
                                                   child: Button(
-                                                      onTap: () async {
+                                                      onTap: () async
+                                                          //
+                                                          {
                                                         if (serviceEnabled ==
                                                             false) {
-                                                          await location
-                                                              .requestService();
+                                                          if (permission ==
+                                                                  PermissionStatus
+                                                                      .denied ||
+                                                              permission ==
+                                                                  PermissionStatus
+                                                                      .deniedForever) {
+                                                            await location
+                                                                .requestPermission();
+                                                            await geolocs
+                                                                    .Geolocator
+                                                                .getCurrentPosition(
+                                                                    desiredAccuracy:
+                                                                        geolocs
+                                                                            .LocationAccuracy
+                                                                            .low);
+                                                          } else {
+                                                            await geolocs
+                                                                    .Geolocator
+                                                                .getCurrentPosition(
+                                                                    desiredAccuracy:
+                                                                        geolocs
+                                                                            .LocationAccuracy
+                                                                            .low);
+                                                          }
+                                                          // await location
+                                                          //     .requestService();
                                                         }
                                                         if (await geolocs
                                                             .GeolocatorPlatform
@@ -619,7 +689,9 @@ class _MapsState extends State<Maps>
                                                                               [
                                                                               1]);
                                                                       if (dist >
-                                                                          100) {
+                                                                              100 &&
+                                                                          _controller !=
+                                                                              null) {
                                                                         animationController =
                                                                             AnimationController(
                                                                           duration:
@@ -689,7 +761,7 @@ class _MapsState extends State<Maps>
                                                                   },
                                                                   onCameraIdle:
                                                                       () async {
-                                                                    if (_bottom ==
+                                                                        if (_bottom ==
                                                                             0 &&
                                                                         _pickaddress ==
                                                                             false) {
@@ -728,7 +800,6 @@ class _MapsState extends State<Maps>
                                                                     //         0 &&
                                                                     //     _pickaddress ==
                                                                     //         false) {
-                                                                    //
                                                                     //   var val = await geoCoding(
                                                                     //       _centerLocation
                                                                     //           .latitude,
@@ -816,9 +887,7 @@ class _MapsState extends State<Maps>
                                                                 'assets/images/dropmarker.png'))),
                                                 Positioned(
                                                     top: 0,
-                                                    child: AnimatedContainer(
-                                                      duration: const Duration(
-                                                          milliseconds: 400),
+                                                    child: Container(
                                                       width: media.width * 1,
                                                       decoration: BoxDecoration(
                                                         color: (_bottom == 0)
@@ -857,11 +926,7 @@ class _MapsState extends State<Maps>
                                                               });
                                                             },
                                                             child:
-                                                                AnimatedContainer(
-                                                              duration:
-                                                                  const Duration(
-                                                                      milliseconds:
-                                                                          400),
+                                                                Container(
                                                               margin: EdgeInsets.only(
                                                                   left: media
                                                                           .width *
@@ -872,15 +937,14 @@ class _MapsState extends State<Maps>
                                                                   bottom: media
                                                                           .width *
                                                                       0.05),
-                                                              padding: EdgeInsets.fromLTRB(
-                                                                  media.width *
-                                                                      0.03,
-                                                                  media.width *
-                                                                      0.01,
-                                                                  media.width *
-                                                                      0.03,
-                                                                  media.width *
-                                                                      0.01),
+                                                              padding: EdgeInsets
+                                                                  .fromLTRB(
+                                                                      media.width *
+                                                                          0.03,
+                                                                      0,
+                                                                      media.width *
+                                                                          0.03,
+                                                                      0),
                                                               height:
                                                                   media.width *
                                                                       0.1,
@@ -890,8 +954,9 @@ class _MapsState extends State<Maps>
                                                                       0.75
                                                                   : media.width *
                                                                       0.9,
-                                                              decoration: BoxDecoration(
-                                                                  boxShadow: [
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                      boxShadow: [
                                                                     BoxShadow(
                                                                         blurRadius: (_bottom ==
                                                                                 0)
@@ -908,26 +973,27 @@ class _MapsState extends State<Maps>
                                                                             ? 2
                                                                             : 0)
                                                                   ],
-                                                                  border: Border.all(
-                                                                      color: (_bottom ==
-                                                                              0)
-                                                                          ? page
-                                                                          : Colors
-                                                                              .grey,
-                                                                      width: (_bottom ==
-                                                                              0)
-                                                                          ? 0
-                                                                          : 1.5),
-                                                                  color: (_pickaddress ==
-                                                                              true &&
-                                                                          _bottom ==
-                                                                              1)
-                                                                      ? Colors.grey[
-                                                                          300]
-                                                                      : page,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                          media.width * 0.02)),
+                                                                      border: Border.all(
+                                                                          color: (_bottom == 0)
+                                                                              ? page
+                                                                              : Colors
+                                                                                  .grey,
+                                                                          width: (_bottom == 0)
+                                                                              ? 0
+                                                                              : 1.5),
+                                                                      color: (_pickaddress == true &&
+                                                                              _bottom ==
+                                                                                  1)
+                                                                          ? (isDarkTheme ==
+                                                                                  true)
+                                                                              ? Colors.grey.withOpacity(
+                                                                                  0.3)
+                                                                              : Colors.grey[
+                                                                                  300]
+                                                                          : page,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(media.width *
+                                                                              0.02)),
                                                               alignment:
                                                                   Alignment
                                                                       .center,
@@ -977,18 +1043,29 @@ class _MapsState extends State<Maps>
                                                                               decoration: InputDecoration(
                                                                                 contentPadding: (languageDirection == 'rtl') ? EdgeInsets.only(bottom: media.width * 0.035) : EdgeInsets.only(bottom: media.width * 0.047),
                                                                                 hintText: languages[choosenLanguage]['text_4lettersforautofill'],
-                                                                                hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor),
+                                                                                hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor),
                                                                                 border: InputBorder.none,
                                                                               ),
+                                                                              style: GoogleFonts.roboto(color: textColor),
                                                                               maxLines: 1,
                                                                               onChanged: (val) {
-                                                                                if (val.length >= 4) {
-                                                                                  getAutoAddress(val, _sessionToken, center.latitude, center.longitude);
-                                                                                } else {
-                                                                                  setState(() {
-                                                                                    addAutoFill.clear();
-                                                                                  });
-                                                                                }
+                                                                                _debouncer.run(() {
+                                                                                  if (val.length >= 4) {
+                                                                                    if (storedAutoAddress.where((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase())).isNotEmpty) {
+                                                                                      addAutoFill.removeWhere((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase()) == false);
+                                                                                      storedAutoAddress.where((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase())).forEach((element) {
+                                                                                        addAutoFill.add(element);
+                                                                                      });
+                                                                                      valueNotifierHome.incrementNotifier();
+                                                                                    } else {
+                                                                                      getAutoAddress(val, _sessionToken, center.latitude, center.longitude);
+                                                                                    }
+                                                                                  } else {
+                                                                                    setState(() {
+                                                                                      addAutoFill.clear();
+                                                                                    });
+                                                                                  }
+                                                                                });
                                                                               }),
                                                                         )
                                                                       : Expanded(
@@ -1024,7 +1101,11 @@ class _MapsState extends State<Maps>
                                                                                       child: Icon(
                                                                                         Icons.favorite_outline,
                                                                                         size: media.width * 0.05,
-                                                                                        color: favAddress.where((element) => element['pick_address'] == addressList.firstWhere((element) => element.id == 'pickup').address).isEmpty ? Colors.black : buttonColor,
+                                                                                        color: favAddress.where((element) => element['pick_address'] == addressList.firstWhere((element) => element.id == 'pickup').address).isEmpty
+                                                                                            ? (isDarkTheme == true)
+                                                                                                ? textColor.withOpacity(0.4)
+                                                                                                : Colors.black
+                                                                                            : buttonColor,
                                                                                       ),
                                                                                     )
                                                                                   : Container()
@@ -1060,8 +1141,7 @@ class _MapsState extends State<Maps>
                                                           boxShadow: [
                                                             BoxShadow(
                                                                 blurRadius: 2,
-                                                                color: Colors
-                                                                    .black
+                                                                color: textColor
                                                                     .withOpacity(
                                                                         0.2),
                                                                 spreadRadius: 2)
@@ -1075,11 +1155,11 @@ class _MapsState extends State<Maps>
                                                       alignment:
                                                           Alignment.center,
                                                       child: Image.asset(
-                                                        'assets/images/customercare.png',
-                                                        fit: BoxFit.contain,
-                                                        width:
-                                                            media.width * 0.06,
-                                                      ),
+                                                          'assets/images/customercare.png',
+                                                          fit: BoxFit.contain,
+                                                          width: media.width *
+                                                              0.06,
+                                                          color: textColor),
                                                       // Icon(
                                                       //     Icons
                                                       //         .my_location_sharp,
@@ -1137,11 +1217,11 @@ class _MapsState extends State<Maps>
                                                                     },
                                                                     child: Row(
                                                                       children: [
-                                                                        const Expanded(
+                                                                        Expanded(
                                                                             flex:
                                                                                 20,
                                                                             child:
-                                                                                Icon(Icons.call)),
+                                                                                Icon(Icons.call, color: textColor)),
                                                                         Expanded(
                                                                             flex:
                                                                                 80,
@@ -1161,11 +1241,11 @@ class _MapsState extends State<Maps>
                                                                     },
                                                                     child: Row(
                                                                       children: [
-                                                                        const Expanded(
+                                                                        Expanded(
                                                                             flex:
                                                                                 20,
                                                                             child:
-                                                                                Icon(Icons.call)),
+                                                                                Icon(Icons.call, color: textColor)),
                                                                         Expanded(
                                                                             flex:
                                                                                 80,
@@ -1185,17 +1265,17 @@ class _MapsState extends State<Maps>
                                                                     },
                                                                     child: Row(
                                                                       children: [
-                                                                        const Expanded(
+                                                                        Expanded(
                                                                             flex:
                                                                                 20,
                                                                             child:
-                                                                                Icon(Icons.vpn_lock_rounded)),
+                                                                                Icon(Icons.vpn_lock_rounded, color: textColor)),
                                                                         Expanded(
                                                                             flex:
                                                                                 80,
                                                                             child:
                                                                                 Text(
-                                                                              'Goto URL',
+                                                                              languages[choosenLanguage]['text_goto_url'],
                                                                               maxLines: 1,
                                                                               // overflow:
                                                                               //     TextOverflow.ellipsis,
@@ -1237,7 +1317,7 @@ class _MapsState extends State<Maps>
                                                                               0)
                                                                           ? BoxShadow(
                                                                               blurRadius: (_bottom == 0) ? 2 : 0,
-                                                                              color: (_bottom == 0) ? Colors.black.withOpacity(0.2) : Colors.transparent,
+                                                                              color: (_bottom == 0) ? textColor.withOpacity(0.2) : Colors.transparent,
                                                                               spreadRadius: (_bottom == 0) ? 2 : 0)
                                                                           : const BoxShadow(),
                                                                     ],
@@ -1257,11 +1337,14 @@ class _MapsState extends State<Maps>
                                                                           () {
                                                                         Scaffold.of(context)
                                                                             .openDrawer();
-                                                                            printWrapped(userDetails.toString());
                                                                       },
-                                                                      child: const Icon(
-                                                                          Icons
-                                                                              .menu));
+                                                                      child:
+                                                                          Icon(
+                                                                        Icons
+                                                                            .menu,
+                                                                        color:
+                                                                            textColor,
+                                                                      ));
                                                                 }),
                                                               ),
                                                             ],
@@ -1269,8 +1352,13 @@ class _MapsState extends State<Maps>
                                                         ))
                                                     : Container(),
                                                 Positioned(
-                                                    bottom:
-                                                      (userDetails['show_ride_without_destination'].toString() == '1') ?  20 + media.width * 0.4 : 20 + media.width*0.25,
+                                                    bottom: (userDetails[
+                                                                    'show_ride_without_destination']
+                                                                .toString() ==
+                                                            '1')
+                                                        ? 20 + media.width * 0.4
+                                                        : 20 +
+                                                            media.width * 0.25,
                                                     child: SizedBox(
                                                       width: media.width * 0.9,
                                                       child: Row(
@@ -1303,11 +1391,20 @@ class _MapsState extends State<Maps>
                                                             onTap: () async {
                                                               if (locationAllowed ==
                                                                   true) {
-                                                                _controller?.animateCamera(
-                                                                    CameraUpdate
-                                                                        .newLatLngZoom(
-                                                                            center,
-                                                                            18.0));
+                                                                if (currentLocation !=
+                                                                    null) {
+                                                                  _controller?.animateCamera(
+                                                                      CameraUpdate.newLatLngZoom(
+                                                                          currentLocation,
+                                                                          18.0));
+                                                                  center =
+                                                                      currentLocation;
+                                                                } else {
+                                                                  _controller?.animateCamera(
+                                                                      CameraUpdate.newLatLngZoom(
+                                                                          center,
+                                                                          18.0));
+                                                                }
                                                               } else {
                                                                 if (serviceEnabled ==
                                                                     true) {
@@ -1316,8 +1413,14 @@ class _MapsState extends State<Maps>
                                                                         true;
                                                                   });
                                                                 } else {
-                                                                  await location
-                                                                      .requestService();
+                                                                  await geolocs
+                                                                          .Geolocator
+                                                                      .getCurrentPosition(
+                                                                          desiredAccuracy: geolocs
+                                                                              .LocationAccuracy
+                                                                              .low);
+                                                                  // await location
+                                                                  //     .requestService();
                                                                   if (await geolocs
                                                                       .GeolocatorPlatform
                                                                       .instance
@@ -1343,10 +1446,8 @@ class _MapsState extends State<Maps>
                                                                     BoxShadow(
                                                                         blurRadius:
                                                                             2,
-                                                                        color: Colors
-                                                                            .black
-                                                                            .withOpacity(
-                                                                                0.2),
+                                                                        color: textColor.withOpacity(
+                                                                            0.2),
                                                                         spreadRadius:
                                                                             2)
                                                                   ],
@@ -1355,9 +1456,11 @@ class _MapsState extends State<Maps>
                                                                       BorderRadius.circular(
                                                                           media.width *
                                                                               0.02)),
-                                                              child: const Icon(
+                                                              child: Icon(
                                                                   Icons
-                                                                      .my_location_sharp),
+                                                                      .my_location_sharp,
+                                                                  color:
+                                                                      textColor),
                                                             ),
                                                           ),
                                                         ],
@@ -1383,7 +1486,7 @@ class _MapsState extends State<Maps>
                                                           });
                                                         }
                                                       },
-                                                      child: AnimatedContainer(
+                                                      child: Container(
                                                         padding:
                                                             EdgeInsets.fromLTRB(
                                                                 media.width *
@@ -1393,12 +1496,14 @@ class _MapsState extends State<Maps>
                                                                 media.width *
                                                                     0.05,
                                                                 0),
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    200),
                                                         height: (_bottom == 0)
-                                                            ? (userDetails['show_ride_without_destination'].toString() == '1') ? media.width * 0.4 : media.width*0.25
+                                                            ? (userDetails['show_ride_without_destination']
+                                                                        .toString() ==
+                                                                    '1')
+                                                                ? media.width *
+                                                                    0.4
+                                                                : media.width *
+                                                                    0.25
                                                             : media.height * 1 -
                                                                 (MediaQuery.of(
                                                                             context)
@@ -1457,12 +1562,10 @@ class _MapsState extends State<Maps>
                                                                   padding: EdgeInsets.fromLTRB(
                                                                       media.width *
                                                                           0.03,
-                                                                      media.width *
-                                                                          0.01,
+                                                                      0,
                                                                       media.width *
                                                                           0.03,
-                                                                      media.width *
-                                                                          0.01),
+                                                                      0),
                                                                   height: media
                                                                           .width *
                                                                       0.1,
@@ -1517,22 +1620,39 @@ class _MapsState extends State<Maps>
                                                                           ? Expanded(
                                                                               child: TextField(
                                                                                   autofocus: true,
-                                                                                  decoration: InputDecoration(contentPadding: (languageDirection == 'rtl') ? EdgeInsets.only(bottom: media.width * 0.035) : EdgeInsets.only(bottom: media.width * 0.047), border: InputBorder.none, hintText: languages[choosenLanguage]['text_4lettersforautofill'], hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor)),
+                                                                                  decoration: InputDecoration(
+                                                                                    contentPadding: (languageDirection == 'rtl') ? EdgeInsets.only(bottom: media.width * 0.035) : EdgeInsets.only(bottom: media.width * 0.047),
+                                                                                    border: InputBorder.none,
+                                                                                    hintText: languages[choosenLanguage]['text_4lettersforautofill'],
+                                                                                    hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : hintColor),
+                                                                                  ),
+                                                                                  style: GoogleFonts.roboto(color: textColor),
                                                                                   maxLines: 1,
                                                                                   onChanged: (val) {
-                                                                                    if (val.length >= 4) {
-                                                                                      getAutoAddress(val, _sessionToken, center.latitude, center.longitude);
-                                                                                    } else {
-                                                                                      setState(() {
-                                                                                        addAutoFill.clear();
-                                                                                      });
-                                                                                    }
+                                                                                    _debouncer.run(() {
+                                                                                      if (val.length >= 4) {
+                                                                                        if (storedAutoAddress.where((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase())).isNotEmpty) {
+                                                                                          addAutoFill.removeWhere((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase()) == false);
+
+                                                                                          storedAutoAddress.where((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase())).forEach((element) {
+                                                                                            addAutoFill.add(element);
+                                                                                          });
+                                                                                          valueNotifierHome.incrementNotifier();
+                                                                                        } else {
+                                                                                          getAutoAddress(val, _sessionToken, center.latitude, center.longitude);
+                                                                                        }
+                                                                                      } else {
+                                                                                        setState(() {
+                                                                                          addAutoFill.clear();
+                                                                                        });
+                                                                                      }
+                                                                                    });
                                                                                   }),
                                                                             )
                                                                           : Expanded(
                                                                               child: Text(
                                                                               languages[choosenLanguage]['text_4lettersforautofill'],
-                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor),
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : hintColor),
                                                                             )),
                                                                     ],
                                                                   )),
@@ -1564,9 +1684,12 @@ class _MapsState extends State<Maps>
                                                                                                             width: media.width * 0.1,
                                                                                                             decoration: BoxDecoration(
                                                                                                               shape: BoxShape.circle,
-                                                                                                              color: Colors.grey[200],
+                                                                                                              color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : Colors.grey[200],
                                                                                                             ),
-                                                                                                            child: const Icon(Icons.access_time),
+                                                                                                            child: Icon(
+                                                                                                              Icons.access_time,
+                                                                                                              color: textColor,
+                                                                                                            ),
                                                                                                           ),
                                                                                                           InkWell(
                                                                                                             onTap: () async {
@@ -1631,7 +1754,11 @@ class _MapsState extends State<Maps>
                                                                                                                   child: Icon(
                                                                                                                     Icons.favorite_outline,
                                                                                                                     size: media.width * 0.05,
-                                                                                                                    color: favAddress.where((element) => element['pick_address'] == addAutoFill[i]['description']).isNotEmpty ? buttonColor : Colors.black,
+                                                                                                                    color: favAddress.where((element) => element['pick_address'] == addAutoFill[i]['description']).isNotEmpty
+                                                                                                                        ? buttonColor
+                                                                                                                        : (isDarkTheme == true)
+                                                                                                                            ? textColor.withOpacity(0.4)
+                                                                                                                            : Colors.black,
                                                                                                                   ),
                                                                                                                 )
                                                                                                               : Container()
@@ -1723,18 +1850,18 @@ class _MapsState extends State<Maps>
                                                                                                               (favAddress[i]['address_name'] == 'Home')
                                                                                                                   ? Image.asset(
                                                                                                                       'assets/images/home.png',
-                                                                                                                      color: Colors.black,
+                                                                                                                      color: textColor,
                                                                                                                       width: media.width * 0.075,
                                                                                                                     )
                                                                                                                   : (favAddress[i]['address_name'] == 'Work')
                                                                                                                       ? Image.asset(
                                                                                                                           'assets/images/briefcase.png',
-                                                                                                                          color: Colors.black,
+                                                                                                                          color: textColor,
                                                                                                                           width: media.width * 0.075,
                                                                                                                         )
                                                                                                                       : Image.asset(
                                                                                                                           'assets/images/navigation.png',
-                                                                                                                          color: Colors.black,
+                                                                                                                          color: textColor,
                                                                                                                           width: media.width * 0.075,
                                                                                                                         ),
                                                                                                               SizedBox(
@@ -1808,17 +1935,18 @@ class _MapsState extends State<Maps>
                                                                             SizedBox(
                                                                               height: media.width * 0.05,
                                                                             ),
-                                                                            if(userDetails['show_ride_without_destination'].toString() == '1')
-                                                                            Button(
-                                                                                onTap: () {
-                                                                                  Navigator.push(
-                                                                                      context,
-                                                                                      MaterialPageRoute(
-                                                                                          builder: (context) => BookingConfirmation(
-                                                                                                type: 2,
-                                                                                              )));
-                                                                                },
-                                                                                text: languages[choosenLanguage]['text_ridewithout_destination']),
+                                                                            if (userDetails['show_ride_without_destination'].toString() ==
+                                                                                '1')
+                                                                              Button(
+                                                                                  onTap: () {
+                                                                                    Navigator.push(
+                                                                                        context,
+                                                                                        MaterialPageRoute(
+                                                                                            builder: (context) => BookingConfirmation(
+                                                                                                  type: 2,
+                                                                                                )));
+                                                                                  },
+                                                                                  text: languages[choosenLanguage]['text_ridewithout_destination']),
                                                                           ],
                                                                         ))),
                                                           ],
@@ -1838,7 +1966,10 @@ class _MapsState extends State<Maps>
                               child: Container(
                                 height: media.height * 1,
                                 width: media.width * 1,
-                                color: Colors.transparent.withOpacity(0.6),
+                                // color: Colors.transparent.withOpacity(0.6),
+                                color: (isDarkTheme == true)
+                                    ? textColor.withOpacity(0.2)
+                                    : Colors.transparent.withOpacity(0.6),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -1861,8 +1992,10 @@ class _MapsState extends State<Maps>
                                                   favAddressAdd = false;
                                                 });
                                               },
-                                              child: const Icon(
-                                                  Icons.cancel_outlined),
+                                              child: Icon(
+                                                Icons.cancel_outlined,
+                                                color: textColor,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -1928,8 +2061,8 @@ class _MapsState extends State<Maps>
                                                             shape:
                                                                 BoxShape.circle,
                                                             border: Border.all(
-                                                                color: Colors
-                                                                    .black,
+                                                                color:
+                                                                    textColor,
                                                                 width: 1.2)),
                                                         alignment:
                                                             Alignment.center,
@@ -1943,11 +2076,11 @@ class _MapsState extends State<Maps>
                                                                             .width *
                                                                         0.03,
                                                                     decoration:
-                                                                        const BoxDecoration(
+                                                                        BoxDecoration(
                                                                       shape: BoxShape
                                                                           .circle,
-                                                                      color: Colors
-                                                                          .black,
+                                                                      color:
+                                                                          textColor,
                                                                     ),
                                                                   )
                                                                 : Container(),
@@ -1956,9 +2089,13 @@ class _MapsState extends State<Maps>
                                                         width:
                                                             media.width * 0.01,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_home'])
+                                                      Text(
+                                                        languages[
+                                                                choosenLanguage]
+                                                            ['text_home'],
+                                                        style: TextStyle(
+                                                            color: textColor),
+                                                      )
                                                     ],
                                                   ),
                                                 ),
@@ -1986,8 +2123,8 @@ class _MapsState extends State<Maps>
                                                             shape:
                                                                 BoxShape.circle,
                                                             border: Border.all(
-                                                                color: Colors
-                                                                    .black,
+                                                                color:
+                                                                    textColor,
                                                                 width: 1.2)),
                                                         alignment:
                                                             Alignment.center,
@@ -2001,11 +2138,11 @@ class _MapsState extends State<Maps>
                                                                             .width *
                                                                         0.03,
                                                                     decoration:
-                                                                        const BoxDecoration(
+                                                                        BoxDecoration(
                                                                       shape: BoxShape
                                                                           .circle,
-                                                                      color: Colors
-                                                                          .black,
+                                                                      color:
+                                                                          textColor,
                                                                     ),
                                                                   )
                                                                 : Container(),
@@ -2014,9 +2151,13 @@ class _MapsState extends State<Maps>
                                                         width:
                                                             media.width * 0.01,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_work'])
+                                                      Text(
+                                                        languages[
+                                                                choosenLanguage]
+                                                            ['text_work'],
+                                                        style: TextStyle(
+                                                            color: textColor),
+                                                      )
                                                     ],
                                                   ),
                                                 ),
@@ -2044,8 +2185,8 @@ class _MapsState extends State<Maps>
                                                             shape:
                                                                 BoxShape.circle,
                                                             border: Border.all(
-                                                                color: Colors
-                                                                    .black,
+                                                                color:
+                                                                    textColor,
                                                                 width: 1.2)),
                                                         alignment:
                                                             Alignment.center,
@@ -2059,11 +2200,11 @@ class _MapsState extends State<Maps>
                                                                         .width *
                                                                     0.03,
                                                                 decoration:
-                                                                    const BoxDecoration(
+                                                                    BoxDecoration(
                                                                   shape: BoxShape
                                                                       .circle,
-                                                                  color: Colors
-                                                                      .black,
+                                                                  color:
+                                                                      textColor,
                                                                 ),
                                                               )
                                                             : Container(),
@@ -2072,9 +2213,13 @@ class _MapsState extends State<Maps>
                                                         width:
                                                             media.width * 0.01,
                                                       ),
-                                                      Text(languages[
-                                                              choosenLanguage]
-                                                          ['text_others'])
+                                                      Text(
+                                                        languages[
+                                                                choosenLanguage]
+                                                            ['text_others'],
+                                                        style: TextStyle(
+                                                            color: textColor),
+                                                      )
                                                     ],
                                                   ),
                                                 ),
@@ -2094,19 +2239,25 @@ class _MapsState extends State<Maps>
                                                           width: 1.2)),
                                                   child: TextField(
                                                     decoration: InputDecoration(
-                                                        border:
-                                                            InputBorder.none,
+                                                        border: InputBorder
+                                                            .none,
                                                         hintText: languages[
                                                                 choosenLanguage]
                                                             [
                                                             'text_enterfavname'],
-                                                        hintStyle: GoogleFonts
-                                                            .roboto(
+                                                        hintStyle:
+                                                            GoogleFonts.roboto(
                                                                 fontSize: media
                                                                         .width *
                                                                     twelve,
-                                                                color:
-                                                                    hintColor)),
+                                                                color: (isDarkTheme ==
+                                                                        true)
+                                                                    ? textColor
+                                                                        .withOpacity(
+                                                                            0.4)
+                                                                    : hintColor)),
+                                                    style: GoogleFonts.roboto(
+                                                        color: textColor),
                                                     maxLines: 1,
                                                     onChanged: (val) {
                                                       setState(() {
@@ -2132,6 +2283,9 @@ class _MapsState extends State<Maps>
                                                           favLng,
                                                           favSelectedAddress,
                                                           favNameText);
+                                                  if (val == 'logout') {
+                                                    navigateLogout();
+                                                  }
                                                   setState(() {
                                                     _loading = false;
                                                     if (val == true) {
@@ -2154,6 +2308,9 @@ class _MapsState extends State<Maps>
                                                           favLng,
                                                           favSelectedAddress,
                                                           favName);
+                                                  if (val == 'logout') {
+                                                    navigateLogout();
+                                                  }
                                                   setState(() {
                                                     _loading = false;
                                                     if (val == true) {
@@ -2285,7 +2442,10 @@ class _MapsState extends State<Maps>
                               child: Container(
                                 height: media.height * 1,
                                 width: media.width * 1,
-                                color: Colors.transparent.withOpacity(0.6),
+                                // color: Colors.transparent.withOpacity(0.6),
+                                color: (isDarkTheme == true)
+                                    ? textColor.withOpacity(0.2)
+                                    : Colors.transparent.withOpacity(0.6),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -2307,8 +2467,10 @@ class _MapsState extends State<Maps>
                                                       deleteAccount = false;
                                                     });
                                                   },
-                                                  child: const Icon(
-                                                      Icons.cancel_outlined))),
+                                                  child: Icon(
+                                                    Icons.cancel_outlined,
+                                                    color: textColor,
+                                                  ))),
                                         ],
                                       ),
                                     ),
@@ -2351,6 +2513,8 @@ class _MapsState extends State<Maps>
                                                         (route) => false);
                                                     userDetails.clear();
                                                   });
+                                                } else if (result == 'logout') {
+                                                  navigateLogout();
                                                 } else {
                                                   setState(() {
                                                     _loading = false;
@@ -2378,7 +2542,10 @@ class _MapsState extends State<Maps>
                               child: Container(
                                 height: media.height * 1,
                                 width: media.width * 1,
-                                color: Colors.transparent.withOpacity(0.6),
+                                // color: Colors.transparent.withOpacity(0.6),
+                                color: (isDarkTheme == true)
+                                    ? textColor.withOpacity(0.2)
+                                    : Colors.transparent.withOpacity(0.6),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -2400,8 +2567,10 @@ class _MapsState extends State<Maps>
                                                       logout = false;
                                                     });
                                                   },
-                                                  child: const Icon(
-                                                      Icons.cancel_outlined))),
+                                                  child: Icon(
+                                                    Icons.cancel_outlined,
+                                                    color: textColor,
+                                                  ))),
                                         ],
                                       ),
                                     ),
@@ -2572,7 +2741,7 @@ class _MapsState extends State<Maps>
                             ))
                           : Container(),
 
-                      //display toast
+                           //display toast
                       (_showToast == true)
                           ? Positioned(
                               top: media.height * 0.5,
@@ -2592,6 +2761,69 @@ class _MapsState extends State<Maps>
                                 ),
                               ))
                           : Container(),
+
+                          (updateAvailable == true)
+                ? Positioned(
+                    top: 0,
+                    child: Container(
+                      height: media.height * 1,
+                      width: media.width * 1,
+                      color: Colors.transparent.withOpacity(0.6),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                              width: media.width * 0.9,
+                              padding: EdgeInsets.all(media.width * 0.05),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: page,
+                              ),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                      width: media.width * 0.8,
+                                      child: Text(
+                                        languages[choosenLanguage]['text_update_available'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * sixteen,
+                                            fontWeight: FontWeight.w600),
+                                      )),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Button(
+                                      onTap: () async {
+                                        if (platform ==
+                                            TargetPlatform.android) {
+                                          openBrowser(
+                                              'https://play.google.com/store/apps/details?id=${package.packageName}');
+                                        } else {
+                                          setState(() {
+                                            _loading = true;
+                                          });
+                                          var response = await http.get(Uri.parse(
+                                              'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
+                                          if (response.statusCode == 200) {
+                                            openBrowser(jsonDecode(
+                                                    response.body)['results'][0]
+                                                ['trackViewUrl']);
+
+                                            // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
+                                          }
+
+                                          setState(() {
+                                            _loading = false;
+                                          });
+                                        }
+                                      },
+                                      text: 'Update')
+                                ],
+                              ))
+                        ],
+                      ),
+                    ))
+                : Container(),
 
                       //loader
                       (_loading == true || state == '')
@@ -2712,5 +2944,20 @@ class _MapsState extends State<Maps>
     //Starting the animation
 
     animationController.forward();
+  }
+}
+
+class Debouncer {
+  final int milliseconds;
+  dynamic action;
+  dynamic _timer;
+
+  Debouncer({required this.milliseconds});
+
+  run(VoidCallback action) {
+    if (null != _timer) {
+      _timer.cancel();
+    }
+    _timer = Timer(Duration(milliseconds: milliseconds), action);
   }
 }

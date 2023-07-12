@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/login/otp_page.dart';
+import 'package:tagyourtaxi_driver/pages/login/signinwithemail.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
 import '../../styles/styles.dart';
@@ -15,6 +16,7 @@ class Login extends StatefulWidget {
   State<Login> createState() => _LoginState();
 }
 
+var value = 0;
 //code as int for getting phone dial code of choosen country
 String phnumber = ''; // phone number as string entered in input field
 // String phone = '';
@@ -32,12 +34,8 @@ class _LoginState extends State<Login> {
   }
 
   countryCode() async {
-    var result = await getCountryCode();
-    if (result == 'success') {
-      setState(() {
-        _isLoading = false;
-      });
-    } else {
+    await getCountryCode();
+    if (mounted) {
       setState(() {
         _isLoading = false;
       });
@@ -47,7 +45,11 @@ class _LoginState extends State<Login> {
   //navigate
   navigate() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const Otp()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => Otp(
+                  from: '1',
+                )));
   }
 
   @override
@@ -90,7 +92,7 @@ class _LoginState extends State<Login> {
                           width: media.width * 1 - (media.width * 0.08 * 2),
                           decoration: BoxDecoration(
                               border:
-                                  Border(bottom: BorderSide(color: underline))),
+                                  Border(bottom: BorderSide(color: (isDarkTheme == true) ? textColor.withOpacity(0.6) : underline))),
                           child: Row(
                             children: [
                               InkWell(
@@ -99,16 +101,20 @@ class _LoginState extends State<Login> {
                                     //dialod box for select country for dial code
                                     await showDialog(
                                         context: context,
+                                        barrierColor: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.3)
+                                            : Colors.black.withOpacity(0.5),
                                         builder: (context) {
                                           var searchVal = '';
                                           return AlertDialog(
+                                            backgroundColor: page,
                                             insetPadding:
                                                 const EdgeInsets.all(10),
                                             content: StatefulBuilder(
                                                 builder: (context, setState) {
                                               return Container(
                                                 width: media.width * 0.9,
-                                                color: Colors.white,
+                                                color: page,
                                                 child: Directionality(
                                                   textDirection:
                                                       (languageDirection ==
@@ -152,9 +158,16 @@ class _LoginState extends State<Login> {
                                                                       [
                                                                       'text_search'],
                                                               hintStyle: GoogleFonts.roboto(
+                                                                  color: textColor
+                                                                      .withOpacity(
+                                                                          0.4),
                                                                   fontSize: media
                                                                           .width *
                                                                       sixteen)),
+                                                              style: GoogleFonts
+                                                              .roboto(
+                                                                  color:
+                                                                      textColor),        
                                                           onChanged: (val) {
                                                             setState(() {
                                                               searchVal = val;
@@ -188,7 +201,7 @@ class _LoginState extends State<Login> {
                                                                                 },
                                                                                 child: Container(
                                                                                   padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                                                                  color: Colors.white,
+                                                                                  color: page,
                                                                                   child: Row(
                                                                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                     children: [
@@ -202,13 +215,13 @@ class _LoginState extends State<Login> {
                                                                                               width: media.width * 0.4,
                                                                                               child: Text(
                                                                                                 countries[i]['name'],
-                                                                                                style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                                style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                               )),
                                                                                         ],
                                                                                       ),
                                                                                       Text(
                                                                                         countries[i]['dial_code'],
-                                                                                        style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                        style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                       )
                                                                                     ],
                                                                                   ),
@@ -223,7 +236,7 @@ class _LoginState extends State<Login> {
                                                                                     },
                                                                                     child: Container(
                                                                                       padding: const EdgeInsets.only(top: 10, bottom: 10),
-                                                                                      color: Colors.white,
+                                                                                      color: page,
                                                                                       child: Row(
                                                                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                                                         children: [
@@ -237,13 +250,13 @@ class _LoginState extends State<Login> {
                                                                                                   width: media.width * 0.4,
                                                                                                   child: Text(
                                                                                                     countries[i]['name'],
-                                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                                   )),
                                                                                             ],
                                                                                           ),
                                                                                           Text(
                                                                                             countries[i]['dial_code'],
-                                                                                            style: GoogleFonts.roboto(fontSize: media.width * sixteen),
+                                                                                            style: GoogleFonts.roboto(fontSize: media.width * sixteen, color: textColor),
                                                                                           )
                                                                                         ],
                                                                                       ),
@@ -268,6 +281,7 @@ class _LoginState extends State<Login> {
                                   }
                                   setState(() {});
                                 },
+
                                 //input field
                                 child: Container(
                                   height: 50,
@@ -290,7 +304,7 @@ class _LoginState extends State<Login> {
                                       const SizedBox(
                                         width: 2,
                                       ),
-                                      const Icon(Icons.keyboard_arrow_down)
+                                      Icon(Icons.keyboard_arrow_down, color: textColor)
                                     ],
                                   ),
                                 ),
@@ -362,8 +376,10 @@ class _LoginState extends State<Login> {
                                       shape: BoxShape.circle,
                                       color:
                                           (terms == true) ? buttonColor : page),
-                                  child: const Icon(Icons.done,
-                                      color: Colors.white)),
+                                  child: Icon(Icons.done,
+                                      color: (isDarkTheme == true)
+                                          ? Colors.black
+                                          : Colors.white)),
                             ),
                             SizedBox(
                               width: media.width * 0.02,
@@ -384,8 +400,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser(
-                                          'https://tagyourtaxi.com/privacy-policy');
+                                      openBrowser('terms and conditions url');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]['text_terms'],
@@ -402,8 +417,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser(
-                                          'https://tagyourtaxi.com/privacy-policy');
+                                      openBrowser('privacy policy url');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]
@@ -414,6 +428,49 @@ class _LoginState extends State<Login> {
                                     ),
                                   )
                                 ],
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: media.height * 0.03,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.email,
+                              size: media.width * eighteen,
+                              color: textColor.withOpacity(0.7)
+                            ),
+                            SizedBox(width: media.width * 0.02),
+                            Text(
+                              languages[choosenLanguage]
+                                  ['text_continue_with'],
+                              style: GoogleFonts.roboto(
+                                color: textColor.withOpacity(0.7),
+                                fontSize: media.width * sixteen,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            SizedBox(
+                              width: media.width * 0.01,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                controller.clear();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const SignInwithEmail()));
+                              },
+                              child: Text(
+                                languages[choosenLanguage]['text_email'],
+                                style: GoogleFonts.roboto(
+                                    fontSize: media.width * sixteen,
+                                    fontWeight: FontWeight.w400,
+                                    color: buttonColor),
                               ),
                             )
                           ],
@@ -432,6 +489,7 @@ class _LoginState extends State<Login> {
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
                                     setState(() {
+                                      
                                       _isLoading = true;
                                     });
                                     var val = await otpCall();
@@ -440,7 +498,7 @@ class _LoginState extends State<Login> {
                                       await phoneAuth(countries[phcode]
                                               ['dial_code'] +
                                           phnumber);
-
+                                      value = 0;    
                                       navigate();
                                     } else {
                                       phoneAuthCheck = false;

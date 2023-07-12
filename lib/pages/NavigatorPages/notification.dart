@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 
 import '../../functions/functions.dart';
 import '../../styles/styles.dart';
@@ -25,12 +26,28 @@ class _NotificationPageState extends State<NotificationPage> {
     super.initState();
   }
 
+  navigate() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
   getdata() async {
     var val = await getnotificationHistory();
     if (val == 'success') {
-      isLoading = false;
-    } else {
-      isLoading = true;
+      if (mounted) {
+        isLoading = false;
+      }
+    } else if (val == 'logout') {
+      navigate();
     }
   }
 
@@ -92,7 +109,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(Icons.arrow_back,
+                                        color: textColor)))
                           ],
                         ),
                         Expanded(
@@ -154,15 +172,18 @@ class _NotificationPageState extends State<NotificationPage> {
                                                                         borderRadius:
                                                                             BorderRadius.circular(
                                                                                 10),
-                                                                        color: const Color(0xff000000)
-                                                                            .withOpacity(
+                                                                        color: (isDarkTheme ==
+                                                                                true)
+                                                                            ? textColor.withOpacity(
+                                                                                0.3)
+                                                                            : const Color(0xff000000).withOpacity(
                                                                                 0.05)),
                                                                     alignment:
                                                                         Alignment
                                                                             .center,
-                                                                    child: const Icon(
-                                                                        Icons
-                                                                            .notifications)),
+                                                                    child: Icon(
+                                                                        Icons.notifications,
+                                                                        color: textColor)),
                                                                 SizedBox(
                                                                   width: media
                                                                           .width *
@@ -263,8 +284,9 @@ class _NotificationPageState extends State<NotificationPage> {
                                                                               notificationid = notificationHistory[i]['id'];
                                                                             });
                                                                           },
-                                                                          icon:
-                                                                              const Icon(Icons.delete_forever),
+                                                                          icon: Icon(
+                                                                              Icons.delete_forever,
+                                                                              color: textColor),
                                                                         ))
                                                                   ],
                                                                 ))
@@ -313,8 +335,12 @@ class _NotificationPageState extends State<NotificationPage> {
                                                       setState(() {
                                                         isLoading = true;
                                                       });
-                                                      await getNotificationPages(
-                                                          'page=${notificationHistoryPage['pagination']['current_page'] + 1}');
+                                                      var result =
+                                                          await getNotificationPages(
+                                                              'page=${notificationHistoryPage['pagination']['current_page'] + 1}');
+                                                      if (result == 'logout') {
+                                                        navigateLogout();
+                                                      }
                                                       setState(() {
                                                         isLoading = false;
                                                       });
@@ -373,7 +399,10 @@ class _NotificationPageState extends State<NotificationPage> {
                           child: Container(
                             height: media.height * 1,
                             width: media.width * 1,
-                            color: Colors.transparent.withOpacity(0.6),
+                            // color: Colors.transparent.withOpacity(0.6),
+                            color: (isDarkTheme == true)
+                                ? textColor.withOpacity(0.2)
+                                : Colors.transparent.withOpacity(0.6),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -395,8 +424,10 @@ class _NotificationPageState extends State<NotificationPage> {
                                                   showinfovalue = null;
                                                 });
                                               },
-                                              child: const Icon(
-                                                  Icons.cancel_outlined))),
+                                              child: Icon(
+                                                Icons.cancel_outlined,
+                                                color: textColor,
+                                              ))),
                                     ],
                                   ),
                                 ),
@@ -405,6 +436,13 @@ class _NotificationPageState extends State<NotificationPage> {
                                   width: media.width * 0.9,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
+                                      // boxShadow: [
+                                      //   BoxShadow(
+                                      //       color: Colors.white,
+                                      //       spreadRadius: 2,
+                                      //       blurRadius: 2)
+                                      // ],
+                                      // border: Border.all(color: topBar),
                                       color: page),
                                   child: Column(
                                     children: [
@@ -455,7 +493,9 @@ class _NotificationPageState extends State<NotificationPage> {
                           child: Container(
                             height: media.height * 1,
                             width: media.width * 1,
-                            color: Colors.transparent.withOpacity(0.6),
+                            color: (isDarkTheme == true)
+                                ? textColor.withOpacity(0.2)
+                                : Colors.transparent.withOpacity(0.6),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -510,6 +550,8 @@ class _NotificationPageState extends State<NotificationPage> {
                                                     isLoading = false;
                                                     showToast();
                                                   });
+                                                } else if (result == 'logout') {
+                                                  navigateLogout();
                                                 } else {
                                                   // setState(() {
                                                   //   logout = true;

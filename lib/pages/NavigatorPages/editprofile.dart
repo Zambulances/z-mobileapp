@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,7 +23,7 @@ dynamic imageFile;
 class _EditProfileState extends State<EditProfile> {
   ImagePicker picker = ImagePicker();
   bool _isLoading = false;
-  bool _error = false;
+  String _error = '';
   String _permission = '';
   bool _pickImage = false;
   TextEditingController name = TextEditingController();
@@ -83,6 +84,13 @@ class _EditProfileState extends State<EditProfile> {
     Navigator.pop(context, true);
   }
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
   @override
   void initState() {
     imageFile = null;
@@ -132,7 +140,7 @@ class _EditProfileState extends State<EditProfile> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)))
+                                    child: Icon(Icons.arrow_back, color: textColor)))
                           ],
                         ),
                         SizedBox(height: media.width * 0.1),
@@ -180,12 +188,26 @@ class _EditProfileState extends State<EditProfile> {
                                 : TextDirection.ltr,
                             controller: name,
                             decoration: InputDecoration(
+                                
                                 labelText: languages[choosenLanguage]
                                     ['text_name'],
+                                labelStyle: TextStyle(
+                                  color: textColor.withOpacity(0.6)
+                                ),    
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: textColor.withOpacity(0.4),
+                                      width: 1),
+                                  borderRadius: BorderRadius.circular(12),
+                                  gapPadding: 1
+                                ), 
                                 isDense: true),
+                                style: GoogleFonts.roboto(
+                                  color: textColor,
+                                ),
                           ),
                         ),
                         SizedBox(
@@ -203,10 +225,22 @@ class _EditProfileState extends State<EditProfile> {
                             decoration: InputDecoration(
                                 labelText: languages[choosenLanguage]
                                     ['text_email'],
+                                labelStyle: TextStyle(
+                                  color: textColor.withOpacity(0.6)
+                                ),    
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: textColor.withOpacity(0.4), width: 1),
+                                  borderRadius: BorderRadius.circular(12),   
+                                  gapPadding: 1 
+                                ),    
                                 isDense: true),
+                                style: GoogleFonts.roboto(
+                                  color: textColor,
+                                ),
                           ),
                         )
                       ],
@@ -216,31 +250,46 @@ class _EditProfileState extends State<EditProfile> {
                       width: media.width * 0.8,
                       child: Button(
                           onTap: () async {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            dynamic val;
+                            String pattern =
+                                r"^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])*$";
+                            RegExp regex = RegExp(pattern);
+                            if (regex.hasMatch(email.text)) {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              dynamic val;
 
-                            if (imageFile == null) {
-                              //update name or email
-                              val = await updateProfileWithoutImage(
-                                  name.text, email.text);
-                            } else {
-                              //update image
-                              val = await updateProfile(name.text, email.text);
-                            }
-                            if (val == 'success') {
-                              pop();
+                              if (imageFile == null) {
+                                //update name or email
+                                val = await updateProfileWithoutImage(
+                                    name.text, email.text);
+                              } else {
+                                //update image
+                                val =
+                                    await updateProfile(name.text, email.text);
+                              }
+                              if (val == 'success') {
+                                pop();
+                              } else if (val == 'logout') {
+                                navigateLogout();
+                              } else {
+                                setState(() {
+                                  _error = val.toString();
+                                });
+                              }
+                              setState(() {
+                                _isLoading = false;
+                              });
                             } else {
                               setState(() {
-                                _error = true;
+                                _error = languages[choosenLanguage]
+                                    ['text_email_validation'];
                               });
                             }
-                            setState(() {
-                              _isLoading = false;
-                            });
                           },
-                          text: languages[choosenLanguage]['text_confirm']))
+                          text: languages[choosenLanguage]['text_confirm'],
+                          
+                          ))
                 ],
               ),
             ),
@@ -311,6 +360,7 @@ class _EditProfileState extends State<EditProfile> {
                                                 child: Icon(
                                                   Icons.camera_alt_outlined,
                                                   size: media.width * 0.064,
+                                                  color: textColor,
                                                 )),
                                           ),
                                           SizedBox(
@@ -344,6 +394,7 @@ class _EditProfileState extends State<EditProfile> {
                                                 child: Icon(
                                                   Icons.image_outlined,
                                                   size: media.width * 0.064,
+                                                  color: textColor,
                                                 )),
                                           ),
                                           SizedBox(
@@ -492,7 +543,7 @@ class _EditProfileState extends State<EditProfile> {
                 : Container(),
 
             //error
-            (_error == true)
+            (_error != '')
                 ? Positioned(
                     child: Container(
                     height: media.height * 1,
@@ -510,8 +561,7 @@ class _EditProfileState extends State<EditProfile> {
                           child: Column(
                             children: [
                               Text(
-                                languages[choosenLanguage]
-                                    ['text_somethingwentwrong'],
+                                _error,
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.roboto(
                                     fontSize: media.width * sixteen,
@@ -524,7 +574,7 @@ class _EditProfileState extends State<EditProfile> {
                               Button(
                                   onTap: () async {
                                     setState(() {
-                                      _error = false;
+                                      _error = '';
                                     });
                                   },
                                   text: languages[choosenLanguage]['text_ok'])

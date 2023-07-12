@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -31,6 +32,13 @@ class _ReviewState extends State<Review> {
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const Maps()),
+        (route) => false);
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
         (route) => false);
   }
 
@@ -149,6 +157,7 @@ class _ReviewState extends State<Review> {
                   SizedBox(
                     height: media.height * 0.05,
                   ),
+
                   //feedback text
                   Container(
                     padding: EdgeInsets.all(media.width * 0.05),
@@ -165,7 +174,13 @@ class _ReviewState extends State<Review> {
                       },
                       decoration: InputDecoration(
                           hintText: languages[choosenLanguage]['text_feedback'],
+                          hintStyle: GoogleFonts.roboto(
+                            color: textColor.withOpacity(0.6)
+                          ),
                           border: InputBorder.none),
+                      style: GoogleFonts.roboto(
+                        color: textColor
+                      ),    
                     ),
                   ),
                   SizedBox(
@@ -182,6 +197,8 @@ class _ReviewState extends State<Review> {
                           if (result == true) {
                             navigate();
                             _loading = false;
+                          } else if (result == 'logout') {
+                            navigateLogout();
                           } else {
                             setState(() {
                               _loading = false;

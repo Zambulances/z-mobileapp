@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loadingpage.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -32,23 +33,49 @@ class _ReferralPageState extends State<ReferralPage> {
 
 //get referral code
   _getReferral() async {
-    await getReferral();
+    var val = await getReferral();
+    if (val == 'logout') {
+      navigateLogout();
+    }
     await getUrls();
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
   }
 
   var android = '';
   var ios = '';
+  String androidPackage = '';
+  String iOSBundle = '';
 
   getUrls() async {
-    android =
-        'https://play.google.com/store/apps/details?id=${package.packageName}';
-    var response = await http.get(Uri.parse(
-        'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
-    if (response.statusCode == 200) {
-      ios = jsonDecode(response.body)['results'][0]['trackViewUrl'];
+    var packageName =
+        await FirebaseDatabase.instance.ref().child('user_package_name').get();
+    if (packageName.value != null) {
+      androidPackage = packageName.value.toString();
+      android = 'https://play.google.com/store/apps/details?id=$androidPackage';
+    }
+    var bundleId =
+        await FirebaseDatabase.instance.ref().child('user_bundle_id').get();
+    if (bundleId.value != null) {
+      iOSBundle = bundleId.value.toString();
+      var response = await http
+          .get(Uri.parse('http://itunes.apple.com/lookup?bundleId=$iOSBundle'));
+      if (response.statusCode == 200) {
+        if (jsonDecode(response.body)['results'].isNotEmpty) {
+          ios = jsonDecode(response.body)['results'][0]['trackViewUrl'];
+        }
+        // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
+      }
     }
   }
 
@@ -113,8 +140,8 @@ class _ReferralPageState extends State<ReferralPage> {
                                                 onTap: () {
                                                   Navigator.pop(context);
                                                 },
-                                                child: const Icon(
-                                                    Icons.arrow_back)))
+                                                child: Icon(
+                                                    Icons.arrow_back, color: textColor)))
                                       ],
                                     ),
                                     SizedBox(
@@ -173,7 +200,7 @@ class _ReferralPageState extends State<ReferralPage> {
                                                   });
                                                   showToast();
                                                 },
-                                                child: const Icon(Icons.copy))
+                                                child: Icon(Icons.copy, color: textColor,))
                                           ],
                                         ))
                                   ],
@@ -271,7 +298,7 @@ class _ReferralPageState extends State<ReferralPage> {
                             padding: EdgeInsets.all(media.width * 0.025),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: Colors.transparent.withOpacity(0.6)),
+                                color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : Colors.transparent.withOpacity(0.6)),
                             child: Text(
                               languages[choosenLanguage]['text_code_copied'],
                               style: GoogleFonts.roboto(

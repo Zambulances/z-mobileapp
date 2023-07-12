@@ -14,15 +14,22 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
+// ignore: must_be_immutable
 class Otp extends StatefulWidget {
-  const Otp({Key? key}) : super(key: key);
+  dynamic from;
+  Otp({
+    this.from,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<Otp> createState() => _OtpState();
 }
 
+String otpNumber = '';
+
 class _OtpState extends State<Otp> {
-  String otpNumber = ''; //otp number
+  //otp number
   List otpText = []; //otp number as list for 6 boxes
   List otpPattern = [1, 2, 3, 4, 5, 6]; //list to create number of input box
   var resendTime = 60; //otp resend time
@@ -38,6 +45,7 @@ class _OtpState extends State<Otp> {
   TextEditingController fifth = TextEditingController();
   TextEditingController sixth = TextEditingController();
   bool _loading = false; //loading screen showing
+
   @override
   void initState() {
     _loading = false;
@@ -71,6 +79,14 @@ class _OtpState extends State<Otp> {
                           type: 1,
                         )),
                 (route) => false);
+          } else if (userRequestData['drop_lat'] == null) {
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => BookingConfirmation(
+                          type: 2,
+                        )),
+                (route) => false);
           } else {
             Navigator.pushAndRemoveUntil(
                 context,
@@ -85,8 +101,15 @@ class _OtpState extends State<Otp> {
             (route) => false);
       }
     } else if (verify == false) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const GetStarted()));
+      (value == 0)
+          ? Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => GetStarted(
+                        from: '1',
+                      )))
+          : Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => GetStarted()));
     } else {
       _error = verify.toString();
       setState(() {
@@ -102,13 +125,12 @@ class _OtpState extends State<Otp> {
       otpController.text = '123456';
       otpNumber = otpController.text;
       var verify = await verifyUser(phnumber);
-
+      value = 0;
       navigate(verify);
     }
   }
 
   //auto verify otp
-
   verifyOtp() async {
     FocusManager.instance.primaryFocus?.unfocus();
     try {
@@ -116,6 +138,7 @@ class _OtpState extends State<Otp> {
       await FirebaseAuth.instance.signInWithCredential(credentials);
 
       var verify = await verifyUser(phnumber);
+
       navigate(verify);
     } on FirebaseAuthException catch (error) {
       if (error.code == 'invalid-verification-code') {
@@ -159,6 +182,7 @@ class _OtpState extends State<Otp> {
                 _loading = true;
                 verifyOtp();
               }
+
               return Stack(
                 children: [
                   Container(
@@ -172,7 +196,7 @@ class _OtpState extends State<Otp> {
                         Container(
                             height: media.height * 0.12,
                             width: media.width * 1,
-                            color: topBar,
+                            color: page,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
@@ -180,7 +204,8 @@ class _OtpState extends State<Otp> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: const Icon(Icons.arrow_back)),
+                                    child: Icon(Icons.arrow_back,
+                                        color: textColor)),
                               ],
                             )),
                         Expanded(
@@ -190,17 +215,30 @@ class _OtpState extends State<Otp> {
                               SizedBox(
                                 height: media.height * 0.04,
                               ),
-                              SizedBox(
-                                width: media.width * 1,
-                                child: Text(
-                                  languages[choosenLanguage]
-                                      ['text_phone_verify'],
-                                  style: GoogleFonts.roboto(
-                                      fontSize: media.width * twentyeight,
-                                      fontWeight: FontWeight.bold,
-                                      color: textColor),
-                                ),
-                              ),
+                              (widget.from == '1')
+                                  ? SizedBox(
+                                      width: media.width * 1,
+                                      child: Text(
+                                        languages[choosenLanguage]
+                                            ['text_phone_verify'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * twentyeight,
+                                            fontWeight: FontWeight.bold,
+                                            color: textColor),
+                                      ),
+                                    )
+                                  : SizedBox(
+                                      width: media.width * 1,
+                                      child: Text(
+                                        languages[choosenLanguage]
+                                            ['text_email_verify'],
+                                        style: GoogleFonts.roboto(
+                                            fontSize: media.width * twentyeight,
+                                            fontWeight: FontWeight.bold,
+                                            color: textColor),
+                                      ),
+                                    ),
+
                               const SizedBox(
                                 height: 10,
                               ),
@@ -211,14 +249,24 @@ class _OtpState extends State<Otp> {
                                     color: textColor.withOpacity(0.3)),
                               ),
                               const SizedBox(height: 10),
-                              Text(
-                                countries[phcode]['dial_code'] + phnumber,
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * sixteen,
-                                    color: textColor,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 1),
-                              ),
+                              (widget.from == '1')
+                                  ? Text(
+                                      countries[phcode]['dial_code'] + phnumber,
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * sixteen,
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1),
+                                    )
+                                  : Text(
+                                      email,
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * sixteen,
+                                          color: textColor,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1),
+                                    ),
+
                               SizedBox(height: media.height * 0.1),
 
                               //otp text box
@@ -247,7 +295,9 @@ class _OtpState extends State<Otp> {
                                       border: InputBorder.none,
                                       counterText: '',
                                       hintText: languages[choosenLanguage]
-                                          ['text_enter_otp_login']),
+                                          ['text_enter_otp_login'],
+                                      hintStyle: TextStyle(
+                                          color: textColor.withOpacity(0.4))),
                                   textAlign: TextAlign.center,
                                   style: GoogleFonts.roboto(
                                     fontSize: media.width * twenty,
@@ -276,84 +326,169 @@ class _OtpState extends State<Otp> {
                               SizedBox(
                                 height: media.height * 0.05,
                               ),
-                              Container(
-                                alignment: Alignment.center,
-                                child: Button(
-                                  onTap: () async {
-                                    if (otpNumber.length == 6) {
-                                      setState(() {
-                                        _loading = true;
-                                        _error = '';
-                                      });
-                                      //firebase code send false
-                                      if (phoneAuthCheck == false) {
-                                        var verify = await verifyUser(phnumber);
-
-                                        navigate(verify);
-                                      } else {
-                                        // firebase code send true
-                                        try {
-                                          PhoneAuthCredential credential =
-                                              PhoneAuthProvider.credential(
-                                                  verificationId: verId,
-                                                  smsCode: otpNumber);
-
-                                          // Sign the user in (or link) with the credential
-                                          await FirebaseAuth.instance
-                                              .signInWithCredential(credential);
-
-                                          var verify =
-                                              await verifyUser(phnumber);
-                                          navigate(verify);
-                                        } on FirebaseAuthException catch (error) {
-                                          if (error.code ==
-                                              'invalid-verification-code') {
+                              (widget.from == '1')
+                                  ? Container(
+                                      alignment: Alignment.center,
+                                      child: Button(
+                                        onTap: () async {
+                                          if (otpNumber.length == 6) {
                                             setState(() {
-                                              otpController.clear();
-                                              otpNumber = '';
-                                              _error =
-                                                  languages[choosenLanguage]
-                                                      ['text_otp_error'];
+                                              _loading = true;
+                                              _error = '';
                                             });
+                                            //firebase code send false
+                                            if (phoneAuthCheck == false) {
+                                              var verify =
+                                                  await verifyUser(phnumber);
+                                              value = 0;
+                                              navigate(verify);
+                                            } else {
+                                              // firebase code send true
+                                              try {
+                                                PhoneAuthCredential credential =
+                                                    PhoneAuthProvider
+                                                        .credential(
+                                                            verificationId:
+                                                                verId,
+                                                            smsCode: otpNumber);
+
+                                                // Sign the user in (or link) with the credential
+                                                await FirebaseAuth.instance
+                                                    .signInWithCredential(
+                                                        credential);
+
+                                                var verify =
+                                                    await verifyUser(phnumber);
+                                                navigate(verify);
+
+                                                value = 0;
+                                              } on FirebaseAuthException catch (error) {
+                                                if (error.code ==
+                                                    'invalid-verification-code') {
+                                                  setState(() {
+                                                    otpController.clear();
+                                                    otpNumber = '';
+                                                    _error = languages[
+                                                            choosenLanguage]
+                                                        ['text_otp_error'];
+                                                  });
+                                                }
+                                              }
+                                            }
+                                            setState(() {
+                                              _loading = false;
+                                            });
+                                          } else if (phoneAuthCheck == true &&
+                                              resendTime == 0 &&
+                                              otpNumber.length != 6) {
+                                            setState(() {
+                                              setState(() {
+                                                resendTime = 60;
+                                              });
+                                              timers();
+                                            });
+                                            phoneAuth(countries[phcode]
+                                                    ['dial_code'] +
+                                                phnumber);
                                           }
-                                        }
-                                      }
-                                      setState(() {
-                                        _loading = false;
-                                      });
-                                    } else if (phoneAuthCheck == true &&
-                                        resendTime == 0 &&
-                                        otpNumber.length != 6) {
-                                      setState(() {
-                                        setState(() {
-                                          resendTime = 60;
-                                        });
-                                        timers();
-                                      });
-                                      phoneAuth(countries[phcode]['dial_code'] +
-                                          phnumber);
-                                    }
-                                  },
-                                  text: (otpNumber.length == 6)
-                                      ? languages[choosenLanguage]
-                                          ['text_verify']
-                                      : (resendTime == 0)
-                                          ? languages[choosenLanguage]
-                                              ['text_resend_code']
-                                          : languages[choosenLanguage]
-                                                  ['text_resend_code'] +
-                                              ' ' +
-                                              resendTime.toString(),
-                                  color:
-                                      (resendTime != 0 && otpNumber.length != 6)
-                                          ? underline
-                                          : null,
-                                  borcolor:
-                                      (resendTime != 0 && otpNumber.length != 6)
-                                          ? underline
-                                          : null,
-                                ),
-                              ),
+                                        },
+                                        text: (otpNumber.length == 6)
+                                            ? languages[choosenLanguage]
+                                                ['text_verify']
+                                            : (resendTime == 0)
+                                                ? languages[choosenLanguage]
+                                                    ['text_resend_code']
+                                                : languages[choosenLanguage]
+                                                        ['text_resend_code'] +
+                                                    ' ' +
+                                                    resendTime.toString(),
+                                        color: (resendTime != 0 &&
+                                                otpNumber.length != 6)
+                                            ? (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.3)
+                                                : underline
+                                            : null,
+                                        borcolor: (resendTime != 0 &&
+                                                otpNumber.length != 6)
+                                            ? underline
+                                            : null,
+                                      ),
+                                    )
+                                  : Container(
+                                      alignment: Alignment.center,
+                                      child: Button(
+                                        onTap: () async {
+                                          if (otpNumber.length == 6) {
+                                            setState(() {
+                                              _loading = true;
+                                              _error = '';
+                                            });
+
+                                            var result = await emailVerify(
+                                                email, otpNumber);
+
+                                            if (result == 'success') {
+                                              setState(() {
+                                                _error = '';
+                                                _loading = true;
+                                              });
+
+                                              var verify =
+                                                  await verifyUser(email);
+                                              value = 1;
+                                              navigate(verify);
+
+                                              setState(() {
+                                                _loading = false;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                otpController.clear();
+                                                otpNumber = '';
+                                                _error =
+                                                    languages[choosenLanguage]
+                                                        ['text_otp_error'];
+                                              });
+                                            }
+
+                                            setState(() {
+                                              _loading = false;
+                                            });
+                                          } else if (phoneAuthCheck == true &&
+                                              resendTime == 0 &&
+                                              otpNumber.length != 6) {
+                                            setState(() {
+                                              setState(() {
+                                                resendTime = 60;
+                                              });
+                                              timers();
+                                            });
+                                            value = 1;
+                                            sendOTPtoEmail(email);
+                                          }
+                                        },
+                                        text: (otpNumber.length == 6)
+                                            ? languages[choosenLanguage]
+                                                ['text_verify']
+                                            : (resendTime == 0)
+                                                ? languages[choosenLanguage]
+                                                    ['text_resend_code']
+                                                : languages[choosenLanguage]
+                                                        ['text_resend_code'] +
+                                                    ' ' +
+                                                    resendTime.toString(),
+                                        color: (resendTime != 0 &&
+                                                otpNumber.length != 6)
+                                            ? (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.3)
+                                                : underline
+                                            : null,
+                                        borcolor: (resendTime != 0 &&
+                                                otpNumber.length != 6)
+                                            ? underline
+                                            : null,
+                                      ),
+                                    ),
                             ],
                           ),
                         )

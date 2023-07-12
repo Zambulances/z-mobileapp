@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/NavigatorPages/historydetails.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -31,6 +32,13 @@ class _HistoryState extends State<History> {
     super.initState();
   }
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
 //get history datas
   _getHistory() async {
     setState(() {
@@ -39,9 +47,13 @@ class _HistoryState extends State<History> {
     });
     var val = await getHistory('is_later=1');
     if (val == 'success') {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else if (val == 'logout') {
+      navigateLogout();
     }
   }
 
@@ -88,7 +100,8 @@ class _HistoryState extends State<History> {
                                       onTap: () {
                                         Navigator.pop(context);
                                       },
-                                      child: const Icon(Icons.arrow_back)))
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor)))
                             ],
                           ),
                           SizedBox(
@@ -104,7 +117,9 @@ class _HistoryState extends State<History> {
                                   BoxShadow(
                                       blurRadius: 2,
                                       spreadRadius: 2,
-                                      color: Colors.black.withOpacity(0.2))
+                                      color: (isDarkTheme == true)
+                                          ? textColor.withOpacity(0.3)
+                                          : Colors.black.withOpacity(0.2))
                                 ]),
                             child: Row(
                               children: [
@@ -117,7 +132,10 @@ class _HistoryState extends State<History> {
                                       _isLoading = true;
                                     });
 
-                                    await getHistory('is_later=1');
+                                    var val = await getHistory('is_later=1');
+                                    if (val == 'logout') {
+                                      navigateLogout();
+                                    }
                                     setState(() {
                                       _isLoading = false;
                                     });
@@ -130,7 +148,9 @@ class _HistoryState extends State<History> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           color: (_showHistory == 0)
-                                              ? const Color(0xff222222)
+                                              ? (isDarkTheme == true)
+                                                  ? Colors.white
+                                                  : const Color(0xff222222)
                                               : page),
                                       child: Text(
                                         languages[choosenLanguage]
@@ -139,7 +159,9 @@ class _HistoryState extends State<History> {
                                             fontSize: media.width * fifteen,
                                             fontWeight: FontWeight.w600,
                                             color: (_showHistory == 0)
-                                                ? Colors.white
+                                                ? (isDarkTheme == true)
+                                                    ? Colors.black
+                                                    : Colors.white
                                                 : textColor),
                                       )),
                                 ),
@@ -152,7 +174,11 @@ class _HistoryState extends State<History> {
                                       _isLoading = true;
                                     });
 
-                                    await getHistory('is_completed=1');
+                                    var val =
+                                        await getHistory('is_completed=1');
+                                    if (val == 'logout') {
+                                      navigateLogout();
+                                    }
                                     setState(() {
                                       _isLoading = false;
                                     });
@@ -165,7 +191,9 @@ class _HistoryState extends State<History> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           color: (_showHistory == 1)
-                                              ? const Color(0xff222222)
+                                              ? (isDarkTheme == true)
+                                                  ? Colors.white
+                                                  : const Color(0xff222222)
                                               : page),
                                       child: Text(
                                         languages[choosenLanguage]
@@ -174,7 +202,9 @@ class _HistoryState extends State<History> {
                                             fontSize: media.width * fifteen,
                                             fontWeight: FontWeight.w600,
                                             color: (_showHistory == 1)
-                                                ? Colors.white
+                                                ? (isDarkTheme == true)
+                                                    ? Colors.black
+                                                    : Colors.white
                                                 : textColor),
                                       )),
                                 ),
@@ -187,7 +217,11 @@ class _HistoryState extends State<History> {
                                       _isLoading = true;
                                     });
 
-                                    await getHistory('is_cancelled=1');
+                                    var val =
+                                        await getHistory('is_cancelled=1');
+                                    if (val == 'logout') {
+                                      navigateLogout();
+                                    }
                                     setState(() {
                                       _isLoading = false;
                                     });
@@ -200,7 +234,9 @@ class _HistoryState extends State<History> {
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           color: (_showHistory == 2)
-                                              ? const Color(0xff222222)
+                                              ? (isDarkTheme == true)
+                                                  ? Colors.white
+                                                  : const Color(0xff222222)
                                               : page),
                                       child: Text(
                                         languages[choosenLanguage]
@@ -209,7 +245,9 @@ class _HistoryState extends State<History> {
                                             fontSize: media.width * fifteen,
                                             fontWeight: FontWeight.w600,
                                             color: (_showHistory == 2)
-                                                ? Colors.white
+                                                ? (isDarkTheme == true)
+                                                    ? Colors.black
+                                                    : Colors.white
                                                 : textColor),
                                       )),
                                 )
@@ -291,7 +329,8 @@ class _HistoryState extends State<History> {
                                                                         0.05),
                                                                 decoration: BoxDecoration(
                                                                     borderRadius:
-                                                                        BorderRadius.circular(12),
+                                                                        BorderRadius.circular(
+                                                                            12),
                                                                     color: page,
                                                                     boxShadow: [
                                                                       BoxShadow(
@@ -299,9 +338,9 @@ class _HistoryState extends State<History> {
                                                                               2,
                                                                           spreadRadius:
                                                                               2,
-                                                                          color: Colors
-                                                                              .black
-                                                                              .withOpacity(0.2))
+                                                                          color: (isDarkTheme == true)
+                                                                              ? textColor.withOpacity(0.3)
+                                                                              : Colors.black.withOpacity(0.2))
                                                                     ]),
                                                                 child: Column(
                                                                   crossAxisAlignment:
@@ -314,6 +353,8 @@ class _HistoryState extends State<History> {
                                                                           [
                                                                           'request_number'],
                                                                       style: GoogleFonts.roboto(
+                                                                          color:
+                                                                              textColor,
                                                                           fontSize: media.width *
                                                                               sixteen,
                                                                           fontWeight:
@@ -350,7 +391,7 @@ class _HistoryState extends State<History> {
                                                                               width: media.width * 0.3,
                                                                               child: Text(
                                                                                 myHistory[i]['driverDetail']['data']['name'],
-                                                                                style: GoogleFonts.roboto(fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
+                                                                                style: GoogleFonts.roboto(color: textColor, fontSize: media.width * eighteen, fontWeight: FontWeight.w600),
                                                                               ),
                                                                             ),
                                                                             SizedBox(
@@ -367,15 +408,9 @@ class _HistoryState extends State<History> {
                                                                                           fit: BoxFit.contain,
                                                                                         )
                                                                                       : (myHistory[i]['payment_opt'] == '2')
-                                                                                          ? Image.asset(
-                                                                                              'assets/images/wallet.png',
-                                                                                              fit: BoxFit.contain,
-                                                                                            )
+                                                                                          ? Image.asset('assets/images/wallet.png', fit: BoxFit.contain, color: textColor)
                                                                                           : (myHistory[i]['payment_opt'] == '0')
-                                                                                              ? Image.asset(
-                                                                                                  'assets/images/card.png',
-                                                                                                  fit: BoxFit.contain,
-                                                                                                )
+                                                                                              ? Image.asset('assets/images/card.png', fit: BoxFit.contain, color: textColor)
                                                                                               : Container(),
                                                                                 ),
                                                                                 SizedBox(
@@ -389,7 +424,7 @@ class _HistoryState extends State<History> {
                                                                                           : (myHistory[i]['payment_opt'] == '0')
                                                                                               ? languages[choosenLanguage]['text_card']
                                                                                               : '',
-                                                                                  style: GoogleFonts.roboto(fontSize: media.width * twelve, fontWeight: FontWeight.w600),
+                                                                                  style: GoogleFonts.roboto(color: textColor, fontSize: media.width * twelve, fontWeight: FontWeight.w600),
                                                                                 ),
                                                                               ],
                                                                             ),
@@ -405,7 +440,7 @@ class _HistoryState extends State<History> {
                                                                                 children: [
                                                                                   Text(
                                                                                     myHistory[i]['requestBill']['data']['requested_currency_symbol'] + ' ' + myHistory[i]['requestBill']['data']['total_amount'].toString(),
-                                                                                    style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.bold),
+                                                                                    style: GoogleFonts.roboto(color: textColor, fontSize: media.width * sixteen, fontWeight: FontWeight.bold),
                                                                                   ),
                                                                                   SizedBox(
                                                                                     height: media.width * 0.01,
@@ -414,7 +449,7 @@ class _HistoryState extends State<History> {
                                                                                     children: [
                                                                                       Text(
                                                                                         (myHistory[i]['total_time'] < 50) ? myHistory[i]['total_distance'] + myHistory[i]['unit'] + ' - ' + myHistory[i]['total_time'].toString() + ' mins' : myHistory[i]['total_distance'] + myHistory[i]['unit'] + ' - ' + (myHistory[i]['total_time'] / 60).round().toString() + ' hr',
-                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                       ),
                                                                                     ],
                                                                                   )
@@ -465,7 +500,7 @@ class _HistoryState extends State<History> {
                                                                             child:
                                                                                 Text(
                                                                               myHistory[i]['pick_address'],
-                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                             )),
                                                                         Expanded(
                                                                             child:
@@ -522,7 +557,7 @@ class _HistoryState extends State<History> {
                                                                             child:
                                                                                 Text(
                                                                               myHistory[i]['drop_address'],
-                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                             )),
                                                                         Expanded(
                                                                             child:
@@ -595,16 +630,19 @@ class _HistoryState extends State<History> {
                                                                           0.05),
                                                                   decoration: BoxDecoration(
                                                                       borderRadius:
-                                                                          BorderRadius.circular(12),
-                                                                      color: page,
+                                                                          BorderRadius.circular(
+                                                                              12),
+                                                                      color:
+                                                                          page,
                                                                       boxShadow: [
                                                                         BoxShadow(
                                                                             blurRadius:
                                                                                 2,
                                                                             spreadRadius:
                                                                                 2,
-                                                                            color:
-                                                                                Colors.black.withOpacity(0.2))
+                                                                            color: (isDarkTheme == true)
+                                                                                ? textColor.withOpacity(0.3)
+                                                                                : Colors.black.withOpacity(0.2))
                                                                       ]),
                                                                   child: Column(
                                                                     crossAxisAlignment:
@@ -616,6 +654,8 @@ class _HistoryState extends State<History> {
                                                                             [
                                                                             'request_number'],
                                                                         style: GoogleFonts.roboto(
+                                                                            color:
+                                                                                textColor,
                                                                             fontSize: media.width *
                                                                                 sixteen,
                                                                             fontWeight:
@@ -702,7 +742,7 @@ class _HistoryState extends State<History> {
                                                                               width: media.width * 0.7,
                                                                               child: Text(
                                                                                 myHistory[i]['pick_address'],
-                                                                                style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                                style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                               )),
                                                                         ],
                                                                       ),
@@ -731,7 +771,7 @@ class _HistoryState extends State<History> {
                                                                                       width: media.width * 0.7,
                                                                                       child: Text(
                                                                                         myHistory[i]['drop_address'],
-                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                       )),
                                                                                 ],
                                                                               ),
@@ -790,14 +830,15 @@ class _HistoryState extends State<History> {
                                                                           media.width *
                                                                               0.05),
                                                                       decoration: BoxDecoration(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(12),
-                                                                          color: page,
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              12),
+                                                                          color:
+                                                                              page,
                                                                           boxShadow: [
                                                                             BoxShadow(
                                                                                 blurRadius: 2,
                                                                                 spreadRadius: 2,
-                                                                                color: Colors.black.withOpacity(0.2))
+                                                                                color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : Colors.black.withOpacity(0.2))
                                                                           ]),
                                                                       child:
                                                                           Column(
@@ -810,7 +851,7 @@ class _HistoryState extends State<History> {
                                                                             children: [
                                                                               Text(
                                                                                 myHistory[i]['request_number'],
-                                                                                style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.w600),
+                                                                                style: GoogleFonts.roboto(color: textColor, fontSize: media.width * sixteen, fontWeight: FontWeight.w600),
                                                                               ),
                                                                               InkWell(
                                                                                 onTap: () {
@@ -821,7 +862,7 @@ class _HistoryState extends State<History> {
                                                                                 },
                                                                                 child: Text(
                                                                                   languages[choosenLanguage]['text_cancel_ride'],
-                                                                                  style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.w600, color: buttonColor),
+                                                                                  style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.w600, color: (isDarkTheme == true) ? textColor : buttonColor),
                                                                                 ),
                                                                               ),
                                                                             ],
@@ -900,7 +941,7 @@ class _HistoryState extends State<History> {
                                                                                   width: media.width * 0.7,
                                                                                   child: Text(
                                                                                     myHistory[i]['pick_address'],
-                                                                                    style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                                    style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                   )),
                                                                             ],
                                                                           ),
@@ -924,12 +965,11 @@ class _HistoryState extends State<History> {
                                                                                       SizedBox(
                                                                                         width: media.width * 0.05,
                                                                                       ),
-                                                                                      Container(
-                                                                                          padding: EdgeInsets.only(top: media.width * 0.05),
+                                                                                      SizedBox(
                                                                                           width: media.width * 0.7,
                                                                                           child: Text(
                                                                                             myHistory[i]['drop_address'],
-                                                                                            style: GoogleFonts.roboto(fontSize: media.width * twelve),
+                                                                                            style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor),
                                                                                           )),
                                                                                     ],
                                                                                   ),
@@ -992,15 +1032,19 @@ class _HistoryState extends State<History> {
                                               setState(() {
                                                 _isLoading = true;
                                               });
+                                              dynamic val;
                                               if (_showHistory == 0) {
-                                                await getHistoryPages(
+                                                val = await getHistoryPages(
                                                     'is_later=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                               } else if (_showHistory == 1) {
-                                                await getHistoryPages(
+                                                val = await getHistoryPages(
                                                     'is_completed=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
                                               } else if (_showHistory == 2) {
-                                                await getHistoryPages(
+                                                val = await getHistoryPages(
                                                     'is_cancelled=1&page=${myHistoryPage['pagination']['current_page'] + 1}');
+                                              }
+                                              if (val == 'logout') {
+                                                navigateLogout();
                                               }
                                               setState(() {
                                                 _isLoading = false;
@@ -1064,8 +1108,10 @@ class _HistoryState extends State<History> {
                                                     _cancelId = '';
                                                   });
                                                 },
-                                                child: const Icon(
-                                                    Icons.cancel_outlined))),
+                                                child: Icon(
+                                                  Icons.cancel_outlined,
+                                                  color: textColor,
+                                                ))),
                                       ],
                                     ),
                                   ),
@@ -1092,8 +1138,12 @@ class _HistoryState extends State<History> {
                                               setState(() {
                                                 _isLoading = true;
                                               });
-                                              await cancelLaterRequest(
-                                                  _cancelId);
+                                              var val =
+                                                  await cancelLaterRequest(
+                                                      _cancelId);
+                                              if (val == 'logout') {
+                                                navigateLogout();
+                                              }
                                               await _getHistory();
                                               setState(() {
                                                 _cancelRide = false;

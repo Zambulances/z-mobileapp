@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -33,6 +34,13 @@ class _ReferralState extends State<Referral> {
         context, MaterialPageRoute(builder: (context) => const Maps()));
   }
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -56,7 +64,7 @@ class _ReferralState extends State<Referral> {
                     alignment: Alignment.bottomLeft,
                     height: media.height * 0.12,
                     width: media.width * 1,
-                    color: topBar,
+                    color: page,
                   ),
                   SizedBox(
                     height: media.height * 0.04,
@@ -112,12 +120,6 @@ class _ReferralState extends State<Referral> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => const Maps()));
-                            // } else {
-                            //   setState(() {
-                            //     _error = languages[choosenLanguage]
-                            //         ['text_somethingwentwrong'];
-                            //   });
-                            // }
                             setState(() {
                               _loading = false;
                             });
@@ -137,18 +139,14 @@ class _ReferralState extends State<Referral> {
                             var result = await updateReferral();
                             if (result == 'true') {
                               navigate();
+                            } else if (result == 'logout') {
+                              navigateLogout();
                             } else {
                               setState(() {
                                 _error = languages[choosenLanguage]
                                     ['text_referral_code'];
                               });
                             }
-                            // } else {
-                            //   setState(() {
-                            //     _error = languages[choosenLanguage]
-                            //         ['text_somethingwentwrong'];
-                            //   });
-                            // }
                             setState(() {
                               _loading = false;
                             });

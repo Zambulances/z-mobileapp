@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
 import 'package:tagyourtaxi_driver/styles/styles.dart';
 import 'package:tagyourtaxi_driver/translations/translation.dart';
@@ -26,6 +27,13 @@ class _MakeComplaintState extends State<MakeComplaint> {
   TextEditingController complaintText = TextEditingController();
   bool _success = false;
 
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
   @override
   void initState() {
     getData();
@@ -33,22 +41,30 @@ class _MakeComplaintState extends State<MakeComplaint> {
   }
 
   getData() async {
-    setState(() {
-      complaintType = 0;
-      complaintDesc = '';
-      generalComplaintList = [];
-    });
-    if (widget.fromPage == 1) {
-      await getGeneralComplaint("request");
-    } else {
-      await getGeneralComplaint("general");
-    }
-    setState(() {
-      _isLoading = false;
-      if (generalComplaintList.isNotEmpty) {
+    dynamic result;
+    if (mounted) {
+      setState(() {
         complaintType = 0;
+        complaintDesc = '';
+        generalComplaintList = [];
+      });
+    }
+    if (widget.fromPage == 1) {
+      result = await getGeneralComplaint("request");
+    } else {
+      result = await getGeneralComplaint("general");
+    }
+    if (mounted) {
+      if (result == 'logout') {
+        navigateLogout();
       }
-    });
+      setState(() {
+        _isLoading = false;
+        if (generalComplaintList.isNotEmpty) {
+          complaintType = 0;
+        }
+      });
+    }
   }
 
   @override
@@ -96,7 +112,10 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                 onTap: () {
                                   Navigator.pop(context, false);
                                 },
-                                child: const Icon(Icons.arrow_back)))
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: textColor,
+                                )))
                       ],
                     ),
                     SizedBox(
@@ -129,8 +148,11 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(generalComplaintList[complaintType]
-                                        ['title']),
+                                    Text(
+                                      generalComplaintList[complaintType]
+                                          ['title'],
+                                      style: TextStyle(color: textColor),
+                                    ),
                                     RotatedBox(
                                       quarterTurns:
                                           (_showOptions == true) ? 2 : 0,
@@ -165,6 +187,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   hintStyle: GoogleFonts.roboto(
+                                      color: textColor.withOpacity(0.6),
                                       fontSize: media.width * fourteen),
                                   hintText: languages[choosenLanguage]
                                           ['text_complaint_2'] +
@@ -172,6 +195,9 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                       languages[choosenLanguage]
                                           ['text_complaint_3'] +
                                       ')',
+                                ),
+                                style: GoogleFonts.roboto(
+                                  color: textColor,
                                 ),
                               ),
                             ),
@@ -192,6 +218,9 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                       result = await makeRequestComplaint();
                                     } else {
                                       result = await makeGeneralComplaint();
+                                    }
+                                    if (result == 'logout') {
+                                      navigateLogout();
                                     }
                                     setState(() {
                                       if (result == 'success') {
@@ -257,7 +286,9 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                                           ? Colors.transparent
                                                           : borderLines))),
                                           child: Text(
-                                              generalComplaintList[i]['title']),
+                                            generalComplaintList[i]['title'],
+                                            style: TextStyle(color: textColor),
+                                          ),
                                         ),
                                       ));
                                 })
@@ -272,7 +303,10 @@ class _MakeComplaintState extends State<MakeComplaint> {
                       child: Container(
                       height: media.height * 1,
                       width: media.width * 1,
-                      color: Colors.transparent.withOpacity(0.6),
+                      // color: Colors.transparent.withOpacity(0.6),
+                      color: (isDarkTheme == true)
+                          ? textColor.withOpacity(0.2)
+                          : Colors.transparent.withOpacity(0.6),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -281,8 +315,8 @@ class _MakeComplaintState extends State<MakeComplaint> {
                             width: media.width * 0.9,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              border:
-                                  Border.all(width: 1.2, color: borderLines),
+                              // border:
+                              //     Border.all(width: 1.2, color: borderLines),
                               color: page,
                             ),
                             child: Column(

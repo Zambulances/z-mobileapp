@@ -10,6 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:tagyourtaxi_driver/functions/functions.dart';
 import 'package:tagyourtaxi_driver/functions/geohash.dart';
 import 'package:tagyourtaxi_driver/pages/chatPage/chat_page.dart';
+import 'package:tagyourtaxi_driver/pages/login/login.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/invoice.dart';
 import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
 import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
@@ -40,7 +41,7 @@ class BookingConfirmation extends StatefulWidget {
 bool serviceNotAvailable = false;
 String promoCode = '';
 dynamic promoStatus;
-dynamic choosenVehicle;
+dynamic choosenVehicle = 0;
 int payingVia = 0;
 dynamic timing;
 dynamic mapPadding = 0.0;
@@ -58,6 +59,9 @@ Animation<double>? _animation;
 class _BookingConfirmationState extends State<BookingConfirmation>
     with WidgetsBindingObserver, TickerProviderStateMixin {
   TextEditingController promoKey = TextEditingController();
+  GlobalKey iconKey = GlobalKey();
+  GlobalKey iconDropKey = GlobalKey();
+  GlobalKey iconDistanceKey = GlobalKey();
   final Map minutes = {};
   List myMarker = [];
   Map myBearings = {};
@@ -67,6 +71,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   Location location = Location();
   bool _locationDenied = false;
   bool _isLoading = false;
+  bool _showToast = false;
   LatLng _center = const LatLng(41.4219057, -102.0840772);
   dynamic pinLocationIcon;
   dynamic pinLocationIcon2;
@@ -90,10 +95,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   final _mapMarkerSC = StreamController<List<Marker>>();
   StreamSink<List<Marker>> get _mapMarkerSink => _mapMarkerSC.sink;
   Stream<List<Marker>> get mapMarkerStream => _mapMarkerSC.stream;
-
-  // final _distSC = StreamController();
-  // // StreamSink get _distSCSink => _distSC.sink;
-  // Stream get distSinc => _distSC.stream;
 
   @override
   void initState() {
@@ -123,8 +124,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
           userRequestData['accepted_at'] == null) {
         timer();
       }
-      if (timerLocation == null && locationAllowed == true) {
-        getCurrentLocation();
+      if (locationAllowed == true) {
+        if (positionStream == null || positionStream!.isPaused) {
+          positionStreamData();
+        }
       }
     }
   }
@@ -134,6 +137,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     if (timers != null) {
       timers.cancel;
     }
+    _controller?.dispose();
+    _controller = null;
 
     animationController?.dispose();
 
@@ -142,6 +147,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
 //running timer
   timer() {
+    timers?.cancel();
+    timers = null;
     timing = userRequestData['maximum_time_for_find_drivers_for_regular_ride'];
 
     if (mounted) {
@@ -154,7 +161,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
         } else if (userRequestData.isNotEmpty &&
             userRequestData['accepted_at'] == null &&
             timing == 0) {
-          await cancelRequest();
+          var val = await cancelRequest();
+          if (val == 'logout') {
+            navigateLogout();
+          }
           setState(() {
             noDriverFound = true;
           });
@@ -186,9 +196,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     }
     return bitmap;
   }
-
-  GlobalKey iconKey = GlobalKey();
-  GlobalKey iconDropKey = GlobalKey();
 
   addDropMarker() async {
     var testIcon = await _capturePng(iconDropKey);
@@ -346,14 +353,50 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     }
   }
 
+  addDistanceMarker(length) async {
+    var testIcon = await _capturePng(iconDistanceKey);
+    if (testIcon != null) {
+      setState(() {
+        if (polyList.isNotEmpty) {
+          myMarker.add(Marker(
+              markerId: const MarkerId('pointdistance'),
+              icon: testIcon,
+              position: polyList[length],
+              anchor: const Offset(0.0, 1.0)));
+        }
+      });
+    }
+  }
+
+      //show toast for demo
+  addToast() {
+    setState(() {
+      _showToast = true;
+    });
+    Future.delayed(const Duration(seconds: 5), () {
+      setState(() {
+        _showToast = false;
+      });
+    });
+  }
+
 //add drop marker
   addPickDropMarker() async {
     addMarker();
-    if (widget.type == null || (userRequestData.isNotEmpty)
-        ? userRequestData['is_rental'] != true
-        : 11 == 5) {
+    if (widget.type == null) {
       addDropMarker();
-      getPolylines();
+      // var list = await getPolylines();
+      // addDistanceMarker((list.length / 2).toInt());
+      addToast();
+      if(userRequestData.isEmpty){
+      polyline.add(Polyline(polylineId:const PolylineId('1'),color: buttonColor, points: [addressList
+        .firstWhere((element) => element.id == 'pickup')
+        .latlng , addressList
+        .firstWhere((element) => element.id == 'pickup')
+        .latlng],geodesic: false,width: 5),);
+      }else{
+        polyline.add(Polyline(polylineId:const PolylineId('1'),color: buttonColor, points: [LatLng(double.parse(userRequestData['pick_lat'].toString()), double.parse(userRequestData['pick_lng'].toString())) , LatLng(double.parse(userRequestData['pick_lat'].toString()), double.parse(userRequestData['pick_lng'].toString()))],geodesic: false,width: 5),);
+      }
     } else if (widget.type == 1 || widget.type == 2) {
       if (userRequestData.isNotEmpty) {
         CameraUpdate cameraUpdate = CameraUpdate.newLatLng(
@@ -375,6 +418,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
         .buffer
         .asUint8List();
+  }
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
   }
 
 //get location permission and location details
@@ -400,9 +450,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     _dist = null;
 
     if (widget.type != 1) {
-      etaRequest();
+      var val = await etaRequest();
+      if (val == 'logout') {
+        navigateLogout();
+      }
     } else {
-      rentalEta();
+      var val = await rentalEta();
+      if (val == 'logout') {
+        navigateLogout();
+      }
     }
 
     permission = await location.hasPermission();
@@ -416,12 +472,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
         permission == PermissionStatus.grantedLimited) {
       // var loc = await location.getLocation();
       locationAllowed = true;
-      if (timerLocation == null && locationAllowed == true) {
-        getCurrentLocation();
+      if (locationAllowed == true) {
+        if (positionStream == null || positionStream!.isPaused) {
+          positionStreamData();
+        }
       }
       setState(() {});
     }
-    Future.delayed(const Duration(milliseconds: 2000), () async {
+    Future.delayed(const Duration(milliseconds: 100), () async {
       await addPickDropMarker();
     });
   }
@@ -432,22 +490,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
       _controller?.setMapStyle(mapStyle);
     });
     // await getBounds();
-
-// Future.delayed(const Duration(seconds: 1)).then((value) {
-
-//         animateCar(
-//           11.0589596,
-//            76.9967165,
-//            11.1589596,
-//            76.9967165,
-//            _mapMarkerSink,
-//            this,
-//            _controller,
-//            MarkerId('car')
-//            );
-
-//       });
-    // print(CameraPosition.zoom)
   }
 
   void check(CameraUpdate u, GoogleMapController c) async {
@@ -572,10 +614,20 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                       userRequestData['accepted_at'] == null) {
                     timer();
                   }
+                  if (userRequestData.isNotEmpty &&
+                      userRequestData['accepted_at'] != null) {
+                    if (myMarker
+                        .where((element) =>
+                            element.markerId == const MarkerId('pointdistance'))
+                        .isNotEmpty) {
+                      myMarker.removeWhere((element) =>
+                          element.markerId == const MarkerId('pointdistance'));
+                    }
+                  }
                   return StreamBuilder<DatabaseEvent>(
                       stream: (userRequestData['driverDetail'] == null &&
                               pinLocationIcon != null)
-                          ? fdb.onValue
+                          ? fdb.onValue.asBroadcastStream()
                           : null,
                       builder: (context, AsyncSnapshot<DatabaseEvent> event) {
                         if (event.hasData) {
@@ -583,7 +635,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                             if (userRequestData['accepted_at'] == null) {
                               DataSnapshot snapshots = event.data!.snapshot;
                               // ignore: unnecessary_null_comparison
-                              if (snapshots != null) {
+                              if (snapshots != null &&
+                                  choosenVehicle != null &&
+                                  etaDetails.isNotEmpty) {
                                 driversData = [];
                                 // ignore: avoid_function_literals_in_foreach_calls
                                 snapshots.children.forEach((element) {
@@ -593,78 +647,51 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                 driversData.forEach((e) {
                                   if (e['is_active'] == 1 &&
                                       e['is_available'] == true) {
-                                    DateTime dt =
-                                        DateTime.fromMillisecondsSinceEpoch(
-                                            e['updated_at']);
-                                    if (DateTime.now()
-                                            .difference(dt)
-                                            .inMinutes <=
-                                        2) {
-                                      if (myMarker
-                                          .where((element) => element.markerId
-                                              .toString()
-                                              .contains('car${e['id']}'))
-                                          .isEmpty) {
-                                        myMarker.add(Marker(
-                                          markerId: MarkerId('car${e['id']}'),
-                                          rotation: (myBearings[
-                                                      e['id'].toString()] !=
-                                                  null)
-                                              ? myBearings[e['id'].toString()]
-                                              : 0.0,
-                                          position:
-                                              LatLng(e['l'][0], e['l'][1]),
-                                          icon: (e['vehicle_type_icon'] ==
-                                                  'motor_bike')
-                                              ? pinLocationIcon2
-                                              : pinLocationIcon,
-                                        ));
-                                      } else if (_controller != null) {
-                                        var dist = calculateDistance(
-                                            myMarker
-                                                .lastWhere((element) => element
-                                                    .markerId
-                                                    .toString()
-                                                    .contains('car${e['id']}'))
-                                                .position
-                                                .latitude,
-                                            myMarker
-                                                .lastWhere((element) => element
-                                                    .markerId
-                                                    .toString()
-                                                    .contains('car${e['id']}'))
-                                                .position
-                                                .longitude,
-                                            e['l'][0],
-                                            e['l'][1]);
-                                        if (dist > 100) {
-                                          if (myMarker
-                                                      .lastWhere((element) =>
-                                                          element.markerId
-                                                              .toString()
-                                                              .contains(
-                                                                  'car${e['id']}'))
-                                                      .position
-                                                      .latitude !=
-                                                  e['l'][0] ||
-                                              myMarker
-                                                      .lastWhere((element) =>
-                                                          element.markerId
-                                                              .toString()
-                                                              .contains(
-                                                                  'car${e['id']}'))
-                                                      .position
-                                                      .longitude !=
-                                                  e['l'][1]) {
-                                            animationController =
-                                                AnimationController(
-                                              duration: const Duration(
-                                                  milliseconds:
-                                                      1500), //Animation duration of marker
-
-                                              vsync: this, //From the widget
-                                            );
-                                            animateCar(
+                                    if (((e['vehicle_types'] != null &&
+                                            ((widget.type != 1 &&
+                                                    e['vehicle_types'].contains(
+                                                        etaDetails[choosenVehicle]
+                                                            ['type_id'])) ||
+                                                (widget.type == 1 &&
+                                                    e['vehicle_types'].contains(
+                                                        rentalOption[choosenVehicle]
+                                                            ['type_id'])))) ||
+                                        ((widget.type != 1 &&
+                                                e['vehicle_type'] ==
+                                                    etaDetails[choosenVehicle]
+                                                        ['type_id']) ||
+                                            (widget.type == 1 &&
+                                                e['vehicle_type'] ==
+                                                    rentalOption[choosenVehicle]
+                                                        ['type_id'])))) {
+                                      DateTime dt =
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              e['updated_at']);
+                                      if (DateTime.now()
+                                              .difference(dt)
+                                              .inMinutes <=
+                                          2) {
+                                        if (myMarker
+                                            .where((element) => element.markerId
+                                                .toString()
+                                                .contains('car${e['id']}'))
+                                            .isEmpty) {
+                                          myMarker.add(Marker(
+                                            markerId: MarkerId('car${e['id']}'),
+                                            rotation: (myBearings[
+                                                        e['id'].toString()] !=
+                                                    null)
+                                                ? myBearings[e['id'].toString()]
+                                                : 0.0,
+                                            position:
+                                                LatLng(e['l'][0], e['l'][1]),
+                                            icon: (e['vehicle_type_icon'] ==
+                                                    'motor_bike')
+                                                ? pinLocationIcon2
+                                                : pinLocationIcon,
+                                          ));
+                                        } else if (_controller != null) {
+                                          var dist = calculateDistance(
                                               myMarker
                                                   .lastWhere((element) =>
                                                       element.markerId
@@ -682,31 +709,213 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   .position
                                                   .longitude,
                                               e['l'][0],
-                                              e['l'][1],
-                                              _mapMarkerSink,
-                                              this,
-                                              _controller,
-                                              'car${e['id']}',
-                                              e['id'],
-                                              (e['vehicle_type_icon'] ==
-                                                      'motor_bike')
-                                                  ? pinLocationIcon2
-                                                  : pinLocationIcon,
-                                            );
+                                              e['l'][1]);
+                                          if (dist > 100) {
+                                            if (myMarker
+                                                        .lastWhere((element) =>
+                                                            element.markerId
+                                                                .toString()
+                                                                .contains(
+                                                                    'car${e['id']}'))
+                                                        .position
+                                                        .latitude !=
+                                                    e['l'][0] ||
+                                                myMarker
+                                                            .lastWhere((element) =>
+                                                                element.markerId
+                                                                    .toString()
+                                                                    .contains(
+                                                                        'car${e['id']}'))
+                                                            .position
+                                                            .longitude !=
+                                                        e['l'][1] &&
+                                                    _controller != null) {
+                                              animationController =
+                                                  AnimationController(
+                                                duration: const Duration(
+                                                    milliseconds:
+                                                        1500), //Animation duration of marker
+
+                                                vsync: this, //From the widget
+                                              );
+                                              animateCar(
+                                                myMarker
+                                                    .lastWhere((element) =>
+                                                        element.markerId
+                                                            .toString()
+                                                            .contains(
+                                                                'car${e['id']}'))
+                                                    .position
+                                                    .latitude,
+                                                myMarker
+                                                    .lastWhere((element) =>
+                                                        element.markerId
+                                                            .toString()
+                                                            .contains(
+                                                                'car${e['id']}'))
+                                                    .position
+                                                    .longitude,
+                                                e['l'][0],
+                                                e['l'][1],
+                                                _mapMarkerSink,
+                                                this,
+                                                _controller,
+                                                'car${e['id']}',
+                                                e['id'],
+                                                (e['vehicle_type_icon'] ==
+                                                        'motor_bike')
+                                                    ? pinLocationIcon2
+                                                    : pinLocationIcon,
+                                              );
+                                            }
                                           }
                                         }
                                       }
-                                    }
-                                  } else {
-                                    if (myMarker
-                                        .where((element) => element.markerId
-                                            .toString()
-                                            .contains('car${e['id']}'))
-                                        .isNotEmpty) {
-                                      myMarker.removeWhere((element) => element
-                                          .markerId
-                                          .toString()
-                                          .contains('car${e['id']}'));
+                                    } else if (((e['vehicle_types'] != null &&
+                                            ((widget.type != 1 &&
+                                                    e['vehicle_types'].contains(
+                                                        etaDetails[choosenVehicle]
+                                                            ['type_id'])) ||
+                                                (widget.type == 1 &&
+                                                    e['vehicle_types'].contains(
+                                                        rentalOption[choosenVehicle]
+                                                            ['type_id'])))) ||
+                                        ((widget.type != 1 &&
+                                                e['vehicle_type'] ==
+                                                    etaDetails[choosenVehicle]
+                                                        ['type_id']) ||
+                                            (widget.type == 1 &&
+                                                e['vehicle_type'] ==
+                                                    rentalOption[choosenVehicle]
+                                                        ['type_id'])))) {
+                                      DateTime dt =
+                                          DateTime.fromMillisecondsSinceEpoch(
+                                              e['updated_at']);
+                                      if (DateTime.now()
+                                              .difference(dt)
+                                              .inMinutes <=
+                                          2) {
+                                        if (myMarker
+                                            .where((element) => element.markerId
+                                                .toString()
+                                                .contains('car${e['id']}'))
+                                            .isEmpty) {
+                                          myMarker.add(Marker(
+                                            markerId: MarkerId('car${e['id']}'),
+                                            rotation: (myBearings[
+                                                        e['id'].toString()] !=
+                                                    null)
+                                                ? myBearings[e['id'].toString()]
+                                                : 0.0,
+                                            position:
+                                                LatLng(e['l'][0], e['l'][1]),
+                                            icon: (e['vehicle_type_icon'] ==
+                                                    'motor_bike')
+                                                ? pinLocationIcon2
+                                                : pinLocationIcon,
+                                          ));
+                                        } else if (_controller != null) {
+                                          var dist = calculateDistance(
+                                              myMarker
+                                                  .lastWhere((element) =>
+                                                      element.markerId
+                                                          .toString()
+                                                          .contains(
+                                                              'car${e['id']}'))
+                                                  .position
+                                                  .latitude,
+                                              myMarker
+                                                  .lastWhere((element) =>
+                                                      element.markerId
+                                                          .toString()
+                                                          .contains(
+                                                              'car${e['id']}'))
+                                                  .position
+                                                  .longitude,
+                                              e['l'][0],
+                                              e['l'][1]);
+                                          if (dist > 100) {
+                                            if (myMarker
+                                                        .lastWhere((element) =>
+                                                            element.markerId
+                                                                .toString()
+                                                                .contains(
+                                                                    'car${e['id']}'))
+                                                        .position
+                                                        .latitude !=
+                                                    e['l'][0] ||
+                                                myMarker
+                                                            .lastWhere((element) =>
+                                                                element.markerId
+                                                                    .toString()
+                                                                    .contains(
+                                                                        'car${e['id']}'))
+                                                            .position
+                                                            .longitude !=
+                                                        e['l'][1] &&
+                                                    _controller != null) {
+                                              animationController =
+                                                  AnimationController(
+                                                duration: const Duration(
+                                                    milliseconds:
+                                                        1500), //Animation duration of marker
+
+                                                vsync: this, //From the widget
+                                              );
+                                              animateCar(
+                                                  myMarker
+                                                      .lastWhere((element) =>
+                                                          element.markerId
+                                                              .toString()
+                                                              .contains(
+                                                                  'car${e['id']}'))
+                                                      .position
+                                                      .latitude,
+                                                  myMarker
+                                                      .lastWhere((element) =>
+                                                          element.markerId
+                                                              .toString()
+                                                              .contains(
+                                                                  'car${e['id']}'))
+                                                      .position
+                                                      .longitude,
+                                                  e['l'][0],
+                                                  e['l'][1],
+                                                  _mapMarkerSink,
+                                                  this,
+                                                  _controller,
+                                                  'car${e['id']}',
+                                                  e['id'],
+                                                  (driverData['vehicle_type_icon'] ==
+                                                          'motor_bike')
+                                                      ? pinLocationIcon2
+                                                      : pinLocationIcon);
+                                            }
+                                          }
+                                        }
+                                      }
+                                    } else {
+                                      if (myMarker
+                                          .where((element) => element.markerId
+                                              .toString()
+                                              .contains('car${e['id']}'))
+                                          .isNotEmpty) {
+                                        myMarker.removeWhere((element) =>
+                                            element.markerId
+                                                .toString()
+                                                .contains('car${e['id']}'));
+                                      } else {
+                                        if (myMarker
+                                            .where((element) => element.markerId
+                                                .toString()
+                                                .contains('car${e['id']}'))
+                                            .isNotEmpty) {
+                                          myMarker.removeWhere((element) =>
+                                              element.markerId
+                                                  .toString()
+                                                  .contains('car${e['id']}'));
+                                        }
+                                      }
                                     }
                                   }
                                 });
@@ -722,6 +931,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                     .ref(
                                         'drivers/${userRequestData['driverDetail']['data']['id']}')
                                     .onValue
+                                    .asBroadcastStream()
                                 : null,
                             builder:
                                 (context, AsyncSnapshot<DatabaseEvent> event) {
@@ -750,6 +960,19 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                               userRequestData['pick_lng'],
                                               driverData['l'][0],
                                               driverData['l'][1]);
+                                          _dist = double.parse(
+                                              (distCalc / 1000).toString());
+                                        } else if (userRequestData[
+                                                    'is_rental'] !=
+                                                true &&
+                                            userRequestData['drop_lat'] !=
+                                                null) {
+                                          var distCalc = calculateDistance(
+                                            driverData['l'][0],
+                                            driverData['l'][1],
+                                            userRequestData['drop_lat'],
+                                            userRequestData['drop_lng'],
+                                          );
                                           _dist = double.parse(
                                               (distCalc / 1000).toString());
                                         }
@@ -808,14 +1031,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         .latitude !=
                                                     driverData['l'][0] ||
                                                 myMarker
-                                                        .lastWhere((element) =>
-                                                            element.markerId
-                                                                .toString()
-                                                                .contains(
-                                                                    'car${driverData['id']}'))
-                                                        .position
-                                                        .longitude !=
-                                                    driverData['l'][1]) {
+                                                            .lastWhere((element) =>
+                                                                element.markerId
+                                                                    .toString()
+                                                                    .contains(
+                                                                        'car${driverData['id']}'))
+                                                            .position
+                                                            .longitude !=
+                                                        driverData['l'][1] &&
+                                                    _controller != null) {
                                               animationController =
                                                   AnimationController(
                                                 duration: const Duration(
@@ -945,8 +1169,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         ],
                                                         color: page),
                                                     alignment: Alignment.center,
-                                                    child: const Icon(
-                                                        Icons.arrow_back),
+                                                    child: Icon(
+                                                      Icons.arrow_back,
+                                                      color: textColor,
+                                                    ),
                                                   ),
                                                 ),
                                               ],
@@ -987,6 +1213,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       0.2),
                                                               spreadRadius: 2)
                                                         ],
+                                                        // color: buttonColor,
                                                         color: buttonColor,
                                                         borderRadius:
                                                             BorderRadius
@@ -1015,9 +1242,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         true) {
                                                       if (currentLocation !=
                                                           null) {
+                                                        _controller?.animateCamera(
+                                                            CameraUpdate
+                                                                .newLatLngZoom(
+                                                                    currentLocation,
+                                                                    18.0));
                                                         center =
                                                             currentLocation;
-
+                                                      } else {
                                                         _controller?.animateCamera(
                                                             CameraUpdate
                                                                 .newLatLngZoom(
@@ -1032,8 +1264,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                               true;
                                                         });
                                                       } else {
-                                                        await location
-                                                            .requestService();
+                                                        await geolocs.Geolocator
+                                                            .getCurrentPosition(
+                                                                desiredAccuracy:
+                                                                    geolocs
+                                                                        .LocationAccuracy
+                                                                        .low);
+                                                        
                                                         if (await geolocs
                                                             .GeolocatorPlatform
                                                             .instance
@@ -1065,8 +1302,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                 .circular(media
                                                                         .width *
                                                                     0.02)),
-                                                    child: const Icon(Icons
-                                                        .my_location_sharp),
+                                                    child: Icon(
+                                                      Icons.my_location_sharp,
+                                                      color: textColor,
+                                                    ),
                                                   ),
                                                 )
                                               : Container(),
@@ -1097,9 +1336,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                 });
                                               }
                                             },
-                                            child: AnimatedContainer(
-                                              duration: const Duration(
-                                                  milliseconds: 200),
+                                            child: Container(
                                               padding: EdgeInsets.all(
                                                   media.width * 0.05),
                                               height: (_bottomChooseMethod ==
@@ -1178,7 +1415,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           return MapEntry(
                                                                               i,
                                                                               StreamBuilder<DatabaseEvent>(
-                                                                                  stream: fdb.onValue,
+                                                                                  stream: fdb.onValue.asBroadcastStream(),
                                                                                   builder: (context, AsyncSnapshot event) {
                                                                                     if (event.data != null && etaDetails.isNotEmpty) {
                                                                                       minutes[etaDetails[i]['type_id']] = '';
@@ -1192,7 +1429,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         // ignore: avoid_function_literals_in_foreach_calls
                                                                                         vehicleList.forEach(
                                                                                           (e) async {
-                                                                                            if (e['is_active'] == 1 && e['is_available'] == true && e['vehicle_type'] == etaDetails[i]['type_id']) {
+                                                                                            if (e['is_active'] == 1 && e['is_available'] == true && (e['vehicle_type'] == etaDetails[i]['type_id'] || (e['vehicle_types'] != null && e['vehicle_types'].contains(etaDetails[i]['type_id'])))) {
                                                                                               DateTime dt = DateTime.fromMillisecondsSinceEpoch(e['updated_at']);
                                                                                               if (DateTime.now().difference(dt).inMinutes <= 2) {
                                                                                                 vehicles.add(e);
@@ -1233,12 +1470,17 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         setState(() {
                                                                                           choosenVehicle = i;
                                                                                         });
+                                                                                      
                                                                                       },
                                                                                       child: Container(
                                                                                         padding: EdgeInsets.all(media.width * 0.03),
                                                                                         decoration: BoxDecoration(
                                                                                           borderRadius: BorderRadius.circular(12),
-                                                                                          color: (choosenVehicle != i) ? Colors.transparent : Colors.grey[200],
+                                                                                          color: (choosenVehicle != i)
+                                                                                              ? Colors.transparent
+                                                                                              : (isDarkTheme == true)
+                                                                                                  ? textColor.withOpacity(0.2)
+                                                                                                  : Colors.grey[200],
                                                                                         ),
                                                                                         child: Row(
                                                                                           children: [
@@ -1252,14 +1494,15 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                           fit: BoxFit.contain,
                                                                                                         ))
                                                                                                     : Container(),
+                                                                                                SizedBox(height: media.width * 0.01),
                                                                                                 (minutes[etaDetails[i]['type_id']] != '')
                                                                                                     ? Text(
                                                                                                         minutes[etaDetails[i]['type_id']].toString(),
-                                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.3)),
+                                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.4)),
                                                                                                       )
                                                                                                     : Text(
                                                                                                         '- -',
-                                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.3)),
+                                                                                                        style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.4)),
                                                                                                       )
                                                                                               ],
                                                                                             ),
@@ -1291,7 +1534,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                             _showInfo = true;
                                                                                                           });
                                                                                                         },
-                                                                                                        child: Icon(Icons.info_outline, size: media.width * twelve)),
+                                                                                                        child: Icon(
+                                                                                                          Icons.info_outline,
+                                                                                                          size: media.width * twelve,
+                                                                                                          color: textColor,
+                                                                                                        )),
                                                                                                   ],
                                                                                                 ),
                                                                                               ],
@@ -1372,7 +1619,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                     i,
                                                                                     Container(
                                                                                       margin: EdgeInsets.only(right: media.width * 0.05),
-                                                                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8), color: (rentalChoosenOption == i) ? buttonColor : borderLines),
+                                                                                      decoration: BoxDecoration(
+                                                                                          borderRadius: BorderRadius.circular(8),
+                                                                                          color: (rentalChoosenOption == i)
+                                                                                              ? buttonColor
+                                                                                              : (isDarkTheme == true)
+                                                                                                  ? textColor.withOpacity(0.7)
+                                                                                                  : borderLines),
                                                                                       padding: EdgeInsets.all(media.width * 0.02),
                                                                                       child: InkWell(
                                                                                         onTap: () {
@@ -1385,7 +1638,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         },
                                                                                         child: Text(
                                                                                           etaDetails[i]['package_name'],
-                                                                                          style: GoogleFonts.roboto(fontSize: media.width * sixteen, fontWeight: FontWeight.w600, color: (rentalChoosenOption == i) ? Colors.white : Colors.black),
+                                                                                          style: GoogleFonts.roboto(
+                                                                                              fontSize: media.width * sixteen,
+                                                                                              fontWeight: FontWeight.w600,
+                                                                                              color: (rentalChoosenOption == i)
+                                                                                                  ? (isDarkTheme == true)
+                                                                                                      ? Colors.black
+                                                                                                      : Colors.white
+                                                                                                  : Colors.black),
                                                                                         ),
                                                                                       ),
                                                                                     ));
@@ -1414,7 +1674,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                     return MapEntry(
                                                                                         i,
                                                                                         StreamBuilder<DatabaseEvent>(
-                                                                                            stream: fdb.onValue,
+                                                                                            stream: fdb.onValue.asBroadcastStream(),
                                                                                             builder: (context, AsyncSnapshot event) {
                                                                                               if (event.data != null && etaDetails.isNotEmpty) {
                                                                                                 minutes[rentalOption[i]['type_id']] = '';
@@ -1473,7 +1733,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                   padding: EdgeInsets.all(media.width * 0.03),
                                                                                                   decoration: BoxDecoration(
                                                                                                     borderRadius: BorderRadius.circular(12),
-                                                                                                    color: (choosenVehicle != i) ? Colors.transparent : Colors.grey[200],
+                                                                                                    color: (choosenVehicle != i)
+                                                                                                        ? Colors.transparent
+                                                                                                        : (isDarkTheme == true)
+                                                                                                            ? textColor.withOpacity(0.2)
+                                                                                                            : Colors.grey[200],
                                                                                                   ),
                                                                                                   child: Row(
                                                                                                     children: [
@@ -1490,11 +1754,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                           (minutes[rentalOption[i]['type_id']] != "")
                                                                                                               ? Text(
                                                                                                                   minutes[rentalOption[i]['type_id']].toString(),
-                                                                                                                  style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.3)),
+                                                                                                                  style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.4)),
                                                                                                                 )
                                                                                                               : Text(
                                                                                                                   '- -',
-                                                                                                                  style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.3)),
+                                                                                                                  style: GoogleFonts.roboto(fontSize: media.width * twelve, color: textColor.withOpacity(0.4)),
                                                                                                                 )
                                                                                                         ],
                                                                                                       ),
@@ -1526,7 +1790,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                                       _showInfo = true;
                                                                                                                     });
                                                                                                                   },
-                                                                                                                  child: Icon(Icons.info_outline, size: media.width * twelve)),
+                                                                                                                  child: Icon(Icons.info_outline, size: media.width * twelve, color: textColor)),
                                                                                                             ],
                                                                                                           ),
                                                                                                         ],
@@ -1828,8 +2092,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                 0.9,
                                                             decoration: BoxDecoration(
                                                                 border: Border.all(
-                                                                    color:
-                                                                        borderLines,
+                                                                    color: (isDarkTheme ==
+                                                                            true)
+                                                                        ? textColor.withOpacity(
+                                                                            0.4)
+                                                                        : borderLines,
                                                                     width: 1.2),
                                                                 borderRadius:
                                                                     BorderRadius
@@ -1872,15 +2139,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                               fit: BoxFit.contain,
                                                                             )
                                                                           : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] == 'wallet')
-                                                                              ? Image.asset(
-                                                                                  'assets/images/wallet.png',
-                                                                                  fit: BoxFit.contain,
-                                                                                )
+                                                                              ? Image.asset('assets/images/wallet.png', fit: BoxFit.contain, color: textColor)
                                                                               : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] == 'card')
-                                                                                  ? Image.asset(
-                                                                                      'assets/images/card.png',
-                                                                                      fit: BoxFit.contain,
-                                                                                    )
+                                                                                  ? Image.asset('assets/images/card.png', fit: BoxFit.contain, color: textColor)
                                                                                   : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] == 'upi')
                                                                                       ? Image.asset(
                                                                                           'assets/images/upi.png',
@@ -1905,6 +2166,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                               .toList()[payingVia]
                                                                               .toString(),
                                                                           style: GoogleFonts.roboto(
+                                                                              color: textColor,
                                                                               fontSize: media.width * fourteen,
                                                                               fontWeight: FontWeight.w600),
                                                                         ),
@@ -1921,6 +2183,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                 ? languages[choosenLanguage]['text_payupi']
                                                                                                 : '',
                                                                                 style: GoogleFonts.roboto(
+                                                                                  color: textColor,
                                                                                   fontSize: media.width * ten,
                                                                                 ),
                                                                               )
@@ -1939,10 +2202,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       mainAxisAlignment:
                                                                           MainAxisAlignment
                                                                               .end,
-                                                                      children: const [
+                                                                      children: [
                                                                         Icon(
                                                                           Icons
                                                                               .arrow_forward_ios,
+                                                                          color:
+                                                                              textColor,
                                                                         ),
                                                                       ],
                                                                     ))
@@ -2015,15 +2280,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                   fit: BoxFit.contain,
                                                                                 )
                                                                               : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] == 'wallet')
-                                                                                  ? Image.asset(
-                                                                                      'assets/images/wallet.png',
-                                                                                      fit: BoxFit.contain,
-                                                                                    )
+                                                                                  ? Image.asset('assets/images/wallet.png', fit: BoxFit.contain, color: textColor)
                                                                                   : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] == 'card')
-                                                                                      ? Image.asset(
-                                                                                          'assets/images/card.png',
-                                                                                          fit: BoxFit.contain,
-                                                                                        )
+                                                                                      ? Image.asset('assets/images/card.png', fit: BoxFit.contain, color: textColor)
                                                                                       : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] == 'upi')
                                                                                           ? Image.asset(
                                                                                               'assets/images/upi.png',
@@ -2041,7 +2300,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           children: [
                                                                             Text(
                                                                               rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia].toString(),
-                                                                              style: GoogleFonts.roboto(fontSize: media.width * fourteen, fontWeight: FontWeight.w600),
+                                                                              style: GoogleFonts.roboto(fontSize: media.width * fourteen, fontWeight: FontWeight.w600, color: textColor),
                                                                             ),
                                                                             (rentalOption[choosenVehicle]['has_discount'] == false)
                                                                                 ? Text(
@@ -2054,9 +2313,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                 : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] == 'upi')
                                                                                                     ? languages[choosenLanguage]['text_payupi']
                                                                                                     : '',
-                                                                                    style: GoogleFonts.roboto(
-                                                                                      fontSize: media.width * ten,
-                                                                                    ),
+                                                                                    style: GoogleFonts.roboto(fontSize: media.width * ten, color: textColor),
                                                                                   )
                                                                                 : Text(
                                                                                     languages[choosenLanguage]['text_promoaccepted'],
@@ -2072,10 +2329,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                 Row(
                                                                           mainAxisAlignment:
                                                                               MainAxisAlignment.end,
-                                                                          children: const [
-                                                                            Icon(
-                                                                              Icons.arrow_forward_ios,
-                                                                            ),
+                                                                          children: [
+                                                                            Icon(Icons.arrow_forward_ios,
+                                                                                color: textColor),
                                                                           ],
                                                                         ))
                                                                       ],
@@ -2150,9 +2406,17 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     false) {
                                                                   result =
                                                                       await createRequest();
+                                                                  if (result ==
+                                                                      'logout') {
+                                                                    navigateLogout();
+                                                                  }
                                                                 } else {
                                                                   result =
                                                                       await createRequestWithPromo();
+                                                                  if (result ==
+                                                                      'logout') {
+                                                                    navigateLogout();
+                                                                  }
                                                                 }
                                                               } else {
                                                                 if (rentalOption[
@@ -2162,9 +2426,17 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     false) {
                                                                   result =
                                                                       await createRentalRequest();
+                                                                  if (result ==
+                                                                      'logout') {
+                                                                    navigateLogout();
+                                                                  }
                                                                 } else {
                                                                   result =
                                                                       await createRentalRequestWithPromo();
+                                                                  if (result ==
+                                                                      'logout') {
+                                                                    navigateLogout();
+                                                                  }
                                                                 }
                                                               }
                                                             }
@@ -2197,8 +2469,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                 bottom: media.width * 0.05),
                                             height: media.height * 1,
                                             width: media.width * 1,
-                                            color: Colors.transparent
-                                                .withOpacity(0.6),
+                                            // color: Colors.transparent
+                                            //     .withOpacity(0.6),
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.2)
+                                                : Colors.transparent
+                                                    .withOpacity(0.6),
                                             child: Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.end,
@@ -2226,8 +2502,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                   shape: BoxShape
                                                                       .circle,
                                                                   color: page),
-                                                          child: const Icon(Icons
-                                                              .cancel_outlined),
+                                                          child: Icon(
+                                                            Icons
+                                                                .cancel_outlined,
+                                                            color: textColor,
+                                                          ),
                                                         ),
                                                       ),
                                                     ],
@@ -2241,6 +2520,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12),
+                                                    
                                                       color: page),
                                                   padding: EdgeInsets.all(
                                                       media.width * 0.05),
@@ -2791,9 +3071,17 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             false;
                                                       });
                                                       if (widget.type != 1) {
-                                                        await etaRequest();
+                                                        var val =
+                                                            await etaRequest();
+                                                        if (val == 'logout') {
+                                                          navigateLogout();
+                                                        }
                                                       } else {
-                                                        await rentalEta();
+                                                        var val =
+                                                            await rentalEta();
+                                                        if (val == 'logout') {
+                                                          navigateLogout();
+                                                        }
                                                       }
                                                       setState(() {});
                                                     },
@@ -2811,8 +3099,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           child: Container(
                                             height: media.height * 1,
                                             width: media.width * 1,
-                                            color: Colors.transparent
-                                                .withOpacity(0.6),
+                                            // color: Colors.transparent
+                                            //     .withOpacity(0.6),
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.2)
+                                                : Colors.transparent
+                                                    .withOpacity(0.6),
                                             child: Scaffold(
                                               backgroundColor:
                                                   Colors.transparent,
@@ -2859,9 +3151,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         .circle,
                                                                     color:
                                                                         page),
-                                                                child: const Icon(
-                                                                    Icons
-                                                                        .cancel_outlined),
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .cancel_outlined,
+                                                                  color:
+                                                                      textColor,
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -2880,6 +3175,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(12),
+                                                          // border: Border.all(
+                                                          //     color: topBar)
                                                         ),
                                                         padding: EdgeInsets.all(
                                                             media.width * 0.05),
@@ -2964,14 +3261,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                     fit: BoxFit.contain,
                                                                                                   )
                                                                                                 : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'wallet')
-                                                                                                    ? Image.asset(
-                                                                                                        'assets/images/wallet.png',
-                                                                                                        fit: BoxFit.contain,
-                                                                                                      )
+                                                                                                    ? Image.asset('assets/images/wallet.png', fit: BoxFit.contain, color: textColor)
                                                                                                     : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'card')
                                                                                                         ? Image.asset(
                                                                                                             'assets/images/card.png',
                                                                                                             fit: BoxFit.contain,
+                                                                                                            color: textColor,
                                                                                                           )
                                                                                                         : (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'upi')
                                                                                                             ? Image.asset(
@@ -2988,7 +3283,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                             children: [
                                                                                               Text(
                                                                                                 etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i].toString(),
-                                                                                                style: GoogleFonts.roboto(fontSize: media.width * fourteen, fontWeight: FontWeight.w600),
+                                                                                                style: GoogleFonts.roboto(color: textColor, fontSize: media.width * fourteen, fontWeight: FontWeight.w600),
                                                                                               ),
                                                                                               Text(
                                                                                                 (etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'cash')
@@ -3001,6 +3296,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                                 ? languages[choosenLanguage]['text_payupi']
                                                                                                                 : '',
                                                                                                 style: GoogleFonts.roboto(
+                                                                                                  color: textColor,
                                                                                                   fontSize: media.width * ten,
                                                                                                 ),
                                                                                               )
@@ -3013,9 +3309,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                               Container(
                                                                                                 height: media.width * 0.05,
                                                                                                 width: media.width * 0.05,
-                                                                                                decoration: BoxDecoration(shape: BoxShape.circle, color: page, border: Border.all(color: Colors.black, width: 1.2)),
+                                                                                                decoration: BoxDecoration(shape: BoxShape.circle, color: page, border: Border.all(color: textColor, width: 1.2)),
                                                                                                 alignment: Alignment.center,
-                                                                                                child: (payingVia == i) ? Container(height: media.width * 0.03, width: media.width * 0.03, decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle)) : Container(),
+                                                                                                child: (payingVia == i) ? Container(height: media.width * 0.03, width: media.width * 0.03, decoration: BoxDecoration(color: textColor, shape: BoxShape.circle)) : Container(),
                                                                                               )
                                                                                             ],
                                                                                           ))
@@ -3064,15 +3360,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                     fit: BoxFit.contain,
                                                                                                   )
                                                                                                 : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'wallet')
-                                                                                                    ? Image.asset(
-                                                                                                        'assets/images/wallet.png',
-                                                                                                        fit: BoxFit.contain,
-                                                                                                      )
+                                                                                                    ? Image.asset('assets/images/wallet.png', fit: BoxFit.contain, color: textColor)
                                                                                                     : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'card')
-                                                                                                        ? Image.asset(
-                                                                                                            'assets/images/card.png',
-                                                                                                            fit: BoxFit.contain,
-                                                                                                          )
+                                                                                                        ? Image.asset('assets/images/card.png', fit: BoxFit.contain, color: textColor)
                                                                                                         : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'upi')
                                                                                                             ? Image.asset(
                                                                                                                 'assets/images/upi.png',
@@ -3088,7 +3378,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                             children: [
                                                                                               Text(
                                                                                                 rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i].toString(),
-                                                                                                style: GoogleFonts.roboto(fontSize: media.width * fourteen, fontWeight: FontWeight.w600),
+                                                                                                style: GoogleFonts.roboto(fontSize: media.width * fourteen, fontWeight: FontWeight.w600, color: textColor),
                                                                                               ),
                                                                                               Text(
                                                                                                 (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'cash')
@@ -3100,9 +3390,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                             : (rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[i] == 'upi')
                                                                                                                 ? languages[choosenLanguage]['text_payupi']
                                                                                                                 : '',
-                                                                                                style: GoogleFonts.roboto(
-                                                                                                  fontSize: media.width * ten,
-                                                                                                ),
+                                                                                                style: GoogleFonts.roboto(fontSize: media.width * ten, color: textColor),
                                                                                               )
                                                                                             ],
                                                                                           ),
@@ -3113,9 +3401,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                               Container(
                                                                                                 height: media.width * 0.05,
                                                                                                 width: media.width * 0.05,
-                                                                                                decoration: BoxDecoration(shape: BoxShape.circle, color: page, border: Border.all(color: Colors.black, width: 1.2)),
+                                                                                                decoration: BoxDecoration(shape: BoxShape.circle, color: page, border: Border.all(color: textColor, width: 1.2)),
                                                                                                 alignment: Alignment.center,
-                                                                                                child: (payingVia == i) ? Container(height: media.width * 0.03, width: media.width * 0.03, decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle)) : Container(),
+                                                                                                child: (payingVia == i) ? Container(height: media.width * 0.03, width: media.width * 0.03, decoration: BoxDecoration(color: textColor, shape: BoxShape.circle)) : Container(),
                                                                                               )
                                                                                             ],
                                                                                           ))
@@ -3166,7 +3454,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     child: Image.asset(
                                                                         'assets/images/promocode.png',
                                                                         fit: BoxFit
-                                                                            .contain),
+                                                                            .contain,
+                                                                        color:
+                                                                            textColor),
                                                                   ),
                                                                   SizedBox(
                                                                     width: media
@@ -3188,7 +3478,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                             decoration: InputDecoration(
                                                                                 border: InputBorder.none,
                                                                                 hintText: languages[choosenLanguage]['text_enterpromo'],
-                                                                                hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: hintColor)),
+                                                                                hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : hintColor)),
+                                                                            style:
+                                                                                GoogleFonts.roboto(color: textColor),
                                                                           )
                                                                         : (promoStatus ==
                                                                                 1)
@@ -3211,8 +3503,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         dynamic result;
                                                                                         if (widget.type != 1) {
                                                                                           result = await etaRequest();
+                                                                                          if (result == 'logout') {
+                                                                                            navigateLogout();
+                                                                                          }
                                                                                         } else {
                                                                                           result = await rentalEta();
+                                                                                          if (result == 'logout') {
+                                                                                            navigateLogout();
+                                                                                          }
                                                                                         }
                                                                                         setState(() {
                                                                                           _isLoading = false;
@@ -3235,17 +3533,27 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                       children: [
                                                                                         Text(promoKey.text, style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xffFF0000))),
                                                                                         InkWell(
-                                                                                          onTap: () {
+                                                                                          onTap: () async {
                                                                                             setState(() {
+                                                                                              _isLoading = true;
                                                                                               promoStatus = null;
                                                                                               promoCode = '';
                                                                                               promoKey.clear();
-                                                                                              // promoKey.text = promoCode;
-                                                                                              if (widget.type != 1) {
-                                                                                                etaRequest();
-                                                                                              } else {
-                                                                                                rentalEta();
+                                                                                            });
+                                                                                            if (widget.type != 1) {
+                                                                                              var val = await etaRequest();
+                                                                                              if (val == 'logout') {
+                                                                                                navigateLogout();
                                                                                               }
+                                                                                            } else {
+                                                                                              var val = await rentalEta();
+                                                                                              if (val == 'logout') {
+                                                                                                navigateLogout();
+                                                                                              }
+                                                                                            }
+
+                                                                                            setState(() {
+                                                                                              _isLoading = true;
                                                                                             });
                                                                                           },
                                                                                           child: Text(languages[choosenLanguage]['text_remove'], style: GoogleFonts.roboto(fontSize: media.width * twelve, color: const Color(0xffFF0000))),
@@ -3306,9 +3614,19 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     if (widget
                                                                             .type !=
                                                                         1) {
-                                                                      await etaRequestWithPromo();
+                                                                      var val =
+                                                                          await etaRequestWithPromo();
+                                                                      if (val ==
+                                                                          'logout') {
+                                                                        navigateLogout();
+                                                                      }
                                                                     } else {
-                                                                      await rentalRequestWithPromo();
+                                                                      var val =
+                                                                          await rentalRequestWithPromo();
+                                                                      if (val ==
+                                                                          'logout') {
+                                                                        navigateLogout();
+                                                                      }
                                                                     }
                                                                     setState(
                                                                         () {
@@ -3413,20 +3731,18 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         ? languages[choosenLanguage][
                                                                 'text_arrive_eta'] +
                                                             ' ' +
-                                                            double.parse(((_dist * 2))
+                                                            double.parse(((_dist *
+                                                                        2))
                                                                     .toString())
                                                                 .round()
                                                                 .toString() +
                                                             ' ' +
                                                             languages[choosenLanguage]
                                                                 ['text_mins']
-                                                        : (userRequestData[
-                                                                        'accepted_at'] !=
-                                                                    null &&
+                                                        : (userRequestData['accepted_at'] != null &&
                                                                 userRequestData['arrived_at'] !=
                                                                     null &&
-                                                                userRequestData[
-                                                                        'is_trip_start'] ==
+                                                                userRequestData['is_trip_start'] ==
                                                                     0)
                                                             ? languages[choosenLanguage]
                                                                 ['text_arrived']
@@ -3435,10 +3751,18 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     userRequestData['arrived_at'] !=
                                                                         null &&
                                                                     userRequestData['is_trip_start'] !=
+                                                                        null &&
+                                                                    widget.type ==
                                                                         null)
-                                                                ? languages[choosenLanguage]
-                                                                    ['text_onride']
-                                                                : '',
+                                                                ? languages[choosenLanguage]['text_onride'] +
+                                                                    ' in ' +
+                                                                    double.parse(((_dist * 2)).toString())
+                                                                        .round()
+                                                                        .toString() +
+                                                                    ' ' +
+                                                                    languages[choosenLanguage]
+                                                                        ['text_mins']
+                                                                : languages[choosenLanguage]['text_onride'],
                                                     style: GoogleFonts.roboto(
                                                       fontSize:
                                                           media.width * twelve,
@@ -3470,8 +3794,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           1)
                                                                   ? const Color(
                                                                       0xffFF0000)
-                                                                  : Colors
-                                                                      .transparent,
+                                                                  : (etaDetails
+                                                                          .isNotEmpty)
+                                                                      ? Colors
+                                                                          .orange
+                                                                      : Colors
+                                                                          .transparent,
                                                     ))
                                               ],
                                             ),
@@ -3594,8 +3922,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                 ),
                                                 Button(
                                                     width: media.width * 0.5,
-                                                    onTap: () {
-                                                      cancelRequest();
+                                                    onTap: () async {
+                                                      var val =
+                                                          await cancelRequest();
+                                                      if (val == 'logout') {
+                                                        navigateLogout();
+                                                      }
                                                     },
                                                     text: languages[
                                                             choosenLanguage]
@@ -3893,6 +4225,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           'assets/images/call.png',
                                                                           fit: BoxFit
                                                                               .contain,
+                                                                          color:
+                                                                              textColor,
                                                                           // height: media.width*0.064,
                                                                         ),
                                                                       ),
@@ -3945,14 +4279,22 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                             (chatList.where((element) => element['from_type'] == 2 && element['seen'] == 0).isEmpty)
                                                                                 ? languages[choosenLanguage]['text_pickup_instruction']
                                                                                 : languages[choosenLanguage]['text_newmessagereceived'],
-                                                                            style:
-                                                                                GoogleFonts.roboto(fontSize: media.width * twelve, color: (chatList.where((element) => element['from_type'] == 2 && element['seen'] == 0).isEmpty) ? hintColor : const Color(0xffFF0000)),
+                                                                            style: GoogleFonts.roboto(
+                                                                                fontSize: media.width * twelve,
+                                                                                color: (chatList.where((element) => element['from_type'] == 2 && element['seen'] == 0).isEmpty)
+                                                                                    ? (isDarkTheme == true)
+                                                                                        ? textColor.withOpacity(0.3)
+                                                                                        : hintColor
+                                                                                    : const Color(0xffFF0000)),
                                                                           ),
                                                                         ),
                                                                         (chatList.where((element) => element['from_type'] == 2 && element['seen'] == 0).isEmpty)
                                                                             ? RotatedBox(
                                                                                 quarterTurns: (languageDirection == 'rtl') ? 2 : 0,
-                                                                                child: Image.asset('assets/images/send.png'),
+                                                                                child: Image.asset(
+                                                                                  'assets/images/send.png',
+                                                                                  color: textColor,
+                                                                                ),
                                                                               )
                                                                             : Text(
                                                                                 chatList.where((element) => element['from_type'] == 2 && element['seen'] == 0).length.toString(),
@@ -4215,6 +4557,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                     _cancellingError = '';
                                                                                     _cancelling = true;
                                                                                   });
+                                                                                } else if (reason == 'logout') {
+                                                                                  navigateLogout();
                                                                                 }
                                                                                 setState(() {
                                                                                   _isLoading = false;
@@ -4225,7 +4569,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                   SizedBox(
                                                                                     height: media.width * 0.064,
                                                                                     width: media.width * 0.064,
-                                                                                    child: Image.asset('assets/images/cancel.png'),
+                                                                                    child: Image.asset(
+                                                                                      'assets/images/cancel.png',
+                                                                                      color: textColor,
+                                                                                    ),
                                                                                   ),
                                                                                   SizedBox(
                                                                                     height: media.width * 0.02,
@@ -4310,15 +4657,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                 fit: BoxFit.contain,
                                                                               )
                                                                             : (userRequestData['payment_opt'] == '2')
-                                                                                ? Image.asset(
-                                                                                    'assets/images/wallet.png',
-                                                                                    fit: BoxFit.contain,
-                                                                                  )
+                                                                                ? Image.asset('assets/images/wallet.png', fit: BoxFit.contain, color: textColor)
                                                                                 : (userRequestData['payment_opt'] == '0')
-                                                                                    ? Image.asset(
-                                                                                        'assets/images/card.png',
-                                                                                        fit: BoxFit.contain,
-                                                                                      )
+                                                                                    ? Image.asset('assets/images/card.png', fit: BoxFit.contain, color: textColor)
                                                                                     : Container(),
                                                                       ),
                                                                       SizedBox(
@@ -4333,8 +4674,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                             (userRequestData.isNotEmpty)
                                                                                 ? userRequestData['payment_type_string']
                                                                                 : etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia].toString(),
-                                                                            style:
-                                                                                GoogleFonts.roboto(fontSize: media.width * fourteen, fontWeight: FontWeight.w600),
+                                                                            style: GoogleFonts.roboto(
+                                                                                fontSize: media.width * fourteen,
+                                                                                fontWeight: FontWeight.w600,
+                                                                                color: textColor),
                                                                           ),
                                                                           Text(
                                                                             (userRequestData['payment_opt'] == '1')
@@ -4345,9 +4688,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         ? languages[choosenLanguage]['text_paycard']
                                                                                         : '',
                                                                             style:
-                                                                                GoogleFonts.roboto(
-                                                                              fontSize: media.width * ten,
-                                                                            ),
+                                                                                GoogleFonts.roboto(fontSize: media.width * ten, color: textColor),
                                                                           )
                                                                         ],
                                                                       ),
@@ -4369,8 +4710,12 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           child: Container(
                                           height: media.height * 1,
                                           width: media.width * 1,
-                                          color: Colors.transparent
-                                              .withOpacity(0.6),
+                                          // color: Colors.transparent
+                                          //     .withOpacity(0.6),
+                                          color: (isDarkTheme == true)
+                                              ? textColor.withOpacity(0.2)
+                                              : Colors.transparent
+                                                  .withOpacity(0.6),
                                           alignment: Alignment.center,
                                           child: Column(
                                             mainAxisAlignment:
@@ -4445,7 +4790,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         decoration: BoxDecoration(
                                                                             shape:
                                                                                 BoxShape.circle,
-                                                                            border: Border.all(color: Colors.black, width: 1.2)),
+                                                                            border: Border.all(color: textColor, width: 1.2)),
                                                                         alignment:
                                                                             Alignment.center,
                                                                         child: (_cancelReason ==
@@ -4453,9 +4798,9 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                             ? Container(
                                                                                 height: media.width * 0.03,
                                                                                 width: media.width * 0.03,
-                                                                                decoration: const BoxDecoration(
+                                                                                decoration: BoxDecoration(
                                                                                   shape: BoxShape.circle,
-                                                                                  color: Colors.black,
+                                                                                  color: textColor,
                                                                                 ),
                                                                               )
                                                                             : Container(),
@@ -4468,7 +4813,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           width: media.width *
                                                                               0.65,
                                                                           child:
-                                                                              Text(cancelReasonsList[i]['reason']))
+                                                                              Text(
+                                                                            cancelReasonsList[i]['reason'],
+                                                                            style:
+                                                                                TextStyle(color: textColor),
+                                                                          ))
                                                                     ],
                                                                   ),
                                                                 ),
@@ -4499,8 +4848,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                 shape: BoxShape
                                                                     .circle,
                                                                 border: Border.all(
-                                                                    color: Colors
-                                                                        .black,
+                                                                    color:
+                                                                        textColor,
                                                                     width:
                                                                         1.2)),
                                                             alignment: Alignment
@@ -4514,11 +4863,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         width: media.width *
                                                                             0.03,
                                                                         decoration:
-                                                                            const BoxDecoration(
+                                                                            BoxDecoration(
                                                                           shape:
                                                                               BoxShape.circle,
                                                                           color:
-                                                                              Colors.black,
+                                                                              textColor,
                                                                         ),
                                                                       )
                                                                     : Container(),
@@ -4527,9 +4876,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             width: media.width *
                                                                 0.05,
                                                           ),
-                                                          Text(languages[
-                                                                  choosenLanguage]
-                                                              ['text_others'])
+                                                          Text(
+                                                            languages[
+                                                                    choosenLanguage]
+                                                                ['text_others'],
+                                                            style: TextStyle(
+                                                                color:
+                                                                    textColor),
+                                                          )
                                                         ],
                                                       ),
                                                     ),
@@ -4562,16 +4916,23 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           12)),
                                                           child: TextField(
                                                             decoration: InputDecoration(
-                                                                border: InputBorder
-                                                                    .none,
+                                                                border:
+                                                                    InputBorder
+                                                                        .none,
                                                                 hintText: languages[
                                                                         choosenLanguage]
                                                                     [
                                                                     'text_cancelRideReason'],
                                                                 hintStyle: GoogleFonts.roboto(
+                                                                    color: textColor
+                                                                        .withOpacity(
+                                                                            0.4),
                                                                     fontSize: media
                                                                             .width *
                                                                         twelve)),
+                                                            style: TextStyle(
+                                                                color:
+                                                                    textColor),
                                                             maxLines: 4,
                                                             minLines: 2,
                                                             onChanged: (val) {
@@ -4627,8 +4988,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         .isNotEmpty) {
                                                                   _cancellingError =
                                                                       '';
-                                                                  await cancelRequestWithReason(
-                                                                      _cancelCustomReason);
+                                                                  var val =
+                                                                      await cancelRequestWithReason(
+                                                                          _cancelCustomReason);
+                                                                  if (val ==
+                                                                      'logout') {
+                                                                    navigateLogout();
+                                                                  }
                                                                   setState(() {
                                                                     _cancelling =
                                                                         false;
@@ -4642,8 +5008,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                   });
                                                                 }
                                                               } else {
-                                                                await cancelRequestWithReason(
-                                                                    _cancelReason);
+                                                                var val =
+                                                                    await cancelRequestWithReason(
+                                                                        _cancelReason);
+                                                                if (val ==
+                                                                    'logout') {
+                                                                  navigateLogout();
+                                                                }
                                                                 setState(() {
                                                                   _cancelling =
                                                                       false;
@@ -4716,9 +5087,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       false;
                                                                 });
                                                               },
-                                                              child: const Icon(
+                                                              child: Icon(
                                                                   Icons
-                                                                      .cancel_outlined))),
+                                                                      .cancel_outlined,
+                                                                  color:
+                                                                      textColor))),
                                                     ],
                                                   ),
                                                 ),
@@ -4729,7 +5102,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12),
-                                                      color: page),
+                                                      color: topBar),
                                                   child: CupertinoDatePicker(
                                                       minimumDate: DateTime.now()
                                                           .add(Duration(
@@ -4806,9 +5179,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       false;
                                                                 });
                                                               },
-                                                              child: const Icon(
+                                                              child: Icon(
                                                                   Icons
-                                                                      .cancel_outlined))),
+                                                                      .cancel_outlined,
+                                                                  color:
+                                                                      textColor))),
                                                     ],
                                                   ),
                                                 ),
@@ -4820,6 +5195,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12),
+                                                      border: Border.all(
+                                                          color: topBar),
                                                       color: page),
                                                   child: Column(
                                                     children: [
@@ -4877,6 +5254,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
                                                                 val =
                                                                     await createRequestLater();
+                                                                if (val ==
+                                                                    'logout') {
+                                                                  navigateLogout();
+                                                                }
                                                                 setState(() {
                                                                   if (val ==
                                                                       'success') {
@@ -4897,6 +5278,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
                                                                 val =
                                                                     await createRequestLaterPromo();
+                                                                if (val ==
+                                                                    'logout') {
+                                                                  navigateLogout();
+                                                                }
                                                                 setState(() {
                                                                   if (val ==
                                                                       'success') {
@@ -4924,6 +5309,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
                                                                 val =
                                                                     await createRentalRequestLater();
+                                                                if (val ==
+                                                                    'logout') {
+                                                                  navigateLogout();
+                                                                }
                                                                 setState(() {
                                                                   if (val ==
                                                                       'success') {
@@ -4944,6 +5333,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
                                                                 val =
                                                                     await createRentalRequestLaterPromo();
+                                                                if (val ==
+                                                                    'logout') {
+                                                                  navigateLogout();
+                                                                }
                                                                 setState(() {
                                                                   if (val ==
                                                                       'success') {
@@ -4993,6 +5386,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12),
+                                                      border: Border.all(
+                                                          color: topBar),
                                                       color: page),
                                                   padding: EdgeInsets.all(
                                                       media.width * 0.05),
@@ -5056,8 +5451,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           child: Container(
                                             height: media.height * 1,
                                             width: media.width * 1,
-                                            color: Colors.transparent
-                                                .withOpacity(0.6),
+                                           
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.2)
+                                                : Colors.transparent
+                                                    .withOpacity(0.6),
                                             child: Column(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
@@ -5088,8 +5486,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         .circle,
                                                                     color:
                                                                         page),
-                                                            child: const Icon(Icons
-                                                                .cancel_outlined),
+                                                            child: Icon(
+                                                                Icons
+                                                                    .cancel_outlined,
+                                                                color:
+                                                                    textColor),
                                                           ),
                                                         ),
                                                       ],
@@ -5168,8 +5569,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                 : Container()
                                                                           ],
                                                                         ),
-                                                                        const Icon(
-                                                                            Icons.notification_add)
+                                                                        Icon(
+                                                                            Icons
+                                                                                .notification_add,
+                                                                            color:
+                                                                                textColor)
                                                                       ],
                                                                     ),
                                                                   ),
@@ -5212,7 +5616,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                               )
                                                                                             ],
                                                                                           ),
-                                                                                          const Icon(Icons.call)
+                                                                                          Icon(Icons.call, color: textColor)
                                                                                         ],
                                                                                       ),
                                                                                     ),
@@ -5361,11 +5765,14 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     true;
                                                               });
 
-                                                              if (timerLocation ==
-                                                                      null &&
-                                                                  locationAllowed ==
-                                                                      true) {
-                                                                getCurrentLocation();
+                                                              if (locationAllowed ==
+                                                                  true) {
+                                                                if (positionStream ==
+                                                                        null ||
+                                                                    positionStream!
+                                                                        .isPaused) {
+                                                                  positionStreamData();
+                                                                }
                                                               }
                                                             },
                                                             child: Text(
@@ -5391,6 +5798,26 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           ),
                                         ))
                                       : Container(),
+
+                                      (_showToast == true)
+                        ? Positioned(
+                            top: media.height * 0.2,
+                            child: Container(
+                              width: media.width * 0.9,
+                              margin: EdgeInsets.all(media.width * 0.05),
+                              padding: EdgeInsets.all(media.width * 0.025),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: page),
+                              child: Text(
+                                'Route Poly line is not available in demo',
+                                style: GoogleFonts.roboto(
+                                    fontSize: media.width * twelve,
+                                    color: textColor),
+                                textAlign: TextAlign.center,
+                              ),
+                            ))
+                        : Container(),
 
                                   //loader
                                   (_isLoading == true)
@@ -5434,21 +5861,24 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                         borderRadius: (languageDirection ==
                                                                 'ltr')
                                                             ? const BorderRadius.only(
-                                                                topLeft: Radius
-                                                                    .circular(
+                                                                topLeft:
+                                                                    Radius.circular(
                                                                         10),
                                                                 bottomLeft:
                                                                     Radius.circular(
                                                                         10))
                                                             : const BorderRadius.only(
-                                                                topRight: Radius
-                                                                    .circular(
+                                                                topRight:
+                                                                    Radius.circular(
                                                                         10),
                                                                 bottomRight:
                                                                     Radius.circular(
                                                                         10)),
-                                                        color: const Color(
-                                                            0xff222222)),
+                                                        color: (isDarkTheme ==
+                                                                true)
+                                                            ? textColor
+                                                            : const Color(
+                                                                0xff222222)),
                                                     alignment: Alignment.center,
                                                     child: const Icon(
                                                       Icons.star,
@@ -5476,6 +5906,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                               [
                                                               'text_pickpoint'],
                                                           style: GoogleFonts.roboto(
+                                                              color: textColor,
                                                               fontSize:
                                                                   media.width *
                                                                       twelve,
@@ -5494,6 +5925,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                         .fade,
                                                                 softWrap: false,
                                                                 style: GoogleFonts.roboto(
+                                                                    color:
+                                                                        textColor,
                                                                     fontSize: media
                                                                             .width *
                                                                         twelve),
@@ -5517,6 +5950,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     softWrap:
                                                                         false,
                                                                     style: GoogleFonts.roboto(
+                                                                        color:
+                                                                            textColor,
                                                                         fontSize:
                                                                             media.width *
                                                                                 twelve),
@@ -5569,8 +6004,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                           decoration: BoxDecoration(
                                                               borderRadius: (languageDirection ==
                                                                       'ltr')
-                                                                  ? const BorderRadius
-                                                                          .only(
+                                                                  ? const BorderRadius.only(
                                                                       topLeft:
                                                                           Radius.circular(
                                                                               10),
@@ -5585,8 +6019,11 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       bottomRight:
                                                                           Radius.circular(
                                                                               10)),
-                                                              color: const Color(
-                                                                  0xff222222)),
+                                                              color: (isDarkTheme ==
+                                                                      true)
+                                                                  ? textColor
+                                                                  : const Color(
+                                                                      0xff222222)),
                                                           alignment:
                                                               Alignment.center,
                                                           child: const Icon(
@@ -5618,6 +6055,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     [
                                                                     'text_droppoint'],
                                                                 style: GoogleFonts.roboto(
+                                                                    color:
+                                                                        textColor,
                                                                     fontSize: media
                                                                             .width *
                                                                         twelve,
@@ -5641,6 +6080,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       softWrap:
                                                                           false,
                                                                       style: GoogleFonts.roboto(
+                                                                          color:
+                                                                              textColor,
                                                                           fontWeight: FontWeight
                                                                               .w600,
                                                                           fontSize:
@@ -5662,6 +6103,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           softWrap:
                                                                               false,
                                                                           style: GoogleFonts.roboto(
+                                                                              color: textColor,
                                                                               fontWeight: FontWeight.w600,
                                                                               fontSize: media.width * twelve),
                                                                         )
@@ -5688,6 +6130,60 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                   )
                                                 ],
                                               )))
+                                      : Container(),
+
+                                  (widget.type != 1)
+                                      ? Positioned(
+                                          top: media.height * 2,
+                                          child: RepaintBoundary(
+                                              key: iconDistanceKey,
+                                              child: Stack(
+                                                children: [
+                                                  Icon(Icons.chat_bubble,
+                                                      size: media.width * 0.2,
+                                                      color: page,
+                                                      shadows: [
+                                                        BoxShadow(
+                                                            spreadRadius: 2,
+                                                            blurRadius: 2,
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.2))
+                                                      ]),
+                                                  if (etaDetails.isNotEmpty)
+                                                    if (etaDetails[0]
+                                                            ['distance'] !=
+                                                        null)
+                                                      Positioned(
+                                                          left: media.width *
+                                                              0.03,
+                                                          top: media.width *
+                                                              0.03,
+                                                          child: Container(
+                                                              width:
+                                                                  media.width *
+                                                                      0.14,
+                                                              height:
+                                                                  media.width *
+                                                                      0.1,
+                                                              alignment:
+                                                                  Alignment
+                                                                      .center,
+                                                              child: Text(
+                                                                "${etaDetails[0]['distance'].toString()} ${etaDetails[0]['unit_in_words'].toString()} ",
+                                                                style: GoogleFonts.roboto(
+                                                                    color:
+                                                                        textColor,
+                                                                    fontSize: media
+                                                                            .width *
+                                                                        twelve,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              )))
+                                                ],
+                                              )),
+                                        )
                                       : Container()
                                 ],
                               );
