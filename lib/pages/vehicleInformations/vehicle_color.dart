@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/managevehicles.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/referral_code.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/managevehicles.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/onTripPage/map_page.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/vehicleInformations/referral_code.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class VehicleColor extends StatefulWidget {
   const VehicleColor({Key? key}) : super(key: key);
@@ -156,6 +156,7 @@ class _VehicleColorState extends State<VehicleColor> {
                                     _isLoading = false;
                                   });
                                   if (reg == 'true') {
+                                    // ignore: use_build_context_synchronously
                                     showDialog(
                                         context: context,
                                         barrierDismissible: false,

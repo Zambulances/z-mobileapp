@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class SelectLanguage extends StatefulWidget {
   const SelectLanguage({Key? key}) : super(key: key);
@@ -23,8 +23,11 @@ class _SelectLanguageState extends State<SelectLanguage> {
     Navigator.pop(context, true);
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   @override
@@ -70,7 +73,10 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                 onTap: () {
                                   Navigator.pop(context, false);
                                 },
-                                child: Icon(Icons.arrow_back, color: textColor,)))
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: textColor,
+                                )))
                       ],
                     ),
                     SizedBox(
@@ -126,8 +132,11 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     border: Border.all(
-                                                        color: (isDarkTheme == true) ? textColor : const Color(
-                                                            0xff222222),
+                                                        color: (isDarkTheme ==
+                                                                true)
+                                                            ? textColor
+                                                            : const Color(
+                                                                0xff222222),
                                                         width: 1.2)),
                                                 alignment: Alignment.center,
                                                 child: (_choosenLanguage == i)
@@ -136,11 +145,13 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                             media.width * 0.03,
                                                         width:
                                                             media.width * 0.03,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: (isDarkTheme == true) ? textColor :const Color(
+                                                        decoration: BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: (isDarkTheme ==
+                                                                    true)
+                                                                ? textColor
+                                                                : const Color(
                                                                     0xff222222)),
                                                       )
                                                     : Container(),
@@ -170,7 +181,7 @@ class _SelectLanguageState extends State<SelectLanguage> {
                             _isLoading = true;
                           });
                           var val = await getlangid();
-                          if(val == 'logout'){
+                          if (val == 'logout') {
                             navigateLogout();
                           }
                           pref.setString(

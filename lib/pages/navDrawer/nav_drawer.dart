@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/about.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/bankdetails.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/driverdetails.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/driverearnings.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/editprofile.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/faq.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/history.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/myroutebookings.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/referral.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/selectlanguage.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/sos.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/updatevehicle.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/upload_docs.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/about.dart';
+import 'package:tagxidriver/pages/NavigatorPages/bankdetails.dart';
+import 'package:tagxidriver/pages/NavigatorPages/driverdetails.dart';
+import 'package:tagxidriver/pages/NavigatorPages/driverearnings.dart';
+import 'package:tagxidriver/pages/NavigatorPages/editprofile.dart';
+import 'package:tagxidriver/pages/NavigatorPages/faq.dart';
+import 'package:tagxidriver/pages/NavigatorPages/history.dart';
+import 'package:tagxidriver/pages/NavigatorPages/makecomplaint.dart';
+import 'package:tagxidriver/pages/NavigatorPages/myroutebookings.dart';
+import 'package:tagxidriver/pages/NavigatorPages/referral.dart';
+import 'package:tagxidriver/pages/NavigatorPages/selectlanguage.dart';
+import 'package:tagxidriver/pages/NavigatorPages/sos.dart';
+import 'package:tagxidriver/pages/NavigatorPages/updatevehicle.dart';
+import 'package:tagxidriver/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/onTripPage/map_page.dart';
+import 'package:tagxidriver/pages/vehicleInformations/upload_docs.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 import '../NavigatorPages/fleetdetails.dart';
 import '../NavigatorPages/managevehicles.dart';
@@ -261,6 +261,9 @@ class _NavDrawerState extends State<NavDrawer> {
                                                                 loaderColor =
                                                                     Colors
                                                                         .white;
+                                                                buttonText =
+                                                                    Colors
+                                                                        .black;
                                                               } else {
                                                                 page = Colors
                                                                     .white;
@@ -268,11 +271,12 @@ class _NavDrawerState extends State<NavDrawer> {
                                                                     Colors
                                                                         .black;
                                                                 buttonColor =
-                                                                    const Color(
-                                                                        0xffFCB13D);
+                                                                    theme;
                                                                 loaderColor =
+                                                                    theme;
+                                                                buttonText =
                                                                     const Color(
-                                                                        0xffFCB13D);
+                                                                        0xffFFFFFF);
                                                               }
                                                               pref.setBool(
                                                                   'isDarkTheme',
@@ -601,7 +605,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                                     userDetails['owner_id'] ==
                                                                 null &&
                                                             userDetails[
-                                                                    'show_bank_info_feature_on_mobile_app'] ==
+                                                                    'show_wallet_feature_on_mobile_app'] ==
                                                                 "1"
                                                         ? InkWell(
                                                             onTap: () {
@@ -1256,7 +1260,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                                     userDetails['owner_id'] ==
                                                                 null &&
                                                             userDetails[
-                                                                    "show_wallet_feature_on_mobile_app"] ==
+                                                                    'show_bank_info_feature_on_mobile_app'] ==
                                                                 "1"
                                                         ? InkWell(
                                                             onTap: () {

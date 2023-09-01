@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/history.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/history.dart';
+import 'package:tagxidriver/pages/NavigatorPages/makecomplaint.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'dart:ui' as ui;
 
 class HistoryDetails extends StatefulWidget {
@@ -96,26 +96,14 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                 myHistory[selectedHistory]['drop_lng']));
       }
     } else {
-      if (myHistory
-                  .firstWhere((element) => element.id == 'pickup')
-                  .LatLng(myHistory[selectedHistory]['pick_lat'],
-                      myHistory[selectedHistory]['pick_lng'])
-                  .myHistory[selectedHistory]['pick_lat'] >
-              myHistory
-                  .firstWhere((element) => element.id == 'drop')
-                  .LatLng(myHistory[selectedHistory]['drop_lat'],
-                      myHistory[selectedHistory]['drop_lng'])
-                  .myHistory[selectedHistory]['drop_lat'] &&
-          myHistory
-                  .firstWhere((element) => element.id == 'pickup')
-                  .LatLng(myHistory[selectedHistory]['pick_lat'],
-                      myHistory[selectedHistory]['pick_lng'])
-                  .myHistory[selectedHistory]['pick_lng'] >
-              myHistory
-                  .firstWhere((element) => element.id == 'drop')
-                  .LatLng(myHistory[selectedHistory]['drop_lat'],
-                      myHistory[selectedHistory]['drop_lng'])
-                  .myHistory[selectedHistory]['drop_lng']) {
+      if (myHistory.firstWhere((element) => element.id == 'pickup').LatLng(myHistory[selectedHistory]['pick_lat'], myHistory[selectedHistory]['pick_lng']).myHistory[selectedHistory]
+                  ['pick_lat'] >
+              myHistory.firstWhere((element) => element.id == 'drop').LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng']).myHistory[selectedHistory]
+                  ['drop_lat'] &&
+          myHistory.firstWhere((element) => element.id == 'pickup').LatLng(myHistory[selectedHistory]['pick_lat'], myHistory[selectedHistory]['pick_lng']).myHistory[selectedHistory]
+                  ['pick_lng'] >
+              myHistory.firstWhere((element) => element.id == 'drop').LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng']).myHistory[selectedHistory]
+                  ['drop_lng']) {
         bound = LatLngBounds(
             southwest: myHistory
                 .firstWhere((element) => element.id == 'drop')
@@ -130,11 +118,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               .LatLng(myHistory[selectedHistory]['pick_lat'],
                   myHistory[selectedHistory]['pick_lng'])
               .myHistory[selectedHistory]['pick_lng'] >
-          myHistory
-              .firstWhere((element) => element.id == 'drop')
-              .LatLng(myHistory[selectedHistory]['drop_lat'],
-                  myHistory[selectedHistory]['drop_lng'])
-              .myHistory[selectedHistory]['drop_lng']) {
+          myHistory.firstWhere((element) => element.id == 'drop').LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng']).myHistory[selectedHistory]
+              ['drop_lng']) {
         bound = LatLngBounds(
             southwest: LatLng(
                 myHistory
@@ -165,8 +150,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               .myHistory[selectedHistory]['pick_lat'] >
           myHistory
               .firstWhere((element) => element.id == 'drop')
-              .LatLng(myHistory[selectedHistory]['drop_lat'],
-                  myHistory[selectedHistory]['drop_lng'])
+              .LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng'])
               .myHistory[selectedHistory]['drop_lat']) {
         bound = LatLngBounds(
             southwest: LatLng(
@@ -518,7 +502,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                   size: media.width * 0.04,
                                   color: (isDarkTheme == true)
                                       ? Colors.black
-                                      :  Colors.white,
+                                      : Colors.white,
                                 ),
                               ),
                               SizedBox(
@@ -642,9 +626,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             myHistory[selectedHistory]['userDetail']['data']
                                 ['name'],
                             style: GoogleFonts.roboto(
-                              fontSize: media.width * eighteen,
-                              color: textColor
-                            ),
+                                fontSize: media.width * eighteen,
+                                color: textColor),
                           ),
                           Expanded(
                               child: Row(

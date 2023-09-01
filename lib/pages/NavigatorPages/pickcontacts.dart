@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class PickContact extends StatefulWidget {
   const PickContact({Key? key}) : super(key: key);
@@ -24,6 +24,7 @@ class _PickContactState extends State<PickContact> {
   String pickedName = '';
   String pickedNumber = '';
   bool _contactDenied = false;
+  bool _noPermission = false;
 
   @override
   void initState() {
@@ -41,9 +42,9 @@ class _PickContactState extends State<PickContact> {
 //get contact permission
   getContactPermission() async {
     var status = await Permission.contacts.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.contacts.request();
-    }
+    // if (status != PermissionStatus.granted) {
+    //   status = await Permission.contacts.request();
+    // }
     return status;
   }
 
@@ -74,7 +75,8 @@ class _PickContactState extends State<PickContact> {
       } else {
         if (mounted) {
           setState(() {
-            _contactDenied = true;
+            _noPermission = true;
+            _isLoading = false;
           });
         }
       }
@@ -296,6 +298,60 @@ class _PickContactState extends State<PickContact> {
                       : Container()
                 ]),
               ),
+
+              //logout popup
+              (_noPermission == true)
+                  ? Positioned(
+                      top: 0,
+                      child: Container(
+                        height: media.height * 1,
+                        width: media.width * 1,
+                        // color:
+                        //     Colors.transparent.withOpacity(0.6),
+                        color: (isDarkTheme == true)
+                            ? textColor.withOpacity(0.2)
+                            : Colors.transparent.withOpacity(0.6),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(media.width * 0.05),
+                              width: media.width * 0.9,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: page),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_contact_permission'],
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Button(
+                                      onTap: () async {
+                                        await Permission.contacts.request();
+                                        setState(() {
+                                          _isLoading = true;
+                                          _noPermission = false;
+                                        });
+                                        getContact();
+                                      },
+                                      text: languages[choosenLanguage]
+                                          ['text_confirm'])
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ))
+                  : Container(),
 
               //permission denied error
               (_contactDenied == true)

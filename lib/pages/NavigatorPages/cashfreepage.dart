@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'package:cashfree_pg/cashfree_pg.dart';
 
 class CashFreePage extends StatefulWidget {
@@ -30,13 +30,15 @@ class _CashFreePageState extends State<CashFreePage> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
 //payment gateway code
   payMoney() async {
-    
     var getToken =
         await getCfToken(addMoney.toString(), walletBalance['currency_code']);
     if (getToken == 'success') {
@@ -60,13 +62,13 @@ class _CashFreePageState extends State<CashFreePage> {
         if (cfSuccessList['txStatus'] == 'SUCCESS') {
           var verify = await cashFreePaymentSuccess();
           if (verify == 'success') {
-            if(mounted){
-            setState(() {
-              _success = true;
-              _isLoading = false;
-            });
+            if (mounted) {
+              setState(() {
+                _success = true;
+                _isLoading = false;
+              });
             }
-          }else if(verify == 'logout'){
+          } else if (verify == 'logout') {
             navigateLogout();
           } else {
             setState(() {
@@ -80,18 +82,18 @@ class _CashFreePageState extends State<CashFreePage> {
           });
         }
       });
-    }else if(getToken == 'logout'){
+    } else if (getToken == 'logout') {
       navigateLogout();
     } else {
       setState(() {
         _failed = true;
       });
     }
-  if(mounted){
-    setState(() {
-      _isLoading = false;
-    });
-  }
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -140,7 +142,10 @@ class _CashFreePageState extends State<CashFreePage> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: Icon(Icons.arrow_back, color: textColor,)))
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: textColor,
+                                      )))
                             ],
                           ),
                           SizedBox(

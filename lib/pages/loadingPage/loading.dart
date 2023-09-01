@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxidriver/styles/styles.dart';
 import 'dart:async';
 
 class Loading extends StatefulWidget {

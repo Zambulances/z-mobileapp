@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/cashfreepage.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/flutterwavepayment.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/paystackpayment.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/razorpaypage.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/selectwallet.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/withdraw.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/cashfreepage.dart';
+import 'package:tagxidriver/pages/NavigatorPages/ccavenue.dart';
+import 'package:tagxidriver/pages/NavigatorPages/flutterwavepayment.dart';
+import 'package:tagxidriver/pages/NavigatorPages/paystackpayment.dart';
+import 'package:tagxidriver/pages/NavigatorPages/razorpaypage.dart';
+import 'package:tagxidriver/pages/NavigatorPages/selectwallet.dart';
+import 'package:tagxidriver/pages/NavigatorPages/withdraw.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -1027,6 +1028,56 @@ class _WalletPageState extends State<WalletPage> {
                                                                   image: DecorationImage(
                                                                       image: AssetImage(
                                                                           'assets/images/razorpay-icon.jpeg'),
+                                                                      fit: BoxFit
+                                                                          .contain)),
+                                                            ),
+                                                          ))
+                                                      : Container(),
+
+                                                      //ccavenue
+                                                      (walletBalance['ccAvenue'] ==
+                                                          true)
+                                                      ? Container(
+                                                          margin: EdgeInsets.only(
+                                                              bottom:
+                                                                  media.width *
+                                                                      0.025),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          width:
+                                                              media.width * 0.7,
+                                                          child: InkWell(
+                                                            onTap: () async {
+                                                              var val = await Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                               CcavenuePage()));
+                                                              if (val) {
+                                                                setState(() {
+                                                                  _choosePayment =
+                                                                      false;
+                                                                  _addPayment =
+                                                                      false;
+                                                                  addMoney =
+                                                                      null;
+                                                                  addMoneyController
+                                                                      .clear();
+                                                                });
+                                                              }
+                                                            },
+                                                            child: Container(
+                                                              width:
+                                                                  media.width *
+                                                                      0.25,
+                                                              height:
+                                                                  media.width *
+                                                                      0.125,
+                                                              decoration: const BoxDecoration(
+                                                                  image: DecorationImage(
+                                                                      image: AssetImage(
+                                                                          'assets/images/ccavenue.png'),
                                                                       fit: BoxFit
                                                                           .contain)),
                                                             ),

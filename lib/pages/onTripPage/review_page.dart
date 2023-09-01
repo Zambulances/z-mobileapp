@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/onTripPage/map_page.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class Review extends StatefulWidget {
   const Review({Key? key}) : super(key: key);
@@ -36,8 +36,11 @@ class _ReviewState extends State<Review> {
         (route) => false);
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   @override
@@ -189,9 +192,9 @@ class _ReviewState extends State<Review> {
                                 hintText: languages[choosenLanguage]
                                     ['text_feedback'],
                                 hintStyle: GoogleFonts.roboto(
-                                    color: textColor.withOpacity(0.6)),    
+                                    color: textColor.withOpacity(0.6)),
                                 border: InputBorder.none),
-                            style: GoogleFonts.roboto(color: textColor),    
+                            style: GoogleFonts.roboto(color: textColor),
                           ),
                         ),
                         SizedBox(
@@ -208,7 +211,7 @@ class _ReviewState extends State<Review> {
                                 if (result == true) {
                                   _loading = false;
                                   navigate();
-                                }else if(result == 'logout'){
+                                } else if (result == 'logout') {
                                   navigateLogout();
                                 } else {
                                   setState(() {

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
 
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class DriverEarnings extends StatefulWidget {
   const DriverEarnings({Key? key}) : super(key: key);
@@ -30,21 +30,24 @@ class _DriverEarningsState extends State<DriverEarnings> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
 //getting earnings data
   getEarnings() async {
     driverTodayEarnings.clear();
     var val = await driverTodayEarning();
-    if(mounted){
-      if(val == 'logout'){
+    if (mounted) {
+      if (val == 'logout') {
         navigateLogout();
       }
-    setState(() {
-      _isLoading = false;
-    });
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -123,7 +126,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                           BoxShadow(
                               blurRadius: 2,
                               spreadRadius: 2,
-                              color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : Colors.black.withOpacity(0.2))
+                              color: (isDarkTheme == true)
+                                  ? textColor.withOpacity(0.3)
+                                  : Colors.black.withOpacity(0.2))
                         ]),
                     child: Row(
                       children: [
@@ -135,7 +140,7 @@ class _DriverEarningsState extends State<DriverEarnings> {
                             });
 
                             var val = await driverTodayEarning();
-                            if(val == 'logout'){
+                            if (val == 'logout') {
                               navigateLogout();
                             }
                             setState(() {
@@ -173,7 +178,7 @@ class _DriverEarningsState extends State<DriverEarnings> {
                             });
 
                             var val = await driverWeeklyEarning();
-                            if(val == 'logout'){
+                            if (val == 'logout') {
                               navigateLogout();
                             }
                             setState(() {
@@ -250,7 +255,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                               driverTodayEarnings['current_date'],
                               style: GoogleFonts.roboto(
                                   fontSize: media.width * fifteen,
-                                  color: (isDarkTheme == true) ? textColor.withOpacity(0.5) : hintColor),
+                                  color: (isDarkTheme == true)
+                                      ? textColor.withOpacity(0.5)
+                                      : hintColor),
                             ),
                             SizedBox(
                               height: media.width * 0.025,
@@ -929,8 +936,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                               media.width *
                                                                   sixteen),
                                                     ),
-                                              Icon(
-                                                  Icons.date_range_outlined, color: textColor)
+                                              Icon(Icons.date_range_outlined,
+                                                  color: textColor)
                                             ],
                                           ),
                                         ),
@@ -982,8 +989,8 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                                               media.width *
                                                                   sixteen),
                                                     ),
-                                              Icon(
-                                                  Icons.date_range_outlined, color: textColor)
+                                              Icon(Icons.date_range_outlined,
+                                                  color: textColor)
                                             ],
                                           ),
                                         ),
@@ -997,9 +1004,9 @@ class _DriverEarningsState extends State<DriverEarnings> {
                                               driverReportEarnings.clear();
                                               _isLoading = true;
                                             });
-                                            var val =await driverEarningReport(
+                                            var val = await driverEarningReport(
                                                 _fromDate, _toDate);
-                                            if(val == 'logout'){
+                                            if (val == 'logout') {
                                               navigateLogout();
                                             }
                                             setState(() {

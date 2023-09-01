@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/functions/notifications.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/functions/notifications.dart';
 import 'pages/loadingPage/loadingpage.dart';
 import 'package:firebase_core/firebase_core.dart';
 

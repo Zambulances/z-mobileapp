@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
 
 class About extends StatefulWidget {
   const About({Key? key}) : super(key: key);
@@ -55,7 +55,8 @@ class _AboutState extends State<About> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Icon(Icons.arrow_back, color: textColor)))
+                                    child: Icon(Icons.arrow_back,
+                                        color: textColor)))
                           ],
                         ),
                         SizedBox(

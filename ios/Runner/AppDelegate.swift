@@ -12,17 +12,11 @@ import Firebase
     FirebaseApp.configure()
     GMSServices.provideAPIKey("AIzaSyD9g7Gv0okelx6Ntjh2mV7fK0QRSI0gRSI")
     GeneratedPluginRegistrant.register(with: self)
-    if #available(iOS 10.0, *) { 
-     UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
-    }
     application.registerForRemoteNotifications()
-   UIApplication.shared.beginReceivingRemoteControlEvents()
+    UIApplication.shared.beginReceivingRemoteControlEvents()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-}
-
-    
-    
-var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0);
+  }
+  var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0);
     override func applicationDidEnterBackground(_ application: UIApplication) {
                 bgTask = application.beginBackgroundTask()
     }
@@ -30,5 +24,4 @@ var bgTask: UIBackgroundTaskIdentifier = UIBackgroundTaskIdentifier(rawValue: 0)
         application.endBackgroundTask(bgTask);
         application.applicationIconBadgeNumber = 0;
     }
-    
 }

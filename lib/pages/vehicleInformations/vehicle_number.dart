@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_color.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_color.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class VehicleNumber extends StatefulWidget {
   const VehicleNumber({Key? key}) : super(key: key);
@@ -54,7 +54,8 @@ class _VehicleNumberState extends State<VehicleNumber> {
                                   onTap: () {
                                     Navigator.pop(context);
                                   },
-                                  child: Icon(Icons.arrow_back, color: textColor)),
+                                  child:
+                                      Icon(Icons.arrow_back, color: textColor)),
                             ],
                           )),
                       SizedBox(

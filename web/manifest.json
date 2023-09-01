@@ -1,6 +1,6 @@
 {
-    "name": "tagxi_driver",
-    "short_name": "tagxi_driver",
+    "name": "tagxidriver",
+    "short_name": "tagxidriver",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

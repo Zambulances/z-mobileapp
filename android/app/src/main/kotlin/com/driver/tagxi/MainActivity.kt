@@ -42,10 +42,10 @@ class MainActivity: FlutterFragmentActivity() {
     }
     }
 
-     override fun onUserLeaveHint(){
-     if(pip == 1){
-         pipmode()
-     }
+    override fun onUserLeaveHint(){
+        if(pip == 1){
+            pipmode()
+        }
     }
 
     private fun awakeapp(){
@@ -53,9 +53,7 @@ class MainActivity: FlutterFragmentActivity() {
 startActivity(bringToForegroundIntent);
     }
 
-
-
-        private fun pipmode(){
+    private fun pipmode(){
         val rational = Rational(50,
             75)   
  
@@ -66,5 +64,5 @@ startActivity(bringToForegroundIntent);
  
     enterPictureInPictureMode(params)
     }
-
 }
+

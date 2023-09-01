@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/onTripPage/map_page.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
 
 class Faq extends StatefulWidget {
   const Faq({Key? key}) : super(key: key);
@@ -25,22 +25,26 @@ class _FaqState extends State<Faq> {
     faqDatas();
     super.initState();
   }
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
 //get faq datas
 
   faqDatas() async {
     var val = await getFaqData(center.latitude, center.longitude);
-    if(mounted){
-      if(val == 'logout'){
+    if (mounted) {
+      if (val == 'logout') {
         navigateLogout();
       }
-    setState(() {
-      _isLoading = false;
-      _faqCompleted = true;
-    });
+      setState(() {
+        _isLoading = false;
+        _faqCompleted = true;
+      });
     }
   }
 
@@ -86,7 +90,8 @@ class _FaqState extends State<Faq> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Icon(Icons.arrow_back, color: textColor)))
+                                    child: Icon(Icons.arrow_back,
+                                        color: textColor)))
                           ],
                         ),
                         SizedBox(
@@ -107,109 +112,152 @@ class _FaqState extends State<Faq> {
                           child: SingleChildScrollView(
                             child: (faqData.isNotEmpty)
                                 ? Column(
-                                    children: faqData
-                                        .asMap()
-                                        .map((i, value) {
-                                          return MapEntry(
-                                              i,
-                                              InkWell(
-                                                onTap: () {
-                                                  setState(() {
-                                                    _selectedQuestion = i;
-                                                  });
-                                                },
-                                                child: Container(
-                                                  width: media.width * 0.9,
-                                                  margin: EdgeInsets.only(
-                                                      top: media.width * 0.025,
-                                                      bottom:
-                                                          media.width * 0.025),
-                                                  padding: EdgeInsets.all(
-                                                      media.width * 0.05),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8),
-                                                      color: page,
-                                                      border: Border.all(
-                                                          color: borderLines,
-                                                          width: 1.2)),
-                                                  child: Column(
-                                                    children: [
-                                                      Row(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .end,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
+                                  children: [
+                                    Column(
+                                        children: faqData
+                                            .asMap()
+                                            .map((i, value) {
+                                              return MapEntry(
+                                                  i,
+                                                  InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _selectedQuestion = i;
+                                                      });
+                                                    },
+                                                    child: Container(
+                                                      width: media.width * 0.9,
+                                                      margin: EdgeInsets.only(
+                                                          top: media.width * 0.025,
+                                                          bottom:
+                                                              media.width * 0.025),
+                                                      padding: EdgeInsets.all(
+                                                          media.width * 0.05),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                  8),
+                                                          color: page,
+                                                          border: Border.all(
+                                                              color: borderLines,
+                                                              width: 1.2)),
+                                                      child: Column(
                                                         children: [
-                                                          SizedBox(
-                                                              // color: Colors.red,
-                                                              width:
-                                                                  media.width *
-                                                                      0.7,
-                                                              child: Text(
-                                                                faqData[i][
-                                                                    'question'],
-                                                                style: GoogleFonts.roboto(
-                                                                    fontSize: media
+                                                          Row(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .end,
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              SizedBox(
+                                                                  // color: Colors.red,
+                                                                  width:
+                                                                      media.width *
+                                                                          0.7,
+                                                                  child: Text(
+                                                                    faqData[i][
+                                                                        'question'],
+                                                                    style: GoogleFonts.roboto(
+                                                                        fontSize: media
+                                                                                .width *
+                                                                            fourteen,
+                                                                        fontWeight:
+                                                                            FontWeight
+                                                                                .w600,
+                                                                        color:
+                                                                            textColor),
+                                                                  )),
+                                                              RotatedBox(
+                                                                  quarterTurns:
+                                                                      (_selectedQuestion ==
+                                                                              i)
+                                                                          ? 2
+                                                                          : 0,
+                                                                  child:
+                                                                      Image.asset(
+                                                                    'assets/images/chevron-down.png',
+                                                                    width: media
                                                                             .width *
-                                                                        fourteen,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
-                                                                    color:
-                                                                        textColor),
-                                                              )),
-                                                          RotatedBox(
-                                                              quarterTurns:
-                                                                  (_selectedQuestion ==
-                                                                          i)
-                                                                      ? 2
-                                                                      : 0,
-                                                              child:
-                                                                  Image.asset(
-                                                                'assets/images/chevron-down.png',
-                                                                width: media
-                                                                        .width *
-                                                                    0.075,
-                                                              ))
+                                                                        0.075,
+                                                                  ))
+                                                            ],
+                                                          ),
+                                                          AnimatedContainer(
+                                                            duration:
+                                                                const Duration(
+                                                                    milliseconds:
+                                                                        200),
+                                                            // padding: EdgeInsets.only(top: media.width*0.025),
+                                                            child: (_selectedQuestion ==
+                                                                    i)
+                                                                ? Container(
+                                                                    padding: EdgeInsets.only(
+                                                                        top: media
+                                                                                .width *
+                                                                            0.025),
+                                                                    child: Text(
+                                                                      faqData[i][
+                                                                          'answer'],
+                                                                      style: GoogleFonts.roboto(
+                                                                          fontSize:
+                                                                              media.width *
+                                                                                  twelve,
+                                                                          color:
+                                                                              textColor),
+                                                                    ))
+                                                                : Container(),
+                                                          )
                                                         ],
                                                       ),
-                                                      AnimatedContainer(
-                                                        duration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    200),
-                                                        // padding: EdgeInsets.only(top: media.width*0.025),
-                                                        child: (_selectedQuestion ==
-                                                                i)
-                                                            ? Container(
-                                                                padding: EdgeInsets.only(
-                                                                    top: media
-                                                                            .width *
-                                                                        0.025),
-                                                                child: Text(
-                                                                  faqData[i][
-                                                                      'answer'],
-                                                                  style: GoogleFonts.roboto(
-                                                                      fontSize:
-                                                                          media.width *
-                                                                              twelve,
-                                                                      color:
-                                                                          textColor),
-                                                                ))
-                                                            : Container(),
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
-                                              ));
-                                        })
-                                        .values
-                                        .toList(),
-                                  )
+                                                    ),
+                                                  ));
+                                            })
+                                            .values
+                                            .toList(),
+                                      ),
+                                       //load more button
+                      (myFaqPage['pagination'] != null)
+                          ? (myFaqPage['pagination']['current_page'] <
+                                  myFaqPage['pagination']['total_pages'])
+                              ? InkWell(
+                                  onTap: () async {
+                                    dynamic val;
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    val = await getFaqPages('${center.latitude}/${center.longitude}?page=${myFaqPage['pagination']['current_page'] + 1}');
+                                    if (val == 'logout') {
+                                      navigateLogout();
+                                    }
+                                    setState(() {
+                                      _isLoading = false;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding:
+                                        EdgeInsets.all(media.width * 0.025),
+                                    margin: EdgeInsets.only(
+                                        bottom: media.width * 0.05),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: page,
+                                        border: Border.all(
+                                            color: borderLines, width: 1.2)),
+                                    child: Text(
+                                      languages[choosenLanguage]
+                                          ['text_loadmore'],
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * sixteen,
+                                          color: textColor),
+                                    ),
+                                  ),
+                                )
+                              : Container()
+                          : Container()
+                                  ],
+                                )
                                 : (_faqCompleted == true)
                                     ? Text(
                                         languages[choosenLanguage]

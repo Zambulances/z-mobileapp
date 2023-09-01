@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/assigndriver.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/fleetdocuments.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_type.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/assigndriver.dart';
+import 'package:tagxidriver/pages/NavigatorPages/fleetdocuments.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_type.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 import '../vehicleInformations/service_area.dart';
 
@@ -26,29 +26,32 @@ class _ManageVehiclesState extends State<ManageVehicles> {
 
   @override
   void initState() {
-      getvehicledata();
+    getvehicledata();
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getvehicledata() async {
     isclickmenu = '';
-    if(mounted){
-    setState(() {
-      _isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
     }
     var val = await getVehicleInfo();
-    if(val == 'logout'){
+    if (val == 'logout') {
       navigateLogout();
     }
-    if(mounted){
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -102,7 +105,8 @@ class _ManageVehiclesState extends State<ManageVehicles> {
                                   // Navigator.popUntil(
                                   //     context, (route) => route is VehicleColor);
                                 },
-                                child: Icon(Icons.arrow_back, color: textColor)))
+                                child:
+                                    Icon(Icons.arrow_back, color: textColor)))
                       ],
                     ),
                     Expanded(
@@ -432,7 +436,8 @@ class _ManageVehiclesState extends State<ManageVehicles> {
                                                               },
                                                               child: Icon(
                                                                 Icons.more_vert,
-                                                                color: textColor,
+                                                                color:
+                                                                    textColor,
                                                                 size: 30,
                                                               ),
                                                             )
@@ -646,18 +651,17 @@ class MenuClass extends StatelessWidget {
   }
 }
 
-
 // import 'package:flutter/material.dart';
 // import 'package:google_fonts/google_fonts.dart';
-// import 'package:tagxi_driver/functions/functions.dart';
-// import 'package:tagxi_driver/pages/NavigatorPages/assigndriver.dart';
-// import 'package:tagxi_driver/pages/NavigatorPages/fleetdocuments.dart';
-// import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-// import 'package:tagxi_driver/pages/login/signupmethod.dart';
-// import 'package:tagxi_driver/pages/vehicleInformations/vehicle_type.dart';
-// import 'package:tagxi_driver/styles/styles.dart';
-// import 'package:tagxi_driver/translation/translation.dart';
-// import 'package:tagxi_driver/widgets/widgets.dart';
+// import 'package:tagxidriver/functions/functions.dart';
+// import 'package:tagxidriver/pages/NavigatorPages/assigndriver.dart';
+// import 'package:tagxidriver/pages/NavigatorPages/fleetdocuments.dart';
+// import 'package:tagxidriver/pages/loadingPage/loading.dart';
+// import 'package:tagxidriver/pages/login/signupmethod.dart';
+// import 'package:tagxidriver/pages/vehicleInformations/vehicle_type.dart';
+// import 'package:tagxidriver/styles/styles.dart';
+// import 'package:tagxidriver/translation/translation.dart';
+// import 'package:tagxidriver/widgets/widgets.dart';
 
 // import '../vehicleInformations/service_area.dart';
 
@@ -903,7 +907,7 @@ class MenuClass extends StatelessWidget {
 //                                                                             .width *
 //                                                                         fourteen,
 //                                                                     color:
-//                                                                         textColor,    
+//                                                                         textColor,
 //                                                                     // color: (isDarkTheme ==
 //                                                                     //         true)
 //                                                                     //     ? topBar
@@ -923,7 +927,7 @@ class MenuClass extends StatelessWidget {
 //                                                                     fontSize: media
 //                                                                             .width *
 //                                                                         fourteen,
-//                                                                     color: textColor,    
+//                                                                     color: textColor,
 //                                                                     // color: (isDarkTheme ==
 //                                                                     //         true)
 //                                                                     //     ? topBar
@@ -1126,7 +1130,7 @@ class MenuClass extends StatelessWidget {
 //                                                               BorderRadius
 //                                                                   .circular(
 //                                                                       10.0),
-//                                                           color: Colors.white,            
+//                                                           color: Colors.white,
 //                                                           // color: (isDarkTheme ==
 //                                                           //         true)
 //                                                           //     ? Colors.black

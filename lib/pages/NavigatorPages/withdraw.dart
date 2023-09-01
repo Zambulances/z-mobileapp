@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/bankdetails.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/bankdetails.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class Withdraw extends StatefulWidget {
   const Withdraw({Key? key}) : super(key: key);
@@ -33,22 +33,24 @@ class _WithdrawState extends State<Withdraw> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
-
 
 //get withdrawed money list
   getWithdrawel() async {
     var val = await getWithdrawList();
-    if(mounted){
-      if(val == 'logout'){
+    if (mounted) {
+      if (val == 'logout') {
         navigateLogout();
       }
-    setState(() {
-      _isLoading = false;
-      addBank = false;
-    });
+      setState(() {
+        _isLoading = false;
+        addBank = false;
+      });
     }
   }
 
@@ -111,7 +113,8 @@ class _WithdrawState extends State<Withdraw> {
                                 onTap: () {
                                   Navigator.pop(context);
                                 },
-                                child: Icon(Icons.arrow_back, color: textColor)))
+                                child:
+                                    Icon(Icons.arrow_back, color: textColor)))
                       ],
                     ),
                     SizedBox(
@@ -197,8 +200,7 @@ class _WithdrawState extends State<Withdraw> {
                                                                     fontSize: media
                                                                             .width *
                                                                         fourteen,
-                                                                    color:
-                                                                        (isDarkTheme ==
+                                                                    color: (isDarkTheme ==
                                                                             true)
                                                                         ? textColor
                                                                             .withOpacity(0.5)
@@ -272,11 +274,11 @@ class _WithdrawState extends State<Withdraw> {
                                         )
                                       : (_isLoading == false &&
                                               withDrawHistory.isEmpty)
-                                          ? Text(languages[choosenLanguage]
-                                              ['text_noDataFound'],
-                                              style: TextStyle(
-                                                color: textColor
-                                              ),
+                                          ? Text(
+                                              languages[choosenLanguage]
+                                                  ['text_noDataFound'],
+                                              style:
+                                                  TextStyle(color: textColor),
                                             )
                                           : Container(),
                                   (withDrawHistoryPages.isNotEmpty)
@@ -289,12 +291,13 @@ class _WithdrawState extends State<Withdraw> {
                                                   _isLoading = true;
                                                 });
 
-                                                var val = await getWithdrawListPages(
-                                                    (withDrawHistoryPages[
-                                                                'current_page'] +
-                                                            1)
-                                                        .toString());
-                                                if(val == 'logout'){
+                                                var val =
+                                                    await getWithdrawListPages(
+                                                        (withDrawHistoryPages[
+                                                                    'current_page'] +
+                                                                1)
+                                                            .toString());
+                                                if (val == 'logout') {
                                                   navigateLogout();
                                                 }
 
@@ -607,7 +610,7 @@ class _WithdrawState extends State<Withdraw> {
                                           _isLoading = true;
                                         });
                                         var val = await getBankInfo();
-                                        if(val == 'logout'){
+                                        if (val == 'logout') {
                                           navigateLogout();
                                         }
                                         if (bankData.isNotEmpty) {
@@ -617,10 +620,9 @@ class _WithdrawState extends State<Withdraw> {
                                           //withdraw request
                                           var val = await requestWithdraw(
                                               withDrawMoney);
-                                          if(val == 'logout'){
+                                          if (val == 'logout') {
                                             navigateLogout();
-                                          }
-                                          else if (val != 'success' &&
+                                          } else if (val != 'success' &&
                                               val != 'no internet') {
                                             setState(() {
                                               _error = val;

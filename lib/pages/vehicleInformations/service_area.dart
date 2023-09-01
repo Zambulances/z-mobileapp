@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_type.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_type.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import '../../functions/functions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../loadingPage/loading.dart';
@@ -32,10 +32,10 @@ class _ServiceAreaState extends State<ServiceArea> {
     myServiceId = '';
     myServiceLocation = '';
     await getServiceLocation();
-    if(mounted){
-    setState(() {
-      _loaded = true;
-    });
+    if (mounted) {
+      setState(() {
+        _loaded = true;
+      });
     }
   }
 

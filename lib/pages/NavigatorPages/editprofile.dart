@@ -1,15 +1,16 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxidriver/translation/translation.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -31,15 +32,28 @@ class _EditProfileState extends State<EditProfile> {
 
 //get gallery permission
   getGalleryPermission() async {
-    var status = await Permission.photos.status;
+    dynamic status;
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+  if (androidInfo.version.sdkInt <= 32) {
+    status = await Permission.storage.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.storage.request();
+    }
+    /// use [Permissions.storage.status]
+  } else{
+    status = await Permission.photos.status;
     if (status != PermissionStatus.granted) {
       status = await Permission.photos.request();
     }
+  }
     return status;
   }
-  
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
 //get camera permission
@@ -137,7 +151,8 @@ class _EditProfileState extends State<EditProfile> {
                                     onTap: () {
                                       Navigator.pop(context, true);
                                     },
-                                    child: Icon(Icons.arrow_back, color: textColor)))
+                                    child: Icon(Icons.arrow_back,
+                                        color: textColor)))
                           ],
                         ),
                         SizedBox(height: media.width * 0.1),
@@ -189,7 +204,7 @@ class _EditProfileState extends State<EditProfile> {
                                 labelText: languages[choosenLanguage]
                                     ['text_name'],
                                 labelStyle: TextStyle(
-                                    color: textColor.withOpacity(0.6)),    
+                                    color: textColor.withOpacity(0.6)),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
@@ -200,9 +215,9 @@ class _EditProfileState extends State<EditProfile> {
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
                                 isDense: true),
-                              style: GoogleFonts.roboto(
-                                color: textColor,
-                              ),  
+                            style: GoogleFonts.roboto(
+                              color: textColor,
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -233,9 +248,9 @@ class _EditProfileState extends State<EditProfile> {
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
                                 isDense: true),
-                                style: GoogleFonts.roboto(
-                                  color: textColor,
-                                ),
+                            style: GoogleFonts.roboto(
+                              color: textColor,
+                            ),
                           ),
                         )
                       ],
@@ -258,7 +273,7 @@ class _EditProfileState extends State<EditProfile> {
                             }
                             if (val == 'success') {
                               pop();
-                            }else if(val == 'logout'){
+                            } else if (val == 'logout') {
                               navigateLogout();
                             } else {
                               setState(() {

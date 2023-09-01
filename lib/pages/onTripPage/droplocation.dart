@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/myroutebookings.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/myroutebookings.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/onTripPage/map_page.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:permission_handler/permission_handler.dart' as perm;
 // import 'package:location/location.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'package:uuid/uuid.dart';
 
 class DropLocation extends StatefulWidget {
@@ -28,7 +28,7 @@ bool serviceNotAvailable = false;
 class _DropLocationState extends State<DropLocation>
     with WidgetsBindingObserver {
   GoogleMapController? _controller;
-late geolocs.LocationPermission permission; // Location location = Location();
+  late geolocs.LocationPermission permission; // Location location = Location();
   String _state = '';
   bool _isLoading = false;
   String sessionToken = const Uuid().v4();
@@ -57,8 +57,11 @@ late geolocs.LocationPermission permission; // Location location = Location();
     Navigator.pop(context, true);
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   @override
@@ -86,10 +89,11 @@ late geolocs.LocationPermission permission; // Location location = Location();
       _showToast = true;
     });
     Future.delayed(const Duration(seconds: 2), () {
-      if(mounted){
-      setState(() {
-        _showToast = false;
-      });}
+      if (mounted) {
+        setState(() {
+          _showToast = false;
+        });
+      }
     });
   }
 
@@ -123,13 +127,12 @@ late geolocs.LocationPermission permission; // Location location = Location();
               double.parse(loc.longitude.toString()));
         });
       }
-     var val = await geoCoding(
-                   _centerLocation.latitude,
-                   _centerLocation.longitude);
-               setState(() {
-                 _center = _centerLocation;
-                 dropAddressConfirmation = val;
-               });
+      var val =
+          await geoCoding(_centerLocation.latitude, _centerLocation.longitude);
+      setState(() {
+        _center = _centerLocation;
+        dropAddressConfirmation = val;
+      });
       _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
       setState(() {
         _state = '3';
@@ -237,8 +240,11 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                               setState(() {
                                                 _state = '';
                                               });
-                                              await geolocs.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocs.LocationAccuracy.low);
+                                              await geolocs.Geolocator
+                                                  .getCurrentPosition(
+                                                      desiredAccuracy: geolocs
+                                                          .LocationAccuracy
+                                                          .low);
                                               getLocs();
                                             },
                                             child: Text(
@@ -296,8 +302,10 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                         _locationDenied = true;
                                       });
                                     } else {
-                                      await geolocs.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocs.LocationAccuracy.low);
+                                      await geolocs.Geolocator
+                                          .getCurrentPosition(
+                                              desiredAccuracy:
+                                                  geolocs.LocationAccuracy.low);
                                       // await location.requestService();
                                       if (await geolocs
                                           .GeolocatorPlatform.instance
@@ -323,7 +331,8 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                       color: page,
                                       borderRadius: BorderRadius.circular(
                                           media.width * 0.02)),
-                                  child: Icon(Icons.my_location_sharp, color: textColor),
+                                  child: Icon(Icons.my_location_sharp,
+                                      color: textColor),
                                 ),
                               ),
                             ),
@@ -480,7 +489,7 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                               _isLoading = true;
                                             });
                                             var val = await etaRequest();
-                                            if(val == 'logout'){
+                                            if (val == 'logout') {
                                               navigateLogout();
                                             }
                                             setState(() {
@@ -541,14 +550,19 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
-                                                color: (isDarkTheme == true) ? textColor.withOpacity(0.3) :Colors.black
-                                                    .withOpacity(0.2),
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.3)
+                                                    : Colors.black
+                                                        .withOpacity(0.2),
                                                 spreadRadius: 2,
                                                 blurRadius: 2)
                                           ],
                                           color: page),
                                       alignment: Alignment.center,
-                                      child: Icon(Icons.arrow_back, color: textColor,),
+                                      child: Icon(
+                                        Icons.arrow_back,
+                                        color: textColor,
+                                      ),
                                     ),
                                   ),
                                   Container(
@@ -562,8 +576,10 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                     decoration: BoxDecoration(
                                         boxShadow: [
                                           BoxShadow(
-                                              color: (isDarkTheme == true) ? textColor.withOpacity(0.3) :
-                                                  Colors.black.withOpacity(0.2),
+                                              color: (isDarkTheme == true)
+                                                  ? textColor.withOpacity(0.3)
+                                                  : Colors.black
+                                                      .withOpacity(0.2),
                                               spreadRadius: 2,
                                               blurRadius: 2)
                                         ],
@@ -586,34 +602,57 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                                 ['text_4lettersforautofill'],
                                             hintStyle: GoogleFonts.roboto(
                                                 fontSize: media.width * twelve,
-                                                color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor)),
+                                                color: (isDarkTheme == true)
+                                                    ? textColor.withOpacity(0.4)
+                                                    : hintColor)),
                                         style: GoogleFonts.roboto(
-                                          color: textColor
-                                        ),
+                                            color: textColor),
                                         maxLines: 1,
                                         onChanged: (val) {
                                           _debouncer.run(() {
-                                              if (val.length >= 4) {
-                                                if(storedAutoAddress.where((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase())).isNotEmpty){
-                                                                                        addAutoFill.removeWhere((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase()) == false);
-                                                                                      
-                                                                                            storedAutoAddress.where((element) => element['description'].toString().toLowerCase().contains(val.toLowerCase())).forEach((element) { 
-                                                                                              addAutoFill.add(element);
-                                                                                            });
-                                                                                            valueNotifierHome.incrementNotifier();
-                                                                                          }else{
+                                            if (val.length >= 4) {
+                                              if (storedAutoAddress
+                                                  .where((element) =>
+                                                      element['description']
+                                                          .toString()
+                                                          .toLowerCase()
+                                                          .contains(val
+                                                              .toLowerCase()))
+                                                  .isNotEmpty) {
+                                                addAutoFill.removeWhere(
+                                                    (element) =>
+                                                        element['description']
+                                                            .toString()
+                                                            .toLowerCase()
+                                                            .contains(val
+                                                                .toLowerCase()) ==
+                                                        false);
+
+                                                storedAutoAddress
+                                                    .where((element) =>
+                                                        element['description']
+                                                            .toString()
+                                                            .toLowerCase()
+                                                            .contains(val
+                                                                .toLowerCase()))
+                                                    .forEach((element) {
+                                                  addAutoFill.add(element);
+                                                });
+                                                valueNotifierHome
+                                                    .incrementNotifier();
+                                              } else {
                                                 getAutoAddress(
                                                     val,
                                                     sessionToken,
                                                     _centerLocation.latitude,
                                                     _centerLocation.longitude);
-                                                                                          }
-                                              } else if (val.isEmpty) {
-                                                setState(() {
-                                                  addAutoFill.clear();
-                                                });
                                               }
+                                            } else if (val.isEmpty) {
+                                              setState(() {
+                                                addAutoFill.clear();
                                               });
+                                            }
+                                          });
                                         }),
                                   )
                                 ],
@@ -664,15 +703,18 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                                                       BoxDecoration(
                                                                     shape: BoxShape
                                                                         .circle,
-                                                                    color: (isDarkTheme == true) ? textColor.withOpacity(0.3) : Colors
-                                                                            .grey[
-                                                                        200],
+                                                                    color: (isDarkTheme ==
+                                                                            true)
+                                                                        ? textColor.withOpacity(
+                                                                            0.3)
+                                                                        : Colors
+                                                                            .grey[200],
                                                                   ),
                                                                   child: Icon(
                                                                       Icons
                                                                           .access_time,
-                                                                      color: textColor    
-                                                                  ),
+                                                                      color:
+                                                                          textColor),
                                                                 ),
                                                                 InkWell(
                                                                   onTap:
@@ -769,16 +811,15 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                               width: media.width * 0.02,
                                             ),
                                             Text(
-                                                userDetails['currency_symbol'], 
-                                                style: TextStyle(
-                                                  color: textColor
-                                                ),
+                                              userDetails['currency_symbol'],
+                                              style:
+                                                  TextStyle(color: textColor),
                                             ),
                                             Text(
                                               etaDetails['total']
-                                                .toStringAsFixed(2),
+                                                  .toStringAsFixed(2),
                                               style:
-                                                  TextStyle(color: textColor),  
+                                                  TextStyle(color: textColor),
                                             ),
                                           ],
                                         ),
@@ -939,9 +980,8 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                                         ? textColor
                                                             .withOpacity(0.5)
                                                         : hintColor)),
-                                                style: GoogleFonts.roboto(
-                                                  color: textColor
-                                                ),        
+                                            style: GoogleFonts.roboto(
+                                                color: textColor),
                                           ),
                                         ),
                                         SizedBox(
@@ -990,9 +1030,8 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                                         ? textColor
                                                             .withOpacity(0.5)
                                                         : hintColor)),
-                                                style: GoogleFonts.roboto(
-                                                  color: textColor
-                                                ),        
+                                            style: GoogleFonts.roboto(
+                                                color: textColor),
                                           ),
                                         ),
                                         SizedBox(
@@ -1035,7 +1074,8 @@ late geolocs.LocationPermission permission; // Location location = Location();
                                                         _isLoading = false;
                                                       });
                                                       navigate();
-                                                    } else if(val == 'logout'){
+                                                    } else if (val ==
+                                                        'logout') {
                                                       navigateLogout();
                                                     } else {
                                                       _error = true;

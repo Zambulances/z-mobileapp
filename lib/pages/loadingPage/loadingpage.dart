@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:tagxi_driver/pages/language/languages.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/docs_onprocess.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/upload_docs.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/pages/language/languages.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/onTripPage/map_page.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/vehicleInformations/docs_onprocess.dart';
+import 'package:tagxidriver/pages/vehicleInformations/upload_docs.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import '../../styles/styles.dart';
 import '../../functions/functions.dart';
 import 'package:http/http.dart' as http;
@@ -65,12 +65,6 @@ class _LoadingPageState extends State<LoadingPage> {
     super.initState();
   }
 
-  // getData() async {
-  //   for (var i = 0; _error == true; i++) {
-  //     await getLanguageDone();
-  //   }
-  // }
-
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
     await getDetailsOfDevice();
@@ -110,52 +104,6 @@ class _LoadingPageState extends State<LoadingPage> {
         }
         positionStreamData();
       }
-      // package = await PackageInfo.fromPlatform();
-      // try{
-      // if (platform == TargetPlatform.android) {
-      //   _version = await FirebaseDatabase.instance
-      //       .ref()
-      //       .child('driver_android_version')
-      //       .get();
-      // } else {
-      //   _version = await FirebaseDatabase.instance
-      //       .ref()
-      //       .child('driver_ios_version')
-      //       .get();
-      // }
-      // _error = false;
-      // if (_version.value != null) {
-      //   var version = _version.value.toString().split('.');
-      //   var packages = package.version.toString().split('.');
-
-      //   for (var i = 0; i < version.length || i < packages.length; i++) {
-      //     if (i < version.length && i < packages.length) {
-      //       if (int.parse(packages[i]) < int.parse(version[i])) {
-      //         setState(() {
-      //           updateAvailable = true;
-      //         });
-      //         break;
-      //       } else if (int.parse(packages[i]) > int.parse(version[i])) {
-      //         setState(() {
-      //           updateAvailable = false;
-      //         });
-      //         break;
-      //       }
-      //     } else if (i >= version.length && i < packages.length) {
-      //       setState(() {
-      //         updateAvailable = false;
-      //       });
-      //       break;
-      //     } else if (i < version.length && i >= packages.length) {
-      //       setState(() {
-      //         updateAvailable = true;
-      //       });
-      //       break;
-      //     }
-      //   }
-      // }
-
-      // if (updateAvailable == false) {
 
       if (internet == true) {
         var val = await getLocalData();
@@ -179,26 +127,10 @@ class _LoadingPageState extends State<LoadingPage> {
       } else {
         setState(() {});
       }
-//     }else{
-// setState(() {
-//             _isLoading = false;
-//           });
-//     }}catch(e){
-//   if(_error == false){
-//   setState(() {
-//     _error = true;
-//   });
-//   getData();
-//   }
-
-//     }
     }
-    // setState(() {});
   }
 
   getLocationPermission() async {
-    // if (await geolocator.GeolocatorPlatform.instance
-    //     .isLocationServiceEnabled()) {
     if (permission == geolocator.LocationPermission.denied ||
         permission == geolocator.LocationPermission.deniedForever) {
       if (permission != geolocator.LocationPermission.deniedForever) {

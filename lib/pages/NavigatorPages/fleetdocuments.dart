@@ -1,12 +1,13 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -126,7 +127,7 @@ class _FleetDocumentsState extends State<FleetDocuments> {
                                                               true)
                                                           ? textColor
                                                               .withOpacity(0.4)
-                                                          : underline,    
+                                                          : underline,
                                                       width: 1),
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -464,10 +465,20 @@ class _UploadDocsState extends State<UploadDocs> {
 
 //get gallery permission
   getGalleryPermission() async {
-    var status = await Permission.photos.status;
+    dynamic status;
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+  if (androidInfo.version.sdkInt <= 32) {
+    status = await Permission.storage.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.storage.request();
+    }
+    /// use [Permissions.storage.status]
+  } else{
+    status = await Permission.photos.status;
     if (status != PermissionStatus.granted) {
       status = await Permission.photos.request();
     }
+  }
     return status;
   }
 
@@ -630,7 +641,10 @@ class _UploadDocsState extends State<UploadDocs> {
                               decoration: BoxDecoration(
                                   border: Border(
                                       bottom: BorderSide(
-                                          color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : underline, width: 1.5))),
+                                          color: (isDarkTheme == true)
+                                              ? textColor.withOpacity(0.4)
+                                              : underline,
+                                          width: 1.5))),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -705,20 +719,20 @@ class _UploadDocsState extends State<UploadDocs> {
                           )),
                   SizedBox(height: media.height * 0.04),
                   (fleetimageFile != null &&
-                              ((fleetdocumentsNeeded[fleetchoosenDocs]
-                                      ['has_identify_number'] ==
-                                  true
-                          && idNumber.text.isNotEmpty)
-                          || fleetdocumentsNeeded[fleetchoosenDocs]
+                          ((fleetdocumentsNeeded[fleetchoosenDocs]
+                                          ['has_identify_number'] ==
+                                      true &&
+                                  idNumber.text.isNotEmpty) ||
+                              fleetdocumentsNeeded[fleetchoosenDocs]
                                       ['has_identify_number'] ==
                                   false) &&
-                                  ((fleetdocumentsNeeded[fleetchoosenDocs]
+                          ((fleetdocumentsNeeded[fleetchoosenDocs]
                                           ['has_expiry_date'] ==
-                                      true
-                              && fleetdate != '')
-                              || fleetdocumentsNeeded[fleetchoosenDocs]
-                                          ['has_expiry_date'] ==
-                                      false))
+                                      true &&
+                                  fleetdate != '') ||
+                              fleetdocumentsNeeded[fleetchoosenDocs]
+                                      ['has_expiry_date'] ==
+                                  false))
                       ? Button(
                           onTap: () async {
                             FocusManager.instance.primaryFocus?.unfocus();

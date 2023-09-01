@@ -9,24 +9,23 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:location/location.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/functions/geohash.dart';
-import 'package:tagxi_driver/functions/notifications.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/notification.dart';
-import 'package:tagxi_driver/pages/chatPage/chat_page.dart';
-import 'package:tagxi_driver/pages/onTripPage/droplocation.dart';
-import 'package:tagxi_driver/pages/onTripPage/invoice.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/login.dart';
-import 'package:tagxi_driver/pages/navDrawer/nav_drawer.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/docs_onprocess.dart';
-import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/functions/geohash.dart';
+import 'package:tagxidriver/functions/notifications.dart';
+import 'package:tagxidriver/pages/NavigatorPages/notification.dart';
+import 'package:tagxidriver/pages/chatPage/chat_page.dart';
+import 'package:tagxidriver/pages/onTripPage/droplocation.dart';
+import 'package:tagxidriver/pages/onTripPage/invoice.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/login.dart';
+import 'package:tagxidriver/pages/navDrawer/nav_drawer.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/vehicleInformations/docs_onprocess.dart';
+import 'package:tagxidriver/styles/styles.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
 import 'package:vector_math/vector_math.dart' as vector;
 
@@ -241,13 +240,6 @@ class _MapsState extends State<Maps>
     return bitmap;
   }
 
-  // Future<BitmapDescriptor> getCustomIcon(GlobalKey iconKeys) async {
-
-  //   var imageData = await _capturePng(iconKeys);
-
-  //   return BitmapDescriptor.fromBytes(imageData);
-  // }
-
   addDropMarker() async {
     if (driverReq.isNotEmpty) {
       var testIcon = await capturePng(iconDropKey);
@@ -277,13 +269,6 @@ class _MapsState extends State<Maps>
               position: LatLng(driverReq['pick_lat'], driverReq['pick_lng'])));
         });
       }
-
-      // setState(() {
-
-      // });
-      //  }else{
-      //    print('it is not null');
-      //  }
     }
   }
 
@@ -643,7 +628,7 @@ class _MapsState extends State<Maps>
                           .where((element) =>
                               element.markerId == const MarkerId('2'))
                           .isEmpty &&
-                      _pickAnimateDone != true) {
+                      _pickAnimateDone != true && isBackground == false) {
                     _pickAnimateDone = true;
                     Future.delayed(const Duration(milliseconds: 100), () {
                       // _pickAnimateDone = true;
@@ -651,34 +636,6 @@ class _MapsState extends State<Maps>
                       // addMarker();
                     });
                   }
-
-                  // if (_pickAnimateDone != true) {
-                  //   _pickAnimateDone = true;
-                  //   Future.delayed(const Duration(seconds: 2), () {
-                  //     _controller?.animateCamera(CameraUpdate.newLatLngZoom(
-                  //         LatLng(driverReq['pick_lat'], driverReq['pick_lng']),
-                  //         11.0));
-                  //   });
-                  // }
-                  // } else if (driverReq['is_trip_start'] == 1 &&
-                  //     driverReq['is_completed'] == 0) {
-                  // if (myMarkers
-                  //         .where((element) =>
-                  //             element.markerId == const MarkerId('3'))
-                  //         .isEmpty &&
-                  //     driverReq['is_rental'] != true &&
-                  //     _controller != null) {
-                  //       Future.delayed(const Duration(seconds: 2), () {
-                  //         // addDropMarker();
-                  //       });
-
-                  // }
-                  // if (myMarkers
-                  //     .where(
-                  //         (element) => element.markerId == const MarkerId('2'))
-                  //     .isEmpty) {
-                  //   addMarker();
-                  // }
                 } else if (driverReq['is_completed'] == 1 &&
                     driverReq['requestBill'] != null) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -693,13 +650,6 @@ class _MapsState extends State<Maps>
                   myMarkers.removeWhere(
                       (element) => element.markerId != const MarkerId('1'));
                   polyline.clear();
-
-                  // myMarkers.removeWhere(
-                  //     (element) => element.markerId == const MarkerId('2'));
-                  // myMarkers.removeWhere(
-                  //     (element) => element.markerId == const MarkerId('3'));
-                  // polyline.removeWhere(
-                  //     (element) => element.polylineId == const PolylineId('1'));
                 }
 
                 if (driverReq['accepted_at'] != null &&
@@ -722,15 +672,15 @@ class _MapsState extends State<Maps>
                 if (myMarkers
                     .where((element) => element.markerId != const MarkerId('1'))
                     .isNotEmpty) {
-                  myMarkers.removeWhere((element) => element.markerId != const MarkerId('1'));
+                  myMarkers.removeWhere(
+                      (element) => element.markerId != const MarkerId('1'));
                   polyline.clear();
                   if (userReject == true) {
                     reqCancel();
                   }
-                    }
-                  _pickAnimateDone = false;
-                  _dropMarkerDone = false;
-                
+                }
+                _pickAnimateDone = false;
+                _dropMarkerDone = false;
               }
 
               if (userDetails['approve'] == false && driverReq.isEmpty) {
@@ -807,21 +757,9 @@ class _MapsState extends State<Maps>
                                                   ? onridebikeicon
                                                   : onrideicon,
                                     ));
-                                  } else if ((element['is_active'] != 0 &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
-                                              offlineicon) ||
+                                  } else if ((element['is_active'] != 0 && myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon == offlineicon) ||
                                       (element['is_active'] != 0 &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
+                                          myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon ==
                                               offlinebikeicon)) {
                                     myMarkers.removeWhere((e) => e.markerId
                                         .toString()
@@ -853,20 +791,10 @@ class _MapsState extends State<Maps>
                                                   : onrideicon,
                                     ));
                                   } else if ((element['is_available'] != true &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
+                                          myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon ==
                                               onlineicon) ||
                                       (element['is_available'] != true &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
+                                          myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon ==
                                               onlinebikeicon)) {
                                     myMarkers.removeWhere((e) => e.markerId
                                         .toString()
@@ -897,21 +825,9 @@ class _MapsState extends State<Maps>
                                                   ? onridebikeicon
                                                   : onrideicon,
                                     ));
-                                  } else if ((element['is_active'] != 1 &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
-                                              onlineicon) ||
+                                  } else if ((element['is_active'] != 1 && myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon == onlineicon) ||
                                       (element['is_active'] != 1 &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
+                                          myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon ==
                                               onlinebikeicon)) {
                                     myMarkers.removeWhere((e) => e.markerId
                                         .toString()
@@ -943,20 +859,10 @@ class _MapsState extends State<Maps>
                                                   : onrideicon,
                                     ));
                                   } else if ((element['is_available'] == true &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
+                                          myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon ==
                                               onrideicon) ||
                                       (element['is_available'] == true &&
-                                          myMarkers
-                                                  .lastWhere((e) => e.markerId
-                                                      .toString()
-                                                      .contains(
-                                                          'car${element['id']}'))
-                                                  .icon ==
+                                          myMarkers.lastWhere((e) => e.markerId.toString().contains('car${element['id']}')).icon ==
                                               onridebikeicon)) {
                                     myMarkers.removeWhere((e) => e.markerId
                                         .toString()
@@ -1403,195 +1309,6 @@ class _MapsState extends State<Maps>
                                   }
                                 }
                               }
-                              //else if (filtericon == 1 &&
-                              //     userDetails['role'] == 'owner') {
-                              //   if (element['l'] != null) {
-                              //     if (element['is_active'] == 0 &&
-                              //         offlineicon != null) {
-                              //           if (myMarkers
-                              //                                             .where((e) => e
-                              //                                                 .markerId
-                              //                                                 .toString()
-                              //                                                 .contains('car' +
-                              //                                                     element['id'].toString()))
-                              //                                             .isEmpty) {
-                              //       myMarkers.add(Marker(
-                              //         markerId: MarkerId(
-                              //             'carid' + element['id'].toString() + 'idoffline'),
-                              //         rotation: double.parse(
-                              //             element['bearing'].toString()),
-                              //         position:
-                              //             LatLng(element['l'][0], element['l'][1]),
-                              //         anchor: const Offset(0.5, 0.5),
-                              //         icon: offlineicon,
-                              //       ));
-                              //                                             }else if (_controller !=
-                              //                                             null) {
-                              //                                           if (myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude !=
-                              //                                                   element['l'][
-                              //                                                       0] ||
-                              //                                               myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude !=
-                              //                                                   element['l'][1]) {
-                              //                                             var dist = calculateDistance(
-                              //                                                 myMarkers
-                              //                                                     .lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString()))
-                              //                                                     .position
-                              //                                                     .latitude,
-                              //                                                 myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
-                              //                                                 element['l'][0],
-                              //                                                 element['l'][1]);
-                              //                                             if (dist >
-                              //                                                 100) {
-                              //                                               animationController =
-                              //                                                   AnimationController(
-                              //                                                 duration:
-                              //                                                     const Duration(milliseconds: 1500), //Animation duration of marker
-
-                              //                                                 vsync:
-                              //                                                     this, //From the widget
-                              //                                               );
-
-                              //                                               animateCar(
-                              //                                                   myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude,
-                              //                                                   myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
-                              //                                                   element['l'][0],
-                              //                                                   element['l'][1],
-                              //                                                   _mapMarkerSink,
-                              //                                                   this,
-                              //                                                   _controller,
-                              //                                                   'car' + element['id'].toString(),
-                              //                                                   offlineicon
-                              //                                                   );
-                              //                                             }
-                              //                                           }
-                              //                                         }
-                              //     }
-                              //   }
-                              // } else if (filtericon == 3 &&
-                              //     element['is_available'] == true &&
-                              //     element['is_active'] == 1 &&
-                              //     userDetails['role'] == 'owner' &&
-                              //     onlineicon != null) {
-                              //       if (myMarkers
-                              //                                             .where((e) => e
-                              //                                                 .markerId
-                              //                                                 .toString()
-                              //                                                 .contains('car' +
-                              //                                                     element['id'].toString()))
-                              //                                             .isEmpty) {
-                              //   myMarkers.add(Marker(
-                              //     markerId:
-                              //         MarkerId('car' + element['id'].toString()),
-                              //     rotation:
-                              //         double.parse(element['bearing'].toString()),
-                              //     position:
-                              //         LatLng(element['l'][0], element['l'][1]),
-                              //     anchor: const Offset(0.5, 0.5),
-                              //     icon: onlineicon,
-                              //   ));
-                              //                                             }else if (_controller !=
-                              //                                             null) {
-                              //                                           if (myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude !=
-                              //                                                   element['l'][
-                              //                                                       0] ||
-                              //                                               myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude !=
-                              //                                                   element['l'][1]) {
-                              //                                             var dist = calculateDistance(
-                              //                                                 myMarkers
-                              //                                                     .lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString()))
-                              //                                                     .position
-                              //                                                     .latitude,
-                              //                                                 myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
-                              //                                                 element['l'][0],
-                              //                                                 element['l'][1]);
-                              //                                             if (dist >
-                              //                                                 100) {
-                              //                                               animationController =
-                              //                                                   AnimationController(
-                              //                                                 duration:
-                              //                                                     const Duration(milliseconds: 1500), //Animation duration of marker
-
-                              //                                                 vsync:
-                              //                                                     this, //From the widget
-                              //                                               );
-
-                              //                                               animateCar(
-                              //                                                   myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude,
-                              //                                                   myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
-                              //                                                   element['l'][0],
-                              //                                                   element['l'][1],
-                              //                                                   _mapMarkerSink,
-                              //                                                   this,
-                              //                                                   _controller,
-                              //                                                   'car' + element['id'].toString(),
-                              //                                                   onlineicon
-                              //                                                   );
-                              //                                             }
-                              //                                           }
-                              //                                         }
-                              // } else if (filtericon == 2 &&
-                              //     element['is_available'] == false &&
-                              //     element['is_active'] == 1 &&
-                              //     userDetails['role'] == 'owner' &&
-                              //     onrideicon != null) {
-                              //       if (myMarkers
-                              //                                             .where((e) => e
-                              //                                                 .markerId
-                              //                                                 .toString()
-                              //                                                 .contains('car' +
-                              //                                                     element['id'].toString()))
-                              //                                             .isEmpty) {
-                              //   myMarkers.add(Marker(
-                              //     markerId:
-                              //         MarkerId('car' + element['id'].toString()),
-                              //     rotation:
-                              //         double.parse(element['bearing'].toString()),
-                              //     position:
-                              //         LatLng(element['l'][0], element['l'][1]),
-                              //     anchor: const Offset(0.5, 0.5),
-                              //     icon: onrideicon,
-                              //   ));
-                              //                                             }else if (_controller !=
-                              //                                             null) {
-                              //                                           if (myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude !=
-                              //                                                   element['l'][
-                              //                                                       0] ||
-                              //                                               myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude !=
-                              //                                                   element['l'][1]) {
-                              //                                             var dist = calculateDistance(
-                              //                                                 myMarkers
-                              //                                                     .lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString()))
-                              //                                                     .position
-                              //                                                     .latitude,
-                              //                                                 myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
-                              //                                                 element['l'][0],
-                              //                                                 element['l'][1]);
-                              //                                             if (dist >
-                              //                                                 100) {
-                              //                                               animationController =
-                              //                                                   AnimationController(
-                              //                                                 duration:
-                              //                                                     const Duration(milliseconds: 1500), //Animation duration of marker
-
-                              //                                                 vsync:
-                              //                                                     this, //From the widget
-                              //                                               );
-
-                              //                                               animateCar(
-                              //                                                   myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.latitude,
-                              //                                                   myMarkers.lastWhere((e) => e.markerId.toString().contains('car' + element['id'].toString())).position.longitude,
-                              //                                                   element['l'][0],
-                              //                                                   element['l'][1],
-                              //                                                   _mapMarkerSink,
-                              //                                                   this,
-                              //                                                   _controller,
-                              //                                                   'car' + element['id'].toString(),
-                              //                                                   onrideicon
-                              //                                                   );
-                              //                                             }
-                              //                                           }
-                              //                                         }
-                              // }
                             } else {
                               if (myMarkers
                                   .where((e) => e.markerId

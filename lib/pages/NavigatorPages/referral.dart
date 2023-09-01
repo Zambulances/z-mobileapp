@@ -4,13 +4,13 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 
@@ -34,7 +34,7 @@ class _ReferralPageState extends State<ReferralPage> {
 //get referral code
   _getReferral() async {
     var val = await getReferral();
-    if(val == 'logout'){
+    if (val == 'logout') {
       navigateLogout();
     }
     await getUrls();
@@ -48,8 +48,11 @@ class _ReferralPageState extends State<ReferralPage> {
   var android = '';
   var ios = '';
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getUrls() async {
@@ -139,7 +142,9 @@ class _ReferralPageState extends State<ReferralPage> {
                                                   Navigator.pop(context);
                                                 },
                                                 child: Icon(
-                                                    Icons.arrow_back, color: textColor,)))
+                                                  Icons.arrow_back,
+                                                  color: textColor,
+                                                )))
                                       ],
                                     ),
                                     SizedBox(
@@ -199,7 +204,8 @@ class _ReferralPageState extends State<ReferralPage> {
                                                   //show toast for copy
                                                   showToast();
                                                 },
-                                                child: Icon(Icons.copy, color: textColor))
+                                                child: Icon(Icons.copy,
+                                                    color: textColor))
                                           ],
                                         ))
                                   ],
@@ -274,19 +280,18 @@ class _ReferralPageState extends State<ReferralPage> {
                       ? Positioned(
                           top: 0,
                           child: NoInternet(
-                            onTap: () async{
+                            onTap: () async {
                               setState(() {
                                 internetTrue();
                                 _isLoading = true;
                               });
-                                var val = await getReferral();
-                                if(val == 'logout'){
-                                  navigateLogout();
-                                }
-                                setState(() {
-                                  _isLoading = false;
-                                });
-                              
+                              var val = await getReferral();
+                              if (val == 'logout') {
+                                navigateLogout();
+                              }
+                              setState(() {
+                                _isLoading = false;
+                              });
                             },
                           ))
                       : Container(),
@@ -306,7 +311,7 @@ class _ReferralPageState extends State<ReferralPage> {
                                 borderRadius: BorderRadius.circular(10),
                                 color: (isDarkTheme == true)
                                     ? textColor.withOpacity(0.4)
-                                    :  Colors.transparent.withOpacity(0.6)),
+                                    : Colors.transparent.withOpacity(0.6)),
                             child: Text(
                               languages[choosenLanguage]['text_code_copied'],
                               style: GoogleFonts.roboto(

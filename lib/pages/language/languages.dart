@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
 import '../../functions/functions.dart';
 import '../../widgets/widgets.dart';
 import '../login/signupmethod.dart';
@@ -133,22 +133,20 @@ class _LanguagesState extends State<Languages> {
                                               border: Border.all(
                                                   color: (isDarkTheme == true)
                                                       ? textColor
-                                                      :const Color(0xff222222),
+                                                      : const Color(0xff222222),
                                                   width: 1.2)),
                                           alignment: Alignment.center,
                                           child: (choosenLanguage == i)
                                               ? Container(
                                                   height: media.width * 0.03,
                                                   width: media.width * 0.03,
-                                                  decoration:
-                                                      BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: (isDarkTheme ==
-                                                                  true)
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      color:
+                                                          (isDarkTheme == true)
                                                               ? textColor
                                                               : const Color(
-                                                              0xff222222)),
+                                                                  0xff222222)),
                                                 )
                                               : Container(),
                                         ),

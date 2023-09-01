@@ -8,30 +8,30 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
 import 'package:location/location.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/editprofile.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/history.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagxi_driver/pages/login/get_started.dart';
-import 'package:tagxi_driver/pages/login/login.dart';
-import 'package:tagxi_driver/pages/login/otp_page.dart';
-import 'package:tagxi_driver/pages/onTripPage/droplocation.dart';
-import 'package:tagxi_driver/pages/onTripPage/invoice.dart';
-import 'package:tagxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagxi_driver/pages/onTripPage/review_page.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/referral_code.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/service_area.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/upload_docs.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_color.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_make.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_model.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_number.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_type.dart';
+import 'package:tagxidriver/pages/NavigatorPages/editprofile.dart';
+import 'package:tagxidriver/pages/NavigatorPages/history.dart';
+import 'package:tagxidriver/pages/NavigatorPages/makecomplaint.dart';
+import 'package:tagxidriver/pages/login/get_started.dart';
+import 'package:tagxidriver/pages/login/login.dart';
+import 'package:tagxidriver/pages/login/otp_page.dart';
+import 'package:tagxidriver/pages/onTripPage/droplocation.dart';
+import 'package:tagxidriver/pages/onTripPage/invoice.dart';
+import 'package:tagxidriver/pages/onTripPage/map_page.dart';
+import 'package:tagxidriver/pages/onTripPage/review_page.dart';
+import 'package:tagxidriver/pages/vehicleInformations/referral_code.dart';
+import 'package:tagxidriver/pages/vehicleInformations/service_area.dart';
+import 'package:tagxidriver/pages/vehicleInformations/upload_docs.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_color.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_make.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_model.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_number.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_type.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/vehicle_year.dart';
-import 'package:tagxi_driver/styles/styles.dart';
+import 'package:tagxidriver/pages/vehicleInformations/vehicle_year.dart';
+import 'package:tagxidriver/styles/styles.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../pages/NavigatorPages/fleetdocuments.dart';
 import '../pages/login/ownerregister.dart';
@@ -85,11 +85,13 @@ darktheme() async {
     textColor = Colors.white;
     buttonColor = Colors.white;
     loaderColor = Colors.white;
+    buttonText = Colors.black;
   } else {
     page = Colors.white;
     textColor = Colors.black;
-    buttonColor = const Color(0xffFCB13D);
-    loaderColor = const Color(0xffFCB13D);
+    buttonColor = theme;
+    loaderColor = theme;
+    buttonText = const Color(0xffFFFFFF);
   }
   if (isDarkTheme == true) {
     rootBundle.loadString('assets/dark.json').then((value) {
@@ -1378,7 +1380,7 @@ getUserDetails() async {
 
           if (payby == 0 && driverReq['is_paid'] == 1) {
             payby = 1;
-            audioPlayer.play(audio);
+            // audioPlayer.play(audio);
           }
 
           if (driverReq['is_driver_arrived'] == 1 &&
@@ -1418,7 +1420,7 @@ getUserDetails() async {
         } else {
           duration = 0;
           if (driverReq.isNotEmpty) {
-            audioPlayer.play(audio);
+            // audioPlayer.play(audio);
           }
           chatList.clear();
           driverReq = {};
@@ -1643,13 +1645,13 @@ currentPositionUpdate() async {
             await driverStatus();
           }
           valueNotifierHome.incrementNotifier();
-          audioPlayer.play(audio);
+          // audioPlayer.play(audio);
         } else if (driverState.child('approve').value == 1 &&
             userDetails['approve'] == false) {
           await getUserDetails();
           valueNotifierHome.incrementNotifier();
 
-          audioPlayer.play(audio);
+          // audioPlayer.play(audio);
         }
         if (driverState.child('fleet_changed').value == 1) {
           FirebaseDatabase.instance
@@ -1659,7 +1661,7 @@ currentPositionUpdate() async {
           await getUserDetails();
           valueNotifierHome.incrementNotifier();
 
-          audioPlayer.play(audio);
+          // audioPlayer.play(audio);
         }
         if (driverState.child('is_deleted').value == 1) {
           FirebaseDatabase.instance
@@ -1696,13 +1698,13 @@ currentPositionUpdate() async {
         await getUserDetails();
         valueNotifierHome.incrementNotifier();
 
-        audioPlayer.play(audio);
+        // audioPlayer.play(audio);
       } else if (ownerStatus.child('approve').value == 1 &&
           userDetails['approve'] == false) {
         await getUserDetails();
         valueNotifierHome.incrementNotifier();
 
-        audioPlayer.play(audio);
+        // audioPlayer.play(audio);
       }
     }
   });
@@ -2002,7 +2004,7 @@ requestAccept() async {
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['message'] == 'success') {
         audioPlayers.stop();
-        audioPlayers.dispose();
+        // audioPlayers.dispose();
         dropDistance = '';
 
         await getUserDetails();
@@ -2063,12 +2065,12 @@ requestReject() async {
 
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['message'] == 'success') {
-        if (audioPlayers.state != PlayerState.STOPPED &&
-            audioPlayers.state != PlayerState.COMPLETED &&
-            audioPlayers.state != PlayerState.PAUSED &&
+        if (audioPlayers.state != PlayerState.stopped &&
+            audioPlayers.state != PlayerState.completed &&
+            audioPlayers.state != PlayerState.paused &&
             audioPlayers.playerId.isNotEmpty) {
           audioPlayers.stop();
-          audioPlayers.dispose();
+          // audioPlayers.dispose();
         }
         driverReject = true;
         await getUserDetails();
@@ -2093,7 +2095,7 @@ requestReject() async {
 }
 
 audioPlay() async {
-  audioPlayers = await audioPlayer.play('audio/request_sound.mp3');
+  audioPlayers.play(AssetSource('audio/request_sound.mp3'));
 }
 
 //sound
@@ -2107,7 +2109,7 @@ sound() async {
         driverReq.isNotEmpty) {
       duration--;
 
-      if (audioPlayers.state == PlayerState.COMPLETED) {
+      if (audioPlayers.state == PlayerState.completed) {
         audioPlay();
       }
       valueNotifierHome.incrementNotifier();
@@ -2115,24 +2117,24 @@ sound() async {
         driverReq['accepted_at'] == null &&
         duration <= 0.0) {
       timer.cancel();
-      if (audioPlayers.state != PlayerState.STOPPED &&
-          audioPlayers.state != PlayerState.COMPLETED &&
-          audioPlayers.state != PlayerState.PAUSED &&
+      if (audioPlayers.state != PlayerState.stopped &&
+          audioPlayers.state != PlayerState.completed &&
+          audioPlayers.state != PlayerState.paused &&
           audioPlayers.playerId.isNotEmpty) {
         audioPlayers.stop();
-        audioPlayers.dispose();
+        // audioPlayers.dispose();
       }
       Future.delayed(const Duration(seconds: 2), () {
         requestReject();
       });
       duration = 0;
     } else {
-      if (audioPlayers.state != PlayerState.STOPPED &&
-          audioPlayers.state != PlayerState.COMPLETED &&
-          audioPlayers.state != PlayerState.PAUSED &&
+      if (audioPlayers.state != PlayerState.stopped &&
+          audioPlayers.state != PlayerState.completed &&
+          audioPlayers.state != PlayerState.paused &&
           audioPlayers.playerId.isNotEmpty) {
         audioPlayers.stop();
-        audioPlayers.dispose();
+        // audioPlayers.dispose();
       }
       timer.cancel();
       duration = 0;
@@ -2701,7 +2703,7 @@ getCurrentMessages() async {
             jsonDecode(response.body)['data']
                 .where((element) => element['from_type'] == 1)
                 .length) {
-          audioPlayer.play(audio);
+          // audioPlayer.play(audio);
         }
         chatList = jsonDecode(response.body)['data'];
         valueNotifierHome.incrementNotifier();
@@ -3004,9 +3006,11 @@ updateProfileWithoutImage(name, email) async {
 
 //get faq
 List faqData = [];
+Map<String, dynamic> myFaqPage = {};
 
 getFaqData(lat, lng) async {
   dynamic result;
+  myFaqPage.clear();
   try {
     var response = await http
         .get(Uri.parse('${url}api/v1/common/faq/list/$lat/$lng'), headers: {
@@ -3015,6 +3019,38 @@ getFaqData(lat, lng) async {
     });
     if (response.statusCode == 200) {
       faqData = jsonDecode(response.body)['data'];
+      myFaqPage = jsonDecode(response.body)['meta'];
+      valueNotifierHome.incrementNotifier();
+      result = 'success';
+    } else if (response.statusCode == 401) {
+      result = 'logout';
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+    }
+    return result;
+  }
+}
+
+getFaqPages(id) async {
+  dynamic result;
+  try {
+    var response = await http
+        .get(Uri.parse('${url}api/v1/common/faq/list/$id'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Content-Type': 'application/json'
+    });
+    if (response.statusCode == 200) {
+      var val = jsonDecode(response.body)['data'];
+      val.forEach((element) {
+        faqData.add(element);
+      });
+      myFaqPage = jsonDecode(response.body)['meta'];
       valueNotifierHome.incrementNotifier();
       result = 'success';
     } else if (response.statusCode == 401) {
@@ -3426,6 +3462,43 @@ addMoneyFlutterwave(amount, nonce) async {
 }
 
 //razorpay
+
+//razorpay
+
+razorpayCreateOrder(amount,publishkey,secretkey)async{
+  dynamic result;
+  String basicAuth =
+        'Basic ${base64Encode(utf8.encode('$publishkey:$secretkey'))}';
+  try {
+    var response = await http.post(
+        Uri.parse('https://api.razorpay.com/v1/orders'),
+        headers: {
+          'Authorization': basicAuth,
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode(
+            {'amount': amount,
+             "currency": "INR",
+      "receipt": 'user_${userDetails['id'].toString()}_${DateTime.now().toString()}'
+      }));
+    if (response.statusCode == 200) {
+      result = jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      result = 'logout';
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }else{
+      result = 'failure';
+    }
+  }
+  return result;
+}
 
 addMoneyRazorpay(amount, nonce) async {
   dynamic result;
@@ -4344,4 +4417,39 @@ enableMyRouteBookings(lat, lng) async {
     }
   }
   return result;
+}
+
+
+
+var ccUrl = '';
+getCcavenuePayment(body) async {
+  dynamic results;
+  ccUrl = '';
+  try {
+    var response =
+        await http.post(Uri.parse('${url}api/v1/payment/ccavenue/initialize'),
+            headers: {
+              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Content-Type': 'application/json'
+            },
+            body: body);
+    if (response.statusCode == 200) {
+      
+      var data = jsonDecode(response.body);
+      ccUrl = 'https://secure.ccavenue.com/transaction.do?command=initiateTransaction&encRequest=${data['enc_val']}&access_code=${data['access_code']}';
+  
+        results = 'success';
+    } else if (response.statusCode == 401) {
+      results = 'logout';
+    } else {
+      debugPrint(response.body);
+      results = jsonDecode(response.body)['message'];
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      results = 'no internet';
+      internet = false;
+    }
+  }
+  return results;
 }

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/withdraw.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/withdraw.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 
 class BankDetails extends StatefulWidget {
   const BankDetails({Key? key}) : super(key: key);
@@ -33,19 +33,22 @@ class _BankDetailsState extends State<BankDetails> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   getBankDetails() async {
     var val = await getBankInfo();
-    if(mounted){
-    if(val == 'logout'){
-      navigateLogout();
-    }
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      if (val == 'logout') {
+        navigateLogout();
+      }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -101,7 +104,10 @@ class _BankDetailsState extends State<BankDetails> {
                                 onTap: () {
                                   Navigator.pop(context);
                                 },
-                                child: Icon(Icons.arrow_back, color: textColor,)))
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: textColor,
+                                )))
                       ],
                     ),
                     SizedBox(
@@ -120,14 +126,14 @@ class _BankDetailsState extends State<BankDetails> {
                                       labelStyle: TextStyle(
                                           color: (isDarkTheme == true)
                                               ? textColor
-                                              : null),  
+                                              : null),
                                       focusedBorder: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           borderSide: BorderSide(
                                               color: (isDarkTheme == true)
                                                   ? textColor
-                                                  : Colors.blue)),           
+                                                  : Colors.blue)),
                                       border: OutlineInputBorder(
                                           borderRadius:
                                               BorderRadius.circular(12),
@@ -141,9 +147,7 @@ class _BankDetailsState extends State<BankDetails> {
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
                                       isDense: true),
-                                    style: GoogleFonts.roboto(
-                                      color: textColor
-                                    ),   
+                                  style: GoogleFonts.roboto(color: textColor),
                                 ),
                                 SizedBox(
                                   height: media.width * 0.05,
@@ -177,7 +181,7 @@ class _BankDetailsState extends State<BankDetails> {
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
                                       isDense: true),
-                                    style: GoogleFonts.roboto(color: textColor),    
+                                  style: GoogleFonts.roboto(color: textColor),
                                 ),
                                 SizedBox(
                                   height: media.width * 0.05,
@@ -211,7 +215,7 @@ class _BankDetailsState extends State<BankDetails> {
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
                                       isDense: true),
-                                    style: GoogleFonts.roboto(color: textColor),    
+                                  style: GoogleFonts.roboto(color: textColor),
                                 ),
                                 SizedBox(
                                   height: media.width * 0.05,
@@ -245,7 +249,7 @@ class _BankDetailsState extends State<BankDetails> {
                                               BorderRadius.circular(12),
                                           gapPadding: 1),
                                       isDense: true),
-                                  style: GoogleFonts.roboto(color: textColor),      
+                                  style: GoogleFonts.roboto(color: textColor),
                                 ),
                                 SizedBox(
                                   height: media.width * 0.1,
@@ -263,8 +267,9 @@ class _BankDetailsState extends State<BankDetails> {
                                       boxShadow: [
                                         BoxShadow(
                                             blurRadius: 2,
-                                            color: (isDarkTheme == true) ? textColor.withOpacity(0.3) :
-                                                Colors.black.withOpacity(0.2),
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.3)
+                                                : Colors.black.withOpacity(0.2),
                                             spreadRadius: 2),
                                       ]),
                                   child: Column(
@@ -274,7 +279,9 @@ class _BankDetailsState extends State<BankDetails> {
                                             ['text_accoutHolderName'],
                                         style: GoogleFonts.roboto(
                                             fontSize: media.width * sixteen,
-                                            color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor),
+                                            color: (isDarkTheme == true)
+                                                ? textColor.withOpacity(0.4)
+                                                : hintColor),
                                       ),
                                       SizedBox(
                                         height: media.width * 0.025,
@@ -397,7 +404,7 @@ class _BankDetailsState extends State<BankDetails> {
                                         if (addBank == true) {
                                           pop();
                                         }
-                                      }else if(val == 'logout'){
+                                      } else if (val == 'logout') {
                                         navigateLogout();
                                       } else {
                                         setState(() {

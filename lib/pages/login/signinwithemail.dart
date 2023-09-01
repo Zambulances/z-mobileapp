@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/get_started.dart';
-import 'package:tagxi_driver/pages/login/login.dart';
-import 'package:tagxi_driver/pages/login/otp_page.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/translation/translation.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/get_started.dart';
+import 'package:tagxidriver/pages/login/login.dart';
+import 'package:tagxidriver/pages/login/otp_page.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/translation/translation.dart';
 import '../../styles/styles.dart';
 import '../../functions/functions.dart';
 import '../../widgets/widgets.dart';
@@ -79,38 +79,33 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                   SizedBox(
                     height: media.height * 0.159,
                   ),
-                  
                   Container(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    height: 55,
-                    width: media.width * 1 - (media.width * 0.08 * 2),
-                    child: InputField(
-                      text: languages[choosenLanguage]['text_email'],
-                      onTap: (val) {
-                        setState(() {
-                          email = controller.text;
-                        });
-                      },
-                      textController: controller,
-                      color: (verifyEmailError == '') ? null : Colors.red,
-                    )
-                  ),
-
+                      padding: const EdgeInsets.only(bottom: 5),
+                      height: 55,
+                      width: media.width * 1 - (media.width * 0.08 * 2),
+                      child: InputField(
+                        text: languages[choosenLanguage]['text_email'],
+                        onTap: (val) {
+                          setState(() {
+                            email = controller.text;
+                          });
+                        },
+                        textController: controller,
+                        color: (verifyEmailError == '') ? null : Colors.red,
+                      )),
                   (_error != '')
-                    ? Container(
-                        width: media.width * 0.8,
-                        margin: EdgeInsets.only(top: media.height * 0.02),
-                        alignment: Alignment.center,
-                        child: Text(
-                          _error,
-                          style: GoogleFonts.roboto(
-                            fontSize: media.width * sixteen,
-                            color: Colors.red
+                      ? Container(
+                          width: media.width * 0.8,
+                          margin: EdgeInsets.only(top: media.height * 0.02),
+                          alignment: Alignment.center,
+                          child: Text(
+                            _error,
+                            style: GoogleFonts.roboto(
+                                fontSize: media.width * sixteen,
+                                color: Colors.red),
                           ),
-                        ),
-                      )
-                    : Container(),
-
+                        )
+                      : Container(),
                   SizedBox(height: media.height * 0.05),
                   Row(
                     children: [
@@ -132,7 +127,10 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                                     Border.all(color: buttonColor, width: 2),
                                 shape: BoxShape.circle,
                                 color: (terms == true) ? buttonColor : page),
-                            child: Icon(Icons.done, color: (isDarkTheme == true) ? Colors.black : Colors.white)),
+                            child: Icon(Icons.done,
+                                color: (isDarkTheme == true)
+                                    ? Colors.black
+                                    : Colors.white)),
                       ),
                       SizedBox(
                         width: media.width * 0.02,
@@ -292,4 +290,3 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
     );
   }
 }
-

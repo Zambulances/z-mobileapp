@@ -1,17 +1,18 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/get_started.dart';
-import 'package:tagxi_driver/pages/login/getstarted_phone_otp.dart';
-import 'package:tagxi_driver/pages/login/login.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/pages/vehicleInformations/referral_code.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/get_started.dart';
+import 'package:tagxidriver/pages/login/getstarted_phone_otp.dart';
+import 'package:tagxidriver/pages/login/login.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/pages/vehicleInformations/referral_code.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -69,10 +70,20 @@ class _OwnersRegisterState extends State<OwnersRegister> {
   }
 
   getGalleryPermission() async {
-    var status = await Permission.photos.status;
+    dynamic status;
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+  if (androidInfo.version.sdkInt <= 32) {
+    status = await Permission.storage.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.storage.request();
+    }
+    /// use [Permissions.storage.status]
+  } else{
+    status = await Permission.photos.status;
     if (status != PermissionStatus.granted) {
       status = await Permission.photos.request();
     }
+  }
     return status;
   }
 

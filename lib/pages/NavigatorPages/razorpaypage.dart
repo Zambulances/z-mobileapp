@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagxi_driver/functions/functions.dart';
-import 'package:tagxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagxi_driver/pages/login/signupmethod.dart';
-import 'package:tagxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagxi_driver/styles/styles.dart';
-import 'package:tagxi_driver/translation/translation.dart';
-import 'package:tagxi_driver/widgets/widgets.dart';
+import 'package:tagxidriver/functions/functions.dart';
+import 'package:tagxidriver/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/signupmethod.dart';
+import 'package:tagxidriver/pages/noInternet/nointernet.dart';
+import 'package:tagxidriver/styles/styles.dart';
+import 'package:tagxidriver/translation/translation.dart';
+import 'package:tagxidriver/widgets/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class RazorPayPage extends StatefulWidget {
@@ -33,8 +33,11 @@ class _RazorPayPageState extends State<RazorPayPage> {
     super.initState();
   }
 
-    navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const SignupMethod()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const SignupMethod()),
+        (route) => false);
   }
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
@@ -44,7 +47,7 @@ class _RazorPayPageState extends State<RazorPayPage> {
         _success = true;
         _isLoading = false;
       });
-    }else if(val == 'logout'){
+    } else if (val == 'logout') {
       navigateLogout();
     } else {
       setState(() {
@@ -65,14 +68,28 @@ class _RazorPayPageState extends State<RazorPayPage> {
 
 //payment gateway code
   payMoney() async {
-    
+    var val = await razorpayCreateOrder(addMoney * 100,(walletBalance['razor_pay_environment'] == 'test')
+          ? walletBalance['razorpay_test_api_key']
+          : walletBalance['razorpay_live_api_key'],(walletBalance['razor_pay_environment'] == 'test')
+          ? walletBalance['razorpay_test_secret_key']
+          : walletBalance['razorpay_live_secret_key'], );
+    if(val == 'logout'){
+      _isLoading = false;
+      navigateLogout();
+    }else if(val == 'failure'){
+      setState(() {
+      _failed = true;
+      _isLoading = false;
+    });
+    }else{
     var options = {
       'key': (walletBalance['razor_pay_environment'] == 'test')
           ? walletBalance['razorpay_test_api_key']
           : walletBalance['razorpay_live_api_key'],
-      'amount': addMoney * 100,
+      'amount': val['amount'],
       'name': userDetails['name'],
       'description': '',
+      'order_id':val['id'],
       'prefill': {
         'contact': userDetails['mobile'],
         'email': userDetails['email']
@@ -80,6 +97,7 @@ class _RazorPayPageState extends State<RazorPayPage> {
     };
 
     await _razorpay.open(options);
+    }
   }
 
   @override
@@ -128,7 +146,8 @@ class _RazorPayPageState extends State<RazorPayPage> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: Icon(Icons.arrow_back, color: textColor)))
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor)))
                             ],
                           ),
                           SizedBox(
