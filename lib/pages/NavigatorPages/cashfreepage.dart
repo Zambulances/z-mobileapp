@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/noInternet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/noInternet/noInternet.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
 import 'package:cashfree_pg/cashfree_pg.dart';
 
 // ignore: must_be_immutable

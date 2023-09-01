@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/noInternet/nointernet.dart';
+import 'package:tagxiuser/styles/styles.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxiuser/translations/translation.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
 
 class PickContact extends StatefulWidget {
   const PickContact({Key? key}) : super(key: key);
@@ -24,6 +24,7 @@ class _PickContactState extends State<PickContact> {
   String pickedName = '';
   String pickedNumber = '';
   bool _contactDenied = false;
+  bool _noPermission = false;
 
   @override
   void initState() {
@@ -31,16 +32,23 @@ class _PickContactState extends State<PickContact> {
     super.initState();
   }
 
-//get permission
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
+  }
+
+//get contact permission
   getContactPermission() async {
     var status = await Permission.contacts.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.contacts.request();
-    }
+    // if (status != PermissionStatus.granted) {
+    //   status = await Permission.contacts.request();
+    // }
     return status;
   }
 
-//fetch contacts
+//fetch contact data
   getContact() async {
     if (contacts.isEmpty) {
       var permission = await getContactPermission();
@@ -50,26 +58,25 @@ class _PickContactState extends State<PickContact> {
             _isLoading = true;
           });
         }
-        Iterable<Contact> contactsList = await ContactsService.getContacts();
 
-        // ignore: avoid_function_literals_in_foreach_calls
-        contactsList.forEach((contact) {
-          contact.phones!.toSet().forEach((phone) {
-            contacts.add({
-              'name': contact.displayName ?? contact.givenName,
-              'phone': phone.value
+        Iterable<Contact> contactsList = await ContactsService.getContacts();
+        setState(() {
+          // ignore: avoid_function_literals_in_foreach_calls
+          contactsList.forEach((contact) {
+            contact.phones!.toSet().forEach((phone) {
+              contacts.add({
+                'name': contact.displayName ?? contact.givenName,
+                'phone': phone.value
+              });
             });
           });
+          _isLoading = false;
         });
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
       } else {
         if (mounted) {
           setState(() {
-            _contactDenied = true;
+            _noPermission = true;
+            _isLoading = false;
           });
         }
       }
@@ -77,15 +84,9 @@ class _PickContactState extends State<PickContact> {
   }
 
   //navigate pop
+
   pop() {
     Navigator.pop(context, true);
-  }
-
-  navigateLogout() {
-    Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const Login()),
-        (route) => false);
   }
 
   @override
@@ -133,9 +134,12 @@ class _PickContactState extends State<PickContact> {
                         children: [
                           InkWell(
                               onTap: () {
-                                Navigator.pop(context, false);
+                                Navigator.pop(context, true);
                               },
-                              child: Icon(Icons.arrow_back, color: textColor)),
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: textColor,
+                              )),
                           InkWell(
                               onTap: () {
                                 setState(() {
@@ -143,7 +147,8 @@ class _PickContactState extends State<PickContact> {
                                 });
                                 getContact();
                               },
-                              child: Icon(Icons.replay_outlined, color: textColor,)),
+                              child: Icon(Icons.replay_outlined,
+                                  color: textColor)),
                         ],
                       ))
                     ],
@@ -232,8 +237,11 @@ class _PickContactState extends State<PickContact> {
                                                   decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
                                                       border: Border.all(
-                                                          color: (isDarkTheme == true) ? textColor : const Color(
-                                                              0xff222222),
+                                                          color: (isDarkTheme ==
+                                                                  true)
+                                                              ? textColor
+                                                              : const Color(
+                                                                  0xff222222),
                                                           width: 1.2)),
                                                   alignment: Alignment.center,
                                                   child: (pickedName ==
@@ -243,11 +251,13 @@ class _PickContactState extends State<PickContact> {
                                                               0.03,
                                                           width: media.width *
                                                               0.03,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                  color: (isDarkTheme == true) ? textColor : const Color(
+                                                          decoration: BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              color: (isDarkTheme ==
+                                                                      true)
+                                                                  ? textColor
+                                                                  : const Color(
                                                                       0xff222222)),
                                                         )
                                                       : Container(),
@@ -289,13 +299,76 @@ class _PickContactState extends State<PickContact> {
                 ]),
               ),
 
-              //permission denied popup
+              //logout popup
+                              (_noPermission == true)
+                                  ? Positioned(
+                                      top: 0,
+                                      child: Container(
+                                        height: media.height * 1,
+                                        width: media.width * 1,
+                                        // color:
+                                        //     Colors.transparent.withOpacity(0.6),
+                                        color: (isDarkTheme == true)
+                                            ? textColor.withOpacity(0.2)
+                                            : Colors.transparent
+                                                .withOpacity(0.6),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.all(
+                                                  media.width * 0.05),
+                                              width: media.width * 0.9,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color: page),
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    languages[choosenLanguage]
+                                                        ['text_contact_permission'],
+                                                    textAlign: TextAlign.center,
+                                                    style: GoogleFonts.roboto(
+                                                        fontSize: media.width *
+                                                            sixteen,
+                                                        color: textColor,
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                  ),
+                                                  SizedBox(
+                                                    height: media.width * 0.05,
+                                                  ),
+                                                  Button(
+                                                      onTap: () async {
+                                                        await Permission.contacts.request();
+                                                        setState(() {
+                                                          _isLoading = true;
+                                                          _noPermission = false;
+                                                        });
+                                                      getContact();
+                                                      },
+                                                      text: languages[
+                                                              choosenLanguage]
+                                                          ['text_confirm'])
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ))
+                                  : Container(),
+
+              //permission denied error
               (_contactDenied == true)
                   ? Positioned(
                       child: Container(
                       height: media.height * 1,
                       width: media.width * 1,
-                      color: Colors.transparent.withOpacity(0.6),
+                      color: (isDarkTheme == true)
+                          ? textColor.withOpacity(0.2)
+                          : Colors.transparent.withOpacity(0.6),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -309,14 +382,15 @@ class _PickContactState extends State<PickContact> {
                                     setState(() {
                                       _contactDenied = false;
                                     });
-                                    Navigator.pop(context, false);
+                                    Navigator.pop(context, true);
                                   },
                                   child: Container(
                                     height: media.width * 0.1,
                                     width: media.width * 0.1,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle, color: page),
-                                    child: Icon(Icons.cancel_outlined, color: textColor,),
+                                    child: Icon(Icons.cancel_outlined,
+                                        color: textColor),
                                   ),
                                 ),
                               ],
@@ -401,7 +475,9 @@ class _PickContactState extends State<PickContact> {
                       top: 0,
                       child: NoInternet(
                         onTap: () {
-                          internetTrue();
+                          setState(() {
+                            internetTrue();
+                          });
                         },
                       ))
                   : Container()

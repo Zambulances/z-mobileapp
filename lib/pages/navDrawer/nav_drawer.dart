@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/about.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/editprofile.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/faq.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/favourite.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/referral.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/selectlanguage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/sos.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/NavigatorPages/about.dart';
+import 'package:tagxiuser/pages/NavigatorPages/editprofile.dart';
+import 'package:tagxiuser/pages/NavigatorPages/faq.dart';
+import 'package:tagxiuser/pages/NavigatorPages/favourite.dart';
+import 'package:tagxiuser/pages/NavigatorPages/history.dart';
+import 'package:tagxiuser/pages/NavigatorPages/makecomplaint.dart';
+import 'package:tagxiuser/pages/NavigatorPages/referral.dart';
+import 'package:tagxiuser/pages/NavigatorPages/selectlanguage.dart';
+import 'package:tagxiuser/pages/NavigatorPages/sos.dart';
+import 'package:tagxiuser/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxiuser/pages/onTripPage/map_page.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
 
 import '../NavigatorPages/notification.dart';
 
@@ -178,13 +178,15 @@ class _NavDrawerState extends State<NavDrawer> {
                                               textColor = Colors.white;
                                               buttonColor = Colors.white;
                                               loaderColor = Colors.white;
+                                              buttonText = Colors.black;
                                             } else {
                                               page = Colors.white;
                                               textColor = Colors.black;
                                               buttonColor =
-                                                  const Color(0xffFCB13D);
+                                                  theme;
                                               loaderColor =
-                                                  const Color(0xffFCB13D);
+                                                  theme;
+                                                  buttonText = const Color(0xffFFFFFF);
                                             }
                                             pref.setBool(
                                                 'isDarkTheme', isDarkTheme);
@@ -273,10 +275,7 @@ class _NavDrawerState extends State<NavDrawer> {
                                                             fontSize:
                                                                 media.width *
                                                                     fourteen,
-                                                            color: (isDarkTheme ==
-                                                                    true)
-                                                                ? Colors.black
-                                                                : buttonText),
+                                                            color:  buttonText),
                                                       ),
                                                     )
                                             ],

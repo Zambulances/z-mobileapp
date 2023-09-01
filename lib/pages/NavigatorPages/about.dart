@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
 
 class About extends StatefulWidget {
   const About({Key? key}) : super(key: key);
@@ -71,7 +71,7 @@ class _AboutState extends State<About> {
                     //terms and condition
                     InkWell(
                       onTap: () {
-                        openBrowser('terms and conditions url');
+                        openBrowser('https://tagyourtaxi.com/privacy-policy');
                       },
                       child: Text(
                         languages[choosenLanguage]['text_termsandconditions'],
@@ -87,7 +87,7 @@ class _AboutState extends State<About> {
                     //privacy policy
                     InkWell(
                       onTap: () {
-                        openBrowser('privacy policy url');
+                        openBrowser('https://tagyourtaxi.com/privacy-policy');
                       },
                       child: Text(
                         languages[choosenLanguage]['text_privacy'],
@@ -103,7 +103,7 @@ class _AboutState extends State<About> {
                     //website url
                     InkWell(
                       onTap: () {
-                        openBrowser('your website url');
+                        openBrowser('https://tagyourtaxi.com/');
                       },
                       child: Text(
                         languages[choosenLanguage]['text_about'],

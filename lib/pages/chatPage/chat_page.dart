@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);

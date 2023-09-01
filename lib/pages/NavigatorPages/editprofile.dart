@@ -1,15 +1,16 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/noInternet/nointernet.dart';
+import 'package:tagxiuser/styles/styles.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
+import 'package:tagxiuser/translations/translation.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
 
 class EditProfile extends StatefulWidget {
   const EditProfile({Key? key}) : super(key: key);
@@ -31,10 +32,20 @@ class _EditProfileState extends State<EditProfile> {
 
 //gallery permission
   getGalleryPermission() async {
-    var status = await Permission.photos.status;
+    dynamic status;
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+  if (androidInfo.version.sdkInt <= 32) {
+    status = await Permission.storage.status;
+    if (status != PermissionStatus.granted) {
+      status = await Permission.storage.request();
+    }
+    /// use [Permissions.storage.status]
+  } else{
+    status = await Permission.photos.status;
     if (status != PermissionStatus.granted) {
       status = await Permission.photos.request();
     }
+  }
     return status;
   }
 

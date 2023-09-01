@@ -6,16 +6,16 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/editprofile.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagyourtaxi_driver/pages/login/otp_page.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
-import 'package:tagyourtaxi_driver/pages/login/get_started.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/review_page.dart';
-import 'package:tagyourtaxi_driver/pages/referralcode/referral_code.dart';
+import 'package:tagxiuser/pages/NavigatorPages/editprofile.dart';
+import 'package:tagxiuser/pages/NavigatorPages/history.dart';
+import 'package:tagxiuser/pages/NavigatorPages/makecomplaint.dart';
+import 'package:tagxiuser/pages/login/otp_page.dart';
+import 'package:tagxiuser/pages/onTripPage/booking_confirmation.dart';
+import 'package:tagxiuser/pages/login/get_started.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/onTripPage/map_page.dart';
+import 'package:tagxiuser/pages/onTripPage/review_page.dart';
+import 'package:tagxiuser/pages/referralcode/referral_code.dart';
 import 'package:http/http.dart' as http;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -25,7 +25,7 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagxiuser/styles/styles.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 //languages code
@@ -379,11 +379,13 @@ getLocalData() async {
         textColor = Colors.white;
         buttonColor = Colors.white;
         loaderColor = Colors.white;
+        buttonText = Colors.black;
       } else {
         page = Colors.white;
         textColor = Colors.black;
-        buttonColor = const Color(0xffFCB13D);
-        loaderColor = const Color(0xffFCB13D);
+        buttonColor = theme;
+        loaderColor = theme;
+        buttonText = const Color(0xffFFFFFF);
       }
       if (isDarkTheme == true) {
         rootBundle.loadString('assets/dark.json').then((value) {
@@ -411,7 +413,6 @@ List<BearerClass> bearerToken = <BearerClass>[];
 registerUser() async {
   bearerToken.clear();
   dynamic result;
-  print('email isssssss $value');
   try {
     var token = await FirebaseMessaging.instance.getToken();
     var fcm = token.toString();
@@ -833,7 +834,7 @@ getUserDetails() async {
       sosData = userDetails['sos']['data'];
       if (userDetails['onTripRequest'] != null) {
         if (userRequestData != userDetails['onTripRequest']['data']) {
-          audioPlayer.play(audio);
+          // audioPlayer.play(audio);
         }
         userRequestData = userDetails['onTripRequest']['data'];
         if (userRequestData['accepted_at'] != null) {
@@ -2476,7 +2477,7 @@ getCurrentMessages() async {
             jsonDecode(response.body)['data']
                 .where((element) => element['from_type'] == 2)
                 .length) {
-          audioPlayer.play(audio);
+          // audioPlayer.play(audio);
         }
         chatList = jsonDecode(response.body)['data'];
         valueNotifierBook.incrementNotifier();
@@ -2620,9 +2621,11 @@ openBrowser(browseUrl) async {
 
 //get faq
 List faqData = [];
+Map<String, dynamic> myFaqPage = {};
 
 getFaqData(lat, lng) async {
   dynamic result;
+  myFaqPage.clear();
   try {
     var response = await http
         .get(Uri.parse('${url}api/v1/common/faq/list/$lat/$lng'), headers: {
@@ -2631,7 +2634,39 @@ getFaqData(lat, lng) async {
     });
     if (response.statusCode == 200) {
       faqData = jsonDecode(response.body)['data'];
+      myFaqPage = jsonDecode(response.body)['meta'];
       valueNotifierBook.incrementNotifier();
+      result = 'success';
+    } else if (response.statusCode == 401) {
+      result = 'logout';
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      result = 'no internet';
+      internet = false;
+    }
+    return result;
+  }
+}
+
+getFaqPages(id) async {
+  dynamic result;
+  try {
+    var response = await http
+        .get(Uri.parse('${url}api/v1/common/faq/list/$id'), headers: {
+      'Authorization': 'Bearer ${bearerToken[0].token}',
+      'Content-Type': 'application/json'
+    });
+    if (response.statusCode == 200) {
+      var val = jsonDecode(response.body)['data'];
+      val.forEach((element) {
+        faqData.add(element);
+      });
+      myFaqPage = jsonDecode(response.body)['meta'];
+      valueNotifierHome.incrementNotifier();
       result = 'success';
     } else if (response.statusCode == 401) {
       result = 'logout';
@@ -3025,6 +3060,7 @@ getPaystackPayment(body) async {
   return results;
 }
 
+
 addMoneyPaystack(amount, nonce) async {
   dynamic result;
   try {
@@ -3089,6 +3125,41 @@ addMoneyFlutterwave(amount, nonce) async {
 }
 
 //razorpay
+
+razorpayCreateOrder(amount,publishkey,secretkey)async{
+  dynamic result;
+  String basicAuth =
+        'Basic ${base64Encode(utf8.encode('$publishkey:$secretkey'))}';
+  try {
+    var response = await http.post(
+        Uri.parse('https://api.razorpay.com/v1/orders'),
+        headers: {
+          'Authorization': basicAuth,
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode(
+            {'amount': amount,
+             "currency": walletBalance['currency_code'],
+      "receipt": 'user_${userDetails['id'].toString()}_${DateTime.now().toString()}'
+      }));
+    if (response.statusCode == 200) {
+      result = jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      result = 'logout';
+    } else {
+      debugPrint(response.body);
+      result = 'failure';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      result = 'no internet';
+    }else{
+      result = 'failure';
+    }
+  }
+  return result;
+}
 
 addMoneyRazorpay(amount, nonce) async {
   dynamic result;
@@ -3482,4 +3553,39 @@ userDelete() async {
     }
   }
   return result;
+}
+
+//ccavenue
+
+var ccUrl = '';
+getCcavenuePayment(body) async {
+  dynamic results;
+  ccUrl = '';
+  try {
+    var response =
+        await http.post(Uri.parse('${url}api/v1/payment/ccavenue/initialize'),
+            headers: {
+              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Content-Type': 'application/json'
+            },
+            body: body);
+    if (response.statusCode == 200) {
+      
+      var data = jsonDecode(response.body);
+      ccUrl = 'https://secure.ccavenue.com/transaction.do?command=initiateTransaction&encRequest=${data['enc_val']}&access_code=${data['access_code']}';
+    
+        results = 'success';
+    } else if (response.statusCode == 401) {
+      results = 'logout';
+    } else {
+      debugPrint(response.body);
+      results = jsonDecode(response.body)['message'];
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      results = 'no internet';
+      internet = false;
+    }
+  }
+  return results;
 }

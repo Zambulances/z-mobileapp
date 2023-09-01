@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/history.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/makecomplaint.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/NavigatorPages/history.dart';
+import 'package:tagxiuser/pages/NavigatorPages/makecomplaint.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
 import 'dart:ui' as ui;
 
 import '../onTripPage/map_page.dart';

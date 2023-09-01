@@ -1,17 +1,19 @@
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/flutterwavepage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/selectwallet.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/paystackpayment.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/razorpaypage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/cashfreepage.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/NavigatorPages/flutterwavepage.dart';
+import 'package:tagxiuser/pages/NavigatorPages/ccavenue.dart';
+import 'package:tagxiuser/pages/NavigatorPages/selectwallet.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/noInternet/nointernet.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
+import 'package:tagxiuser/pages/NavigatorPages/paystackpayment.dart';
+import 'package:tagxiuser/pages/NavigatorPages/razorpaypage.dart';
+import 'package:tagxiuser/pages/NavigatorPages/cashfreepage.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -953,6 +955,56 @@ class _WalletPageState extends State<WalletPage> {
                                                         ),
                                                       ))
                                                   : Container(),
+
+                                                 //ccavenue
+                                                      (walletBalance['ccAvenue'] ==
+                                                          true)
+                                                      ? Container(
+                                                          margin: EdgeInsets.only(
+                                                              bottom:
+                                                                  media.width *
+                                                                      0.025),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          width:
+                                                              media.width * 0.7,
+                                                          child: InkWell(
+                                                            onTap: () async {
+                                                              var val = await Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                               CcavenuePage()));
+                                                              if (val) {
+                                                                setState(() {
+                                                                  _choosePayment =
+                                                                      false;
+                                                                  _addPayment =
+                                                                      false;
+                                                                  addMoney =
+                                                                      null;
+                                                                  addMoneyController
+                                                                      .clear();
+                                                                });
+                                                              }
+                                                            },
+                                                            child: Container(
+                                                              width:
+                                                                  media.width *
+                                                                      0.25,
+                                                              height:
+                                                                  media.width *
+                                                                      0.125,
+                                                              decoration: const BoxDecoration(
+                                                                  image: DecorationImage(
+                                                                      image: AssetImage(
+                                                                          'assets/images/ccavenue.png'),
+                                                                      fit: BoxFit
+                                                                          .contain)),
+                                                            ),
+                                                          ))
+                                                      : Container(),
                                               (walletBalance['cash_free'] ==
                                                       true)
                                                   ? Container(

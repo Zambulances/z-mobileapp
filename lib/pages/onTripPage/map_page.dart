@@ -1,25 +1,25 @@
 import 'dart:convert';
 import 'dart:math';
-import 'package:tagyourtaxi_driver/functions/notifications.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/notification.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/drop_loc_select.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
+import 'package:tagxiuser/functions/notifications.dart';
+import 'package:tagxiuser/pages/NavigatorPages/notification.dart';
+import 'package:tagxiuser/pages/onTripPage/booking_confirmation.dart';
+import 'package:tagxiuser/pages/onTripPage/drop_loc_select.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/noInternet/nointernet.dart';
+import 'package:tagxiuser/translations/translation.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/functions/geohash.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/functions/geohash.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/styles/styles.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'package:location/location.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
 import 'dart:ui' as ui;
 import '../navDrawer/nav_drawer.dart';
 import 'package:geolocator/geolocator.dart' as geolocs;
@@ -253,11 +253,11 @@ class _MapsState extends State<Maps>
       await geolocs.Geolocator.getCurrentPosition(
           desiredAccuracy: geolocs.LocationAccuracy.low);
     }
-    if (permission == geolocs.LocationPermission.denied ||
-        permission == geolocs.LocationPermission.deniedForever) {
+    if (permission == PermissionStatus.granted ||
+        permission == PermissionStatus.deniedForever) {
       //  var _lpermission = await perm.Permission.location.shouldShowRequestRationale;
       //  print(_lpermission);
-      if (permission != geolocs.LocationPermission.deniedForever) {
+      if (permission != PermissionStatus.deniedForever) {
         await perm.Permission.location.request();
       }
     }

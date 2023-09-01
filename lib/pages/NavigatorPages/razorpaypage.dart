@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/noInternet.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/noInternet/noInternet.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 // ignore: must_be_immutable
@@ -83,13 +83,28 @@ class _RazorPayPageState extends State<RazorPayPage> {
 
 //payment gateway code
   payMoney() async {
+    var val = await razorpayCreateOrder(addMoney * 100,(walletBalance['razor_pay_environment'] == 'test')
+          ? walletBalance['razorpay_test_api_key']
+          : walletBalance['razorpay_live_api_key'],(walletBalance['razor_pay_environment'] == 'test')
+          ? walletBalance['razorpay_test_secret_key']
+          : walletBalance['razorpay_live_secret_key'], );
+    if(val == 'logout'){
+      _isLoading = false;
+      navigateLogout();
+    }else if(val == 'failure'){
+      setState(() {
+      _failed = true;
+      _isLoading = false;
+    });
+    }else{
     var options = {
       'key': (walletBalance['razor_pay_environment'] == 'test')
           ? walletBalance['razorpay_test_api_key']
           : walletBalance['razorpay_live_api_key'],
-      'amount': addMoney * 100,
+      'amount': val['amount'],
       'name': userDetails['name'],
       'description': '',
+      'order_id':val['id'],
       'prefill': {
         'contact': userDetails['mobile'],
         'email': userDetails['email']
@@ -97,6 +112,7 @@ class _RazorPayPageState extends State<RazorPayPage> {
     };
 
     await _razorpay.open(options);
+    }
   }
 
   @override

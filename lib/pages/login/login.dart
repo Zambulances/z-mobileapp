@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/otp_page.dart';
-import 'package:tagyourtaxi_driver/pages/login/signinwithemail.dart';
-import 'package:tagyourtaxi_driver/pages/noInternet/nointernet.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/otp_page.dart';
+import 'package:tagxiuser/pages/login/signinwithemail.dart';
+import 'package:tagxiuser/pages/noInternet/nointernet.dart';
+import 'package:tagxiuser/translations/translation.dart';
 import '../../styles/styles.dart';
 import '../../functions/functions.dart';
 import '../../widgets/widgets.dart';
@@ -400,7 +400,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser('terms and conditions url');
+                                      openBrowser('https://tagyourtaxi.com/privacy-policy');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]['text_terms'],
@@ -417,7 +417,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser('privacy policy url');
+                                      openBrowser('https://tagyourtaxi.com/privacy-policy');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]

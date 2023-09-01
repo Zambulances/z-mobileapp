@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tagyourtaxi_driver/functions/functions.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/cashfreepage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/flutterwavepage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/paystackpayment.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/razorpaypage.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/selectwallet.dart';
-import 'package:tagyourtaxi_driver/pages/NavigatorPages/walletpage.dart';
-import 'package:tagyourtaxi_driver/pages/loadingPage/loading.dart';
-import 'package:tagyourtaxi_driver/pages/login/login.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/booking_confirmation.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/map_page.dart';
-import 'package:tagyourtaxi_driver/pages/onTripPage/review_page.dart';
-import 'package:tagyourtaxi_driver/styles/styles.dart';
-import 'package:tagyourtaxi_driver/translations/translation.dart';
-import 'package:tagyourtaxi_driver/widgets/widgets.dart';
+import 'package:tagxiuser/functions/functions.dart';
+import 'package:tagxiuser/pages/NavigatorPages/cashfreepage.dart';
+import 'package:tagxiuser/pages/NavigatorPages/ccavenue.dart';
+import 'package:tagxiuser/pages/NavigatorPages/flutterwavepage.dart';
+import 'package:tagxiuser/pages/NavigatorPages/paystackpayment.dart';
+import 'package:tagxiuser/pages/NavigatorPages/razorpaypage.dart';
+import 'package:tagxiuser/pages/NavigatorPages/selectwallet.dart';
+import 'package:tagxiuser/pages/NavigatorPages/walletpage.dart';
+import 'package:tagxiuser/pages/loadingPage/loading.dart';
+import 'package:tagxiuser/pages/login/login.dart';
+import 'package:tagxiuser/pages/onTripPage/booking_confirmation.dart';
+import 'package:tagxiuser/pages/onTripPage/map_page.dart';
+import 'package:tagxiuser/pages/onTripPage/review_page.dart';
+import 'package:tagxiuser/styles/styles.dart';
+import 'package:tagxiuser/translations/translation.dart';
+import 'package:tagxiuser/widgets/widgets.dart';
 
 class Invoice extends StatefulWidget {
   const Invoice({Key? key}) : super(key: key);
@@ -904,6 +905,66 @@ class _InvoiceState extends State<Invoice> {
                                                 ),
                                               ))
                                           : Container(),
+//ccavenue
+                                          (walletBalance['ccAvenue'] ==
+                                                          true)
+                                                      ? Container(
+                                                          margin: EdgeInsets.only(
+                                                              bottom:
+                                                                  media.width *
+                                                                      0.025),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          width:
+                                                              media.width * 0.7,
+                                                          child: InkWell(
+                                                            onTap: () async {
+                                                              addMoney = int.parse(
+                                                      userRequestData['requestBill']
+                                                                  ['data']
+                                                              ['total_amount']
+                                                          .toStringAsFixed(0));
+                                                              var val = await Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                               CcavenuePage(from:'1')));
+                                                                               
+                                                              if (val != null) {
+                                                    if (val) {
+                                                      setState(() {
+                                                        _isLoading = true;
+                                                        _choosePayment = false;
+                                                      });
+                                                      var val =
+                                                          await getUserDetails();
+                                                      if (val == 'logout') {
+                                                        navigateLogout();
+                                                      }
+                                                      setState(() {
+                                                        _isLoading = false;
+                                                      });
+                                                    }
+                                                  }
+                                                            },
+                                                            child: Container(
+                                                              width:
+                                                                  media.width *
+                                                                      0.25,
+                                                              height:
+                                                                  media.width *
+                                                                      0.125,
+                                                              decoration: const BoxDecoration(
+                                                                  image: DecorationImage(
+                                                                      image: AssetImage(
+                                                                          'assets/images/ccavenue.png'),
+                                                                      fit: BoxFit
+                                                                          .contain)),
+                                                            ),
+                                                          ))
+                                                      : Container(),
+
                                       (walletBalance['cash_free'] == true)
                                           ? Container(
                                               margin: EdgeInsets.only(
