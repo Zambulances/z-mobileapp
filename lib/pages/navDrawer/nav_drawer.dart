@@ -44,6 +44,28 @@ class _NavDrawerState extends State<NavDrawer> {
         (route) => false);
   }
 
+  themefun() {
+    if (isDarkTheme == true) {
+      isDarkTheme = false;
+      page = Colors.black;
+      textColor = Colors.white;
+      buttonColor = Colors.white;
+      loaderColor = Colors.white;
+      buttonText = Colors.black;
+    } else {
+      isDarkTheme = true;
+      page = Colors.white;
+      textColor = Colors.black;
+      buttonColor = theme;
+      loaderColor = theme;
+      buttonText = const Color(0xffFFFFFF);
+    }
+    darktheme();
+
+    pref.setBool('isDarkTheme', isDarkTheme);
+    valueNotifierHome.incrementNotifier();
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -189,102 +211,71 @@ class _NavDrawerState extends State<NavDrawer> {
                                                 width: media.width * 0.7,
                                                 child: Column(
                                                   children: [
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  media.width *
-                                                                      0.025),
-                                                          child: Row(
-                                                            children: [
-                                                              Icon(
-                                                                isDarkTheme
-                                                                    ? Icons
-                                                                        .brightness_4_outlined
-                                                                    : Icons
-                                                                        .brightness_3_rounded,
-                                                                size: media
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        themefun();
+                                                      },
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .all(media
                                                                         .width *
-                                                                    0.075,
-                                                                color:
-                                                                    textColor,
-                                                              ),
-                                                              SizedBox(
-                                                                width: media
-                                                                        .width *
-                                                                    0.025,
-                                                              ),
-                                                              SizedBox(
-                                                                width: media
-                                                                        .width *
-                                                                    0.35,
-                                                                child: Text(
-                                                                  languages[
-                                                                          choosenLanguage]
-                                                                      [
-                                                                      'text_select_theme'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                  style: GoogleFonts.roboto(
-                                                                      fontSize:
-                                                                          media.width *
-                                                                              sixteen,
-                                                                      color:
-                                                                          textColor),
+                                                                    0.025),
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(
+                                                                  isDarkTheme
+                                                                      ? Icons
+                                                                          .brightness_4_outlined
+                                                                      : Icons
+                                                                          .brightness_3_rounded,
+                                                                  size: media
+                                                                          .width *
+                                                                      0.075,
+                                                                  color:
+                                                                      textColor,
                                                                 ),
-                                                              )
-                                                            ],
+                                                                SizedBox(
+                                                                  width: media
+                                                                          .width *
+                                                                      0.025,
+                                                                ),
+                                                                SizedBox(
+                                                                  width: media
+                                                                          .width *
+                                                                      0.35,
+                                                                  child: Text(
+                                                                    languages[
+                                                                            choosenLanguage]
+                                                                        [
+                                                                        'text_select_theme'],
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                    style: GoogleFonts.roboto(
+                                                                        fontSize:
+                                                                            media.width *
+                                                                                sixteen,
+                                                                        color:
+                                                                            textColor),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
                                                           ),
-                                                        ),
-                                                        Switch(
-                                                            value: isDarkTheme,
-                                                            onChanged:
-                                                                (toggle) async {
-                                                              isDarkTheme =
-                                                                  toggle;
-                                                              await darktheme();
-                                                              if (toggle ==
-                                                                  true) {
-                                                                page = Colors
-                                                                    .black;
-                                                                textColor =
-                                                                    Colors
-                                                                        .white;
-                                                                buttonColor =
-                                                                    Colors
-                                                                        .white;
-                                                                loaderColor =
-                                                                    Colors
-                                                                        .white;
-                                                                buttonText =
-                                                                    Colors
-                                                                        .black;
-                                                              } else {
-                                                                page = Colors
-                                                                    .white;
-                                                                textColor =
-                                                                    Colors
-                                                                        .black;
-                                                                buttonColor =
-                                                                    theme;
-                                                                loaderColor =
-                                                                    theme;
-                                                                buttonText =
-                                                                    const Color(
-                                                                        0xffFFFFFF);
-                                                              }
-                                                              pref.setBool(
-                                                                  'isDarkTheme',
-                                                                  isDarkTheme);
-                                                              valueNotifierHome
-                                                                  .incrementNotifier();
-                                                            }),
-                                                      ],
+                                                          Switch(
+                                                              value:
+                                                                  isDarkTheme,
+                                                              onChanged:
+                                                                  (toggle) async {
+                                                                themefun();
+                                                              }),
+                                                        ],
+                                                      ),
                                                     ),
 
                                                     //my route bookings

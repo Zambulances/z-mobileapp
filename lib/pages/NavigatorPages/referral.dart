@@ -74,7 +74,6 @@ class _ReferralPageState extends State<ReferralPage> {
         if (jsonDecode(response.body)['results'].isNotEmpty) {
           ios = jsonDecode(response.body)['results'][0]['trackViewUrl'];
         }
-        // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
       }
     }
   }
@@ -138,7 +137,6 @@ class _ReferralPageState extends State<ReferralPage> {
                                         Positioned(
                                             child: InkWell(
                                                 onTap: () {
-                                                  // print(myReferralCode);
                                                   Navigator.pop(context);
                                                 },
                                                 child: Icon(

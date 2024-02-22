@@ -130,7 +130,7 @@ class _LoginState extends State<Login> {
                                                       Container(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .only(
+                                                                .only(
                                                                 left: 20,
                                                                 right: 20),
                                                         height: 40,
@@ -397,8 +397,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser(
-                                          'https://tagyourtaxi.com/privacy-policy');
+                                      openBrowser('${url}terms');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]['text_terms'],
@@ -415,8 +414,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser(
-                                          'https://tagyourtaxi.com/privacy-policy');
+                                      openBrowser('${url}privacy');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]
@@ -434,43 +432,46 @@ class _LoginState extends State<Login> {
                         SizedBox(
                           height: media.height * 0.03,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.email,
-                                size: media.width * eighteen,
-                                color: textColor.withOpacity(0.7)),
-                            SizedBox(width: media.width * 0.02),
-                            Text(
-                              languages[choosenLanguage]['text_continue_with'],
-                              style: GoogleFonts.roboto(
-                                color: textColor.withOpacity(0.7),
-                                fontSize: media.width * sixteen,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            SizedBox(
-                              width: media.width * 0.01,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                controller.clear();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignInwithEmail()));
-                              },
-                              child: Text(
-                                languages[choosenLanguage]['text_email'],
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * sixteen,
-                                    fontWeight: FontWeight.w400,
-                                    color: buttonColor),
-                              ),
-                            )
-                          ],
-                        ),
+                        (isemailmodule == '1')
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.email,
+                                      size: media.width * eighteen,
+                                      color: textColor.withOpacity(0.7)),
+                                  SizedBox(width: media.width * 0.02),
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_continue_with'],
+                                    style: GoogleFonts.roboto(
+                                      color: textColor.withOpacity(0.7),
+                                      fontSize: media.width * sixteen,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: media.width * 0.01,
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      controller.clear();
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SignInwithEmail()));
+                                    },
+                                    child: Text(
+                                      languages[choosenLanguage]['text_email'],
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * sixteen,
+                                          fontWeight: FontWeight.w400,
+                                          color: buttonColor),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : Container(),
                         SizedBox(
                           height: media.height * 0.1,
                         ),

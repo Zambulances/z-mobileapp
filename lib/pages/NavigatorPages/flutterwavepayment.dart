@@ -73,7 +73,7 @@ class _FlutterWavePageState extends State<FlutterWavePage> {
         publicKey: (walletBalance['flutterwave_environment'] == 'test')
             ? walletBalance['flutter_wave_test_secret_key']
             : walletBalance['flutter_wave_live_secret_key'],
-        currency: "NGN", //walletBalance['currency_code']
+        currency: walletBalance['currency_code'],
         txRef: '${userDetails['id']}_${DateTime.now()}',
         amount: addMoney.toString(),
         customer: customer,

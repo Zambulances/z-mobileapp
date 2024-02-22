@@ -25,6 +25,7 @@ class _MakeComplaintState extends State<MakeComplaint> {
   bool _showOptions = false;
   TextEditingController complaintText = TextEditingController();
   bool _success = false;
+  String _error = '';
 
   @override
   void initState() {
@@ -177,7 +178,10 @@ class _MakeComplaintState extends State<MakeComplaint> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(
-                                      color: borderLines, width: 1.2)),
+                                      color: (_error == '')
+                                          ? borderLines
+                                          : Colors.red,
+                                      width: 1.2)),
                               child: TextField(
                                 controller: complaintText,
                                 minLines: 5,
@@ -194,11 +198,29 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                           ['text_complaint_3'] +
                                       ')',
                                 ),
+                                onChanged: (value) {
+                                  if (value.length >= 10 && _error != '') {
+                                    setState(() {
+                                      _error = '';
+                                    });
+                                  }
+                                },
                                 style: GoogleFonts.roboto(
                                   color: textColor,
                                 ),
                               ),
                             ),
+                            if (_error != '')
+                              Container(
+                                  width: media.width * 0.8,
+                                  padding: EdgeInsets.only(
+                                      top: media.width * 0.025,
+                                      bottom: media.width * 0.025),
+                                  child: Text(_error,
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * fourteen,
+                                          fontWeight: FontWeight.w600,
+                                          color: verifyDeclined))),
                           ]))
                         : Container(),
                     (generalComplaintList.isNotEmpty)
@@ -224,6 +246,11 @@ class _MakeComplaintState extends State<MakeComplaint> {
                                     }
                                     setState(() {
                                       _isLoading = false;
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _error = languages[choosenLanguage]
+                                          ['text_complaint_text_error'];
                                     });
                                   }
                                 },
@@ -314,8 +341,6 @@ class _MakeComplaintState extends State<MakeComplaint> {
                             width: media.width * 0.9,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(12),
-                              // border:
-                              //     Border.all(width: 1.2, color: borderLines),
                               color: page,
                             ),
                             child: Column(

@@ -55,8 +55,8 @@ dynamic centerCheck;
 String ischeckownerordriver = '';
 
 //base url
-String url = 'https://tagxi-server.ondemandappz.com/';
-String mapkey = 'AIzaSyD9g7Gv0okelx6Ntjh2mV7fK0QRSI0gRSI';
+String url = 'http://44.217.123.204/';
+String mapkey = 'AIzaSyDuPKZ57JPNy_kTT3KNCfSsO7PojNOqidg';
 String mapStyle = '';
 
 getDetailsOfDevice() async {
@@ -452,7 +452,6 @@ emailVerify(String email, otpNumber) async {
         body: {"email": email, "otp": otpNumber});
     if (response.statusCode == 200) {
       if (jsonDecode(response.body)['success'] == true) {
-        // print(otpval);
         otpval = 'success';
       } else {
         debugPrint(response.body);
@@ -1227,6 +1226,7 @@ verifyUser(String number) async {
       internet = false;
     }
   }
+
   return val;
 }
 
@@ -1419,9 +1419,7 @@ getUserDetails() async {
           valueNotifierHome.incrementNotifier();
         } else {
           duration = 0;
-          if (driverReq.isNotEmpty) {
-            // audioPlayer.play(audio);
-          }
+
           chatList.clear();
           driverReq = {};
           valueNotifierHome.incrementNotifier();
@@ -1585,7 +1583,7 @@ currentPositionUpdate() async {
         final firebase = FirebaseDatabase.instance.ref();
 
         try {
-          firebase.child('drivers/${userDetails['id']}').update({
+          firebase.child('drivers/driver_${userDetails['id']}').update({
             'bearing': heading,
             'date': DateTime.now().toString(),
             'id': userDetails['id'],
@@ -1636,7 +1634,7 @@ currentPositionUpdate() async {
       }
       if (userDetails['role'] == 'driver') {
         var driverState = await FirebaseDatabase.instance
-            .ref('drivers/${userDetails['id']}')
+            .ref('drivers/driver_${userDetails['id']}')
             .get();
         if (driverState.child('approve').value == 0 &&
             userDetails['approve'] == true) {
@@ -1656,7 +1654,7 @@ currentPositionUpdate() async {
         if (driverState.child('fleet_changed').value == 1) {
           FirebaseDatabase.instance
               .ref()
-              .child('drivers/${userDetails['id']}')
+              .child('drivers/driver_${userDetails['id']}')
               .update({'fleet_changed': 0});
           await getUserDetails();
           valueNotifierHome.incrementNotifier();
@@ -1666,7 +1664,7 @@ currentPositionUpdate() async {
         if (driverState.child('is_deleted').value == 1) {
           FirebaseDatabase.instance
               .ref()
-              .child('drivers/${userDetails['id']}')
+              .child('drivers/driver_${userDetails['id']}')
               .remove();
           await getUserDetails();
           valueNotifierHome.incrementNotifier();
@@ -1676,7 +1674,7 @@ currentPositionUpdate() async {
               userDetails['vehicle_type_icon_for']) {
             FirebaseDatabase.instance
                 .ref()
-                .child('drivers/${userDetails['id']}')
+                .child('drivers/driver_${userDetails['id']}')
                 .update({
               'vehicle_type_icon': userDetails['vehicle_type_icon_for']
             });
@@ -1684,7 +1682,7 @@ currentPositionUpdate() async {
         } else {
           FirebaseDatabase.instance
               .ref()
-              .child('drivers/${userDetails['id']}')
+              .child('drivers/driver_${userDetails['id']}')
               .update(
                   {'vehicle_type_icon': userDetails['vehicle_type_icon_for']});
         }
@@ -1797,14 +1795,14 @@ calculateDistance(lat1, lon1, lat2, lon2) {
 
 userInactive() {
   final firebase = FirebaseDatabase.instance.ref();
-  firebase.child('drivers/${userDetails['id']}').update({
+  firebase.child('drivers/driver_${userDetails['id']}').update({
     'is_active': 0,
   });
 }
 
 userActive() {
   final firebase = FirebaseDatabase.instance.ref();
-  firebase.child('drivers/${userDetails['id']}').update({
+  firebase.child('drivers/driver_${userDetails['id']}').update({
     'is_active': 1,
     'l': {'0': center.latitude, '1': center.longitude},
     'updated_at': ServerValue.timestamp,
@@ -1927,10 +1925,8 @@ createRequest(name, phone) async {
           'mobile': phone
         }));
     if (response.statusCode == 200) {
-      // print(response.body);
       await getUserDetails();
       result = 'success';
-      // valueNotifierHome.incrementNotifier();
     } else if (response.statusCode == 401) {
       result = 'logout';
     } else {
@@ -2012,7 +2008,7 @@ requestAccept() async {
         if (driverReq.isNotEmpty) {
           FirebaseDatabase.instance
               .ref()
-              .child('drivers/${userDetails['id']}')
+              .child('drivers/driver_${userDetails['id']}')
               .update({'is_available': false});
           duration = 0;
           requestStreamStart?.cancel();
@@ -2577,7 +2573,7 @@ userRating() async {
     if (response.statusCode == 200) {
       FirebaseDatabase.instance
           .ref()
-          .child('drivers/${userDetails['id']}')
+          .child('drivers/driver_${userDetails['id']}')
           .update({'is_available': true});
       await getUserDetails();
       result = true;
@@ -2858,7 +2854,7 @@ deletefleetdriver(driverid) async {
     if (response.statusCode == 200) {
       FirebaseDatabase.instance
           .ref()
-          .child('drivers/$driverid')
+          .child('drivers/driver_$driverid')
           .update({'is_deleted': 1});
       result = 'success';
     } else if (response.statusCode == 401) {
@@ -3040,8 +3036,8 @@ getFaqData(lat, lng) async {
 getFaqPages(id) async {
   dynamic result;
   try {
-    var response = await http
-        .get(Uri.parse('${url}api/v1/common/faq/list/$id'), headers: {
+    var response =
+        await http.get(Uri.parse('${url}api/v1/common/faq/list/$id'), headers: {
       'Authorization': 'Bearer ${bearerToken[0].token}',
       'Content-Type': 'application/json'
     });
@@ -3139,11 +3135,6 @@ getHistoryPages(id) async {
 Map<String, dynamic> walletBalance = {};
 List walletHistory = [];
 Map<String, dynamic> walletPages = {};
-
-// void printWrapped(String text) {
-//   final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
-//   pattern.allMatches(text).forEach((match) => debugPrint(match.group(0)));
-// }
 
 getWalletHistory() async {
   walletBalance.clear();
@@ -3465,10 +3456,10 @@ addMoneyFlutterwave(amount, nonce) async {
 
 //razorpay
 
-razorpayCreateOrder(amount,publishkey,secretkey)async{
+razorpayCreateOrder(amount, publishkey, secretkey) async {
   dynamic result;
   String basicAuth =
-        'Basic ${base64Encode(utf8.encode('$publishkey:$secretkey'))}';
+      'Basic ${base64Encode(utf8.encode('$publishkey:$secretkey'))}';
   try {
     var response = await http.post(
         Uri.parse('https://api.razorpay.com/v1/orders'),
@@ -3476,11 +3467,12 @@ razorpayCreateOrder(amount,publishkey,secretkey)async{
           'Authorization': basicAuth,
           'Content-Type': 'application/json'
         },
-        body: jsonEncode(
-            {'amount': amount,
-             "currency": "INR",
-      "receipt": 'user_${userDetails['id'].toString()}_${DateTime.now().toString()}'
-      }));
+        body: jsonEncode({
+          'amount': amount,
+          "currency": "INR",
+          "receipt":
+              'user_${userDetails['id'].toString()}_${DateTime.now().toString()}'
+        }));
     if (response.statusCode == 200) {
       result = jsonDecode(response.body);
     } else if (response.statusCode == 401) {
@@ -3493,7 +3485,7 @@ razorpayCreateOrder(amount,publishkey,secretkey)async{
     if (e is SocketException) {
       internet = false;
       result = 'no internet';
-    }else{
+    } else {
       result = 'failure';
     }
   }
@@ -3629,10 +3621,9 @@ userLogout() async {
       if (platform == TargetPlatform.android) {
         platforms.invokeMethod('logout');
       }
-      // print(id);
       if (role != 'owner') {
         final position = FirebaseDatabase.instance.ref();
-        position.child('drivers/$id').update({
+        position.child('drivers/driver_$id').update({
           'is_active': 0,
         });
       }
@@ -4250,7 +4241,8 @@ streamRide() {
       }
     } else if (event.snapshot.key.toString() == 'message_by_user') {
       getCurrentMessages();
-    } else if (event.snapshot.key.toString() == 'is_paid') {
+    } else if (event.snapshot.key.toString() == 'is_paid' ||
+        event.snapshot.key.toString() == 'modified_by_user') {
       getUserDetails();
     }
   });
@@ -4266,7 +4258,8 @@ streamRide() {
       userReject = true;
     } else if (event.snapshot.key.toString() == 'message_by_user') {
       getCurrentMessages();
-    } else if (event.snapshot.key.toString() == 'is_paid') {
+    } else if (event.snapshot.key.toString() == 'is_paid' ||
+        event.snapshot.key.toString() == 'modified_by_user') {
       getUserDetails();
     }
   });
@@ -4283,7 +4276,7 @@ geolocs.LocationSettings locationSettings = (platform == TargetPlatform.android)
         foregroundNotificationConfig:
             const geolocs.ForegroundNotificationConfig(
           notificationText:
-              "Tagxi Driver will continue to receive your location in background",
+              "product.name will continue to receive your location in background",
           notificationTitle: "Location background service running",
           enableWakeLock: true,
         ))
@@ -4419,8 +4412,6 @@ enableMyRouteBookings(lat, lng) async {
   return result;
 }
 
-
-
 var ccUrl = '';
 getCcavenuePayment(body) async {
   dynamic results;
@@ -4434,11 +4425,11 @@ getCcavenuePayment(body) async {
             },
             body: body);
     if (response.statusCode == 200) {
-      
       var data = jsonDecode(response.body);
-      ccUrl = 'https://secure.ccavenue.com/transaction.do?command=initiateTransaction&encRequest=${data['enc_val']}&access_code=${data['access_code']}';
-  
-        results = 'success';
+      ccUrl =
+          'https://secure.ccavenue.com/transaction.do?command=initiateTransaction&encRequest=${data['enc_val']}&access_code=${data['access_code']}';
+
+      results = 'success';
     } else if (response.statusCode == 401) {
       results = 'logout';
     } else {
@@ -4452,4 +4443,62 @@ getCcavenuePayment(body) async {
     }
   }
   return results;
+}
+
+paymentReceived() async {
+  dynamic result;
+  try {
+    var response =
+        await http.post(Uri.parse('${url}api/v1/request/payment-confirm'),
+            headers: {
+              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({'request_id': driverReq['id']}));
+    if (response.statusCode == 200) {
+      FirebaseDatabase.instance
+          .ref('requests')
+          .child(driverReq['id'])
+          .update({'modified_by_driver': ServerValue.timestamp});
+      await getUserDetails();
+      result = 'success';
+      valueNotifierHome.incrementNotifier();
+    } else if (response.statusCode == 401) {
+      result = 'logout';
+    } else {
+      debugPrint(response.body);
+      result = 'failed';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+  return result;
+}
+
+String ownermodule = '1';
+String isemailmodule = '1';
+getOwnermodule() async {
+  dynamic res;
+  try {
+    final response = await http.get(
+      Uri.parse('${url}api/v1/common/modules'),
+    );
+
+    if (response.statusCode == 200) {
+      ownermodule = jsonDecode(response.body)['enable_owner_login'];
+      isemailmodule = jsonDecode(response.body)['enable_email_otp'];
+
+      res = 'success';
+    } else {
+      debugPrint(response.body);
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      res = 'no internet';
+    }
+  }
+  return res;
 }

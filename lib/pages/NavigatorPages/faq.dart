@@ -112,8 +112,8 @@ class _FaqState extends State<Faq> {
                           child: SingleChildScrollView(
                             child: (faqData.isNotEmpty)
                                 ? Column(
-                                  children: [
-                                    Column(
+                                    children: [
+                                      Column(
                                         children: faqData
                                             .asMap()
                                             .map((i, value) {
@@ -128,18 +128,20 @@ class _FaqState extends State<Faq> {
                                                     child: Container(
                                                       width: media.width * 0.9,
                                                       margin: EdgeInsets.only(
-                                                          top: media.width * 0.025,
-                                                          bottom:
-                                                              media.width * 0.025),
+                                                          top: media.width *
+                                                              0.025,
+                                                          bottom: media.width *
+                                                              0.025),
                                                       padding: EdgeInsets.all(
                                                           media.width * 0.05),
                                                       decoration: BoxDecoration(
                                                           borderRadius:
-                                                              BorderRadius.circular(
-                                                                  8),
+                                                              BorderRadius
+                                                                  .circular(8),
                                                           color: page,
                                                           border: Border.all(
-                                                              color: borderLines,
+                                                              color:
+                                                                  borderLines,
                                                               width: 1.2)),
                                                       child: Column(
                                                         children: [
@@ -153,16 +155,16 @@ class _FaqState extends State<Faq> {
                                                             children: [
                                                               SizedBox(
                                                                   // color: Colors.red,
-                                                                  width:
-                                                                      media.width *
-                                                                          0.7,
+                                                                  width: media
+                                                                          .width *
+                                                                      0.7,
                                                                   child: Text(
                                                                     faqData[i][
                                                                         'question'],
                                                                     style: GoogleFonts.roboto(
-                                                                        fontSize: media
-                                                                                .width *
-                                                                            fourteen,
+                                                                        fontSize:
+                                                                            media.width *
+                                                                                fourteen,
                                                                         fontWeight:
                                                                             FontWeight
                                                                                 .w600,
@@ -175,8 +177,8 @@ class _FaqState extends State<Faq> {
                                                                               i)
                                                                           ? 2
                                                                           : 0,
-                                                                  child:
-                                                                      Image.asset(
+                                                                  child: Image
+                                                                      .asset(
                                                                     'assets/images/chevron-down.png',
                                                                     width: media
                                                                             .width *
@@ -194,16 +196,15 @@ class _FaqState extends State<Faq> {
                                                                     i)
                                                                 ? Container(
                                                                     padding: EdgeInsets.only(
-                                                                        top: media
-                                                                                .width *
+                                                                        top: media.width *
                                                                             0.025),
                                                                     child: Text(
-                                                                      faqData[i][
+                                                                      faqData[i]
+                                                                          [
                                                                           'answer'],
                                                                       style: GoogleFonts.roboto(
-                                                                          fontSize:
-                                                                              media.width *
-                                                                                  twelve,
+                                                                          fontSize: media.width *
+                                                                              twelve,
                                                                           color:
                                                                               textColor),
                                                                     ))
@@ -217,47 +218,56 @@ class _FaqState extends State<Faq> {
                                             .values
                                             .toList(),
                                       ),
-                                       //load more button
-                      (myFaqPage['pagination'] != null)
-                          ? (myFaqPage['pagination']['current_page'] <
-                                  myFaqPage['pagination']['total_pages'])
-                              ? InkWell(
-                                  onTap: () async {
-                                    dynamic val;
-                                    setState(() {
-                                      _isLoading = true;
-                                    });
-                                    val = await getFaqPages('${center.latitude}/${center.longitude}?page=${myFaqPage['pagination']['current_page'] + 1}');
-                                    if (val == 'logout') {
-                                      navigateLogout();
-                                    }
-                                    setState(() {
-                                      _isLoading = false;
-                                    });
-                                  },
-                                  child: Container(
-                                    padding:
-                                        EdgeInsets.all(media.width * 0.025),
-                                    margin: EdgeInsets.only(
-                                        bottom: media.width * 0.05),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: page,
-                                        border: Border.all(
-                                            color: borderLines, width: 1.2)),
-                                    child: Text(
-                                      languages[choosenLanguage]
-                                          ['text_loadmore'],
-                                      style: GoogleFonts.roboto(
-                                          fontSize: media.width * sixteen,
-                                          color: textColor),
-                                    ),
-                                  ),
-                                )
-                              : Container()
-                          : Container()
-                                  ],
-                                )
+                                      //load more button
+                                      (myFaqPage['pagination'] != null)
+                                          ? (myFaqPage['pagination']
+                                                      ['current_page'] <
+                                                  myFaqPage['pagination']
+                                                      ['total_pages'])
+                                              ? InkWell(
+                                                  onTap: () async {
+                                                    dynamic val;
+                                                    setState(() {
+                                                      _isLoading = true;
+                                                    });
+                                                    val = await getFaqPages(
+                                                        '${center.latitude}/${center.longitude}?page=${myFaqPage['pagination']['current_page'] + 1}');
+                                                    if (val == 'logout') {
+                                                      navigateLogout();
+                                                    }
+                                                    setState(() {
+                                                      _isLoading = false;
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(
+                                                        media.width * 0.025),
+                                                    margin: EdgeInsets.only(
+                                                        bottom:
+                                                            media.width * 0.05),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: page,
+                                                        border: Border.all(
+                                                            color: borderLines,
+                                                            width: 1.2)),
+                                                    child: Text(
+                                                      languages[choosenLanguage]
+                                                          ['text_loadmore'],
+                                                      style: GoogleFonts.roboto(
+                                                          fontSize:
+                                                              media.width *
+                                                                  sixteen,
+                                                          color: textColor),
+                                                    ),
+                                                  ),
+                                                )
+                                              : Container()
+                                          : Container()
+                                    ],
+                                  )
                                 : (_faqCompleted == true)
                                     ? Text(
                                         languages[choosenLanguage]

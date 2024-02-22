@@ -18,7 +18,18 @@ class _SignupMethodState extends State<SignupMethod> {
   @override
   void initState() {
     ischeckownerordriver = '';
+    checkmodule();
     super.initState();
+  }
+
+  checkmodule() {
+    if (ownermodule == '0') {
+      ischeckownerordriver == 'driver';
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const Login()));
+      });
+    }
   }
 
   @override

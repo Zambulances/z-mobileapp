@@ -63,7 +63,6 @@ class _AddDriverState extends State<AddDriver> {
         _showToast = false;
         Navigator.pop(context, true);
       });
-      // await fleetDriverDetails();
     });
   }
 
@@ -205,7 +204,7 @@ class _AddDriverState extends State<AddDriver> {
                                                             Container(
                                                               padding:
                                                                   const EdgeInsets
-                                                                          .only(
+                                                                      .only(
                                                                       left: 20,
                                                                       right:
                                                                           20),

@@ -172,7 +172,6 @@ class _DriverListState extends State<DriverList> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           10.0),
-                                                  // color: Colors.white,
                                                   color: (isDarkTheme == true)
                                                       ? Colors.black
                                                       : topBar,
@@ -201,15 +200,13 @@ class _DriverListState extends State<DriverList> {
                                                                     0.01),
                                                         decoration:
                                                             BoxDecoration(
-                                                          // color: Colors.white,
                                                           color: (isDarkTheme ==
                                                                   true)
                                                               ? Colors.black
                                                               : topBar,
                                                           borderRadius:
                                                               const BorderRadius
-                                                                      .all(
-                                                                  Radius
+                                                                  .all(Radius
                                                                       .circular(
                                                                           10)),
                                                           boxShadow: const [
@@ -248,7 +245,7 @@ class _DriverListState extends State<DriverList> {
                                                                             .cover),
                                                                 borderRadius:
                                                                     const BorderRadius
-                                                                            .all(
+                                                                        .all(
                                                                         Radius.circular(
                                                                             10)),
                                                               ),
@@ -341,17 +338,12 @@ class _DriverListState extends State<DriverList> {
                                                                               'approve'] ==
                                                                           false
                                                                       ? Container(
-                                                                          // width:
-                                                                          //     media.width * 0.4,
                                                                           alignment:
                                                                               Alignment.center,
                                                                           padding:
                                                                               EdgeInsets.all(media.width * 0.01),
                                                                           decoration:
                                                                               BoxDecoration(
-                                                                            // border: Border.all(
-                                                                            //     color: Colors.yellow,
-                                                                            //     width: 2),
                                                                             color:
                                                                                 buttonColor,
                                                                             borderRadius:

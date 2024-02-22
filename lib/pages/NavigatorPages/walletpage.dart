@@ -15,6 +15,8 @@ import 'package:tagxidriver/styles/styles.dart';
 import 'package:tagxidriver/translation/translation.dart';
 import 'package:tagxidriver/widgets/widgets.dart';
 
+import 'mercadopago.dart';
+
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
 
@@ -172,19 +174,27 @@ class _WalletPageState extends State<WalletPage> {
                                     SizedBox(
                                       height: media.width * 0.05,
                                     ),
-                                    Button(
-                                      onTap: () {
-                                        setState(() {
-                                          ispop = true;
-                                        });
-                                      },
-                                      text: languages[choosenLanguage]
-                                          ['text_share_money'],
-                                      width: media.width * 0.3,
-                                    ),
-                                    SizedBox(
-                                      height: media.width * 0.05,
-                                    ),
+                                    (userDetails[
+                                                'shoW_wallet_money_transfer_feature_on_mobile_app'] ==
+                                            '1')
+                                        ? Button(
+                                            onTap: () {
+                                              setState(() {
+                                                ispop = true;
+                                              });
+                                            },
+                                            text: languages[choosenLanguage]
+                                                ['text_share_money'],
+                                            width: media.width * 0.3,
+                                          )
+                                        : Container(),
+                                    (userDetails[
+                                                'shoW_wallet_money_transfer_feature_on_mobile_app'] ==
+                                            '1')
+                                        ? SizedBox(
+                                            height: media.width * 0.05,
+                                          )
+                                        : Container(),
                                     SizedBox(
                                       height: media.width * 0.05,
                                     ),
@@ -348,8 +358,12 @@ class _WalletPageState extends State<WalletPage> {
                                                                   fontSize: media
                                                                           .width *
                                                                       twelve,
-                                                                  color: const Color(
-                                                                      0xffE60000),
+                                                                  color: (walletHistory[i]
+                                                                              [
+                                                                              'is_credit'] ==
+                                                                          1)
+                                                                      ? online
+                                                                      : verifyDeclined,
                                                                 ),
                                                               ),
                                                             )
@@ -458,18 +472,22 @@ class _WalletPageState extends State<WalletPage> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Button(
-                                        onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const Withdraw()));
-                                        },
-                                        text: languages[choosenLanguage]
-                                            ['text_withdraw'],
-                                        width: media.width * 0.4,
-                                      ),
+                                      (userDetails[
+                                                  'show_bank_info_feature_on_mobile_app'] ==
+                                              "1")
+                                          ? Button(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const Withdraw()));
+                                              },
+                                              text: languages[choosenLanguage]
+                                                  ['text_withdraw'],
+                                              width: media.width * 0.4,
+                                            )
+                                          : Container(),
                                       Button(
                                         onTap: () {
                                           if (_addPayment == false) {
@@ -480,7 +498,11 @@ class _WalletPageState extends State<WalletPage> {
                                         },
                                         text: languages[choosenLanguage]
                                             ['text_addmoney'],
-                                        width: media.width * 0.4,
+                                        width: (userDetails[
+                                                    'show_bank_info_feature_on_mobile_app'] ==
+                                                "1")
+                                            ? media.width * 0.4
+                                            : media.width * 0.9,
                                       ),
                                     ],
                                   ),
@@ -1034,8 +1056,8 @@ class _WalletPageState extends State<WalletPage> {
                                                           ))
                                                       : Container(),
 
-                                                      //ccavenue
-                                                      (walletBalance['ccAvenue'] ==
+                                                  //ccavenue
+                                                  (walletBalance['ccAvenue'] ==
                                                           true)
                                                       ? Container(
                                                           margin: EdgeInsets.only(
@@ -1053,7 +1075,7 @@ class _WalletPageState extends State<WalletPage> {
                                                                   MaterialPageRoute(
                                                                       builder:
                                                                           (context) =>
-                                                                               CcavenuePage()));
+                                                                              CcavenuePage()));
                                                               if (val) {
                                                                 setState(() {
                                                                   _choosePayment =
@@ -1078,6 +1100,60 @@ class _WalletPageState extends State<WalletPage> {
                                                                   image: DecorationImage(
                                                                       image: AssetImage(
                                                                           'assets/images/ccavenue.png'),
+                                                                      fit: BoxFit
+                                                                          .contain)),
+                                                            ),
+                                                          ))
+                                                      : Container(),
+                                                  (walletBalance[
+                                                              'mercadopago'] ==
+                                                          true)
+                                                      ? Container(
+                                                          margin: EdgeInsets.only(
+                                                              bottom:
+                                                                  media.width *
+                                                                      0.025),
+                                                          alignment:
+                                                              Alignment.center,
+                                                          width:
+                                                              media.width * 0.7,
+                                                          child: InkWell(
+                                                            onTap: () async {
+                                                              var val = await Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              MercadoPago()));
+                                                              if (val != null) {
+                                                                if (val) {
+                                                                  setState(() {
+                                                                    _isLoading =
+                                                                        true;
+                                                                    _choosePayment =
+                                                                        false;
+                                                                    _addPayment =
+                                                                        false;
+                                                                    addMoney =
+                                                                        null;
+                                                                    addMoneyController
+                                                                        .clear();
+                                                                  });
+                                                                  await getWallet();
+                                                                }
+                                                              }
+                                                            },
+                                                            child: Container(
+                                                              width:
+                                                                  media.width *
+                                                                      0.35,
+                                                              height:
+                                                                  media.width *
+                                                                      0.125,
+                                                              decoration: const BoxDecoration(
+                                                                  image: DecorationImage(
+                                                                      image: AssetImage(
+                                                                          'assets/images/mercadopago.png'),
                                                                       fit: BoxFit
                                                                           .contain)),
                                                             ),
@@ -1167,7 +1243,6 @@ class _WalletPageState extends State<WalletPage> {
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              // color: Colors.transparent.withOpacity(0.6),
                               color: (isDarkTheme == true)
                                   ? textColor.withOpacity(0.2)
                                   : Colors.transparent.withOpacity(0.6),
@@ -1199,12 +1274,6 @@ class _WalletPageState extends State<WalletPage> {
                                                 });
                                               },
                                               items: dropdownItems),
-
-                                          // InputField(
-                                          //     text: languages[choosenLanguage]
-                                          //         ['text_phone_number'],
-                                          //     textController: phonenumber,
-                                          //     inputType: TextInputType.number),
                                           TextFormField(
                                             controller: amount,
                                             style: GoogleFonts.roboto(
@@ -1253,8 +1322,6 @@ class _WalletPageState extends State<WalletPage> {
                                                     ?.unfocus();
                                               }
                                             },
-                                            // maxLength: countries[phcode]
-                                            //     ['dial_max_length'],
                                             style: GoogleFonts.roboto(
                                                 fontSize: media.width * sixteen,
                                                 color: textColor,

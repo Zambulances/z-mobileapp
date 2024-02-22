@@ -535,11 +535,7 @@ class _NotificationPageState extends State<NotificationPage> {
                                                   });
                                                 } else if (result == 'logout') {
                                                   navigateLogout();
-                                                } else {
-                                                  // setState(() {
-                                                  //   logout = true;
-                                                  // });
-                                                }
+                                                } else {}
                                               },
                                               text: languages[choosenLanguage]
                                                   ['text_yes']),

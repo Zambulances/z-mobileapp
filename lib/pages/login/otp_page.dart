@@ -438,32 +438,7 @@ class _OtpState extends State<Otp> {
                                                         ['text_otp_error'];
                                               });
                                             }
-                                            //firebase code send false
-                                            // if (phoneAuthCheck == false) {
-                                            //   var verify =
-                                            //       await verifyUser(email);
-                                            //   value = 1;
-                                            //   navigate(verify);
-                                            // } else {
-                                            //   // firebase code send true
-                                            //   try {
-                                            //     var verify =
-                                            //         await verifyUser(email);
-                                            //     navigate(verify);
-                                            //     value = 1;
-                                            //   } on FirebaseAuthException catch (error) {
-                                            //     if (error.code ==
-                                            //         'invalid-verification-code') {
-                                            //       setState(() {
-                                            //         otpController.clear();
-                                            //         otpNumber = '';
-                                            //         _error = languages[
-                                            //                 choosenLanguage]
-                                            //             ['text_otp_error'];
-                                            //       });
-                                            //     }
-                                            //   }
-                                            // }
+
                                             setState(() {
                                               _loading = false;
                                             });

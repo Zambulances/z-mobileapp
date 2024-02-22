@@ -71,19 +71,27 @@ class _OwnersRegisterState extends State<OwnersRegister> {
 
   getGalleryPermission() async {
     dynamic status;
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-  if (androidInfo.version.sdkInt <= 32) {
-    status = await Permission.storage.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.storage.request();
+    if (platform == TargetPlatform.android) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt <= 32) {
+        status = await Permission.storage.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.storage.request();
+        }
+
+        /// use [Permissions.storage.status]
+      } else {
+        status = await Permission.photos.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.photos.request();
+        }
+      }
+    } else {
+      status = await Permission.photos.status;
+      if (status != PermissionStatus.granted) {
+        status = await Permission.photos.request();
+      }
     }
-    /// use [Permissions.storage.status]
-  } else{
-    status = await Permission.photos.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.photos.request();
-    }
-  }
     return status;
   }
 
@@ -100,7 +108,8 @@ class _OwnersRegisterState extends State<OwnersRegister> {
   pickImageFromGallery() async {
     var permission = await getGalleryPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      final pickedFile =
+          await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
       setState(() {
         proImageFile1 = pickedFile?.path;
         _pickImage = false;
@@ -128,7 +137,8 @@ class _OwnersRegisterState extends State<OwnersRegister> {
   pickImageFromCamera() async {
     var permission = await getCameraPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      final pickedFile =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
       setState(() {
         proImageFile1 = pickedFile?.path;
         _pickImage = false;
@@ -583,11 +593,13 @@ class _OwnersRegisterState extends State<OwnersRegister> {
                                                             child: Column(
                                                               children: [
                                                                 Container(
-                                                                  padding: const EdgeInsets
+                                                                  padding:
+                                                                      const EdgeInsets
                                                                           .only(
-                                                                      left: 20,
-                                                                      right:
-                                                                          20),
+                                                                          left:
+                                                                              20,
+                                                                          right:
+                                                                              20),
                                                                   height: 40,
                                                                   width: media
                                                                           .width *

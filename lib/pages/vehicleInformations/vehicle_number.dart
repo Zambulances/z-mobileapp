@@ -86,8 +86,7 @@ class _VehicleNumberState extends State<VehicleNumber> {
                       const SizedBox(
                         height: 40,
                       ),
-                      (controller.text.length > 4 &&
-                              controller.text.length < 21)
+                      (controller.text != '' && controller.text.length < 21)
                           ? Button(
                               onTap: () {
                                 FocusManager.instance.primaryFocus?.unfocus();

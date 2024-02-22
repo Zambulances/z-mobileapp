@@ -2,24 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CLIENT_ID</key>
-	<string>214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com</string>
-	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.214496791559-69n81e5605p5hcf42if08unq4krqi5md</string>
-	<key>ANDROID_CLIENT_ID</key>
-	<string>214496791559-2ofc5fg1blq9aq4a1c8rj1mqkbmge6kq.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyAb_u7nmm8jZl7dm94lOMGT5dlajdrF46o</string>
+	<string>AIzaSyBDNeNT7ujivZparKrz5woG-2CbgQUJPVA</string>
 	<key>GCM_SENDER_ID</key>
-	<string>214496791559</string>
+	<string>825621911633</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.driver.tagxi</string>
+	<string>bundle.id</string>
 	<key>PROJECT_ID</key>
-	<string>tagxi-340103</string>
+	<string>z-ambulances</string>
 	<key>STORAGE_BUCKET</key>
-	<string>tagxi-340103.appspot.com</string>
+	<string>z-ambulances.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:214496791559:ios:80337a203fa8c59ae2eea2</string>
-	<key>DATABASE_URL</key>
-	<string>https://tagxi-340103-default-rtdb.firebaseio.com</string>
+	<string>1:825621911633:ios:ab9d452611266745ee4070</string>
 </dict>
 </plist>

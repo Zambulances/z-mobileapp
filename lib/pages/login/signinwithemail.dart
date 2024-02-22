@@ -150,7 +150,7 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                             ),
                             InkWell(
                               onTap: () {
-                                openBrowser('terms and conditions url');
+                                openBrowser('${url}terms');
                               },
                               child: Text(
                                 languages[choosenLanguage]['text_terms'],
@@ -167,7 +167,7 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                             ),
                             InkWell(
                               onTap: () {
-                                openBrowser('privacy policy url');
+                                openBrowser('${url}privacy');
                               },
                               child: Text(
                                 languages[choosenLanguage]['text_privacy'],
@@ -231,6 +231,9 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                           alignment: Alignment.center,
                           child: Button(
                               onTap: () async {
+                                setState(() {
+                                  _isLoading = true;
+                                });
                                 String pattern =
                                     r"^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])*$";
                                 RegExp regex = RegExp(pattern);
@@ -247,19 +250,16 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                                   await sendOTPtoEmail(email);
                                   value = 1;
                                   navigate();
-
-                                  setState(() {
-                                    _isLoading = false;
-                                  });
                                 } else {
-                                  setState(() {
-                                    verifyEmailError =
-                                        languages[choosenLanguage]
-                                            ['text_email_validation'];
-                                    _error = languages[choosenLanguage]
-                                        ['text_email_validation'];
-                                  });
+                                  verifyEmailError = languages[choosenLanguage]
+                                      ['text_email_validation'];
+                                  _error = languages[choosenLanguage]
+                                      ['text_email_validation'];
                                 }
+
+                                setState(() {
+                                  _isLoading = false;
+                                });
                               },
                               text: languages[choosenLanguage]['text_login']))
                       : Container(),

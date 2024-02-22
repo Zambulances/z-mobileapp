@@ -34,12 +34,10 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     final Uint8List dropicon1 =
         await getBytesFromAsset('assets/images/droploc.png', 40);
 
-    // if (mounted) {
     setState(() {
       pickicon = BitmapDescriptor.fromBytes(pickicon1);
       dropicon = BitmapDescriptor.fromBytes(dropicon1);
     });
-    // }
     addPickDropMarker();
   }
 
@@ -52,8 +50,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               myHistory[selectedHistory]['pick_lng'])));
     });
 
-    // var testIcon = await _capturePng(onlineicon);
-    // if (testIcon != null) {
     setState(() {
       myMarker.add(Marker(
           markerId: const MarkerId('pointdrop'),
@@ -61,7 +57,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
           position: LatLng(myHistory[selectedHistory]['drop_lat'],
               myHistory[selectedHistory]['drop_lng'])));
     });
-    // }
 
     LatLngBounds bound;
     if (myHistory.isNotEmpty) {
@@ -189,11 +184,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     }
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
     _controller!.moveCamera(cameraUpdate);
-    // await getPolylineshistory(
-    //     pickLat: myHistory[selectedHistory]['pick_lat'],
-    //     pickLng: myHistory[selectedHistory]['pick_lng'],
-    //     dropLat: myHistory[selectedHistory]['drop_lat'],
-    //     dropLng: myHistory[selectedHistory]['drop_lng']);
+
     setState(() {});
   }
 
@@ -286,20 +277,16 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                         padding: EdgeInsets.all(media.width * 0.034),
                         height: media.width * 0.5,
                         width: media.width * 0.9,
-                        // color: Colors.black,
                         child: GoogleMap(
                           padding: const EdgeInsets.all(5),
                           onMapCreated: onMapCreated,
                           compassEnabled: false,
                           initialCameraPosition: CameraPosition(
                             target: center,
-                            // zoom: 0.0,
                           ),
                           markers: Set<Marker>.from(myMarker),
                           scrollGesturesEnabled: false,
                           zoomGesturesEnabled: false,
-                          polylines: polylineHistory,
-                          // minMaxZoomPreference: const MinMaxZoomPreference(0.0, 20.0),
                           myLocationButtonEnabled: false,
                           buildingsEnabled: false,
                           zoomControlsEnabled: false,

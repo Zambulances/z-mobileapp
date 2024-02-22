@@ -39,12 +39,14 @@ class _DropLocationState extends State<DropLocation>
   String favNameText = '';
   bool _locationDenied = false;
   bool favAddressAdd = false;
-  bool _showToast = false;
   bool droplocation = false;
   String dropAddressConfirmation = '';
   bool _error = false;
+  String nameerror = '';
+  String phoneerror = '';
   TextEditingController username = TextEditingController();
   TextEditingController userphonenumber = TextEditingController();
+  dynamic _lastCenter = center;
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
@@ -77,24 +79,7 @@ class _DropLocationState extends State<DropLocation>
       if (_controller != null) {
         _controller?.setMapStyle(mapStyle);
       }
-      // if (timerLocation == null && locationAllowed == true) {
-      //   getCurrentLocation();
-      // }
     }
-  }
-
-  //show toast for demo
-  addToast() {
-    setState(() {
-      _showToast = true;
-    });
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _showToast = false;
-        });
-      }
-    });
   }
 
 //get current location
@@ -116,6 +101,7 @@ class _DropLocationState extends State<DropLocation>
               double.parse(locs.longitude.toString()));
           _centerLocation = LatLng(double.parse(locs.latitude.toString()),
               double.parse(locs.longitude.toString()));
+          _lastCenter = _centerLocation;
         });
       } else {
         var loc = await geolocs.Geolocator.getCurrentPosition(
@@ -125,6 +111,7 @@ class _DropLocationState extends State<DropLocation>
               double.parse(loc.longitude.toString()));
           _centerLocation = LatLng(double.parse(loc.latitude.toString()),
               double.parse(loc.longitude.toString()));
+          _lastCenter = _centerLocation;
         });
       }
       var val =
@@ -175,24 +162,7 @@ class _DropLocationState extends State<DropLocation>
                                 });
                               },
                               onCameraIdle: () async {
-                                if (addAutoFill.isEmpty) {
-                                  addToast();
-                                } else {
-                                  addAutoFill.clear();
-                                  search.clear();
-                                }
-                                // if (addAutoFill.isEmpty) {
-                                //   var val = await geoCoding(
-                                //       _centerLocation.latitude,
-                                //       _centerLocation.longitude);
-                                //   setState(() {
-                                //     _center = _centerLocation;
-                                //     dropAddressConfirmation = val;
-                                //   });
-                                // } else {
-                                //   addAutoFill.clear();
-                                //   search.clear();
-                                // }
+                                setState(() {});
                               },
                               minMaxZoomPreference:
                                   const MinMaxZoomPreference(8.0, 20.0),
@@ -279,6 +249,35 @@ class _DropLocationState extends State<DropLocation>
                             width: media.width * 0.07,
                             height: media.width * 0.08,
                           ),
+                          SizedBox(
+                            height: media.width * 0.025,
+                          ),
+                          if (_lastCenter != _centerLocation)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Button(
+                                  onTap: () async {
+                                    // addToast();
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    var val = await geoCoding(
+                                        _centerLocation.latitude,
+                                        _centerLocation.longitude);
+                                    setState(() {
+                                      _lastCenter = _centerLocation;
+
+                                      _center = _centerLocation;
+                                      dropAddressConfirmation = val;
+                                      _isLoading = false;
+                                    });
+                                  },
+                                  text: languages[choosenLanguage]
+                                      ['text_confirm'],
+                                ),
+                              ],
+                            ),
                         ],
                       ),
                     )),
@@ -414,44 +413,6 @@ class _DropLocationState extends State<DropLocation>
                                                               .ellipsis,
                                                         ),
                                                       ),
-                                                      // (favAddress.length < 4)
-                                                      //     ? InkWell(
-                                                      //         onTap: () async {
-                                                      //           if (favAddress
-                                                      //               .where((element) =>
-                                                      //                   element[
-                                                      //                       'pick_address'] ==
-                                                      //                   dropAddressConfirmation)
-                                                      //               .isEmpty) {
-                                                      //             setState(() {
-                                                      //               favSelectedAddress =
-                                                      //                   dropAddressConfirmation;
-                                                      //               favLat = _center
-                                                      //                   .latitude;
-                                                      //               favLng = _center
-                                                      //                   .longitude;
-                                                      //               favAddressAdd =
-                                                      //                   true;
-                                                      //             });
-                                                      //           }
-                                                      //         },
-                                                      //         child: Icon(
-                                                      //           Icons
-                                                      //               .favorite_outline,
-                                                      //           size: media
-                                                      //                   .width *
-                                                      //               0.05,
-                                                      //           color: favAddress
-                                                      //                   .where((element) =>
-                                                      //                       element['pick_address'] ==
-                                                      //                       dropAddressConfirmation)
-                                                      //                   .isEmpty
-                                                      //               ? Colors
-                                                      //                   .black
-                                                      //               : buttonColor,
-                                                      //         ),
-                                                      //       )
-                                                      //     : Container()
                                                     ],
                                                   ),
                                           ),
@@ -496,15 +457,6 @@ class _DropLocationState extends State<DropLocation>
                                               _isLoading = false;
                                               droplocation = true;
                                             });
-                                            // var val =
-                                            //     await Navigator.pushReplacement(
-                                            //         context,
-                                            //         MaterialPageRoute(
-                                            //             builder: (context) =>
-                                            //                 Maps()));
-                                            // if (val) {
-                                            //   setState(() {});
-                                            // }
                                           }
                                         }
                                       },
@@ -526,12 +478,7 @@ class _DropLocationState extends State<DropLocation>
                               media.width * 0.05,
                               0),
                           width: media.width * 1,
-                          // height: media.height * 1,
-                          // height: (addAutoFill.isNotEmpty)
-                          //     ? media.height * 0.6
-                          //     : null,
                           color: page,
-                          // (addAutoFill.isEmpty) ? Colors.transparent : page,
                           child: Column(
                             children: [
                               Row(
@@ -740,6 +687,8 @@ class _DropLocationState extends State<DropLocation>
                                                                         .instance
                                                                         .primaryFocus
                                                                         ?.unfocus();
+                                                                    addAutoFill
+                                                                        .clear();
                                                                   },
                                                                   child:
                                                                       Container(
@@ -942,7 +891,7 @@ class _DropLocationState extends State<DropLocation>
                                         ),
                                         Container(
                                           height: media.width * 0.1,
-                                          width: media.width * 0.75,
+                                          width: media.width * 0.8,
                                           padding: EdgeInsets.fromLTRB(
                                               media.width * 0.05,
                                               media.width * 0.02,
@@ -950,8 +899,10 @@ class _DropLocationState extends State<DropLocation>
                                               media.width * 0.02),
                                           decoration: BoxDecoration(
                                               border: Border.all(
-                                                  color: Colors.grey,
-                                                  width: 1.5),
+                                                  color: (nameerror == '')
+                                                      ? Colors.grey
+                                                      : Colors.red,
+                                                  width: 1.2),
                                               color: page,
                                               borderRadius:
                                                   BorderRadius.circular(
@@ -980,16 +931,37 @@ class _DropLocationState extends State<DropLocation>
                                                         ? textColor
                                                             .withOpacity(0.5)
                                                         : hintColor)),
+                                            onChanged: (value) {
+                                              if (value != '' &&
+                                                  nameerror != '') {
+                                                setState(() {
+                                                  nameerror = '';
+                                                });
+                                              }
+                                            },
                                             style: GoogleFonts.roboto(
                                                 color: textColor),
                                           ),
                                         ),
+                                        if (nameerror != '')
+                                          Container(
+                                              width: media.width * 0.8,
+                                              padding: EdgeInsets.only(
+                                                  top: media.width * 0.025,
+                                                  bottom: media.width * 0.025),
+                                              child: Text(nameerror,
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * twelve,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: verifyDeclined))),
                                         SizedBox(
                                           height: media.width * 0.05,
                                         ),
                                         Container(
                                           height: media.width * 0.1,
-                                          width: media.width * 0.75,
+                                          width: media.width * 0.8,
                                           padding: EdgeInsets.fromLTRB(
                                               media.width * 0.05,
                                               media.width * 0.02,
@@ -997,8 +969,10 @@ class _DropLocationState extends State<DropLocation>
                                               media.width * 0.02),
                                           decoration: BoxDecoration(
                                               border: Border.all(
-                                                  color: Colors.grey,
-                                                  width: 1.5),
+                                                  color: (phoneerror == '')
+                                                      ? Colors.grey
+                                                      : Colors.red,
+                                                  width: 1.2),
                                               color: page,
                                               borderRadius:
                                                   BorderRadius.circular(
@@ -1032,8 +1006,29 @@ class _DropLocationState extends State<DropLocation>
                                                         : hintColor)),
                                             style: GoogleFonts.roboto(
                                                 color: textColor),
+                                            onChanged: (value) {
+                                              if (value != '' &&
+                                                  phoneerror != '') {
+                                                setState(() {
+                                                  phoneerror = '';
+                                                });
+                                              }
+                                            },
                                           ),
                                         ),
+                                        if (phoneerror != '')
+                                          Container(
+                                              width: media.width * 0.8,
+                                              padding: EdgeInsets.only(
+                                                  top: media.width * 0.025,
+                                                  bottom: media.width * 0.025),
+                                              child: Text(phoneerror,
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * twelve,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: verifyDeclined))),
                                         SizedBox(
                                           height: media.width * 0.04,
                                         ),
@@ -1053,10 +1048,21 @@ class _DropLocationState extends State<DropLocation>
                                             Button(
                                                 width: media.width * 0.4,
                                                 onTap: () async {
-                                                  if (username
-                                                          .text.isNotEmpty &&
-                                                      userphonenumber
-                                                          .text.isNotEmpty) {
+                                                  if (username.text == '') {
+                                                    setState(() {
+                                                      nameerror = languages[
+                                                              choosenLanguage]
+                                                          ['text_enter_name'];
+                                                    });
+                                                  } else if (userphonenumber
+                                                          .text ==
+                                                      '') {
+                                                    setState(() {
+                                                      phoneerror = languages[
+                                                              choosenLanguage][
+                                                          'text_enter_phone_number'];
+                                                    });
+                                                  } else {
                                                     FocusManager
                                                         .instance.primaryFocus
                                                         ?.unfocus();
@@ -1096,358 +1102,6 @@ class _DropLocationState extends State<DropLocation>
                               ),
                             ))
                         // )
-                        : Container(),
-
-                    //fav address
-                    // (favAddressAdd == true)
-                    //     ? Positioned(
-                    //         top: 0,
-                    //         child: Container(
-                    //           height: media.height * 1,
-                    //           width: media.width * 1,
-                    //           color: Colors.transparent.withOpacity(0.6),
-                    //           child: Column(
-                    //             mainAxisAlignment: MainAxisAlignment.center,
-                    //             children: [
-                    //               SizedBox(
-                    //                 width: media.width * 0.9,
-                    //                 child: Row(
-                    //                   mainAxisAlignment: MainAxisAlignment.end,
-                    //                   children: [
-                    //                     Container(
-                    //                       height: media.width * 0.1,
-                    //                       width: media.width * 0.1,
-                    //                       decoration: BoxDecoration(
-                    //                           shape: BoxShape.circle,
-                    //                           color: page),
-                    //                       child: InkWell(
-                    //                         onTap: () {
-                    //                           setState(() {
-                    //                             favName = '';
-                    //                             favAddressAdd = false;
-                    //                           });
-                    //                         },
-                    //                         child: const Icon(
-                    //                             Icons.cancel_outlined),
-                    //                       ),
-                    //                     ),
-                    //                   ],
-                    //                 ),
-                    //               ),
-                    //               SizedBox(
-                    //                 height: media.width * 0.05,
-                    //               ),
-                    //               Container(
-                    //                 padding: EdgeInsets.all(media.width * 0.05),
-                    //                 width: media.width * 0.9,
-                    //                 decoration: BoxDecoration(
-                    //                     borderRadius: BorderRadius.circular(12),
-                    //                     color: page),
-                    //                 child: Column(
-                    //                   children: [
-                    //                     Text(
-                    //                       languages[choosenLanguage]
-                    //                           ['text_saveaddressas'],
-                    //                       style: GoogleFonts.roboto(
-                    //                           fontSize: media.width * sixteen,
-                    //                           color: textColor,
-                    //                           fontWeight: FontWeight.w600),
-                    //                     ),
-                    //                     SizedBox(
-                    //                       height: media.width * 0.025,
-                    //                     ),
-                    //                     Text(
-                    //                       favSelectedAddress,
-                    //                       style: GoogleFonts.roboto(
-                    //                           fontSize: media.width * twelve,
-                    //                           color: textColor),
-                    //                     ),
-                    //                     SizedBox(
-                    //                       height: media.width * 0.025,
-                    //                     ),
-                    //                     Row(
-                    //                       mainAxisAlignment:
-                    //                           MainAxisAlignment.spaceBetween,
-                    //                       children: [
-                    //                         InkWell(
-                    //                           onTap: () {
-                    //                             FocusManager
-                    //                                 .instance.primaryFocus
-                    //                                 ?.unfocus();
-                    //                             setState(() {
-                    //                               favName = 'Home';
-                    //                             });
-                    //                           },
-                    //                           child: Container(
-                    //                             padding: EdgeInsets.all(
-                    //                                 media.width * 0.01),
-                    //                             child: Row(
-                    //                               children: [
-                    //                                 Container(
-                    //                                   height:
-                    //                                       media.height * 0.05,
-                    //                                   width: media.width * 0.05,
-                    //                                   decoration: BoxDecoration(
-                    //                                       shape:
-                    //                                           BoxShape.circle,
-                    //                                       border: Border.all(
-                    //                                           color:
-                    //                                               Colors.black,
-                    //                                           width: 1.2)),
-                    //                                   alignment:
-                    //                                       Alignment.center,
-                    //                                   child: (favName == 'Home')
-                    //                                       ? Container(
-                    //                                           height:
-                    //                                               media.width *
-                    //                                                   0.03,
-                    //                                           width:
-                    //                                               media.width *
-                    //                                                   0.03,
-                    //                                           decoration:
-                    //                                               const BoxDecoration(
-                    //                                             shape: BoxShape
-                    //                                                 .circle,
-                    //                                             color: Colors
-                    //                                                 .black,
-                    //                                           ),
-                    //                                         )
-                    //                                       : Container(),
-                    //                                 ),
-                    //                                 SizedBox(
-                    //                                   width: media.width * 0.01,
-                    //                                 ),
-                    //                                 Text(languages[
-                    //                                         choosenLanguage]
-                    //                                     ['text_home'])
-                    //                               ],
-                    //                             ),
-                    //                           ),
-                    //                         ),
-                    //                         InkWell(
-                    //                           onTap: () {
-                    //                             FocusManager
-                    //                                 .instance.primaryFocus
-                    //                                 ?.unfocus();
-                    //                             setState(() {
-                    //                               favName = 'Work';
-                    //                             });
-                    //                           },
-                    //                           child: Container(
-                    //                             padding: EdgeInsets.all(
-                    //                                 media.width * 0.01),
-                    //                             child: Row(
-                    //                               children: [
-                    //                                 Container(
-                    //                                   height:
-                    //                                       media.height * 0.05,
-                    //                                   width: media.width * 0.05,
-                    //                                   decoration: BoxDecoration(
-                    //                                       shape:
-                    //                                           BoxShape.circle,
-                    //                                       border: Border.all(
-                    //                                           color:
-                    //                                               Colors.black,
-                    //                                           width: 1.2)),
-                    //                                   alignment:
-                    //                                       Alignment.center,
-                    //                                   child: (favName == 'Work')
-                    //                                       ? Container(
-                    //                                           height:
-                    //                                               media.width *
-                    //                                                   0.03,
-                    //                                           width:
-                    //                                               media.width *
-                    //                                                   0.03,
-                    //                                           decoration:
-                    //                                               const BoxDecoration(
-                    //                                             shape: BoxShape
-                    //                                                 .circle,
-                    //                                             color: Colors
-                    //                                                 .black,
-                    //                                           ),
-                    //                                         )
-                    //                                       : Container(),
-                    //                                 ),
-                    //                                 SizedBox(
-                    //                                   width: media.width * 0.01,
-                    //                                 ),
-                    //                                 Text(languages[
-                    //                                         choosenLanguage]
-                    //                                     ['text_work'])
-                    //                               ],
-                    //                             ),
-                    //                           ),
-                    //                         ),
-                    //                         InkWell(
-                    //                           onTap: () {
-                    //                             FocusManager
-                    //                                 .instance.primaryFocus
-                    //                                 ?.unfocus();
-                    //                             setState(() {
-                    //                               favName = 'Others';
-                    //                             });
-                    //                           },
-                    //                           child: Container(
-                    //                             padding: EdgeInsets.all(
-                    //                                 media.width * 0.01),
-                    //                             child: Row(
-                    //                               children: [
-                    //                                 Container(
-                    //                                   height:
-                    //                                       media.height * 0.05,
-                    //                                   width: media.width * 0.05,
-                    //                                   decoration: BoxDecoration(
-                    //                                       shape:
-                    //                                           BoxShape.circle,
-                    //                                       border: Border.all(
-                    //                                           color:
-                    //                                               Colors.black,
-                    //                                           width: 1.2)),
-                    //                                   alignment:
-                    //                                       Alignment.center,
-                    //                                   child: (favName ==
-                    //                                           'Others')
-                    //                                       ? Container(
-                    //                                           height:
-                    //                                               media.width *
-                    //                                                   0.03,
-                    //                                           width:
-                    //                                               media.width *
-                    //                                                   0.03,
-                    //                                           decoration:
-                    //                                               const BoxDecoration(
-                    //                                             shape: BoxShape
-                    //                                                 .circle,
-                    //                                             color: Colors
-                    //                                                 .black,
-                    //                                           ),
-                    //                                         )
-                    //                                       : Container(),
-                    //                                 ),
-                    //                                 SizedBox(
-                    //                                   width: media.width * 0.01,
-                    //                                 ),
-                    //                                 Text(languages[
-                    //                                         choosenLanguage]
-                    //                                     ['text_others'])
-                    //                               ],
-                    //                             ),
-                    //                           ),
-                    //                         ),
-                    //                       ],
-                    //                     ),
-                    //                     (favName == 'Others')
-                    //                         ? Container(
-                    //                             padding: EdgeInsets.all(
-                    //                                 media.width * 0.025),
-                    //                             decoration: BoxDecoration(
-                    //                                 borderRadius:
-                    //                                     BorderRadius.circular(
-                    //                                         12),
-                    //                                 border: Border.all(
-                    //                                     color: borderLines,
-                    //                                     width: 1.2)),
-                    //                             child: TextField(
-                    //                               decoration: InputDecoration(
-                    //                                   border: InputBorder.none,
-                    //                                   hintText: languages[
-                    //                                           choosenLanguage][
-                    //                                       'text_enterfavname'],
-                    //                                   hintStyle:
-                    //                                       GoogleFonts.roboto(
-                    //                                           fontSize:
-                    //                                               media.width *
-                    //                                                   twelve,
-                    //                                           color:
-                    //                                               hintColor)),
-                    //                               maxLines: 1,
-                    //                               onChanged: (val) {
-                    //                                 setState(() {
-                    //                                   favNameText = val;
-                    //                                 });
-                    //                               },
-                    //                             ),
-                    //                           )
-                    //                         : Container(),
-                    //                     SizedBox(
-                    //                       height: media.width * 0.05,
-                    //                     ),
-                    //                     Button(
-                    //                         onTap: () async {
-                    //                           if (favName == 'Others' &&
-                    //                               favNameText != '') {
-                    //                             setState(() {
-                    //                               _isLoading = true;
-                    //                             });
-                    //                             var val = await addFavLocation(
-                    //                                 favLat,
-                    //                                 favLng,
-                    //                                 favSelectedAddress,
-                    //                                 favNameText);
-                    //                             setState(() {
-                    //                               _isLoading = false;
-                    //                               if (val == true) {
-                    //                                 favLat = '';
-                    //                                 favLng = '';
-                    //                                 favSelectedAddress = '';
-                    //                                 favNameText = '';
-                    //                                 favName = 'Home';
-                    //                                 favAddressAdd = false;
-                    //                               }
-                    //                             });
-                    //                           } else if (favName == 'Home' ||
-                    //                               favName == 'Work') {
-                    //                             setState(() {
-                    //                               _isLoading = true;
-                    //                             });
-                    //                             var val = await addFavLocation(
-                    //                                 favLat,
-                    //                                 favLng,
-                    //                                 favSelectedAddress,
-                    //                                 favName);
-                    //                             setState(() {
-                    //                               _isLoading = false;
-                    //                               if (val == true) {
-                    //                                 favLat = '';
-                    //                                 favLng = '';
-                    //                                 favSelectedAddress = '';
-                    //                                 favNameText = '';
-                    //                                 favName = 'Home';
-                    //                                 favAddressAdd = false;
-                    //                               }
-                    //                             });
-                    //                           }
-                    //                         },
-                    //                         text: languages[choosenLanguage]
-                    //                             ['text_confirm'])
-                    //                   ],
-                    //                 ),
-                    //               )
-                    //             ],
-                    //           ),
-                    //         ))
-                    //     : Container(),
-
-                    //display toast
-                    (_showToast == true)
-                        ? Positioned(
-                            top: media.height * 0.5,
-                            child: Container(
-                              width: media.width * 0.9,
-                              margin: EdgeInsets.all(media.width * 0.05),
-                              padding: EdgeInsets.all(media.width * 0.025),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: page),
-                              child: Text(
-                                'Auto address by scrolling map feature is not available in demo',
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * twelve,
-                                    color: textColor),
-                                textAlign: TextAlign.center,
-                              ),
-                            ))
                         : Container(),
 
                     (_locationDenied == true)

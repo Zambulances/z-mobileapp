@@ -10,8 +10,11 @@ import Firebase
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     FirebaseApp.configure()
-    GMSServices.provideAPIKey("AIzaSyD9g7Gv0okelx6Ntjh2mV7fK0QRSI0gRSI")
+    GMSServices.provideAPIKey("map key")
     GeneratedPluginRegistrant.register(with: self)
+    if #available(iOS 10.0, *) {
+  UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+}
     application.registerForRemoteNotifications()
     UIApplication.shared.beginReceivingRemoteControlEvents()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)

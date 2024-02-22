@@ -81,15 +81,7 @@ class _MyRouteBookingState extends State<MyRouteBooking> {
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
                             color: page,
-                            border: Border.all(color: Colors.grey, width: 1.1)
-                            // boxShadow: [
-                            //   BoxShadow(
-                            //     blurRadius: 1.0,
-                            //     spreadRadius: 1.0,
-                            //     color: Colors.black.withOpacity(0.4)
-                            //   )
-                            // ]
-                            ),
+                            border: Border.all(color: Colors.grey, width: 1.1)),
                         child: (userDetails['my_route_address'] != null)
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,10 +280,10 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
   bool _isLoading = false;
   String _error = '';
   String _success = '';
-  bool _showToast = false;
   String sessionToken = const Uuid().v4();
   final _debouncer = Debouncer(milliseconds: 1000);
   bool _locationDenied = false;
+  dynamic _lastCenter = center;
 
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
@@ -301,44 +293,13 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
   }
 
   getLocs() async {
-    //  var permission = await location.hasPermission();
-
-    //   if (permission == PermissionStatus.denied ||
-    //       permission == PermissionStatus.deniedForever) {
-    //     setState(() {
-    //       _isLoading = false;
-    //     });
-    //   } else if (permission == PermissionStatus.granted ||
-    //       permission == PermissionStatus.grantedLimited) {
-    //     var locs = await geolocs.Geolocator.getLastKnownPosition();
-    //     if (locs != null) {
-    //       setState(() {
-    //         _center = LatLng(double.parse(locs.latitude.toString()),
-    //             double.parse(locs.longitude.toString()));
-    //         _centerLocation = LatLng(double.parse(locs.latitude.toString()),
-    //             double.parse(locs.longitude.toString()));
-    //       });
-    //     } else {
-    //       var loc = await geolocs.Geolocator.getCurrentPosition(
-    //           desiredAccuracy: geolocs.LocationAccuracy.low);
-    //       setState(() {
-    //         _center = LatLng(double.parse(loc.latitude.toString()),
-    //             double.parse(loc.longitude.toString()));
-    //         _centerLocation = LatLng(double.parse(loc.latitude.toString()),
-    //             double.parse(loc.longitude.toString()));
-    //       });
-    //     }
     var val = await geoCoding(center.latitude, center.longitude);
     setState(() {
+      _lastCenter = _centerLocation;
       homeAddressConfirmation = val;
       homeAddressLatLng = center;
     });
     _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
-    // setState(() {
-    //   _state = '3';
-    //   _isLoading = false;
-    // });
-    // }
   }
 
   navigateLogout() {
@@ -346,20 +307,6 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
         context,
         MaterialPageRoute(builder: (context) => const SignupMethod()),
         (route) => false);
-  }
-
-  //show toast for demo
-  addToast() {
-    setState(() {
-      _showToast = true;
-    });
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _showToast = false;
-        });
-      }
-    });
   }
 
   @override
@@ -396,23 +343,7 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                       });
                     },
                     onCameraIdle: () async {
-                      //     if (addAutoFill.isEmpty) {
-                      //   addToast();
-                      // } else {
-                      //   addAutoFill.clear();
-                      //   search.clear();
-                      // }
-                      if (addAutoFill.isEmpty) {
-                        var val = await geoCoding(_centerLocation.latitude,
-                            _centerLocation.longitude);
-                        setState(() {
-                          homeAddressConfirmation = val;
-                          homeAddressLatLng = _centerLocation;
-                        });
-                      } else {
-                        addAutoFill.clear();
-                        search.clear();
-                      }
+                      setState(() {});
                     },
                   ),
                 ),
@@ -432,6 +363,33 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                         width: media.width * 0.07,
                         height: media.width * 0.08,
                       ),
+                      SizedBox(
+                        height: media.width * 0.025,
+                      ),
+                      if (_lastCenter != _centerLocation)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Button(
+                              onTap: () async {
+                                // addToast();
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                var val = await geoCoding(
+                                    _centerLocation.latitude,
+                                    _centerLocation.longitude);
+                                setState(() {
+                                  _lastCenter = _centerLocation;
+                                  homeAddressConfirmation = val;
+                                  homeAddressLatLng = _centerLocation;
+                                  _isLoading = false;
+                                });
+                              },
+                              text: languages[choosenLanguage]['text_confirm'],
+                            ),
+                          ],
+                        ),
                     ],
                   ),
                 )),
@@ -503,7 +461,10 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                                                 bottom: media.width * 0.042),
                                         border: InputBorder.none,
                                         hintText: languages[choosenLanguage]
-                                            ['text_4lettersforautofill'],
+                                                ['text_search'] +
+                                            ' ' +
+                                            languages[choosenLanguage]
+                                                ['text_address'],
                                         hintStyle: GoogleFonts.roboto(
                                             fontSize: media.width * twelve,
                                             color: (isDarkTheme == true)
@@ -639,6 +600,8 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                                                                       CameraUpdate.newLatLngZoom(
                                                                           _centerLocation,
                                                                           14.0));
+                                                                  addAutoFill
+                                                                      .clear();
                                                                 });
                                                                 FocusManager
                                                                     .instance
@@ -691,7 +654,6 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                           margin: const EdgeInsets.only(right: 20, left: 20),
                           child: InkWell(
                             onTap: () async {
-                              // _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 18.0));
                               if (locationAllowed == true) {
                                 _controller?.animateCamera(
                                     CameraUpdate.newLatLngZoom(center, 18.0));
@@ -704,7 +666,6 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                                   await geolocs.Geolocator.getCurrentPosition(
                                       desiredAccuracy:
                                           geolocs.LocationAccuracy.low);
-                                  // await location.requestService();
                                   if (await geolocs.GeolocatorPlatform.instance
                                       .isLocationServiceEnabled()) {
                                     setState(() {
@@ -713,34 +674,6 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                                   }
                                 }
                               }
-
-                              // if (locationAllowed == true) {
-                              //   if(currentLocation != null){
-                              //     _controller?.animateCamera(
-                              //         CameraUpdate.newLatLngZoom(
-                              //             currentLocation, 18.0));
-                              //             center = currentLocation;
-                              //     }else{
-                              //       _controller?.animateCamera(
-                              //         CameraUpdate.newLatLngZoom(
-                              //             center, 18.0));
-                              //     }
-                              // } else {
-                              //   if (serviceEnabled == true) {
-                              //     setState(() {
-                              //       _locationDenied = true;
-                              //     });
-                              //   } else {
-                              //     await location.requestService();
-                              //     if (await geolocs
-                              //         .GeolocatorPlatform.instance
-                              //         .isLocationServiceEnabled()) {
-                              //       setState(() {
-                              //         _locationDenied = true;
-                              //       });
-                              //     }
-                              //   }
-                              // }
                             },
                             child: Container(
                               height: media.width * 0.1,
@@ -838,43 +771,6 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                                 height: media.width * 0.1,
                               ),
                               Button(
-                                  // onTap: () async {
-                                  //   if (dropAddressConfirmation != '') {
-                                  //     //remove in envato
-                                  //     if (addressList
-                                  //         .where((element) =>
-                                  //             element.id == 'drop')
-                                  //         .isEmpty) {
-                                  //       addressList.add(AddressList(
-                                  //           id: 'drop',
-                                  //           address:
-                                  //               dropAddressConfirmation,
-                                  //           latlng: _center));
-                                  //     } else {
-                                  //       addressList
-                                  //               .firstWhere((element) =>
-                                  //                   element.id == 'drop')
-                                  //               .address =
-                                  //           dropAddressConfirmation;
-                                  //       addressList
-                                  //           .firstWhere((element) =>
-                                  //               element.id == 'drop')
-                                  //           .latlng = _center;
-                                  //     }
-                                  //     if (addressList.length == 2) {
-                                  //       var val =
-                                  //           await Navigator.pushReplacement(
-                                  //               context,
-                                  //               MaterialPageRoute(
-                                  //                   builder: (context) =>
-                                  //                       BookingConfirmation()));
-                                  //       if (val) {
-                                  //         setState(() {});
-                                  //       }
-                                  //     }
-                                  //   }
-                                  // },
-
                                   onTap: () async {
                                     setState(() {
                                       _isLoading = true;
@@ -1010,7 +906,6 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                         child: Container(
                           height: media.height * 1,
                           width: media.width * 1,
-                          // color: Colors.transparent.withOpacity(0.6),
                           color: (isDarkTheme == true)
                               ? textColor.withOpacity(0.2)
                               : Colors.transparent.withOpacity(0.6),
@@ -1103,27 +998,6 @@ class _ChooseHomeAddressState extends State<ChooseHomeAddress> {
                                 ),
                               )
                             ],
-                          ),
-                        ))
-                    : Container(),
-
-                //display toast
-                (_showToast == true)
-                    ? Positioned(
-                        top: media.height * 0.5,
-                        child: Container(
-                          width: media.width * 0.9,
-                          margin: EdgeInsets.all(media.width * 0.05),
-                          padding: EdgeInsets.all(media.width * 0.025),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: page),
-                          child: Text(
-                            'Auto address by scrolling map feature is not available in demo',
-                            style: GoogleFonts.roboto(
-                                fontSize: media.width * twelve,
-                                color: textColor),
-                            textAlign: TextAlign.center,
                           ),
                         ))
                     : Container(),

@@ -45,19 +45,27 @@ class _GetStartedState extends State<GetStarted> {
 
   getGalleryPermission() async {
     dynamic status;
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-  if (androidInfo.version.sdkInt <= 32) {
-    status = await Permission.storage.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.storage.request();
+    if (platform == TargetPlatform.android) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt <= 32) {
+        status = await Permission.storage.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.storage.request();
+        }
+
+        /// use [Permissions.storage.status]
+      } else {
+        status = await Permission.photos.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.photos.request();
+        }
+      }
+    } else {
+      status = await Permission.photos.status;
+      if (status != PermissionStatus.granted) {
+        status = await Permission.photos.request();
+      }
     }
-    /// use [Permissions.storage.status]
-  } else{
-    status = await Permission.photos.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.photos.request();
-    }
-  }
     return status;
   }
 
@@ -90,7 +98,8 @@ class _GetStartedState extends State<GetStarted> {
   pickImageFromCamera() async {
     var permission = await getCameraPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      final pickedFile =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
       setState(() {
         proImageFile1 = pickedFile?.path;
         _pickImage = false;
@@ -394,7 +403,7 @@ class _GetStartedState extends State<GetStarted> {
                                                               Container(
                                                                 padding:
                                                                     const EdgeInsets
-                                                                            .only(
+                                                                        .only(
                                                                         left:
                                                                             20,
                                                                         right:

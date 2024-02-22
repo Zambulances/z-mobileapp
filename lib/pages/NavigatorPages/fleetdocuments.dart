@@ -466,19 +466,27 @@ class _UploadDocsState extends State<UploadDocs> {
 //get gallery permission
   getGalleryPermission() async {
     dynamic status;
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-  if (androidInfo.version.sdkInt <= 32) {
-    status = await Permission.storage.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.storage.request();
+    if (platform == TargetPlatform.android) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt <= 32) {
+        status = await Permission.storage.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.storage.request();
+        }
+
+        /// use [Permissions.storage.status]
+      } else {
+        status = await Permission.photos.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.photos.request();
+        }
+      }
+    } else {
+      status = await Permission.photos.status;
+      if (status != PermissionStatus.granted) {
+        status = await Permission.photos.request();
+      }
     }
-    /// use [Permissions.storage.status]
-  } else{
-    status = await Permission.photos.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.photos.request();
-    }
-  }
     return status;
   }
 
@@ -507,8 +515,8 @@ class _UploadDocsState extends State<UploadDocs> {
   imagePick() async {
     var permission = await getGalleryPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile =
-          await _fleetpicker.pickImage(source: ImageSource.gallery);
+      final pickedFile = await _fleetpicker.pickImage(
+          source: ImageSource.gallery, imageQuality: 50);
       setState(() {
         fleetimageFile = pickedFile?.path;
         _uploadImage = false;
@@ -524,8 +532,8 @@ class _UploadDocsState extends State<UploadDocs> {
   cameraPick() async {
     var permission = await getCameraPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile =
-          await _fleetpicker.pickImage(source: ImageSource.camera);
+      final pickedFile = await _fleetpicker.pickImage(
+          source: ImageSource.camera, imageQuality: 50);
       setState(() {
         fleetimageFile = pickedFile?.path;
         _uploadImage = false;

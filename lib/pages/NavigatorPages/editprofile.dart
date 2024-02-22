@@ -33,19 +33,27 @@ class _EditProfileState extends State<EditProfile> {
 //get gallery permission
   getGalleryPermission() async {
     dynamic status;
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-  if (androidInfo.version.sdkInt <= 32) {
-    status = await Permission.storage.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.storage.request();
+    if (platform == TargetPlatform.android) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt <= 32) {
+        status = await Permission.storage.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.storage.request();
+        }
+
+        /// use [Permissions.storage.status]
+      } else {
+        status = await Permission.photos.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.photos.request();
+        }
+      }
+    } else {
+      status = await Permission.photos.status;
+      if (status != PermissionStatus.granted) {
+        status = await Permission.photos.request();
+      }
     }
-    /// use [Permissions.storage.status]
-  } else{
-    status = await Permission.photos.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.photos.request();
-    }
-  }
     return status;
   }
 
@@ -69,7 +77,8 @@ class _EditProfileState extends State<EditProfile> {
   pickImageFromGallery() async {
     var permission = await getGalleryPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+      final pickedFile =
+          await picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
       setState(() {
         proImageFile = pickedFile?.path;
         _pickImage = false;
@@ -85,7 +94,8 @@ class _EditProfileState extends State<EditProfile> {
   pickImageFromCamera() async {
     var permission = await getCameraPermission();
     if (permission == PermissionStatus.granted) {
-      final pickedFile = await picker.pickImage(source: ImageSource.camera);
+      final pickedFile =
+          await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
       setState(() {
         proImageFile = pickedFile?.path;
         _pickImage = false;

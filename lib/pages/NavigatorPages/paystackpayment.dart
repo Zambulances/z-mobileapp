@@ -6,7 +6,6 @@ import 'package:tagxidriver/pages/loadingPage/loading.dart';
 import 'package:tagxidriver/pages/login/signupmethod.dart';
 import 'package:tagxidriver/pages/noInternet/nointernet.dart';
 import 'package:tagxidriver/styles/styles.dart';
-// import 'package:flutter_paystack/flutter_paystack.dart';
 import 'package:tagxidriver/translation/translation.dart';
 import 'package:tagxidriver/widgets/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -23,6 +22,7 @@ class _PayStackPageState extends State<PayStackPage> {
   bool _success = false;
   String _error = '';
   // final plugin = PaystackPlugin();
+  late final WebViewController _controller;
   @override
   void initState() {
     payMoney();
@@ -44,6 +44,34 @@ class _PayStackPageState extends State<PayStackPage> {
       navigateLogout();
     } else if (val != 'success') {
       _error = val.toString();
+    } else {
+      late final PlatformWebViewControllerCreationParams params;
+
+      params = const PlatformWebViewControllerCreationParams();
+
+      final WebViewController controller =
+          WebViewController.fromPlatformCreationParams(params);
+      // #enddocregion platform_features
+
+      controller
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(const Color(0x00000000))
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onWebResourceError: (WebResourceError error) {
+              debugPrint('''
+Page resource error:
+  code: ${error.errorCode}
+  description: ${error.description}
+  errorType: ${error.errorType}
+  isForMainFrame: ${error.isForMainFrame}
+          ''');
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse(paystackCode['authorization_url']));
+
+      _controller = controller;
     }
     if (mounted) {
       setState(() {
@@ -110,12 +138,7 @@ class _PayStackPageState extends State<PayStackPage> {
                           Expanded(
                             child: (paystackCode['authorization_url'] != null &&
                                     _error == '')
-                                ? WebView(
-                                    initialUrl:
-                                        paystackCode['authorization_url'],
-                                    javascriptMode: JavascriptMode.unrestricted,
-                                    userAgent: 'Flutter;Webview',
-                                  )
+                                ? WebViewWidget(controller: _controller)
                                 : Container(),
                           )
                         ],

@@ -76,8 +76,7 @@ class _AboutState extends State<About> {
                         //terms and conditions
                         InkWell(
                           onTap: () {
-                            openBrowser(
-                                'https://tagyourtaxi.com/privacy-policy');
+                            openBrowser('${url}terms');
                           },
                           child: Text(
                             languages[choosenLanguage]
@@ -94,8 +93,7 @@ class _AboutState extends State<About> {
                         //privacy policy
                         InkWell(
                           onTap: () {
-                            openBrowser(
-                                'https://tagyourtaxi.com/privacy-policy');
+                            openBrowser('${url}privacy');
                           },
                           child: Text(
                             languages[choosenLanguage]['text_privacy'],
@@ -111,7 +109,7 @@ class _AboutState extends State<About> {
                         //website
                         InkWell(
                           onTap: () {
-                            openBrowser('https://tagyourtaxi.com');
+                            openBrowser(url);
                           },
                           child: Text(
                             languages[choosenLanguage]['text_about'],

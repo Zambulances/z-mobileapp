@@ -212,7 +212,7 @@ class _AssignDriverState extends State<AssignDriver> {
                                                                             .fill),
                                                                 borderRadius:
                                                                     const BorderRadius
-                                                                            .all(
+                                                                        .all(
                                                                         Radius.circular(
                                                                             10)),
                                                               ),
@@ -429,10 +429,11 @@ class _AssignDriverState extends State<AssignDriver> {
                                                                       ? Colors
                                                                           .black
                                                                       : topBar,
-                                                                  borderRadius: const BorderRadius
+                                                                  borderRadius:
+                                                                      const BorderRadius
                                                                           .all(
-                                                                      Radius.circular(
-                                                                          10)),
+                                                                          Radius.circular(
+                                                                              10)),
                                                                   boxShadow: const [
                                                                     BoxShadow(
                                                                       color: Colors
@@ -464,8 +465,9 @@ class _AssignDriverState extends State<AssignDriver> {
                                                                               fleetdriverList[i]['profile_picture'].toString(),
                                                                             ),
                                                                             fit: BoxFit.fill),
-                                                                        borderRadius:
-                                                                            const BorderRadius.all(Radius.circular(10)),
+                                                                        borderRadius: const BorderRadius
+                                                                            .all(
+                                                                            Radius.circular(10)),
                                                                       ),
                                                                     ),
                                                                     Text(
@@ -640,21 +642,6 @@ class _AssignDriverState extends State<AssignDriver> {
                                             ],
                                           )
                                         : Container(),
-                                // Column(
-                                //     mainAxisAlignment:
-                                //         MainAxisAlignment.center,
-                                //     children: [
-                                //       Text(
-                                //         languages[choosenLanguage]
-                                //             ['text_no_driver_found'],
-                                //         style: GoogleFonts.roboto(
-                                //             fontSize: media.width * sixteen,
-                                //             fontWeight: FontWeight.bold,
-                                //             color: textColor,
-                                //             letterSpacing: 1),
-                                //       )
-                                //     ],
-                                //   ),
                               ),
                             ],
                           ),
@@ -671,9 +658,6 @@ class _AssignDriverState extends State<AssignDriver> {
                             var result =
                                 await assignDriver(driverid, widget.fleetid);
                             if (result == 'true') {
-                              // await fleetDriverDetails(
-                              //     fleetid: widget.fleetid,
-                              //     isassigndriver: true);
                               var val = await getVehicleInfo();
                               if (val == 'logout') {
                                 navigateLogout();

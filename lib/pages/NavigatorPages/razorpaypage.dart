@@ -68,35 +68,39 @@ class _RazorPayPageState extends State<RazorPayPage> {
 
 //payment gateway code
   payMoney() async {
-    var val = await razorpayCreateOrder(addMoney * 100,(walletBalance['razor_pay_environment'] == 'test')
-          ? walletBalance['razorpay_test_api_key']
-          : walletBalance['razorpay_live_api_key'],(walletBalance['razor_pay_environment'] == 'test')
-          ? walletBalance['razorpay_test_secret_key']
-          : walletBalance['razorpay_live_secret_key'], );
-    if(val == 'logout'){
-      _isLoading = false;
-      navigateLogout();
-    }else if(val == 'failure'){
-      setState(() {
-      _failed = true;
-      _isLoading = false;
-    });
-    }else{
-    var options = {
-      'key': (walletBalance['razor_pay_environment'] == 'test')
+    var val = await razorpayCreateOrder(
+      addMoney * 100,
+      (walletBalance['razor_pay_environment'] == 'test')
           ? walletBalance['razorpay_test_api_key']
           : walletBalance['razorpay_live_api_key'],
-      'amount': val['amount'],
-      'name': userDetails['name'],
-      'description': '',
-      'order_id':val['id'],
-      'prefill': {
-        'contact': userDetails['mobile'],
-        'email': userDetails['email']
-      }
-    };
+      (walletBalance['razor_pay_environment'] == 'test')
+          ? walletBalance['razorpay_test_secret_key']
+          : walletBalance['razorpay_live_secret_key'],
+    );
+    if (val == 'logout') {
+      _isLoading = false;
+      navigateLogout();
+    } else if (val == 'failure') {
+      setState(() {
+        _failed = true;
+        _isLoading = false;
+      });
+    } else {
+      var options = {
+        'key': (walletBalance['razor_pay_environment'] == 'test')
+            ? walletBalance['razorpay_test_api_key']
+            : walletBalance['razorpay_live_api_key'],
+        'amount': val['amount'],
+        'name': userDetails['name'],
+        'description': '',
+        'order_id': val['id'],
+        'prefill': {
+          'contact': userDetails['mobile'],
+          'email': userDetails['email']
+        }
+      };
 
-    await _razorpay.open(options);
+      await _razorpay.open(options);
     }
   }
 

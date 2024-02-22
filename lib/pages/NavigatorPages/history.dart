@@ -18,7 +18,7 @@ class History extends StatefulWidget {
 dynamic selectedHistory;
 
 class _HistoryState extends State<History> {
-  int _showHistory = 0;
+  int _showHistory = 1;
   bool _isLoading = true;
   dynamic isCompleted;
 
@@ -42,7 +42,7 @@ class _HistoryState extends State<History> {
       myHistoryPage.clear();
       myHistory.clear();
     });
-    var val = await getHistory('is_later=1');
+    var val = await getHistory('is_completed=1');
     if (mounted) {
       if (val == 'logout') {
         navigateLogout();

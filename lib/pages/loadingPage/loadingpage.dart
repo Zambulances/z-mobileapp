@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:tagxidriver/pages/language/languages.dart';
 import 'package:tagxidriver/pages/loadingPage/loading.dart';
+import 'package:tagxidriver/pages/login/login.dart';
 import 'package:tagxidriver/pages/onTripPage/map_page.dart';
 import 'package:tagxidriver/pages/noInternet/nointernet.dart';
 import 'package:tagxidriver/pages/vehicleInformations/docs_onprocess.dart';
@@ -33,6 +35,7 @@ class _LoadingPageState extends State<LoadingPage> {
   String state = '';
   int gettingPerm = 0;
   bool _isLoading = false;
+  bool _error = false;
 
   var demopage = TextEditingController();
 
@@ -65,64 +68,105 @@ class _LoadingPageState extends State<LoadingPage> {
     super.initState();
   }
 
+  getData() async {
+    for (var i = 0; _error == true; i++) {
+      await getLanguageDone();
+    }
+  }
+
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
+    await getOwnermodule();
     await getDetailsOfDevice();
-    permission = await geolocator.GeolocatorPlatform.instance.checkPermission();
-    serviceEnabled =
-        await geolocator.GeolocatorPlatform.instance.isLocationServiceEnabled();
-
-    if ((permission == geolocator.LocationPermission.denied ||
-            permission == geolocator.LocationPermission.deniedForever ||
-            serviceEnabled == false) &&
-        gettingPerm == 0) {
-      gettingPerm++;
-      await Future.delayed(const Duration(seconds: 5), () {});
-      if (gettingPerm > 1) {
-        locationAllowed = false;
-        state = '3';
+    try {
+      if (platform == TargetPlatform.android) {
+        await FirebaseDatabase.instance
+            .ref()
+            .child('driver_android_version')
+            .get();
       } else {
-        state = '2';
+        await FirebaseDatabase.instance.ref().child('driver_ios_version').get();
       }
+      _error = false;
 
-      setState(() {
-        _isLoading = false;
-      });
-    } else {
-      if (permission == geolocator.LocationPermission.whileInUse ||
-          permission == geolocator.LocationPermission.always) {
-        if (center == null) {
-          var locs = await geolocator.Geolocator.getLastKnownPosition();
-          if (locs != null) {
-            center = LatLng(locs.latitude, locs.longitude);
-          } else {
-            var loc = await geolocator.Geolocator.getCurrentPosition(
-                desiredAccuracy: geolocator.LocationAccuracy.low);
-            center = LatLng(double.parse(loc.latitude.toString()),
-                double.parse(loc.longitude.toString()));
-          }
-        }
-        positionStreamData();
-      }
+      permission =
+          await geolocator.GeolocatorPlatform.instance.checkPermission();
+      serviceEnabled = await geolocator.GeolocatorPlatform.instance
+          .isLocationServiceEnabled();
 
-      if (internet == true) {
-        var val = await getLocalData();
-        //if user is login and check waiting for approval status and send accordingly
-        if (val == '3') {
-          navigate();
-        }
-        //if user is not login in this device
-        else if (val == '2') {
-          Future.delayed(const Duration(seconds: 2), () {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const SignupMethod()));
-          });
+      if ((permission == geolocator.LocationPermission.denied ||
+              permission == geolocator.LocationPermission.deniedForever ||
+              serviceEnabled == false) &&
+          gettingPerm == 0) {
+        gettingPerm++;
+        await Future.delayed(const Duration(seconds: 5), () {});
+        if (gettingPerm > 1) {
+          locationAllowed = false;
+          state = '3';
         } else {
-          //user installing first time and didnt yet choosen language
-          Future.delayed(const Duration(seconds: 2), () {
-            Navigator.pushReplacement(context,
-                MaterialPageRoute(builder: (context) => const Languages()));
+          state = '2';
+        }
+
+        setState(() {
+          _isLoading = false;
+        });
+      } else {
+        if (permission == geolocator.LocationPermission.whileInUse ||
+            permission == geolocator.LocationPermission.always) {
+          if (center == null) {
+            var locs = await geolocator.Geolocator.getLastKnownPosition();
+            if (locs != null) {
+              center = LatLng(locs.latitude, locs.longitude);
+            } else {
+              var loc = await geolocator.Geolocator.getCurrentPosition(
+                  desiredAccuracy: geolocator.LocationAccuracy.low);
+              center = LatLng(double.parse(loc.latitude.toString()),
+                  double.parse(loc.longitude.toString()));
+            }
+          }
+          positionStreamData();
+        }
+
+        if (internet == true) {
+          var val = await getLocalData();
+          //if user is login and check waiting for approval status and send accordingly
+          if (val == '3') {
+            navigate();
+          }
+          //if user is not login in this device
+          else if (val == '2') {
+            if (ownermodule == '1') {
+              Future.delayed(const Duration(seconds: 2), () {
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SignupMethod()));
+              });
+            } else {
+              ischeckownerordriver == 'driver';
+              Future.delayed(const Duration(seconds: 2), () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => const Login()));
+              });
+            }
+          } else {
+            //user installing first time and didnt yet choosen language
+            Future.delayed(const Duration(seconds: 2), () {
+              Navigator.pushReplacement(context,
+                  MaterialPageRoute(builder: (context) => const Languages()));
+            });
+          }
+        } else {
+          setState(() {});
+        }
+      }
+    } catch (e) {
+      if (internet == true) {
+        if (_error == false) {
+          setState(() {
+            _error = true;
           });
+          getData();
         }
       } else {
         setState(() {});
@@ -311,7 +355,7 @@ class _LoadingPageState extends State<LoadingPage> {
                     height: media.height * 1,
                     width: media.width * 1,
                     decoration: BoxDecoration(
-                      color: page,
+                      color: buttonColor,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -322,7 +366,8 @@ class _LoadingPageState extends State<LoadingPage> {
                           height: media.width * 0.429,
                           decoration: const BoxDecoration(
                               image: DecorationImage(
-                                  image: AssetImage('assets/images/logo.png'),
+                                  image:
+                                      AssetImage('assets/images/logotext.png'),
                                   fit: BoxFit.contain)),
                         ),
                       ],
