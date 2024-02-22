@@ -23,7 +23,7 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
   bool terms = true; //terms and conditions true or false
   bool _isLoading = true;
   bool validate = false;
-   var verifyEmailError = '';
+  var verifyEmailError = '';
   var _error = '';
 
   @override
@@ -79,7 +79,6 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                   SizedBox(
                     height: media.height * 0.159,
                   ),
-                  
                   Container(
                       padding: const EdgeInsets.only(bottom: 5),
                       height: 55,
@@ -94,7 +93,6 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                         textController: controller,
                         color: (verifyEmailError == '') ? null : Colors.red,
                       )),
-
                   (_error != '')
                       ? Container(
                           width: media.width * 0.8,
@@ -108,7 +106,6 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                           ),
                         )
                       : Container(),
-
                   SizedBox(height: media.height * 0.05),
                   Row(
                     children: [
@@ -130,7 +127,10 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                                     Border.all(color: buttonColor, width: 2),
                                 shape: BoxShape.circle,
                                 color: (terms == true) ? buttonColor : page),
-                            child: Icon(Icons.done, color: (isDarkTheme == true) ? Colors.black : Colors.white)),
+                            child: Icon(Icons.done,
+                                color: (isDarkTheme == true)
+                                    ? Colors.black
+                                    : Colors.white)),
                       ),
                       SizedBox(
                         width: media.width * 0.02,
@@ -150,7 +150,7 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                             ),
                             InkWell(
                               onTap: () {
-                                openBrowser('terms and conditions url');
+                                openBrowser('${url}terms');
                               },
                               child: Text(
                                 languages[choosenLanguage]['text_terms'],
@@ -167,7 +167,7 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                             ),
                             InkWell(
                               onTap: () {
-                                openBrowser('privacy policy url');
+                                openBrowser('${url}privacy');
                               },
                               child: Text(
                                 languages[choosenLanguage]['text_privacy'],
@@ -187,11 +187,9 @@ class _SignInwithEmailState extends State<SignInwithEmail> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
-                        Icons.phone,
-                        size: media.width * eighteen,
-                        color: textColor.withOpacity(0.7)
-                      ),
+                      Icon(Icons.phone,
+                          size: media.width * eighteen,
+                          color: textColor.withOpacity(0.7)),
                       SizedBox(width: media.width * 0.02),
                       Text(
                         languages[choosenLanguage]['text_continue_with'],

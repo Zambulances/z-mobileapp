@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'dart:io';
 import 'dart:math';
 import 'package:audioplayers/audioplayers.dart';
@@ -38,9 +37,8 @@ var audio = 'audio/notification_sound.mp3';
 bool internet = true;
 
 //base url
-String url =
-    'https://tagxi-server.ondemandappz.com/'; //add '/' at the end of the url as 'https://yourwebsite.com/'
-String mapkey = 'AIzaSyA-FQUi9C-cnnnhGm9QtgjHRnUPDcfBiPg';
+String url ='http://44.217.123.204/'; //add '/' at the end of the url as 'https://yourwebsite.com/'
+String mapkey = 'AIzaSyDuPKZ57JPNy_kTT3KNCfSsO7PojNOqidg';
 
 //check internet connection
 
@@ -657,6 +655,7 @@ sharewalletfun({mobile, role, amount}) async {
 // verify user already exist
 
 verifyUser(String number) async {
+  print("validate");
   dynamic val;
   try {
     var response = await http.post(
@@ -664,7 +663,6 @@ verifyUser(String number) async {
         body: (value == 0)
             ? {"mobile": number}
             : {"email": email, "otp": otpNumber});
-    // print(value);
     if (response.statusCode == 200) {
       val = jsonDecode(response.body)['success'];
 
@@ -695,6 +693,7 @@ bool navigateToPhone = false;
 
 //user login
 userLogin() async {
+print("login");
   bearerToken.clear();
   dynamic result;
   try {
@@ -718,7 +717,6 @@ userLogin() async {
                 "login_by":
                     (platform == TargetPlatform.android) ? 'android' : 'ios',
               }));
-    // print(value);
     if (response.statusCode == 200) {
       var jsonVal = jsonDecode(response.body);
       bearerToken.add(BearerClass(
@@ -762,9 +760,9 @@ dynamic _version;
 bool updateAvailable = false;
 dynamic package;
 
-checkVersion()async{
-      package = await PackageInfo.fromPlatform();
-try{
+checkVersion() async {
+  package = await PackageInfo.fromPlatform();
+  try {
     if (platform == TargetPlatform.android) {
       _version = await FirebaseDatabase.instance
           .ref()
@@ -781,36 +779,31 @@ try{
       for (var i = 0; i < version.length || i < packages.length; i++) {
         if (i < version.length && i < packages.length) {
           if (int.parse(packages[i]) < int.parse(version[i])) {
-            
-              updateAvailable = true;
-              valueNotifierHome.incrementNotifier();
-            
+            updateAvailable = true;
+            valueNotifierHome.incrementNotifier();
+
             break;
           } else if (int.parse(packages[i]) > int.parse(version[i])) {
-            
-              updateAvailable = false;
-            
+            updateAvailable = false;
+
             break;
           }
         } else if (i >= version.length && i < packages.length) {
-          
-            updateAvailable = false;
-          
+          updateAvailable = false;
+
           break;
         } else if (i < version.length && i >= packages.length) {
-          
-            updateAvailable = true;
-            valueNotifierHome.incrementNotifier();
-          
+          updateAvailable = true;
+          valueNotifierHome.incrementNotifier();
+
           break;
         }
       }
     }
-    }catch(e){
-      debugPrint(e.toString());
-    }
+  } catch (e) {
+    debugPrint(e.toString());
+  }
 }
-
 
 //user current state
 getUserDetails() async {
@@ -841,7 +834,7 @@ getUserDetails() async {
           getCurrentMessages();
         }
 
-        if (userRequestData['is_completed'] == 0) {
+        if (userRequestData.isNotEmpty) {
           if (rideStreamUpdate == null ||
               rideStreamUpdate?.isPaused == true ||
               rideStreamStart == null ||
@@ -1612,6 +1605,8 @@ createRequest() async {
                     addressList.firstWhere((e) => e.id == 'pickup').address,
                 'request_eta_amount': etaDetails[choosenVehicle]['total']
               }));
+    print("----------------------createRequest-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
       streamRequest();
@@ -1681,6 +1676,8 @@ createRequestWithPromo() async {
           'promocode_id': etaDetails[choosenVehicle]['promocode_id'],
           'request_eta_amount': etaDetails[choosenVehicle]['total']
         }));
+    print("----------------------createRequestWithPromo-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
       result = 'success';
@@ -1749,6 +1746,8 @@ createRequestLater() async {
           'is_later': true,
           'request_eta_amount': etaDetails[choosenVehicle]['total']
         }));
+    print("----------------------createRequestLater-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       result = 'success';
       streamRequest();
@@ -1817,6 +1816,8 @@ createRequestLaterPromo() async {
           'is_later': true,
           'request_eta_amount': etaDetails[choosenVehicle]['total']
         }));
+    print("----------------------createRequestLaterPromo-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       myMarkers.clear();
       streamRequest();
@@ -1880,6 +1881,8 @@ createRentalRequest() async {
           'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
           'rental_pack_id': etaDetails[rentalChoosenOption]['id']
         }));
+    print("----------------------createRentalRequest-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
       streamRequest();
@@ -1943,6 +1946,8 @@ createRentalRequestWithPromo() async {
           'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
           'rental_pack_id': etaDetails[rentalChoosenOption]['id']
         }));
+    print("----------------------createRentalRequestWithPromo-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       userRequestData = jsonDecode(response.body)['data'];
       streamRequest();
@@ -2006,6 +2011,8 @@ createRentalRequestLater() async {
           'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
           'rental_pack_id': etaDetails[rentalChoosenOption]['id']
         }));
+    print("----------------------createRentalRequestLater-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       result = 'success';
       streamRequest();
@@ -2068,6 +2075,9 @@ createRentalRequestLaterPromo() async {
           'request_eta_amount': rentalOption[choosenVehicle]['fare_amount'],
           'rental_pack_id': etaDetails[rentalChoosenOption]['id'],
         }));
+
+    print("----------------------createRentalRequestLaterPromo-------------------"+response.body.toString()+"----------------------createRentalRequestLaterPromo-------------------");
+
     if (response.statusCode == 200) {
       myMarkers.clear();
       streamRequest();
@@ -2655,8 +2665,8 @@ getFaqData(lat, lng) async {
 getFaqPages(id) async {
   dynamic result;
   try {
-    var response = await http
-        .get(Uri.parse('${url}api/v1/common/faq/list/$id'), headers: {
+    var response =
+        await http.get(Uri.parse('${url}api/v1/common/faq/list/$id'), headers: {
       'Authorization': 'Bearer ${bearerToken[0].token}',
       'Content-Type': 'application/json'
     });
@@ -3060,7 +3070,6 @@ getPaystackPayment(body) async {
   return results;
 }
 
-
 addMoneyPaystack(amount, nonce) async {
   dynamic result;
   try {
@@ -3126,10 +3135,10 @@ addMoneyFlutterwave(amount, nonce) async {
 
 //razorpay
 
-razorpayCreateOrder(amount,publishkey,secretkey)async{
+razorpayCreateOrder(amount, publishkey, secretkey) async {
   dynamic result;
   String basicAuth =
-        'Basic ${base64Encode(utf8.encode('$publishkey:$secretkey'))}';
+      'Basic ${base64Encode(utf8.encode('$publishkey:$secretkey'))}';
   try {
     var response = await http.post(
         Uri.parse('https://api.razorpay.com/v1/orders'),
@@ -3137,11 +3146,12 @@ razorpayCreateOrder(amount,publishkey,secretkey)async{
           'Authorization': basicAuth,
           'Content-Type': 'application/json'
         },
-        body: jsonEncode(
-            {'amount': amount,
-             "currency": walletBalance['currency_code'],
-      "receipt": 'user_${userDetails['id'].toString()}_${DateTime.now().toString()}'
-      }));
+        body: jsonEncode({
+          'amount': amount,
+          "currency": walletBalance['currency_code'],
+          "receipt":
+              'user_${userDetails['id'].toString()}_${DateTime.now().toString()}'
+        }));
     if (response.statusCode == 200) {
       result = jsonDecode(response.body);
     } else if (response.statusCode == 401) {
@@ -3154,7 +3164,7 @@ razorpayCreateOrder(amount,publishkey,secretkey)async{
     if (e is SocketException) {
       internet = false;
       result = 'no internet';
-    }else{
+    } else {
       result = 'failure';
     }
   }
@@ -3503,7 +3513,8 @@ streamRide() {
   }).listen((DatabaseEvent event) async {
     if (event.snapshot.key.toString() == 'trip_start' ||
         event.snapshot.key.toString() == 'trip_arrived' ||
-        event.snapshot.key.toString() == 'is_completed') {
+        event.snapshot.key.toString() == 'is_completed' ||
+        event.snapshot.key.toString() == 'modified_by_driver') {
       getUserDetails();
     } else if (event.snapshot.key.toString() == 'message_by_driver') {
       getCurrentMessages();
@@ -3523,6 +3534,8 @@ streamRide() {
       getCurrentMessages();
     } else if (event.snapshot.key.toString() == 'cancelled_by_driver') {
       requestCancelledByDriver = true;
+      getUserDetails();
+    } else if (event.snapshot.key.toString() == 'modified_by_driver') {
       getUserDetails();
     }
   });
@@ -3570,11 +3583,11 @@ getCcavenuePayment(body) async {
             },
             body: body);
     if (response.statusCode == 200) {
-      
       var data = jsonDecode(response.body);
-      ccUrl = 'https://secure.ccavenue.com/transaction.do?command=initiateTransaction&encRequest=${data['enc_val']}&access_code=${data['access_code']}';
-    
-        results = 'success';
+      ccUrl =
+          'https://secure.ccavenue.com/transaction.do?command=initiateTransaction&encRequest=${data['enc_val']}&access_code=${data['access_code']}';
+
+      results = 'success';
     } else if (response.statusCode == 401) {
       results = 'logout';
     } else {
@@ -3588,4 +3601,70 @@ getCcavenuePayment(body) async {
     }
   }
   return results;
+}
+
+paymentMethod(payment) async {
+  dynamic result;
+  try {
+    var response =
+        await http.post(Uri.parse('${url}api/v1/request/user/payment-method'),
+            headers: {
+              'Authorization': 'Bearer ${bearerToken[0].token}',
+              'Content-Type': 'application/json',
+            },
+            body: jsonEncode({
+              'request_id': userRequestData['id'],
+              'payment_opt': (payment == 'card')
+                  ? 0
+                  : (payment == 'cash')
+                      ? 1
+                      : (payment == 'wallet')
+                          ? 2
+                          : 4
+            }));
+    if (response.statusCode == 200) {
+      FirebaseDatabase.instance
+          .ref('requests')
+          .child(userRequestData['id'])
+          .update({'modified_by_user': ServerValue.timestamp});
+      await getUserDetails();
+      result = 'success';
+      valueNotifierBook.incrementNotifier();
+    } else if (response.statusCode == 401) {
+      result = 'logout';
+    } else {
+      debugPrint(response.body);
+      result = 'failed';
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+    }
+  }
+  return result;
+}
+
+String isemailmodule = '1';
+getOwnermodule() async {
+  dynamic res;
+  try {
+    final response = await http.get(
+      Uri.parse('${url}api/v1/common/modules'),
+    );
+
+    if (response.statusCode == 200) {
+      isemailmodule = jsonDecode(response.body)['enable_email_otp'];
+
+      res = 'success';
+    } else {
+      debugPrint(response.body);
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      internet = false;
+      res = 'no internet';
+    }
+  }
+
+  return res;
 }

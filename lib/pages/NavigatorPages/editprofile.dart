@@ -33,19 +33,27 @@ class _EditProfileState extends State<EditProfile> {
 //gallery permission
   getGalleryPermission() async {
     dynamic status;
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-  if (androidInfo.version.sdkInt <= 32) {
-    status = await Permission.storage.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.storage.request();
+    if (platform == TargetPlatform.android) {
+      final androidInfo = await DeviceInfoPlugin().androidInfo;
+      if (androidInfo.version.sdkInt <= 32) {
+        status = await Permission.storage.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.storage.request();
+        }
+
+        /// use [Permissions.storage.status]
+      } else {
+        status = await Permission.photos.status;
+        if (status != PermissionStatus.granted) {
+          status = await Permission.photos.request();
+        }
+      }
+    } else {
+      status = await Permission.photos.status;
+      if (status != PermissionStatus.granted) {
+        status = await Permission.photos.request();
+      }
     }
-    /// use [Permissions.storage.status]
-  } else{
-    status = await Permission.photos.status;
-    if (status != PermissionStatus.granted) {
-      status = await Permission.photos.request();
-    }
-  }
     return status;
   }
 
@@ -151,7 +159,8 @@ class _EditProfileState extends State<EditProfile> {
                                     onTap: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Icon(Icons.arrow_back, color: textColor)))
+                                    child: Icon(Icons.arrow_back,
+                                        color: textColor)))
                           ],
                         ),
                         SizedBox(height: media.width * 0.1),
@@ -199,26 +208,23 @@ class _EditProfileState extends State<EditProfile> {
                                 : TextDirection.ltr,
                             controller: name,
                             decoration: InputDecoration(
-                                
                                 labelText: languages[choosenLanguage]
                                     ['text_name'],
                                 labelStyle: TextStyle(
-                                  color: textColor.withOpacity(0.6)
-                                ),    
+                                    color: textColor.withOpacity(0.6)),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                      color: textColor.withOpacity(0.4),
-                                      width: 1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  gapPadding: 1
-                                ), 
+                                    borderSide: BorderSide(
+                                        color: textColor.withOpacity(0.4),
+                                        width: 1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    gapPadding: 1),
                                 isDense: true),
-                                style: GoogleFonts.roboto(
-                                  color: textColor,
-                                ),
+                            style: GoogleFonts.roboto(
+                              color: textColor,
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -237,21 +243,20 @@ class _EditProfileState extends State<EditProfile> {
                                 labelText: languages[choosenLanguage]
                                     ['text_email'],
                                 labelStyle: TextStyle(
-                                  color: textColor.withOpacity(0.6)
-                                ),    
+                                    color: textColor.withOpacity(0.6)),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                     gapPadding: 1),
                                 enabledBorder: OutlineInputBorder(
-                                  borderSide:
-                                      BorderSide(color: textColor.withOpacity(0.4), width: 1),
-                                  borderRadius: BorderRadius.circular(12),   
-                                  gapPadding: 1 
-                                ),    
+                                    borderSide: BorderSide(
+                                        color: textColor.withOpacity(0.4),
+                                        width: 1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    gapPadding: 1),
                                 isDense: true),
-                                style: GoogleFonts.roboto(
-                                  color: textColor,
-                                ),
+                            style: GoogleFonts.roboto(
+                              color: textColor,
+                            ),
                           ),
                         )
                       ],
@@ -260,47 +265,45 @@ class _EditProfileState extends State<EditProfile> {
                   SizedBox(
                       width: media.width * 0.8,
                       child: Button(
-                          onTap: () async {
-                            String pattern =
-                                r"^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])*$";
-                            RegExp regex = RegExp(pattern);
-                            if (regex.hasMatch(email.text)) {
-                              setState(() {
-                                _isLoading = true;
-                              });
-                              dynamic val;
+                        onTap: () async {
+                          String pattern =
+                              r"^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])*$";
+                          RegExp regex = RegExp(pattern);
+                          if (regex.hasMatch(email.text)) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            dynamic val;
 
-                              if (imageFile == null) {
-                                //update name or email
-                                val = await updateProfileWithoutImage(
-                                    name.text, email.text);
-                              } else {
-                                //update image
-                                val =
-                                    await updateProfile(name.text, email.text);
-                              }
-                              if (val == 'success') {
-                                pop();
-                              } else if (val == 'logout') {
-                                navigateLogout();
-                              } else {
-                                setState(() {
-                                  _error = val.toString();
-                                });
-                              }
-                              setState(() {
-                                _isLoading = false;
-                              });
+                            if (imageFile == null) {
+                              //update name or email
+                              val = await updateProfileWithoutImage(
+                                  name.text, email.text);
+                            } else {
+                              //update image
+                              val = await updateProfile(name.text, email.text);
+                            }
+                            if (val == 'success') {
+                              pop();
+                            } else if (val == 'logout') {
+                              navigateLogout();
                             } else {
                               setState(() {
-                                _error = languages[choosenLanguage]
-                                    ['text_email_validation'];
+                                _error = val.toString();
                               });
                             }
-                          },
-                          text: languages[choosenLanguage]['text_confirm'],
-                          
-                          ))
+                            setState(() {
+                              _isLoading = false;
+                            });
+                          } else {
+                            setState(() {
+                              _error = languages[choosenLanguage]
+                                  ['text_email_validation'];
+                            });
+                          }
+                        },
+                        text: languages[choosenLanguage]['text_confirm'],
+                      ))
                 ],
               ),
             ),

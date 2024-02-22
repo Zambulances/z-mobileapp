@@ -129,7 +129,9 @@ class _LanguagesState extends State<Languages> {
                                         decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                                color: (isDarkTheme == true) ? textColor : const Color(0xff222222),
+                                                color: (isDarkTheme == true)
+                                                    ? textColor
+                                                    : const Color(0xff222222),
                                                 width: 1.2)),
                                         alignment: Alignment.center,
                                         child: (choosenLanguage == i)
@@ -140,7 +142,8 @@ class _LanguagesState extends State<Languages> {
                                                     shape: BoxShape.circle,
                                                     color: (isDarkTheme == true)
                                                         ? textColor
-                                                        : const Color(0xff222222)),
+                                                        : const Color(
+                                                            0xff222222)),
                                               )
                                             : Container(),
                                       )

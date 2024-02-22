@@ -50,6 +50,8 @@ var initSetting = InitializationSettings(android: androiInit, iOS: iosInit);
 Future<void> initMessaging() async {
   await fltNotification.initialize(initSetting);
 
+  await FirebaseMessaging.instance.requestPermission();
+
   FirebaseMessaging.instance.getInitialMessage().then((message) {
     if (message?.data != null) {
       if (message?.data['push_type'] == 'general') {

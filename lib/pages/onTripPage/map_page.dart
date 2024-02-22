@@ -64,7 +64,6 @@ class _MapsState extends State<Maps>
   bool _dropaddress = false;
   bool _dropLocationMap = false;
   bool _locationDenied = false;
-  bool _showToast = false;
   int gettingPerm = 0;
   Animation<double>? _animation;
   bool _isDarkTheme = false;
@@ -74,6 +73,7 @@ class _MapsState extends State<Maps>
   String state = '';
   dynamic _controller;
   Map myBearings = {};
+  dynamic _lastCenter;
 
   late BitmapDescriptor pinLocationIcon;
   dynamic pinLocationIcon2;
@@ -148,18 +148,6 @@ class _MapsState extends State<Maps>
         (route) => false);
   }
 
-  //show toast for demo
-  addToast() {
-    setState(() {
-      _showToast = true;
-    });
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        _showToast = false;
-      });
-    });
-  }
-
 //get location permission and location details
   getLocs() async {
     myBearings.clear;
@@ -199,6 +187,7 @@ class _MapsState extends State<Maps>
               double.parse(locs.longitude.toString()));
           currentLocation = LatLng(double.parse(locs.latitude.toString()),
               double.parse(locs.longitude.toString()));
+          _lastCenter = _centerLocation;
         });
       } else {
         var loc = await geolocs.Geolocator.getCurrentPosition(
@@ -210,6 +199,7 @@ class _MapsState extends State<Maps>
               double.parse(loc.longitude.toString()));
           currentLocation = LatLng(double.parse(loc.latitude.toString()),
               double.parse(loc.longitude.toString()));
+          _lastCenter = _centerLocation;
         });
       }
       _controller?.animateCamera(CameraUpdate.newLatLngZoom(center, 14.0));
@@ -249,14 +239,11 @@ class _MapsState extends State<Maps>
 
   getLocationPermission() async {
     if (serviceEnabled == false) {
-      // await location.requestService();
       await geolocs.Geolocator.getCurrentPosition(
           desiredAccuracy: geolocs.LocationAccuracy.low);
     }
     if (permission == PermissionStatus.granted ||
         permission == PermissionStatus.deniedForever) {
-      //  var _lpermission = await perm.Permission.location.shouldShowRequestRationale;
-      //  print(_lpermission);
       if (permission != PermissionStatus.deniedForever) {
         await perm.Permission.location.request();
       }
@@ -352,7 +339,7 @@ class _MapsState extends State<Maps>
                   }
                 });
               }
-              if(package == null){
+              if (package == null) {
                 checkVersion();
               }
               return Directionality(
@@ -562,8 +549,6 @@ class _MapsState extends State<Maps>
                                                                             .LocationAccuracy
                                                                             .low);
                                                           }
-                                                          // await location
-                                                          //     .requestService();
                                                         }
                                                         if (await geolocs
                                                             .GeolocatorPlatform
@@ -605,8 +590,6 @@ class _MapsState extends State<Maps>
                                                                     DatabaseEvent>
                                                                 event) {
                                                           if (event.hasData) {
-                                                            // myMarkers.removeWhere(
-                                                            //     (element) => element.markerId.toString().contains('car'));
                                                             List driverData =
                                                                 [];
                                                             event.data!.snapshot
@@ -761,80 +744,8 @@ class _MapsState extends State<Maps>
                                                                   },
                                                                   onCameraIdle:
                                                                       () async {
-                                                                        if (_bottom ==
-                                                                            0 &&
-                                                                        _pickaddress ==
-                                                                            false) {
-                                                                      // setState(
-                                                                      //       () {
-                                                                      //     if (addressList
-                                                                      //         .where((element) =>
-                                                                      //             element.id ==
-                                                                      //             'pickup')
-                                                                      //         .isNotEmpty) {
-                                                                      //       var add = addressList.firstWhere((element) =>
-                                                                      //           element.id ==
-                                                                      //           'pickup');
-                                                                      //       add.address =
-                                                                      //           val;
-                                                                      //       add.latlng = LatLng(
-                                                                      //           _centerLocation.latitude,
-                                                                      //           _centerLocation.longitude);
-                                                                      //     } else {
-                                                                      //       addressList.add(AddressList(
-                                                                      //           id: 'pickup',
-                                                                      //           address: val,
-                                                                      //           latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
-                                                                      //     }
-                                                                      //   });
-                                                                      addToast();
-                                                                    } else if (_pickaddress ==
-                                                                        true) {
-                                                                      setState(
-                                                                          () {
-                                                                        _pickaddress =
-                                                                            false;
-                                                                      });
-                                                                    }
-                                                                    // if (_bottom ==
-                                                                    //         0 &&
-                                                                    //     _pickaddress ==
-                                                                    //         false) {
-                                                                    //   var val = await geoCoding(
-                                                                    //       _centerLocation
-                                                                    //           .latitude,
-                                                                    //       _centerLocation
-                                                                    //           .longitude);
-                                                                    //   setState(
-                                                                    //       () {
-                                                                    //     if (addressList
-                                                                    //         .where((element) =>
-                                                                    //             element.id ==
-                                                                    //             'pickup')
-                                                                    //         .isNotEmpty) {
-                                                                    //       var add = addressList.firstWhere((element) =>
-                                                                    //           element.id ==
-                                                                    //           'pickup');
-                                                                    //       add.address =
-                                                                    //           val;
-                                                                    //       add.latlng = LatLng(
-                                                                    //           _centerLocation.latitude,
-                                                                    //           _centerLocation.longitude);
-                                                                    //     } else {
-                                                                    //       addressList.add(AddressList(
-                                                                    //           id: 'pickup',
-                                                                    //           address: val,
-                                                                    //           latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
-                                                                    //     }
-                                                                    //   });
-                                                                    // } else if (_pickaddress ==
-                                                                    //     true) {
-                                                                    //   setState(
-                                                                    //       () {
-                                                                    //     _pickaddress =
-                                                                    //         false;
-                                                                    //   });
-                                                                    // }
+                                                                    setState(
+                                                                        () {});
                                                                   },
                                                                   minMaxZoomPreference:
                                                                       const MinMaxZoomPreference(
@@ -881,6 +792,44 @@ class _MapsState extends State<Maps>
                                                                             .width *
                                                                         0.08,
                                                                   ),
+                                                                  SizedBox(
+                                                                    height: media
+                                                                            .width *
+                                                                        0.025,
+                                                                  ),
+                                                                  if (_lastCenter !=
+                                                                      _centerLocation)
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        Button(
+                                                                          onTap:
+                                                                              () async {
+                                                                            // addToast();
+                                                                            setState(() {
+                                                                              _loading = true;
+                                                                            });
+                                                                            var val =
+                                                                                await geoCoding(_centerLocation.latitude, _centerLocation.longitude);
+                                                                            setState(() {
+                                                                              if (addressList.where((element) => element.id == 'pickup').isNotEmpty) {
+                                                                                var add = addressList.firstWhere((element) => element.id == 'pickup');
+                                                                                add.address = val;
+                                                                                add.latlng = LatLng(_centerLocation.latitude, _centerLocation.longitude);
+                                                                              } else {
+                                                                                addressList.add(AddressList(id: 'pickup', address: val, latlng: LatLng(_centerLocation.latitude, _centerLocation.longitude)));
+                                                                              }
+                                                                              _loading = false;
+                                                                            });
+                                                                          },
+                                                                          text: languages[choosenLanguage]
+                                                                              [
+                                                                              'text_confirm'],
+                                                                        ),
+                                                                      ],
+                                                                    ),
                                                                 ],
                                                               )
                                                             : Image.asset(
@@ -925,8 +874,7 @@ class _MapsState extends State<Maps>
                                                                 }
                                                               });
                                                             },
-                                                            child:
-                                                                Container(
+                                                            child: Container(
                                                               margin: EdgeInsets.only(
                                                                   left: media
                                                                           .width *
@@ -1042,7 +990,7 @@ class _MapsState extends State<Maps>
                                                                               autofocus: true,
                                                                               decoration: InputDecoration(
                                                                                 contentPadding: (languageDirection == 'rtl') ? EdgeInsets.only(bottom: media.width * 0.035) : EdgeInsets.only(bottom: media.width * 0.047),
-                                                                                hintText: languages[choosenLanguage]['text_4lettersforautofill'],
+                                                                                hintText: languages[choosenLanguage]['text_4lettersforautofill_pickup'],
                                                                                 hintStyle: GoogleFonts.roboto(fontSize: media.width * twelve, color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor),
                                                                                 border: InputBorder.none,
                                                                               ),
@@ -1160,12 +1108,6 @@ class _MapsState extends State<Maps>
                                                           width: media.width *
                                                               0.06,
                                                           color: textColor),
-                                                      // Icon(
-                                                      //     Icons
-                                                      //         .my_location_sharp,
-                                                      //     size: media
-                                                      //             .width *
-                                                      //         0.06),
                                                     ),
                                                   ),
                                                 ),
@@ -1277,8 +1219,6 @@ class _MapsState extends State<Maps>
                                                                                 Text(
                                                                               languages[choosenLanguage]['text_goto_url'],
                                                                               maxLines: 1,
-                                                                              // overflow:
-                                                                              //     TextOverflow.ellipsis,
                                                                               style: GoogleFonts.roboto(fontSize: media.width * fourteen, color: textColor),
                                                                             ))
                                                                       ],
@@ -1419,8 +1359,6 @@ class _MapsState extends State<Maps>
                                                                           desiredAccuracy: geolocs
                                                                               .LocationAccuracy
                                                                               .low);
-                                                                  // await location
-                                                                  //     .requestService();
                                                                   if (await geolocs
                                                                       .GeolocatorPlatform
                                                                       .instance
@@ -1966,7 +1904,6 @@ class _MapsState extends State<Maps>
                               child: Container(
                                 height: media.height * 1,
                                 width: media.width * 1,
-                                // color: Colors.transparent.withOpacity(0.6),
                                 color: (isDarkTheme == true)
                                     ? textColor.withOpacity(0.2)
                                     : Colors.transparent.withOpacity(0.6),
@@ -2442,7 +2379,6 @@ class _MapsState extends State<Maps>
                               child: Container(
                                 height: media.height * 1,
                                 width: media.width * 1,
-                                // color: Colors.transparent.withOpacity(0.6),
                                 color: (isDarkTheme == true)
                                     ? textColor.withOpacity(0.2)
                                     : Colors.transparent.withOpacity(0.6),
@@ -2542,7 +2478,6 @@ class _MapsState extends State<Maps>
                               child: Container(
                                 height: media.height * 1,
                                 width: media.width * 1,
-                                // color: Colors.transparent.withOpacity(0.6),
                                 color: (isDarkTheme == true)
                                     ? textColor.withOpacity(0.2)
                                     : Colors.transparent.withOpacity(0.6),
@@ -2741,89 +2676,75 @@ class _MapsState extends State<Maps>
                             ))
                           : Container(),
 
-                           //display toast
-                      (_showToast == true)
+                      (updateAvailable == true)
                           ? Positioned(
-                              top: media.height * 0.5,
+                              top: 0,
                               child: Container(
-                                width: media.width * 0.9,
-                                margin: EdgeInsets.all(media.width * 0.05),
-                                padding: EdgeInsets.all(media.width * 0.025),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: page),
-                                child: Text(
-                                  'Auto address by scrolling map feature is not available in demo',
-                                  style: GoogleFonts.roboto(
-                                      fontSize: media.width * twelve,
-                                      color: textColor),
-                                  textAlign: TextAlign.center,
+                                height: media.height * 1,
+                                width: media.width * 1,
+                                color: Colors.transparent.withOpacity(0.6),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                        width: media.width * 0.9,
+                                        padding:
+                                            EdgeInsets.all(media.width * 0.05),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: page,
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                                width: media.width * 0.8,
+                                                child: Text(
+                                                  languages[choosenLanguage]
+                                                      ['text_update_available'],
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * sixteen,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                )),
+                                            SizedBox(
+                                              height: media.width * 0.05,
+                                            ),
+                                            Button(
+                                                onTap: () async {
+                                                  if (platform ==
+                                                      TargetPlatform.android) {
+                                                    openBrowser(
+                                                        'https://play.google.com/store/apps/details?id=${package.packageName}');
+                                                  } else {
+                                                    setState(() {
+                                                      _loading = true;
+                                                    });
+                                                    var response = await http
+                                                        .get(Uri.parse(
+                                                            'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
+                                                    if (response.statusCode ==
+                                                        200) {
+                                                      openBrowser(jsonDecode(
+                                                                  response
+                                                                      .body)[
+                                                              'results'][0]
+                                                          ['trackViewUrl']);
+                                                    }
+
+                                                    setState(() {
+                                                      _loading = false;
+                                                    });
+                                                  }
+                                                },
+                                                text: 'Update')
+                                          ],
+                                        ))
+                                  ],
                                 ),
                               ))
                           : Container(),
-
-                          (updateAvailable == true)
-                ? Positioned(
-                    top: 0,
-                    child: Container(
-                      height: media.height * 1,
-                      width: media.width * 1,
-                      color: Colors.transparent.withOpacity(0.6),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                              width: media.width * 0.9,
-                              padding: EdgeInsets.all(media.width * 0.05),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: page,
-                              ),
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                      width: media.width * 0.8,
-                                      child: Text(
-                                        languages[choosenLanguage]['text_update_available'],
-                                        style: GoogleFonts.roboto(
-                                            fontSize: media.width * sixteen,
-                                            fontWeight: FontWeight.w600),
-                                      )),
-                                  SizedBox(
-                                    height: media.width * 0.05,
-                                  ),
-                                  Button(
-                                      onTap: () async {
-                                        if (platform ==
-                                            TargetPlatform.android) {
-                                          openBrowser(
-                                              'https://play.google.com/store/apps/details?id=${package.packageName}');
-                                        } else {
-                                          setState(() {
-                                            _loading = true;
-                                          });
-                                          var response = await http.get(Uri.parse(
-                                              'http://itunes.apple.com/lookup?bundleId=${package.packageName}'));
-                                          if (response.statusCode == 200) {
-                                            openBrowser(jsonDecode(
-                                                    response.body)['results'][0]
-                                                ['trackViewUrl']);
-
-                                            // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
-                                          }
-
-                                          setState(() {
-                                            _loading = false;
-                                          });
-                                        }
-                                      },
-                                      text: 'Update')
-                                ],
-                              ))
-                        ],
-                      ),
-                    ))
-                : Container(),
 
                       //loader
                       (_loading == true || state == '')

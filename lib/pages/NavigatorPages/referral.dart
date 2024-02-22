@@ -74,7 +74,6 @@ class _ReferralPageState extends State<ReferralPage> {
         if (jsonDecode(response.body)['results'].isNotEmpty) {
           ios = jsonDecode(response.body)['results'][0]['trackViewUrl'];
         }
-        // printWrapped(jsonDecode(response.body)['results'][0]['trackViewUrl']);
       }
     }
   }
@@ -140,8 +139,8 @@ class _ReferralPageState extends State<ReferralPage> {
                                                 onTap: () {
                                                   Navigator.pop(context);
                                                 },
-                                                child: Icon(
-                                                    Icons.arrow_back, color: textColor)))
+                                                child: Icon(Icons.arrow_back,
+                                                    color: textColor)))
                                       ],
                                     ),
                                     SizedBox(
@@ -200,7 +199,10 @@ class _ReferralPageState extends State<ReferralPage> {
                                                   });
                                                   showToast();
                                                 },
-                                                child: Icon(Icons.copy, color: textColor,))
+                                                child: Icon(
+                                                  Icons.copy,
+                                                  color: textColor,
+                                                ))
                                           ],
                                         ))
                                   ],
@@ -298,7 +300,9 @@ class _ReferralPageState extends State<ReferralPage> {
                             padding: EdgeInsets.all(media.width * 0.025),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
-                                color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : Colors.transparent.withOpacity(0.6)),
+                                color: (isDarkTheme == true)
+                                    ? textColor.withOpacity(0.4)
+                                    : Colors.transparent.withOpacity(0.6)),
                             child: Text(
                               languages[choosenLanguage]['text_code_copied'],
                               style: GoogleFonts.roboto(

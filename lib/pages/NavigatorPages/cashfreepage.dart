@@ -151,7 +151,8 @@ class _CashFreePageState extends State<CashFreePage> {
                                       onTap: () {
                                         Navigator.pop(context, true);
                                       },
-                                      child: Icon(Icons.arrow_back, color: textColor)))
+                                      child: Icon(Icons.arrow_back,
+                                          color: textColor)))
                             ],
                           ),
                           SizedBox(

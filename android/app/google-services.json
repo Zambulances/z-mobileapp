@@ -1,65 +1,41 @@
 {
   "project_info": {
-    "project_number": "214496791559",
-    "firebase_url": "https://tagxi-340103-default-rtdb.firebaseio.com",
-    "project_id": "tagxi-340103",
-    "storage_bucket": "tagxi-340103.appspot.com"
+    "project_number": "825621911633",
+    "firebase_url": "https://z-ambulances-default-rtdb.firebaseio.com",
+    "project_id": "z-ambulances",
+    "storage_bucket": "z-ambulances.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:214496791559:android:d2dd107c133a16f2e2eea2",
+        "mobilesdk_app_id": "1:825621911633:android:74af79fa0ea63870ee4070",
         "android_client_info": {
-          "package_name": "com.driver.tagxi"
+          "package_name": "zdriver.ambulance"
         }
       },
       "oauth_client": [
         {
-          "client_id": "214496791559-3m833j3u2kche5uhuf5bagml32ngp92l.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.driver.tagxi",
-            "certificate_hash": "773394247ad0028088b620b2ad46a4827a34fc07"
-          }
-        },
-        {
-          "client_id": "214496791559-oo8d7ekgq9mmk3qrumh4aui6lg7jm57p.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.driver.tagxi",
-            "certificate_hash": "21c17ab6b2f29ba728c98097abd795724c182cf6"
-          }
-        },
-        {
-          "client_id": "214496791559-p1vq1h8uvr8hqpk7cgvvbcglm2189fkf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.driver.tagxi",
-            "certificate_hash": "1e5531209eb632b2c8b3af4a01ead694e59f29af"
-          }
-        },
-        {
-          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+          "client_id": "825621911633-2kcjpvb3m2hcsibj4knsh4ej4hp51fqr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
+          "current_key": "AIzaSyBmEtd6MnmUAAf8KKYLgKpuItQFqDbkhY4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+              "client_id": "825621911633-2kcjpvb3m2hcsibj4knsh4ej4hp51fqr.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
+              "client_id": "825621911633-0gm2ejftkud6jqri3tlnfoffgr9c4p7k.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.driver.tagxi"
+                "bundle_id": "com.example.tagxidriver.RunnerTests"
               }
             }
           ]
@@ -68,250 +44,50 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:214496791559:android:bc84c3979128cd1ce2eea2",
+        "mobilesdk_app_id": "1:825621911633:android:abbafc4bcb036cedee4070",
         "android_client_info": {
-          "package_name": "com.firebase.clean"
+          "package_name": "zuser.ambulance"
         }
       },
       "oauth_client": [
         {
-          "client_id": "214496791559-s3qol2gn4sdkp2injgpe39jbd6o9bu1p.apps.googleusercontent.com",
+          "client_id": "825621911633-0khg84jth4sg554kjqeqp3vnehtgscpk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.firebase.clean",
-            "certificate_hash": "acfc208ce5b529d4328354f7f3541da552ab592c"
+            "package_name": "zuser.ambulance",
+            "certificate_hash": "bed267ab6ad1fe19db7385e87045c5b1c6096969"
           }
         },
         {
-          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+          "client_id": "825621911633-6ot70tindcrv4kl4155l72qt8vfl6qvj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "zuser.ambulance",
+            "certificate_hash": "f89fff17de8757c91144e4dd5505160082103577"
+          }
+        },
+        {
+          "client_id": "825621911633-2kcjpvb3m2hcsibj4knsh4ej4hp51fqr.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
+          "current_key": "AIzaSyBmEtd6MnmUAAf8KKYLgKpuItQFqDbkhY4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
+              "client_id": "825621911633-2kcjpvb3m2hcsibj4knsh4ej4hp51fqr.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
+              "client_id": "825621911633-0gm2ejftkud6jqri3tlnfoffgr9c4p7k.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.driver.tagxi"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:214496791559:android:2a904adbd5b0d34ee2eea2",
-        "android_client_info": {
-          "package_name": "com.tagxi.operator"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "214496791559-h5ki1f1od2fdo2b24pr3uol3tuqspunp.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.tagxi.operator",
-            "certificate_hash": "b6f68583c64953291101c4aaf8edc4a841d41571"
-          }
-        },
-        {
-          "client_id": "214496791559-mjm6emnj708lie3o5j76akv1j06pf7re.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.tagxi.operator",
-            "certificate_hash": "9c79dfa50c59f9c738a641ac6839861a8dbf45e2"
-          }
-        },
-        {
-          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.driver.tagxi"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:214496791559:android:9a383c3780116fc3e2eea2",
-        "android_client_info": {
-          "package_name": "com.user.tagxi"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "214496791559-5u4kc265gvl939lm1a34u67um42qfj2n.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.user.tagxi",
-            "certificate_hash": "9c79dfa50c59f9c738a641ac6839861a8dbf45e2"
-          }
-        },
-        {
-          "client_id": "214496791559-is8v3lcclp6o1931jrm8l4rg7d191u0t.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.user.tagxi",
-            "certificate_hash": "760f4fe53f3be4d2ba6c7a540a48c89f678abad0"
-          }
-        },
-        {
-          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.driver.tagxi"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:214496791559:android:e0715733b29ad62fe2eea2",
-        "android_client_info": {
-          "package_name": "com.user.tagxi"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "214496791559-ighss2vhtdbs5qckvo3vqjd9ln96fbkt.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.user.tagxi",
-            "certificate_hash": "d3a9d059de8722d9568e3e72e0b9761788b2afa8"
-          }
-        },
-        {
-          "client_id": "214496791559-pggo7lqmaem6dqe1pj0rrg9ttva8r0n0.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.user.tagxi",
-            "certificate_hash": "a9c8513a5a3a9b2650d7a36774981c8691df4bf2"
-          }
-        },
-        {
-          "client_id": "214496791559-tlem6fmuq3jisa0m5djppvkk1gpuldnf.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.user.tagxi",
-            "certificate_hash": "8b1f5a22712f04b7e0c281f06328d1c10fdbb044"
-          }
-        },
-        {
-          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.driver.tagxi"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:214496791559:android:d58ea7a592c0f651e2eea2",
-        "android_client_info": {
-          "package_name": "test.flutter.app"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "214496791559-fuuretnqqhnu8od1cov6v0a3gkcqqseg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "test.flutter.app",
-            "certificate_hash": "d3a9d059de8722d9568e3e72e0b9761788b2afa8"
-          }
-        },
-        {
-          "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCaOC588fkGFl7eVsAj0Pun_CG97_7intA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "214496791559-ek614jf5g6r6fkpjb0fa8g0djvakvoek.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "214496791559-69n81e5605p5hcf42if08unq4krqi5md.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.driver.tagxi"
+                "bundle_id": "com.example.tagxidriver.RunnerTests"
               }
             }
           ]

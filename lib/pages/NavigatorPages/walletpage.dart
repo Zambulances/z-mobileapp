@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagxiuser/functions/functions.dart';
@@ -14,6 +13,8 @@ import 'package:tagxiuser/widgets/widgets.dart';
 import 'package:tagxiuser/pages/NavigatorPages/paystackpayment.dart';
 import 'package:tagxiuser/pages/NavigatorPages/razorpaypage.dart';
 import 'package:tagxiuser/pages/NavigatorPages/cashfreepage.dart';
+
+import 'mercadopago.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({Key? key}) : super(key: key);
@@ -178,16 +179,20 @@ class _WalletPageState extends State<WalletPage> {
                                     SizedBox(
                                       height: media.width * 0.05,
                                     ),
-                                    Button(
-                                      onTap: () {
-                                        setState(() {
-                                          ispop = true;
-                                        });
-                                      },
-                                      text: languages[choosenLanguage]
-                                          ['text_share_money'],
-                                      width: media.width * 0.3,
-                                    ),
+                                    (userDetails[
+                                                'shoW_wallet_money_transfer_feature_on_mobile_app'] ==
+                                            '1')
+                                        ? Button(
+                                            onTap: () {
+                                              setState(() {
+                                                ispop = true;
+                                              });
+                                            },
+                                            text: languages[choosenLanguage]
+                                                ['text_share_money'],
+                                            width: media.width * 0.3,
+                                          )
+                                        : Container(),
                                     SizedBox(
                                       height: media.width * 0.05,
                                     ),
@@ -336,8 +341,12 @@ class _WalletPageState extends State<WalletPage> {
                                                                 fontSize: media
                                                                         .width *
                                                                     twelve,
-                                                                color: const Color(
-                                                                    0xffE60000),
+                                                                color: (walletHistory[i]
+                                                                            [
+                                                                            'is_credit'] ==
+                                                                        1)
+                                                                    ? online
+                                                                    : verifyDeclined,
                                                               ),
                                                             )
                                                           ],
@@ -693,7 +702,6 @@ class _WalletPageState extends State<WalletPage> {
                                           ),
                                           Button(
                                             onTap: () async {
-                                              // print(addMoney);
                                               FocusManager.instance.primaryFocus
                                                   ?.unfocus();
                                               if (addMoney != 0 &&
@@ -956,55 +964,98 @@ class _WalletPageState extends State<WalletPage> {
                                                       ))
                                                   : Container(),
 
-                                                 //ccavenue
-                                                      (walletBalance['ccAvenue'] ==
-                                                          true)
-                                                      ? Container(
-                                                          margin: EdgeInsets.only(
-                                                              bottom:
-                                                                  media.width *
-                                                                      0.025),
-                                                          alignment:
-                                                              Alignment.center,
-                                                          width:
-                                                              media.width * 0.7,
-                                                          child: InkWell(
-                                                            onTap: () async {
-                                                              var val = await Navigator.push(
-                                                                  context,
-                                                                  MaterialPageRoute(
-                                                                      builder:
-                                                                          (context) =>
-                                                                               CcavenuePage()));
-                                                              if (val) {
-                                                                setState(() {
-                                                                  _choosePayment =
-                                                                      false;
-                                                                  _addPayment =
-                                                                      false;
-                                                                  addMoney =
-                                                                      null;
-                                                                  addMoneyController
-                                                                      .clear();
-                                                                });
-                                                              }
-                                                            },
-                                                            child: Container(
-                                                              width:
-                                                                  media.width *
-                                                                      0.25,
-                                                              height:
-                                                                  media.width *
-                                                                      0.125,
-                                                              decoration: const BoxDecoration(
-                                                                  image: DecorationImage(
-                                                                      image: AssetImage(
-                                                                          'assets/images/ccavenue.png'),
-                                                                      fit: BoxFit
-                                                                          .contain)),
-                                                            ),
-                                                          ))
-                                                      : Container(),
+                                              //ccavenue
+                                              (walletBalance['ccAvenue'] ==
+                                                      true)
+                                                  ? Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: media.width *
+                                                              0.025),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      width: media.width * 0.7,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          var val = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          CcavenuePage()));
+                                                          if (val) {
+                                                            setState(() {
+                                                              _choosePayment =
+                                                                  false;
+                                                              _addPayment =
+                                                                  false;
+                                                              addMoney = null;
+                                                              addMoneyController
+                                                                  .clear();
+                                                            });
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          width: media.width *
+                                                              0.25,
+                                                          height: media.width *
+                                                              0.125,
+                                                          decoration: const BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/ccavenue.png'),
+                                                                  fit: BoxFit
+                                                                      .contain)),
+                                                        ),
+                                                      ))
+                                                  : Container(),
+                                              (walletBalance['mercadopago'] ==
+                                                      true)
+                                                  ? Container(
+                                                      margin: EdgeInsets.only(
+                                                          bottom: media.width *
+                                                              0.025),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      width: media.width * 0.7,
+                                                      child: InkWell(
+                                                        onTap: () async {
+                                                          var val = await Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          MercadoPago()));
+                                                          if (val != null) {
+                                                            if (val) {
+                                                              setState(() {
+                                                                _isLoading =
+                                                                    true;
+                                                                _choosePayment =
+                                                                    false;
+                                                                _addPayment =
+                                                                    false;
+                                                                addMoney = null;
+                                                                addMoneyController
+                                                                    .clear();
+                                                              });
+                                                              await getWallet();
+                                                            }
+                                                          }
+                                                        },
+                                                        child: Container(
+                                                          width: media.width *
+                                                              0.35,
+                                                          height: media.width *
+                                                              0.125,
+                                                          decoration: const BoxDecoration(
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      'assets/images/mercadopago.png'),
+                                                                  fit: BoxFit
+                                                                      .contain)),
+                                                        ),
+                                                      ))
+                                                  : Container(),
                                               (walletBalance['cash_free'] ==
                                                       true)
                                                   ? Container(

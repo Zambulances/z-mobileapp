@@ -260,7 +260,6 @@ class _SelectWalletState extends State<SelectWallet> {
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              // color: Colors.transparent.withOpacity(0.6),
                               color: (isDarkTheme == true)
                                   ? textColor.withOpacity(0.2)
                                   : Colors.transparent.withOpacity(0.6),
@@ -272,7 +271,6 @@ class _SelectWalletState extends State<SelectWallet> {
                                     width: media.width * 0.9,
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
-                                        // border: Border.all(color: topBar),
                                         color: page),
                                     child: Column(
                                       children: [

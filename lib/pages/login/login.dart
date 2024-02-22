@@ -91,8 +91,11 @@ class _LoginState extends State<Login> {
                           height: 55,
                           width: media.width * 1 - (media.width * 0.08 * 2),
                           decoration: BoxDecoration(
-                              border:
-                                  Border(bottom: BorderSide(color: (isDarkTheme == true) ? textColor.withOpacity(0.6) : underline))),
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: (isDarkTheme == true)
+                                          ? textColor.withOpacity(0.6)
+                                          : underline))),
                           child: Row(
                             children: [
                               InkWell(
@@ -126,7 +129,7 @@ class _LoginState extends State<Login> {
                                                       Container(
                                                         padding:
                                                             const EdgeInsets
-                                                                    .only(
+                                                                .only(
                                                                 left: 20,
                                                                 right: 20),
                                                         height: 40,
@@ -143,8 +146,7 @@ class _LoginState extends State<Login> {
                                                                 width: 1.5)),
                                                         child: TextField(
                                                           decoration: InputDecoration(
-                                                              contentPadding: (languageDirection ==
-                                                                      'rtl')
+                                                              contentPadding: (languageDirection == 'rtl')
                                                                   ? EdgeInsets.only(
                                                                       bottom: media.width *
                                                                           0.035)
@@ -153,21 +155,18 @@ class _LoginState extends State<Login> {
                                                                           0.04),
                                                               border: InputBorder
                                                                   .none,
-                                                              hintText:
-                                                                  languages[choosenLanguage]
-                                                                      [
-                                                                      'text_search'],
+                                                              hintText: languages[choosenLanguage][
+                                                                  'text_search'],
                                                               hintStyle: GoogleFonts.roboto(
                                                                   color: textColor
                                                                       .withOpacity(
                                                                           0.4),
-                                                                  fontSize: media
-                                                                          .width *
+                                                                  fontSize: media.width *
                                                                       sixteen)),
-                                                              style: GoogleFonts
+                                                          style: GoogleFonts
                                                               .roboto(
                                                                   color:
-                                                                      textColor),        
+                                                                      textColor),
                                                           onChanged: (val) {
                                                             setState(() {
                                                               searchVal = val;
@@ -207,7 +206,7 @@ class _LoginState extends State<Login> {
                                                                                     children: [
                                                                                       Row(
                                                                                         children: [
-                                                                                          Image.network(countries[i]['flag']),
+                                                                                        //  Image.network(countries[i]['flag']),
                                                                                           SizedBox(
                                                                                             width: media.width * 0.02,
                                                                                           ),
@@ -242,7 +241,7 @@ class _LoginState extends State<Login> {
                                                                                         children: [
                                                                                           Row(
                                                                                             children: [
-                                                                                              Image.network(countries[i]['flag']),
+                                                                                             // Image.network(countries[i]['flag']),
                                                                                               SizedBox(
                                                                                                 width: media.width * 0.02,
                                                                                               ),
@@ -290,7 +289,7 @@ class _LoginState extends State<Login> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      Image.network(countries[phcode]['flag']),
+                                      //Image.network(countries[phcode]['flag']),
                                       SizedBox(
                                         width: media.width * 0.02,
                                       ),
@@ -304,7 +303,8 @@ class _LoginState extends State<Login> {
                                       const SizedBox(
                                         width: 2,
                                       ),
-                                      Icon(Icons.keyboard_arrow_down, color: textColor)
+                                      Icon(Icons.keyboard_arrow_down,
+                                          color: textColor)
                                     ],
                                   ),
                                 ),
@@ -400,7 +400,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser('https://tagyourtaxi.com/privacy-policy');
+                                      openBrowser('${url}terms');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]['text_terms'],
@@ -417,7 +417,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   InkWell(
                                     onTap: () {
-                                      openBrowser('https://tagyourtaxi.com/privacy-policy');
+                                      openBrowser('${url}privacy');
                                     },
                                     child: Text(
                                       languages[choosenLanguage]
@@ -435,46 +435,46 @@ class _LoginState extends State<Login> {
                         SizedBox(
                           height: media.height * 0.03,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.email,
-                              size: media.width * eighteen,
-                              color: textColor.withOpacity(0.7)
-                            ),
-                            SizedBox(width: media.width * 0.02),
-                            Text(
-                              languages[choosenLanguage]
-                                  ['text_continue_with'],
-                              style: GoogleFonts.roboto(
-                                color: textColor.withOpacity(0.7),
-                                fontSize: media.width * sixteen,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            SizedBox(
-                              width: media.width * 0.01,
-                            ),
-                            InkWell(
-                              onTap: () {
-                                controller.clear();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const SignInwithEmail()));
-                              },
-                              child: Text(
-                                languages[choosenLanguage]['text_email'],
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * sixteen,
-                                    fontWeight: FontWeight.w400,
-                                    color: buttonColor),
-                              ),
-                            )
-                          ],
-                        ),
+                        (isemailmodule == '1')
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.email,
+                                      size: media.width * eighteen,
+                                      color: textColor.withOpacity(0.7)),
+                                  SizedBox(width: media.width * 0.02),
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_continue_with'],
+                                    style: GoogleFonts.roboto(
+                                      color: textColor.withOpacity(0.7),
+                                      fontSize: media.width * sixteen,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: media.width * 0.01,
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      controller.clear();
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const SignInwithEmail()));
+                                    },
+                                    child: Text(
+                                      languages[choosenLanguage]['text_email'],
+                                      style: GoogleFonts.roboto(
+                                          fontSize: media.width * sixteen,
+                                          fontWeight: FontWeight.w400,
+                                          color: buttonColor),
+                                    ),
+                                  )
+                                ],
+                              )
+                            : Container(),
                         SizedBox(
                           height: media.height * 0.1,
                         ),
@@ -489,7 +489,6 @@ class _LoginState extends State<Login> {
                                     FocusManager.instance.primaryFocus
                                         ?.unfocus();
                                     setState(() {
-                                      
                                       _isLoading = true;
                                     });
                                     var val = await otpCall();
@@ -498,7 +497,7 @@ class _LoginState extends State<Login> {
                                       await phoneAuth(countries[phcode]
                                               ['dial_code'] +
                                           phnumber);
-                                      value = 0;    
+                                      value = 0;
                                       navigate();
                                     } else {
                                       phoneAuthCheck = false;

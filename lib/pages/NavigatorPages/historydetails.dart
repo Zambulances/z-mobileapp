@@ -36,12 +36,10 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     final Uint8List dropicon1 =
         await getBytesFromAsset('assets/images/droploc.png', 40);
 
-    // if (mounted) {
     setState(() {
       pickicon = BitmapDescriptor.fromBytes(pickicon1);
       dropicon = BitmapDescriptor.fromBytes(dropicon1);
     });
-    // }
     addPickDropMarker();
   }
 
@@ -95,26 +93,14 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                 myHistory[selectedHistory]['drop_lng']));
       }
     } else {
-      if (myHistory
-                  .firstWhere((element) => element.id == 'pickup')
-                  .LatLng(myHistory[selectedHistory]['pick_lat'],
-                      myHistory[selectedHistory]['pick_lng'])
-                  .myHistory[selectedHistory]['pick_lat'] >
-              myHistory
-                  .firstWhere((element) => element.id == 'drop')
-                  .LatLng(myHistory[selectedHistory]['drop_lat'],
-                      myHistory[selectedHistory]['drop_lng'])
-                  .myHistory[selectedHistory]['drop_lat'] &&
-          myHistory
-                  .firstWhere((element) => element.id == 'pickup')
-                  .LatLng(myHistory[selectedHistory]['pick_lat'],
-                      myHistory[selectedHistory]['pick_lng'])
-                  .myHistory[selectedHistory]['pick_lng'] >
-              myHistory
-                  .firstWhere((element) => element.id == 'drop')
-                  .LatLng(myHistory[selectedHistory]['drop_lat'],
-                      myHistory[selectedHistory]['drop_lng'])
-                  .myHistory[selectedHistory]['drop_lng']) {
+      if (myHistory.firstWhere((element) => element.id == 'pickup').LatLng(myHistory[selectedHistory]['pick_lat'], myHistory[selectedHistory]['pick_lng']).myHistory[selectedHistory]
+                  ['pick_lat'] >
+              myHistory.firstWhere((element) => element.id == 'drop').LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng']).myHistory[selectedHistory]
+                  ['drop_lat'] &&
+          myHistory.firstWhere((element) => element.id == 'pickup').LatLng(myHistory[selectedHistory]['pick_lat'], myHistory[selectedHistory]['pick_lng']).myHistory[selectedHistory]
+                  ['pick_lng'] >
+              myHistory.firstWhere((element) => element.id == 'drop').LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng']).myHistory[selectedHistory]
+                  ['drop_lng']) {
         bound = LatLngBounds(
             southwest: myHistory
                 .firstWhere((element) => element.id == 'drop')
@@ -129,11 +115,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               .LatLng(myHistory[selectedHistory]['pick_lat'],
                   myHistory[selectedHistory]['pick_lng'])
               .myHistory[selectedHistory]['pick_lng'] >
-          myHistory
-              .firstWhere((element) => element.id == 'drop')
-              .LatLng(myHistory[selectedHistory]['drop_lat'],
-                  myHistory[selectedHistory]['drop_lng'])
-              .myHistory[selectedHistory]['drop_lng']) {
+          myHistory.firstWhere((element) => element.id == 'drop').LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng']).myHistory[selectedHistory]
+              ['drop_lng']) {
         bound = LatLngBounds(
             southwest: LatLng(
                 myHistory
@@ -164,8 +147,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
               .myHistory[selectedHistory]['pick_lat'] >
           myHistory
               .firstWhere((element) => element.id == 'drop')
-              .LatLng(myHistory[selectedHistory]['drop_lat'],
-                  myHistory[selectedHistory]['drop_lng'])
+              .LatLng(myHistory[selectedHistory]['drop_lat'], myHistory[selectedHistory]['drop_lng'])
               .myHistory[selectedHistory]['drop_lat']) {
         bound = LatLngBounds(
             southwest: LatLng(
@@ -204,11 +186,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     }
     CameraUpdate cameraUpdate = CameraUpdate.newLatLngBounds(bound, 50);
     _controller!.moveCamera(cameraUpdate);
-    // await getPolylineshistory(
-    //     pickLat: myHistory[selectedHistory]['pick_lat'],
-    //     pickLng: myHistory[selectedHistory]['pick_lng'],
-    //     dropLat: myHistory[selectedHistory]['drop_lat'],
-    //     dropLng: myHistory[selectedHistory]['drop_lng']);
+
     setState(() {});
   }
 
@@ -270,7 +248,10 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           onTap: () {
                             Navigator.pop(context);
                           },
-                          child: Icon(Icons.arrow_back, color: textColor,)))
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: textColor,
+                          )))
                 ],
               ),
               Expanded(
@@ -465,7 +446,9 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
-                                  color: (isDarkTheme == true) ? Colors.black : Colors.white,
+                                  color: (isDarkTheme == true)
+                                      ? Colors.black
+                                      : Colors.white,
                                 ),
                               ),
                               SizedBox(
@@ -513,7 +496,9 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
-                                  color: (isDarkTheme == true) ? Colors.black : Colors.white,
+                                  color: (isDarkTheme == true)
+                                      ? Colors.black
+                                      : Colors.white,
                                 ),
                               ),
                               SizedBox(
@@ -561,7 +546,9 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 child: Icon(
                                   Icons.done,
                                   size: media.width * 0.04,
-                                  color: (isDarkTheme == true) ? Colors.black : Colors.white,
+                                  color: (isDarkTheme == true)
+                                      ? Colors.black
+                                      : Colors.white,
                                 ),
                               ),
                               SizedBox(
@@ -619,9 +606,8 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             myHistory[selectedHistory]['driverDetail']['data']
                                 ['name'],
                             style: GoogleFonts.roboto(
-                              fontSize: media.width * eighteen,
-                              color: textColor
-                            ),
+                                fontSize: media.width * eighteen,
+                                color: textColor),
                           ),
                           Expanded(
                               child: Row(
@@ -767,7 +753,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                       SizedBox(
                         height: media.height * 0.05,
                       ),
-
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -834,7 +819,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           ),
                         ],
                       ),
-
                       SizedBox(
                         height: media.height * 0.02,
                       ),
@@ -1114,7 +1098,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                         height: 1.5,
                         color: const Color(0xffE0E0E0),
                       ),
-                      // SizedBox(height: media.height*0.02,),
                       SizedBox(
                         height: media.height * 0.05,
                       ),

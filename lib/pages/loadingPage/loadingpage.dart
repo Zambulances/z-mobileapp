@@ -1,5 +1,6 @@
 // import 'dart:async';
 import 'dart:convert';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagxiuser/pages/loadingPage/loading.dart';
@@ -21,17 +22,16 @@ class LoadingPage extends StatefulWidget {
   State<LoadingPage> createState() => _LoadingPageState();
 }
 
-
 class _LoadingPageState extends State<LoadingPage> {
   String dot = '.';
   bool updateAvailable = false;
-
+  bool _error = false;
   bool _isLoading = false;
 
   @override
   void initState() {
     getLanguageDone();
-
+    getOwnermodule();
     super.initState();
   }
 
@@ -54,7 +54,8 @@ class _LoadingPageState extends State<LoadingPage> {
                       type: 1,
                     )),
             (route) => false);
-      } else if (userRequestData['drop_lat'] == null) {
+      }
+      else if (userRequestData['drop_lat'] == null) {
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -77,34 +78,59 @@ class _LoadingPageState extends State<LoadingPage> {
     }
   }
 
+  getData() async {
+    for (var i = 0; _error == true; i++) {
+      await getLanguageDone();
+    }
+  }
 
 //get language json and data saved in local (bearer token , choosen language) and find users current status
   getLanguageDone() async {
-        await getDetailsOfDevice();
-        if (internet == true) {
-          var val = await getLocalData();
-
-          if (val == '3') {
-            navigate();
-          } else if (val == '2') {
-            Future.delayed(const Duration(seconds: 2), () {
-              //login page
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const Login()));
-            });
-          } else {
-            Future.delayed(const Duration(seconds: 2), () {
-              //choose language page
-              Navigator.pushReplacement(context,
-                  MaterialPageRoute(builder: (context) => const Languages()));
-            });
-          }
-        } else {
-          setState(() {});
-        }
+    await getDetailsOfDevice();
+    try {
+      if (platform == TargetPlatform.android) {
+        await FirebaseDatabase.instance
+            .ref()
+            .child('driver_android_version')
+            .get();
+      } else {
+        await FirebaseDatabase.instance.ref().child('driver_ios_version').get();
       }
-    
-  
+      _error = false;
+      if (internet == true) {
+        var val = await getLocalData();
+
+        if (val == '3') {
+          navigate();
+        } else if (val == '2') {
+          Future.delayed(const Duration(seconds: 2), () {
+            //login page
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const Login()));
+          });
+        } else {
+          Future.delayed(const Duration(seconds: 2), () {
+            //choose language page
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const Languages()));
+          });
+        }
+      } else {
+        setState(() {});
+      }
+    } catch (e) {
+      if (internet == true) {
+        if (_error == false) {
+          setState(() {
+            _error = true;
+          });
+          getData();
+        }
+      } else {
+        setState(() {});
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +143,7 @@ class _LoadingPageState extends State<LoadingPage> {
             Container(
               height: media.height * 1,
               width: media.width * 1,
-              color: page,
+              color: buttonColor,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -127,7 +153,7 @@ class _LoadingPageState extends State<LoadingPage> {
                     height: media.width * 0.429,
                     decoration: const BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage('assets/images/logo.png'),
+                            image: AssetImage('assets/images/logotext.png'),
                             fit: BoxFit.contain)),
                   ),
                 ],

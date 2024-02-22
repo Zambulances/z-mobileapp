@@ -54,8 +54,11 @@ class _ButtonState extends State<Button> {
             widget.text,
             style: GoogleFonts.roboto(
                 fontSize: media.width * sixteen,
-                color:
-                    (widget.textcolor != null) ? widget.textcolor : (isDarkTheme == true) ? Colors.black : buttonText,
+                color: (widget.textcolor != null)
+                    ? widget.textcolor
+                    : (isDarkTheme == true)
+                        ? Colors.black
+                        : buttonText,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1),
           ),
@@ -105,13 +108,19 @@ class _InputFieldState extends State<InputField> {
           counterText: '',
           focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-            color: (isDarkTheme == true) ? textColor.withOpacity(0.7) : inputfocusedUnderline,
+            color: (isDarkTheme == true)
+                ? textColor.withOpacity(0.7)
+                : inputfocusedUnderline,
             width: 1.2,
             style: BorderStyle.solid,
           )),
           enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(
-            color: (widget.color == null) ? (isDarkTheme == true) ? textColor.withOpacity(0.5) : inputUnderline : widget.color,
+            color: (widget.color == null)
+                ? (isDarkTheme == true)
+                    ? textColor.withOpacity(0.5)
+                    : inputUnderline
+                : widget.color,
             width: 1.2,
             style: BorderStyle.solid,
           )),
@@ -125,11 +134,10 @@ class _InputFieldState extends State<InputField> {
           hintText: widget.text,
           hintStyle: GoogleFonts.roboto(
             fontSize: media.width * sixteen,
-            color: (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor,
+            color:
+                (isDarkTheme == true) ? textColor.withOpacity(0.4) : hintColor,
           )),
-          style: GoogleFonts.roboto(
-            color: textColor
-          ),
+      style: GoogleFonts.roboto(color: textColor),
       onChanged: widget.onTap,
     );
   }

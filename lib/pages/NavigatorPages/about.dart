@@ -51,7 +51,10 @@ class _AboutState extends State<About> {
                                 onTap: () {
                                   Navigator.pop(context);
                                 },
-                                child: Icon(Icons.arrow_back, color: textColor,)))
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: textColor,
+                                )))
                       ],
                     ),
                     SizedBox(
@@ -71,7 +74,7 @@ class _AboutState extends State<About> {
                     //terms and condition
                     InkWell(
                       onTap: () {
-                        openBrowser('https://tagyourtaxi.com/privacy-policy');
+                        openBrowser('${url}terms');
                       },
                       child: Text(
                         languages[choosenLanguage]['text_termsandconditions'],
@@ -87,7 +90,7 @@ class _AboutState extends State<About> {
                     //privacy policy
                     InkWell(
                       onTap: () {
-                        openBrowser('https://tagyourtaxi.com/privacy-policy');
+                        openBrowser('${url}privacy');
                       },
                       child: Text(
                         languages[choosenLanguage]['text_privacy'],
@@ -103,7 +106,7 @@ class _AboutState extends State<About> {
                     //website url
                     InkWell(
                       onTap: () {
-                        openBrowser('https://tagyourtaxi.com/');
+                        openBrowser(url);
                       },
                       child: Text(
                         languages[choosenLanguage]['text_about'],

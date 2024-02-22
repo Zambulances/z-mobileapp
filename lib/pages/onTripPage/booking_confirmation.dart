@@ -25,6 +25,7 @@ import 'dart:ui' as ui;
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart' as perm;
 import 'package:geolocator/geolocator.dart' as geolocs;
+import 'package:share_plus/share_plus.dart';
 
 // ignore: must_be_immutable
 class BookingConfirmation extends StatefulWidget {
@@ -71,7 +72,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
   Location location = Location();
   bool _locationDenied = false;
   bool _isLoading = false;
-  bool _showToast = false;
   LatLng _center = const LatLng(41.4219057, -102.0840772);
   dynamic pinLocationIcon;
   dynamic pinLocationIcon2;
@@ -101,6 +101,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     WidgetsBinding.instance.addObserver(this);
     promoCode = '';
     mapPadding = 0.0;
+    payingVia = 0;
     promoStatus = null;
     serviceNotAvailable = false;
     tripReqError = false;
@@ -111,6 +112,8 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
     super.initState();
   }
+
+  bool islowwalletbalance = false;
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -153,25 +156,30 @@ class _BookingConfirmationState extends State<BookingConfirmation>
 
     if (mounted) {
       timers = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        if (userRequestData.isNotEmpty &&
-            userDetails['accepted_at'] == null &&
-            timing > 0) {
-          timing--;
-          valueNotifierBook.incrementNotifier();
-        } else if (userRequestData.isNotEmpty &&
-            userRequestData['accepted_at'] == null &&
-            timing == 0) {
-          var val = await cancelRequest();
-          if (val == 'logout') {
-            navigateLogout();
-          }
-          setState(() {
-            noDriverFound = true;
-          });
+        if (timing != null) {
+          if (userRequestData.isNotEmpty &&
+              userDetails['accepted_at'] == null &&
+              timing > 0) {
+            timing--;
+            valueNotifierBook.incrementNotifier();
+          } else if (userRequestData.isNotEmpty &&
+              userRequestData['accepted_at'] == null &&
+              timing == 0) {
+            var val = await cancelRequest();
+            if (val == 'logout') {
+              navigateLogout();
+            }
+            setState(() {
+              noDriverFound = true;
+            });
 
-          timers.cancel();
+            timers.cancel();
+          } else {
+            timers.cancel();
+          }
         } else {
-          timers.cancel();
+          timer.cancel();
+          timing = null;
         }
       });
     }
@@ -368,35 +376,13 @@ class _BookingConfirmationState extends State<BookingConfirmation>
     }
   }
 
-      //show toast for demo
-  addToast() {
-    setState(() {
-      _showToast = true;
-    });
-    Future.delayed(const Duration(seconds: 5), () {
-      setState(() {
-        _showToast = false;
-      });
-    });
-  }
-
 //add drop marker
   addPickDropMarker() async {
     addMarker();
     if (widget.type == null) {
       addDropMarker();
-      // var list = await getPolylines();
-      // addDistanceMarker((list.length / 2).toInt());
-      addToast();
-      if(userRequestData.isEmpty){
-      polyline.add(Polyline(polylineId:const PolylineId('1'),color: buttonColor, points: [addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng , addressList
-        .firstWhere((element) => element.id == 'pickup')
-        .latlng],geodesic: false,width: 5),);
-      }else{
-        polyline.add(Polyline(polylineId:const PolylineId('1'),color: buttonColor, points: [LatLng(double.parse(userRequestData['pick_lat'].toString()), double.parse(userRequestData['pick_lng'].toString())) , LatLng(double.parse(userRequestData['pick_lat'].toString()), double.parse(userRequestData['pick_lng'].toString()))],geodesic: false,width: 5),);
-      }
+
+      getPolylines();
     } else if (widget.type == 1 || widget.type == 2) {
       if (userRequestData.isNotEmpty) {
         CameraUpdate cameraUpdate = CameraUpdate.newLatLng(
@@ -648,10 +634,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                   if (e['is_active'] == 1 &&
                                       e['is_available'] == true) {
                                     if (((e['vehicle_types'] != null &&
-                                            ((widget.type != 1 &&
-                                                    e['vehicle_types'].contains(
-                                                        etaDetails[choosenVehicle]
-                                                            ['type_id'])) ||
+                                            ((widget.type != 1 && e['vehicle_types'].contains(etaDetails[choosenVehicle]['type_id'])) ||
                                                 (widget.type == 1 &&
                                                     e['vehicle_types'].contains(
                                                         rentalOption[choosenVehicle]
@@ -772,22 +755,10 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         }
                                       }
                                     } else if (((e['vehicle_types'] != null &&
-                                            ((widget.type != 1 &&
-                                                    e['vehicle_types'].contains(
-                                                        etaDetails[choosenVehicle]
-                                                            ['type_id'])) ||
+                                            ((widget.type != 1 && e['vehicle_types'].contains(etaDetails[choosenVehicle]['type_id'])) ||
                                                 (widget.type == 1 &&
-                                                    e['vehicle_types'].contains(
-                                                        rentalOption[choosenVehicle]
-                                                            ['type_id'])))) ||
-                                        ((widget.type != 1 &&
-                                                e['vehicle_type'] ==
-                                                    etaDetails[choosenVehicle]
-                                                        ['type_id']) ||
-                                            (widget.type == 1 &&
-                                                e['vehicle_type'] ==
-                                                    rentalOption[choosenVehicle]
-                                                        ['type_id'])))) {
+                                                    e['vehicle_types'].contains(rentalOption[choosenVehicle]['type_id'])))) ||
+                                        ((widget.type != 1 && e['vehicle_type'] == etaDetails[choosenVehicle]['type_id']) || (widget.type == 1 && e['vehicle_type'] == rentalOption[choosenVehicle]['type_id'])))) {
                                       DateTime dt =
                                           DateTime.fromMillisecondsSinceEpoch(
                                               e['updated_at']);
@@ -929,7 +900,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                     pinLocationIcon != null)
                                 ? FirebaseDatabase.instance
                                     .ref(
-                                        'drivers/${userRequestData['driverDetail']['data']['id']}')
+                                        'drivers/driver_${userRequestData['driverDetail']['data']['id']}')
                                     .onValue
                                     .asBroadcastStream()
                                 : null,
@@ -1143,7 +1114,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                     etaDetails.clear();
                                                     promoKey.clear();
                                                     promoStatus = null;
-
+                                                    rentalOption.clear();
                                                     _rideLaterSuccess = false;
                                                     myMarker.clear();
                                                     Navigator.pushAndRemoveUntil(
@@ -1190,6 +1161,50 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         crossAxisAlignment:
                                             CrossAxisAlignment.end,
                                         children: [
+                                          if (userRequestData.isNotEmpty &&
+                                              userRequestData['accepted_at'] !=
+                                                  null)
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () async {
+                                                    await Share.share(
+                                                        'Your Driver is ${userRequestData['driverDetail']['data']['name']}. ${userRequestData['driverDetail']['data']['car_color']} ${userRequestData['driverDetail']['data']['car_make_name']} ${userRequestData['driverDetail']['data']['car_model_name']}, Vehicle Number: ${userRequestData['driverDetail']['data']['car_number']}. Track with link: ${url}track/request/${userRequestData['id']}');
+                                                  },
+                                                  child: Container(
+                                                      height: media.width * 0.1,
+                                                      width: media.width * 0.25,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      media.width *
+                                                                          0.02),
+                                                          color: buttonColor),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        languages[
+                                                                choosenLanguage]
+                                                            ['text_shareride'],
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: media
+                                                                        .width *
+                                                                    sixteen,
+                                                                color: page),
+                                                      )),
+                                                ),
+                                              ],
+                                            ),
+                                          SizedBox(
+                                            height: media.width * 0.05,
+                                          ),
                                           (userRequestData.isNotEmpty &&
                                                   userRequestData[
                                                           'is_trip_start'] ==
@@ -1213,7 +1228,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                       0.2),
                                                               spreadRadius: 2)
                                                         ],
-                                                        // color: buttonColor,
                                                         color: buttonColor,
                                                         borderRadius:
                                                             BorderRadius
@@ -1270,7 +1284,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                     geolocs
                                                                         .LocationAccuracy
                                                                         .low);
-                                                        
+
                                                         if (await geolocs
                                                             .GeolocatorPlatform
                                                             .instance
@@ -1470,7 +1484,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                         setState(() {
                                                                                           choosenVehicle = i;
                                                                                         });
-                                                                                      
                                                                                       },
                                                                                       child: Container(
                                                                                         padding: EdgeInsets.all(media.width * 0.03),
@@ -1688,7 +1701,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                                                   // ignore: avoid_function_literals_in_foreach_calls
                                                                                                   vehicleList.forEach(
                                                                                                     (e) async {
-                                                                                                      if (e['is_active'] == 1 && e['is_available'] == true && e['vehicle_type'] == rentalOption[i]['type_id']) {
+                                                                                                      if (e['is_active'] == 1 && e['is_available'] == true && e['vehicle_type'] == rentalOption[i]['type_id'] || (e['vehicle_types'] != null && e['vehicle_types'].contains(rentalOption[i]['type_id']))) {
                                                                                                         DateTime dt = DateTime.fromMillisecondsSinceEpoch(e['updated_at']);
                                                                                                         if (DateTime.now().difference(dt).inMinutes <= 2) {
                                                                                                           vehicles.add(e);
@@ -2391,63 +2404,91 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                   0.9,
                                                           color: buttonColor,
                                                           onTap: () async {
-                                                            setState(() {
-                                                              _isLoading = true;
-                                                            });
-                                                            dynamic result;
-                                                            if (choosenVehicle !=
-                                                                null) {
-                                                              if (widget.type !=
-                                                                  1) {
-                                                                if (etaDetails[
-                                                                            choosenVehicle]
-                                                                        [
-                                                                        'has_discount'] ==
-                                                                    false) {
-                                                                  result =
-                                                                      await createRequest();
-                                                                  if (result ==
-                                                                      'logout') {
-                                                                    navigateLogout();
+                                                            if (((rentalOption.isEmpty && (etaDetails[choosenVehicle]['user_wallet_balance'] >= etaDetails[choosenVehicle]['total'] && etaDetails[choosenVehicle]['has_discount'] == false) || (rentalOption.isEmpty && etaDetails[choosenVehicle]['has_discount'] == true && etaDetails[choosenVehicle]['user_wallet_balance'] >= etaDetails[choosenVehicle]['discounted_totel'])) ||
+                                                                    (rentalOption.isEmpty &&
+                                                                        etaDetails[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] !=
+                                                                            'wallet')) ||
+                                                                ((rentalOption
+                                                                            .isNotEmpty &&
+                                                                        etaDetails[0]['user_wallet_balance'] >=
+                                                                            rentalOption[choosenVehicle][
+                                                                                'fare_amount'] &&
+                                                                        rentalOption[choosenVehicle]['has_discount'] ==
+                                                                            false) ||
+                                                                    (rentalOption.isNotEmpty &&
+                                                                        rentalOption[choosenVehicle]['has_discount'] ==
+                                                                            true &&
+                                                                        rentalOption[choosenVehicle]['user_wallet_balance'] >=
+                                                                            rentalOption[choosenVehicle][
+                                                                                'discounted_totel']) ||
+                                                                    rentalOption.isNotEmpty &&
+                                                                        rentalOption[choosenVehicle]['payment_type'].toString().split(',').toList()[payingVia] !=
+                                                                            'wallet')) {
+                                                              setState(() {
+                                                                _isLoading =
+                                                                    true;
+                                                              });
+                                                              dynamic result;
+                                                              if (choosenVehicle !=
+                                                                  null) {
+                                                                if (widget
+                                                                        .type !=
+                                                                    1) {
+                                                                  if (etaDetails[
+                                                                              choosenVehicle]
+                                                                          [
+                                                                          'has_discount'] ==
+                                                                      false) {
+                                                                    result =
+                                                                        await createRequest();
+                                                                    if (result ==
+                                                                        'logout') {
+                                                                      navigateLogout();
+                                                                    }
+                                                                  } else {
+                                                                    result =
+                                                                        await createRequestWithPromo();
+                                                                    if (result ==
+                                                                        'logout') {
+                                                                      navigateLogout();
+                                                                    }
                                                                   }
                                                                 } else {
-                                                                  result =
-                                                                      await createRequestWithPromo();
-                                                                  if (result ==
-                                                                      'logout') {
-                                                                    navigateLogout();
-                                                                  }
-                                                                }
-                                                              } else {
-                                                                if (rentalOption[
-                                                                            choosenVehicle]
-                                                                        [
-                                                                        'has_discount'] ==
-                                                                    false) {
-                                                                  result =
-                                                                      await createRentalRequest();
-                                                                  if (result ==
-                                                                      'logout') {
-                                                                    navigateLogout();
-                                                                  }
-                                                                } else {
-                                                                  result =
-                                                                      await createRentalRequestWithPromo();
-                                                                  if (result ==
-                                                                      'logout') {
-                                                                    navigateLogout();
+                                                                  if (rentalOption[
+                                                                              choosenVehicle]
+                                                                          [
+                                                                          'has_discount'] ==
+                                                                      false) {
+                                                                    result =
+                                                                        await createRentalRequest();
+                                                                    if (result ==
+                                                                        'logout') {
+                                                                      navigateLogout();
+                                                                    }
+                                                                  } else {
+                                                                    result =
+                                                                        await createRentalRequestWithPromo();
+                                                                    if (result ==
+                                                                        'logout') {
+                                                                      navigateLogout();
+                                                                    }
                                                                   }
                                                                 }
                                                               }
+                                                              if (result ==
+                                                                  'success') {
+                                                                timer();
+                                                              }
+                                                              setState(() {
+                                                                _isLoading =
+                                                                    false;
+                                                              });
+                                                            } else {
+                                                              setState(() {
+                                                                islowwalletbalance =
+                                                                    true;
+                                                              });
                                                             }
-                                                            if (result ==
-                                                                'success') {
-                                                              timer();
-                                                            }
-                                                            setState(() {
-                                                              _isLoading =
-                                                                  false;
-                                                            });
                                                           },
                                                           text: languages[
                                                                   choosenLanguage]
@@ -2520,7 +2561,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                       borderRadius:
                                                           BorderRadius.circular(
                                                               12),
-                                                    
                                                       color: page),
                                                   padding: EdgeInsets.all(
                                                       media.width * 0.05),
@@ -3089,6 +3129,66 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                             choosenLanguage]
                                                         ['text_tryagain'])
                                               ],
+                                            ),
+                                          ))
+                                      : Container(),
+                                  //islowwallet balance popup
+                                  (islowwalletbalance == true)
+                                      ? Positioned(
+                                          bottom: 0,
+                                          child: Container(
+                                            width: media.width * 1,
+                                            height: media.height * 1,
+                                            color:
+                                                Colors.black.withOpacity(0.4),
+                                            padding: EdgeInsets.all(
+                                                media.width * 0.05),
+                                            alignment: Alignment.center,
+                                            child: Container(
+                                              width: media.width * 0.9,
+                                              height: media.width * 0.4,
+                                              padding: EdgeInsets.all(
+                                                  media.width * 0.05),
+                                              decoration: BoxDecoration(
+                                                  color: page,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          media.width * 0.04)),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                      languages[
+                                                              choosenLanguage]
+                                                          [
+                                                          'text_wallet_balance_low'],
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                              fontSize: media
+                                                                      .width *
+                                                                  sixteen,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color: textColor),
+                                                      textAlign:
+                                                          TextAlign.center),
+                                                  Button(
+                                                      width: media.width * 0.4,
+                                                      height: media.width * 0.1,
+                                                      onTap: () {
+                                                        setState(() {
+                                                          islowwalletbalance =
+                                                              false;
+                                                        });
+                                                      },
+                                                      text: languages[
+                                                              choosenLanguage]
+                                                          ['text_ok'])
+                                                ],
+                                              ),
                                             ),
                                           ))
                                       : Container(),
@@ -3944,7 +4044,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           bottom: 0,
                                           child: GestureDetector(
                                             onPanUpdate: (val) {
-                                              // print(val.delta.dy);
                                               if (val.delta.dy > 0 &&
                                                   _ontripBottom == true) {
                                                 setState(() {
@@ -5451,7 +5550,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                           child: Container(
                                             height: media.height * 1,
                                             width: media.width * 1,
-                                           
                                             color: (isDarkTheme == true)
                                                 ? textColor.withOpacity(0.2)
                                                 : Colors.transparent
@@ -5799,26 +5897,6 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                         ))
                                       : Container(),
 
-                                      (_showToast == true)
-                        ? Positioned(
-                            top: media.height * 0.2,
-                            child: Container(
-                              width: media.width * 0.9,
-                              margin: EdgeInsets.all(media.width * 0.05),
-                              padding: EdgeInsets.all(media.width * 0.025),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: page),
-                              child: Text(
-                                'Route Poly line is not available in demo',
-                                style: GoogleFonts.roboto(
-                                    fontSize: media.width * twelve,
-                                    color: textColor),
-                                textAlign: TextAlign.center,
-                              ),
-                            ))
-                        : Container(),
-
                                   //loader
                                   (_isLoading == true)
                                       ? const Positioned(
@@ -6012,7 +6090,7 @@ class _BookingConfirmationState extends State<BookingConfirmation>
                                                                           Radius.circular(
                                                                               10))
                                                                   : const BorderRadius
-                                                                          .only(
+                                                                      .only(
                                                                       topRight:
                                                                           Radius.circular(
                                                                               10),

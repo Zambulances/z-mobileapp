@@ -264,7 +264,6 @@ class _SosState extends State<Sos> {
                             child: Container(
                               height: media.height * 1,
                               width: media.width * 1,
-                              // color: Colors.transparent.withOpacity(0.6),
                               color: (isDarkTheme == true)
                                   ? textColor.withOpacity(0.2)
                                   : Colors.transparent.withOpacity(0.6),

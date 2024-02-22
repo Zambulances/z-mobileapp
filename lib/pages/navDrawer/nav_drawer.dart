@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:tagxiuser/functions/functions.dart';
 import 'package:tagxiuser/pages/NavigatorPages/about.dart';
@@ -24,6 +25,38 @@ class NavDrawer extends StatefulWidget {
 }
 
 class _NavDrawerState extends State<NavDrawer> {
+  themefun() async {
+    if (isDarkTheme) {
+      isDarkTheme = false;
+
+      page = Colors.white;
+      textColor = Colors.black;
+      buttonColor = theme;
+      loaderColor = theme;
+      buttonText = const Color(0xffFFFFFF);
+    } else {
+      isDarkTheme = true;
+      page = Colors.black;
+      textColor = Colors.white;
+      buttonColor = Colors.white;
+      loaderColor = Colors.white;
+      buttonText = Colors.black;
+    }
+    // await getDetailsOfDevice();
+    if (isDarkTheme == true) {
+      rootBundle.loadString('assets/dark.json').then((value) {
+        mapStyle = value;
+      });
+    } else {
+      rootBundle.loadString('assets/map_style_black.json').then((value) {
+        mapStyle = value;
+      });
+    }
+
+    pref.setBool('isDarkTheme', isDarkTheme);
+    valueNotifierHome.incrementNotifier();
+  }
+
   @override
   Widget build(BuildContext context) {
     var media = MediaQuery.of(context).size;
@@ -134,66 +167,54 @@ class _NavDrawerState extends State<NavDrawer> {
                               width: media.width * 0.7,
                               child: Column(
                                 children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        padding:
-                                            EdgeInsets.all(media.width * 0.025),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              isDarkTheme
-                                                  ? Icons.brightness_4_outlined
-                                                  : Icons.brightness_3_rounded,
-                                              size: media.width * 0.075,
-                                              color: textColor,
-                                            ),
-                                            SizedBox(
-                                              width: media.width * 0.025,
-                                            ),
-                                            SizedBox(
-                                              width: media.width * 0.35,
-                                              child: Text(
-                                                languages[choosenLanguage]
-                                                    ['text_select_theme'],
-                                                overflow: TextOverflow.ellipsis,
-                                                style: GoogleFonts.roboto(
-                                                    fontSize:
-                                                        media.width * sixteen,
-                                                    color: textColor),
+                                  InkWell(
+                                    onTap: () async {
+                                      themefun();
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.all(
+                                              media.width * 0.025),
+                                          child: Row(
+                                            children: [
+                                              Icon(
+                                                isDarkTheme
+                                                    ? Icons
+                                                        .brightness_4_outlined
+                                                    : Icons
+                                                        .brightness_3_rounded,
+                                                size: media.width * 0.075,
+                                                color: textColor,
                                               ),
-                                            )
-                                          ],
+                                              SizedBox(
+                                                width: media.width * 0.025,
+                                              ),
+                                              SizedBox(
+                                                width: media.width * 0.35,
+                                                child: Text(
+                                                  languages[choosenLanguage]
+                                                      ['text_select_theme'],
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: GoogleFonts.roboto(
+                                                      fontSize:
+                                                          media.width * sixteen,
+                                                      color: textColor),
+                                                ),
+                                              )
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      Switch(
-                                          value: isDarkTheme,
-                                          onChanged: (toggle) async {
-                                            isDarkTheme = toggle;
-                                            await getDetailsOfDevice();
-                                            if (toggle == true) {
-                                              page = Colors.black;
-                                              textColor = Colors.white;
-                                              buttonColor = Colors.white;
-                                              loaderColor = Colors.white;
-                                              buttonText = Colors.black;
-                                            } else {
-                                              page = Colors.white;
-                                              textColor = Colors.black;
-                                              buttonColor =
-                                                  theme;
-                                              loaderColor =
-                                                  theme;
-                                                  buttonText = const Color(0xffFFFFFF);
-                                            }
-                                            pref.setBool(
-                                                'isDarkTheme', isDarkTheme);
-                                            valueNotifierHome
-                                                .incrementNotifier();
-                                          }),
-                                    ],
+                                        Switch(
+                                            value: isDarkTheme,
+                                            onChanged: (toggle) async {
+                                              themefun();
+                                            }),
+                                      ],
+                                    ),
                                   ),
 
                                   //notification
@@ -271,11 +292,13 @@ class _NavDrawerState extends State<NavDrawer> {
                                                         userDetails[
                                                                 'notifications_count']
                                                             .toString(),
-                                                        style: GoogleFonts.roboto(
-                                                            fontSize:
-                                                                media.width *
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                                fontSize: media
+                                                                        .width *
                                                                     fourteen,
-                                                            color:  buttonText),
+                                                                color:
+                                                                    buttonText),
                                                       ),
                                                     )
                                             ],
@@ -324,7 +347,7 @@ class _NavDrawerState extends State<NavDrawer> {
 
                                   //wallet page
                                   if (userDetails[
-                                          'show_bank_info_feature_on_mobile_app'] ==
+                                          'show_wallet_feature_on_mobile_app'] ==
                                       "1")
                                     InkWell(
                                       onTap: () {

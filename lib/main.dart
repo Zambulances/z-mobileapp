@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
             builder: (context, value, child) {
               return MaterialApp(
                   debugShowCheckedModeBanner: false,
-                  title: 'Tagxi User',
+                  title: 'product.name',
                   theme: ThemeData(),
                   home: const LoadingPage());
             }));

@@ -42,9 +42,6 @@ class _PickContactState extends State<PickContact> {
 //get contact permission
   getContactPermission() async {
     var status = await Permission.contacts.status;
-    // if (status != PermissionStatus.granted) {
-    //   status = await Permission.contacts.request();
-    // }
     return status;
   }
 
@@ -300,65 +297,56 @@ class _PickContactState extends State<PickContact> {
               ),
 
               //logout popup
-                              (_noPermission == true)
-                                  ? Positioned(
-                                      top: 0,
-                                      child: Container(
-                                        height: media.height * 1,
-                                        width: media.width * 1,
-                                        // color:
-                                        //     Colors.transparent.withOpacity(0.6),
-                                        color: (isDarkTheme == true)
-                                            ? textColor.withOpacity(0.2)
-                                            : Colors.transparent
-                                                .withOpacity(0.6),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.all(
-                                                  media.width * 0.05),
-                                              width: media.width * 0.9,
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  color: page),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    languages[choosenLanguage]
-                                                        ['text_contact_permission'],
-                                                    textAlign: TextAlign.center,
-                                                    style: GoogleFonts.roboto(
-                                                        fontSize: media.width *
-                                                            sixteen,
-                                                        color: textColor,
-                                                        fontWeight:
-                                                            FontWeight.w600),
-                                                  ),
-                                                  SizedBox(
-                                                    height: media.width * 0.05,
-                                                  ),
-                                                  Button(
-                                                      onTap: () async {
-                                                        await Permission.contacts.request();
-                                                        setState(() {
-                                                          _isLoading = true;
-                                                          _noPermission = false;
-                                                        });
-                                                      getContact();
-                                                      },
-                                                      text: languages[
-                                                              choosenLanguage]
-                                                          ['text_confirm'])
-                                                ],
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ))
-                                  : Container(),
+              (_noPermission == true)
+                  ? Positioned(
+                      top: 0,
+                      child: Container(
+                        height: media.height * 1,
+                        width: media.width * 1,
+                        color: (isDarkTheme == true)
+                            ? textColor.withOpacity(0.2)
+                            : Colors.transparent.withOpacity(0.6),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.all(media.width * 0.05),
+                              width: media.width * 0.9,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: page),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    languages[choosenLanguage]
+                                        ['text_contact_permission'],
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.roboto(
+                                        fontSize: media.width * sixteen,
+                                        color: textColor,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(
+                                    height: media.width * 0.05,
+                                  ),
+                                  Button(
+                                      onTap: () async {
+                                        await Permission.contacts.request();
+                                        setState(() {
+                                          _isLoading = true;
+                                          _noPermission = false;
+                                        });
+                                        getContact();
+                                      },
+                                      text: languages[choosenLanguage]
+                                          ['text_confirm'])
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ))
+                  : Container(),
 
               //permission denied error
               (_contactDenied == true)

@@ -12,7 +12,6 @@ import 'package:tagxiuser/translations/translation.dart';
 import 'package:tagxiuser/widgets/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-
 // ignore: must_be_immutable
 class CcavenuePage extends StatefulWidget {
   dynamic from;
@@ -29,14 +28,18 @@ class _CcavenuePageState extends State<CcavenuePage> {
   // final plugin = PaystackPlugin();
   @override
   void initState() {
-      payMoney();
-      super.initState();
-    
+    payMoney();
+    super.initState();
   }
 
-  navigateLogout(){
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const Login()), (route) => false);
+  navigateLogout() {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
+        (route) => false);
   }
+
+  late final WebViewController _controller;
 
 //payment gateway code
 
@@ -48,19 +51,44 @@ class _CcavenuePageState extends State<CcavenuePage> {
     } else {
       val = await getCcavenuePayment(jsonEncode({'amount': addMoney}));
     }
-    
-      
-    if(val == 'logout'){
+
+    if (val == 'logout') {
       navigateLogout();
-    }
-    else if (val != 'success') {
+    } else if (val != 'success') {
       _error = val.toString();
+    } else {
+      late final PlatformWebViewControllerCreationParams params;
+
+      params = const PlatformWebViewControllerCreationParams();
+
+      final WebViewController controller =
+          WebViewController.fromPlatformCreationParams(params);
+      // #enddocregion platform_features
+
+      controller
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..setBackgroundColor(const Color(0x00000000))
+        ..setNavigationDelegate(
+          NavigationDelegate(
+            onWebResourceError: (WebResourceError error) {
+              debugPrint('''
+Page resource error:
+  code: ${error.errorCode}
+  description: ${error.description}
+  errorType: ${error.errorType}
+  isForMainFrame: ${error.isForMainFrame}
+          ''');
+            },
+          ),
+        )
+        ..loadRequest(Uri.parse(ccUrl));
+      _controller = controller;
     }
-  if(mounted){
-    setState(() {
-      _isLoading = false;
-    });
-  }
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -81,8 +109,7 @@ class _CcavenuePageState extends State<CcavenuePage> {
                 child: Stack(
                   children: [
                     Container(
-                      padding: EdgeInsets.fromLTRB(0,
-                          media.width * 0.05, 0, 0),
+                      padding: EdgeInsets.fromLTRB(0, media.width * 0.05, 0, 0),
                       height: media.height * 1,
                       width: media.width * 1,
                       color: page,
@@ -115,14 +142,8 @@ class _CcavenuePageState extends State<CcavenuePage> {
                             height: media.width * 0.05,
                           ),
                           Expanded(
-                            child: (ccUrl != '' &&
-                                    _error == '') ?
-                                WebView(
-                                    initialUrl:
-                                        ccUrl,
-                                        javascriptMode: JavascriptMode.unrestricted,
-                                    userAgent: 'Flutter;Webview',
-                                  )
+                            child: (ccUrl != '' && _error == '')
+                                ? WebViewWidget(controller: _controller)
                                 : Container(),
                           )
                         ],

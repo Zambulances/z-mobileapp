@@ -73,7 +73,8 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                 onTap: () {
                                   Navigator.pop(context, false);
                                 },
-                                child: Icon(Icons.arrow_back, color: textColor)))
+                                child:
+                                    Icon(Icons.arrow_back, color: textColor)))
                       ],
                     ),
                     SizedBox(
@@ -128,8 +129,11 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     border: Border.all(
-                                                        color: (isDarkTheme == true) ? textColor : const Color(
-                                                            0xff222222),
+                                                        color: (isDarkTheme ==
+                                                                true)
+                                                            ? textColor
+                                                            : const Color(
+                                                                0xff222222),
                                                         width: 1.2)),
                                                 alignment: Alignment.center,
                                                 child: (_choosenLanguage == i)
@@ -138,11 +142,10 @@ class _SelectLanguageState extends State<SelectLanguage> {
                                                             media.width * 0.03,
                                                         width:
                                                             media.width * 0.03,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                color: (isDarkTheme ==
+                                                        decoration: BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: (isDarkTheme ==
                                                                     true)
                                                                 ? textColor
                                                                 : const Color(

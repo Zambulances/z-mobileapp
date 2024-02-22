@@ -175,12 +175,9 @@ class _ReviewState extends State<Review> {
                       decoration: InputDecoration(
                           hintText: languages[choosenLanguage]['text_feedback'],
                           hintStyle: GoogleFonts.roboto(
-                            color: textColor.withOpacity(0.6)
-                          ),
+                              color: textColor.withOpacity(0.6)),
                           border: InputBorder.none),
-                      style: GoogleFonts.roboto(
-                        color: textColor
-                      ),    
+                      style: GoogleFonts.roboto(color: textColor),
                     ),
                   ),
                   SizedBox(
